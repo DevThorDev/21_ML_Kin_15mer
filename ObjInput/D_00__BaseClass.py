@@ -12,9 +12,6 @@ sNmSpec = 'Data for the BaseClass class in O_00__BaseClass'
 cSep = GC.S_SEMICOL
 
 # --- names and paths of files and dirs ---------------------------------------
-sFXtCSV = GC.S_DOT + GC.S_EXT_CSV
-sFXtPDF = GC.S_DOT + GC.S_EXT_PDF
-sFXtPTH = GC.S_DOT + GC.S_EXT_PTH
 
 # --- strings -----------------------------------------------------------------
 
@@ -25,9 +22,6 @@ dIO = {# --- general
        # --- data specific
        'cSep': cSep,
        # --- names and paths of files and dirs
-       'sFXtCSV': sFXtCSV,
-       'sFXtPDF': sFXtPDF,
-       'sFXtPTH': sFXtPTH,
        # --- strings
        }
 

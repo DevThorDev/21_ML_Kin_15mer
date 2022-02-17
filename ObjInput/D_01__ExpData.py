@@ -29,6 +29,8 @@ mDsp = 1000
 
 # --- strings -----------------------------------------------------------------
 s0 = GC.S_0
+sNULL = 'NULL'
+lSCKinF = ['Effector', 'Target']
 sC15mer = 'c15mer'
 
 # --- lists -------------------------------------------------------------------
@@ -58,6 +60,8 @@ dIO = {# --- general
        'mDsp': mDsp,
        # --- strings
        's0': s0,
+       'sNULL': sNULL,
+       'lSCKinF': lSCKinF,
        'sC15mer': sC15mer,
        # --- lists
        # --- dictionaries

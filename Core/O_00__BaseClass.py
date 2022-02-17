@@ -32,7 +32,7 @@ class BaseClass:
         print(GC.S_DS31, 'Type dictionary:', GC.S_DS31)
         pprint.pprint(self.dITp)
 
-    def printRawInpDfrs(self):
+    def printInpDfrs(self):
         print(GC.S_DS80)
         print(GC.S_DS24, 'Raw input Kinase targets data:', GC.S_DS24)
         print(self.dfrKin)

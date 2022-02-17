@@ -26,7 +26,7 @@ print(cData)
 cData.procExpData()
 cData.printDIG()
 cData.printDITp()
-cData.printRawInpDfrs()
+cData.printInpDfrs()
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

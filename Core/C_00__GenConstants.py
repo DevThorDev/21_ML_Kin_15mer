@@ -77,6 +77,7 @@ P_DIR_RAW_INP_TEST = os.path.join(P_DIR_INP, DIR_RAW_INP_TEST)
 P_DIR_PROC_INP = os.path.join(P_DIR_INP, DIR_PROC_INP)
 P_DIR_PROC_INP_TEST = os.path.join(P_DIR_INP, DIR_PROC_INP_TEST)
 
+S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'
 S_EXT_PDF = 'pdf'
 S_EXT_PTH = 'pth'

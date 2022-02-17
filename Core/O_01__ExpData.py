@@ -35,6 +35,25 @@ class ExpData(BaseClass):
             self.pDirProcInp = self.dITp['pDirProcInp']
 
     # --- methods for processing experimental data ----------------------------
+    def filterRawDataKin(self, nDig=GC.R04):
+        cDfr, lColF = self.dfrKin, self.dITp['lSCKinF']
+        # remove lines with "NaN" or "NULL" in all columns (excl. cColExcl)
+        nR0 = cDfr.shape[0]
+        cDfr.dropna(axis=0, subset=lColF, inplace=True)
+        nR1 = cDfr.shape[0]
+        for sC in lColF:
+            cDfr = cDfr[cDfr[sC] != self.dITp['sNULL']]
+        cDfr.reset_index(drop=True, inplace=True)
+        nR2 = cDfr.shape[0]
+        print(GC.S_DS80, GC.S_NEWL, 'Rows with "NaN" in columns ', lColF, ': ',
+              nR0-nR1, ' of ', nR0, '\t(', round((nR0-nR1)/nR0*100., nDig),
+              '%)', sep='')
+        print('Rows with "', self.dITp['sNULL'], '" in columns ', lColF, ': ',
+              nR1-nR2, ' of ', nR0, '\t(', round((nR1-nR2)/nR0*100., nDig),
+              '%)', GC.S_NEWL, GC.S_DS80, sep='')
+        self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp,
+                                            self.dITp['sFProcInpKin']))
+
     def filterSnippetLen(self, nDig=GC.R04):
         cDfr, cCol = self.dfr15mer, self.dITp['sC15mer']
         lCol, nR0 = list(cDfr.columns), cDfr.shape[0]
@@ -45,17 +64,25 @@ class ExpData(BaseClass):
         # remove lines with the wrong length of the 15mer
         cDfr['lenS'] = [len(cDfr.at[k, cCol]) for k in range(cDfr.shape[0])]
         cDfr = cDfr[cDfr['lenS'] == self.dITp['lenSDef']]
+        cDfr.reset_index(drop=True, inplace=True)
         nR2 = cDfr.shape[0]
         print(GC.S_DS80, GC.S_NEWL, 'Rows with "NaN" in column "', cCol, '": ',
               nR0-nR1, ' of ', nR0, '\t\t(', round((nR0-nR1)/nR0*100., nDig),
               '%)', sep='')
         print('Rows with length of snippet not ', self.dITp['lenSDef'], ': ',
-              nR1-nR2, ' of ', nR0, '\t(',  round((nR1-nR2)/nR0*100., nDig),
+              nR1-nR2, ' of ', nR0, '\t(', round((nR1-nR2)/nR0*100., nDig),
               '%)', GC.S_NEWL, GC.S_DS80, sep='')
         self.saveDfr(cDfr[lCol], pF=GF.joinToPath(self.pDirProcInp,
                                                   self.dITp['sFProcInp15mer']))
 
+    def matchKinTargetCode(self):
+        pass
+
+    def combineInpDfr(self):
+        pass
+
     def procExpData(self, nDigDsp=GC.R04):
+        self.filterRawDataKin(nDig=nDigDsp)
         self.filterSnippetLen(nDig=nDigDsp)
 
 # --- methods initialising and updating dictionaries --------------------------
