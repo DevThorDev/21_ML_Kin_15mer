@@ -88,6 +88,9 @@ S_TYPE = 'Type'
 S_MD_A = S_CAP_A
 S_MD_B = S_CAP_B
 S_MD_C = S_CAP_C
+S_POS_P_SITE = 'PosPSite'
+S_LEN_SNIP = 'lenSnip'
+S_CODE_TRUNC = 'code_trunc'
 
 # --- predefined numbers ------------------------------------------------------
 R01 = 1

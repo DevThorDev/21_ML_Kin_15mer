@@ -16,6 +16,7 @@ class BaseClass:
         self.dIG = inpDat.dI
         self.dITp = copy.deepcopy(self.dIG[0])      # type of base class = 0
         self.dfrKin, self.dfr15mer = None, None
+        self.lDfrInp = [self.dfrKin, self.dfr15mer]
         print('Initiated "BaseClass" base object.')
 
     # --- print methods -------------------------------------------------------

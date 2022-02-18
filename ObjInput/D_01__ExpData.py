@@ -23,17 +23,25 @@ pDirProcInp = GC.P_DIR_PROC_INP
 pDirProcInp_Test = GC.P_DIR_PROC_INP_TEST
 
 # --- numbers -----------------------------------------------------------------
-lenSnippet = 15
+lenSnippetDef = 15
 
 mDsp = 1000
 
 # --- strings -----------------------------------------------------------------
 s0 = GC.S_0
 sNULL = 'NULL'
-lSCKinF = ['Effector', 'Target']
+sSeq = 'Seq'
+sEffCode = 'Effector'
+sTargCode = 'Target'
+sPSite = 'pSite'
+sPosPSite = GC.S_POS_P_SITE
+sCCode = 'code'
 sC15mer = 'c15mer'
+sLenSnip = GC.S_LEN_SNIP
+sCodeTrunc = GC.S_CODE_TRUNC
 
 # --- lists -------------------------------------------------------------------
+lSCKinF = [sEffCode, sTargCode]
 
 # --- dictionaries ------------------------------------------------------------
 
@@ -56,16 +64,24 @@ dIO = {# --- general
        'pDirProcInp': pDirProcInp,
        'pDirProcInp_T': pDirProcInp_Test,
        # --- numbers
-       'lenSDef': lenSnippet,
+       'lenSDef': lenSnippetDef,
        'mDsp': mDsp,
        # --- strings
        's0': s0,
        'sNULL': sNULL,
-       'lSCKinF': lSCKinF,
+       'sEffCode': sEffCode,
+       'sTargCode': sTargCode,
+       'sPSite': sPSite,
+       'sPosPSite': sPosPSite,
+       'sCCode': sCCode,
        'sC15mer': sC15mer,
+       'sLenSnip': sLenSnip,
+       'sCodeTrunc': sCodeTrunc,
        # --- lists
+       'lSCKinF': lSCKinF,
        # --- dictionaries
        # === derived values and input processing
        }
+dIO['lSFProcInp'] = [dIO['sFProcInpKin'], dIO['sFProcInp15mer']]
 
 ###############################################################################
