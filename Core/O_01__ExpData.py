@@ -101,10 +101,18 @@ class ExpData(BaseClass):
         pass
 
     def combineInpDfr(self):
-        dEffTarg, cDfr = {}, self.dfrKin
-        for s in cDfr['sEffCode'].unique():
-            dfrRed = cDfr[cDfr[self.dITp['sEffCode']] == s]
-            dEffTarg[s] = list(dfrRed[self.dITp['sTargCode']].unique())
+        dEffTarg, dfrK, dfr15m, sumTEMP = {}, self.dfrKin, self.dfr15mer, 0
+        for sEC in dfrK[self.dITp['sEffCode']].unique():
+            dfrEC = dfrK[dfrK[self.dITp['sEffCode']] == sEC]
+            lTC = list(dfrEC[self.dITp['sTargCode']].unique())
+            dEffTarg[sEC] = {}
+            for sTC in lTC:
+                dfrTC = dfr15m[dfr15m[self.dITp['sCodeTrunc']] == sTC]
+                dEffTarg[sEC][sTC] = dfrTC
+                sumTEMP += dfrTC.shape[0]
+        # print('dEffTarg:')
+        # print(dEffTarg)
+        print('sumTEMP:', sumTEMP)
 
     def procExpData(self, nDigDsp=GC.R04):
         self.filterRawDataKin(nDig=nDigDsp)
@@ -112,6 +120,7 @@ class ExpData(BaseClass):
         self.filterRawData15mer(nDig=nDigDsp)
         self.procCol15mer()
         self.saveProcInpDfrs()
+        self.combineInpDfr()
 
 # --- methods initialising and updating dictionaries --------------------------
     def iniDfrs(self):

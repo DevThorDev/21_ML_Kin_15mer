@@ -69,6 +69,7 @@ dIO = {# --- general
        # --- strings
        's0': s0,
        'sNULL': sNULL,
+       'sSeq': sSeq,
        'sEffCode': sEffCode,
        'sTargCode': sTargCode,
        'sPSite': sPSite,
