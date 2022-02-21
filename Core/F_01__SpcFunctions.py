@@ -32,12 +32,11 @@ def dDDfrToDfr(dDDfr, lSColL, lSColR):
     fullDfr = GF.iniPdDfr(lSNmC=lSColL+lSColR)
     for sKMain, cDSub in dDDfr.items():
         for sKSub, rightDfr in cDSub.items():
-            print('(sKMain, sKSub) =', (sKMain, sKSub))
+            # print('(sKMain, sKSub) =', (sKMain, sKSub))
             leftDfr = GF.iniPdDfr(lSNmR=rightDfr.index, lSNmC=lSColL)
-            print('leftDfr =', leftDfr)
-            assert False
+            # print('leftDfr =', leftDfr)
             leftDfr[lSColL[:len(sKMain)]] = sKMain
-            leftDfr[lSColL[len(sKMain):]] = sKSub
+            leftDfr[lSColL[-len(sKSub):]] = sKSub
             subDfr = pd.concat([leftDfr, rightDfr], axis=1)
             fullDfr = pd.concat([fullDfr, subDfr], axis=0)
     return fullDfr.reset_index(drop=True)
