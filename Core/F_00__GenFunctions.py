@@ -134,6 +134,28 @@ def addToDictD(cD, cKMain, cKSub, lV=[]):
     else:
         cD[cKMain] = {cKSub: lV}
 
+def printSizeDDDfr(dDDfr, modeF=False, nDig=GC.R04):
+    nKMain, nKSub = len(dDDfr), sum([len(cDSub) for cDSub in dDDfr.values()])
+    sumNLDfr = 0
+    for cKMain in dDDfr:
+        sumNLDfr += sum([cDfr.shape[0] for cDfr in dDDfr[cKMain].values()])
+    print(GC.S_DS80)
+    print('Number of keys in main dictionary: ', nKMain)
+    print('Sum of numbers of keys in sub-dictionaries:', nKSub)
+    print('Average number of keys of a sub-dictionary:',
+          round(nKSub/nKMain, nDig))
+    print('Sum of numbers of lines of DataFrames:', sumNLDfr)
+    print('Average number of lines of DataFrames per sub-dictionary:',
+          round(sumNLDfr/nKSub, nDig))
+    print('Average number of lines of DataFrames per main dictionary:',
+          round(sumNLDfr/nKMain, nDig))
+    if modeF:
+        print(GC.S_DS80)
+        for cKMain, cDSub in dDDfr.items():
+            dN = {len(cDSub): sum([cDfr.shape[0] for cDfr in cDSub.values()])}
+            print(GC.S_DASH, cKMain, GC.S_ARR_LR, dN)
+    print(GC.S_DS80)
+
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):
     return [cB for cB in cIt] == [True]*len(cIt)

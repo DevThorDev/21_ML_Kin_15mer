@@ -55,6 +55,8 @@ S_EQ80 = S_EQ*80
 S_ST80 = S_STAR*80
 S_WV80 = S_WAVE*80
 
+S_ARR_LR = '-->'
+S_ARR_RL = '<--'
 S_0 = '0'
 
 S_CAP_A = 'A'
@@ -70,12 +72,16 @@ DIR_RAW_INP = '01_RawData'
 DIR_RAW_INP_TEST = '02_RawData_Test'
 DIR_PROC_INP = '11_ProcInpData'
 DIR_PROC_INP_TEST = '12_ProcInpData_Test'
+DIR_RES = '31_ResCombined'
+DIR_RES_TEST = '32_ResCombined_Test'
 
 P_DIR_INP = os.path.join('..', '..', DIR_INP)
 P_DIR_RAW_INP = os.path.join(P_DIR_INP, DIR_RAW_INP)
 P_DIR_RAW_INP_TEST = os.path.join(P_DIR_INP, DIR_RAW_INP_TEST)
 P_DIR_PROC_INP = os.path.join(P_DIR_INP, DIR_PROC_INP)
 P_DIR_PROC_INP_TEST = os.path.join(P_DIR_INP, DIR_PROC_INP_TEST)
+P_DIR_RES = os.path.join(P_DIR_INP, DIR_RES)
+P_DIR_RES_TEST = os.path.join(P_DIR_INP, DIR_RES_TEST)
 
 S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'

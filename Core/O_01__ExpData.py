@@ -6,7 +6,7 @@ import copy
 #
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
-# import Core.F_01__SpcFunctions as SF
+import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 
@@ -29,18 +29,20 @@ class ExpData(BaseClass):
             self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin_T'])
             self.dfr15mer = self.loadDfr(pF=self.dITp['pFRawInp15mer_T'])
             self.pDirProcInp = self.dITp['pDirProcInp_T']
+            self.pDirRes = self.dITp['pDirRes_T']
         else:
             self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin'])
             self.dfr15mer = self.loadDfr(pF=self.dITp['pFRawInp15mer'])
             self.pDirProcInp = self.dITp['pDirProcInp']
+            self.pDirRes = self.dITp['pDirRes']
         self.lDfrInp = [self.dfrKin, self.dfr15mer]
 
     # --- methods for saving processed input data -----------------------------
     def saveProcInpDfrs(self):
         self.lDfrInp = [self.dfrKin, self.dfr15mer]
         for cDfr, sFPI in zip(self.lDfrInp, self.dITp['lSFProcInp']):
-            self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI))
-
+            self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI),
+                         saveAnyway=False)
 
     # --- methods for processing experimental data ----------------------------
     def filterRawDataKin(self, nDig=GC.R04):
@@ -50,15 +52,15 @@ class ExpData(BaseClass):
         cDfr.dropna(axis=0, subset=lColF, inplace=True)
         nR1 = cDfr.shape[0]
         for sC in lColF:
-            cDfr = cDfr[cDfr[sC] != self.dITp['sNULL']]
-        cDfr.reset_index(drop=True, inplace=True)
-        nR2 = cDfr.shape[0]
+            self.dfrKin = cDfr[cDfr[sC] != self.dITp['sNULL']]
+        self.dfrKin.reset_index(drop=True, inplace=True)
+        nR2 = self.dfrKin.shape[0]
         print(GC.S_DS80, GC.S_NEWL, 'Rows with "NaN" in columns ', lColF, ': ',
               nR0-nR1, ' of ', nR0, '\t(', round((nR0-nR1)/nR0*100., nDig),
-              '%)', sep='')
-        print('Rows with "', self.dITp['sNULL'], '" in columns ', lColF, ': ',
-              nR1-nR2, ' of ', nR0, '\t(', round((nR1-nR2)/nR0*100., nDig),
-              '%)', GC.S_NEWL, GC.S_DS80, sep='')
+              '%)', GC.S_NEWL, 'Rows with "', self.dITp['sNULL'],
+              '" in columns ', lColF, ': ', nR1-nR2, ' of ', nR0, '\t(',
+              round((nR1-nR2)/nR0*100., nDig), '%)', GC.S_NEWL, GC.S_ARR_LR,
+              ' Remaining rows: ', nR2, GC.S_NEWL, GC.S_DS80, sep='')
 
     def procColKin(self):
         l = [s for s in self.dfrKin[self.dITp['sPSite']]]
@@ -79,16 +81,16 @@ class ExpData(BaseClass):
         nR1 = cDfr.shape[0]
         # remove lines with the wrong length of the 15mer
         cDfr[sLenS] = [len(cDfr.at[k, cCol]) for k in range(cDfr.shape[0])]
-        cDfr = cDfr[cDfr[sLenS] == self.dITp['lenSDef']]
-        cDfr.reset_index(drop=True, inplace=True)
-        self.dfr15mer = cDfr.drop(sLenS, axis=1)
+        self.dfr15mer = cDfr[cDfr[sLenS] == self.dITp['lenSDef']]
+        self.dfr15mer.reset_index(drop=True, inplace=True)
+        self.dfr15mer = self.dfr15mer.drop(sLenS, axis=1)
         nR2 = self.dfr15mer.shape[0]
         print(GC.S_DS80, GC.S_NEWL, 'Rows with "NaN" in column "', cCol, '": ',
               nR0-nR1, ' of ', nR0, '\t\t(', round((nR0-nR1)/nR0*100., nDig),
-              '%)', sep='')
-        print('Rows with length of snippet not ', self.dITp['lenSDef'], ': ',
-              nR1-nR2, ' of ', nR0, '\t(', round((nR1-nR2)/nR0*100., nDig),
-              '%)', GC.S_NEWL, GC.S_DS80, sep='')
+              '%)', GC.S_NEWL, 'Rows with length of snippet not ',
+              self.dITp['lenSDef'], ': ', nR1-nR2, ' of ', nR0, '\t(',
+              round((nR1-nR2)/nR0*100., nDig), '%)', GC.S_NEWL, GC.S_ARR_LR,
+              ' Remaining rows: ', nR2, GC.S_NEWL, GC.S_DS80, sep='')
 
     def procCol15mer(self):
         l = [s for s in self.dfr15mer[self.dITp['sCCode']]]
@@ -97,22 +99,28 @@ class ExpData(BaseClass):
                 l[k] = s.split(GC.S_DOT)[0]
         self.dfr15mer[self.dITp['sCodeTrunc']] = l
 
-    def matchKinTargetCode(self):
-        pass
+    # def combineInpDfr(self):
+    #     dEffTarg, dfrK, dfr15m = {}, self.dfrKin, self.dfr15mer
+    #     for sEC in dfrK[self.dITp['sEffCode']].unique():
+    #         dfrEC = dfrK[dfrK[self.dITp['sEffCode']] == sEC]
+    #         lTC = list(dfrEC[self.dITp['sTargCode']].unique())
+    #         dEffTarg[sEC] = {}
+    #         for sTC in lTC:
+    #             dfrTC = dfr15m[dfr15m[self.dITp['sCodeTrunc']] == sTC]
+    #             dEffTarg[sEC][sTC] = dfrTC
+    #     GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
+    #     dfrComb = SF.dDDfrToDfr(self.dITp, dDDfr=dEffTarg,
+    #                             idxCol=self.dfr15mer.columns)
+    #     pFResComb = GF.joinToPath(self.pDirRes, self.dITp['sFResComb'])
+    #     self.saveDfr(dfrComb, pF=pFResComb, saveAnyway=True)
 
     def combineInpDfr(self):
-        dEffTarg, dfrK, dfr15m, sumTEMP = {}, self.dfrKin, self.dfr15mer, 0
-        for sEC in dfrK[self.dITp['sEffCode']].unique():
-            dfrEC = dfrK[dfrK[self.dITp['sEffCode']] == sEC]
-            lTC = list(dfrEC[self.dITp['sTargCode']].unique())
-            dEffTarg[sEC] = {}
-            for sTC in lTC:
-                dfrTC = dfr15m[dfr15m[self.dITp['sCodeTrunc']] == sTC]
-                dEffTarg[sEC][sTC] = dfrTC
-                sumTEMP += dfrTC.shape[0]
-        # print('dEffTarg:')
-        # print(dEffTarg)
-        print('sumTEMP:', sumTEMP)
+        dEffTarg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfr15mer)
+        GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
+        lSCK, lSC15m = list(self.dfrKin.columns), list(self.dfr15mer.columns)
+        dfrComb = SF.dDDfrToDfr(dDDfr=dEffTarg, lSColL=lSCK, lSColR=lSC15m)
+        pFResComb = GF.joinToPath(self.pDirRes, self.dITp['sFResComb'])
+        self.saveDfr(dfrComb, pF=pFResComb, saveAnyway=True)
 
     def procExpData(self, nDigDsp=GC.R04):
         self.filterRawDataKin(nDig=nDigDsp)
@@ -121,11 +129,5 @@ class ExpData(BaseClass):
         self.procCol15mer()
         self.saveProcInpDfrs()
         self.combineInpDfr()
-
-# --- methods initialising and updating dictionaries --------------------------
-    def iniDfrs(self):
-        pass
-
-# --- methods saving DataFrames -----------------------------------------------
 
 ###############################################################################
