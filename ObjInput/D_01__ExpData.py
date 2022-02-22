@@ -10,13 +10,18 @@ sOType = 'Experimental data (D_01__ExpData)'
 sNmSpec = 'Experimenal data for the ExpData class in O_01__ExpData'
 
 # --- flow control ------------------------------------------------------------
+dBDoDfrRes = {GC.S_SHORT: True,
+              GC.S_MED: True,
+              GC.S_LONG: False}
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
 sFRawInp15mer = GC.S_F_RAW_INP_15MER + GC.S_DOT + GC.S_EXT_CSV
 sFProcInpKin = 'KinasesAndTargets_202202'
 sFProcInp15mer = 'Pho15mer_202202'
-sFResComb = 'Combined_KinasesPho15mer_202202'
+sFResCombS = 'Combined_S_KinasesPho15mer_202202'
+sFResCombM = 'Combined_M_KinasesPho15mer_202202'
+sFResCombL = 'Combined_L_KinasesPho15mer_202202'
 
 pDirRawInp = GC.P_DIR_RAW_INP
 pDirRawInp_Test = GC.P_DIR_RAW_INP_TEST
@@ -40,13 +45,20 @@ sTargCode = 'Target'
 sTargSeq = 'TargetSeq'
 sPSite = 'pSite'
 sPosPSite = GC.S_POS_P_SITE
+sPep = 'pep'
+sPepMod = 'pep_mod'
 sCCode = 'code'
+sCCodeSeq = 'code_seq'
+sPepPIP = 'pep_pos_in_prot'
 sC15mer = 'c15mer'
 sLenSnip = GC.S_LEN_SNIP
+sExpName = GC.S_EXP_NAME
 sCodeTrunc = GC.S_CODE_TRUNC
 
 # --- lists -------------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
+lCXclDfr15merM = [sExpName, sCodeTrunc]
+lCXclDfr15merS = [sPep, sPepMod, sCCode, sCCodeSeq, sPepPIP] + lCXclDfr15merM
 
 # --- dictionaries ------------------------------------------------------------
 
@@ -59,10 +71,13 @@ dIO = {# --- general
        'sOType': sOType,
        'sNmSpec': sNmSpec,
        # --- flow control
+       'dBDoDfrRes': dBDoDfrRes,
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInp15mer': sFProcInp15mer + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResComb': sFResComb + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResCombS': sFResCombS + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResCombM': sFResCombM + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResCombL': sFResCombL + GC.S_DOT + GC.S_EXT_CSV,
        'pFRawInpKin': GF.joinToPath(pDirRawInp, sFRawInpKin),
        'pFRawInpKin_T': GF.joinToPath(pDirRawInp_Test, sFRawInpKin),
        'pFRawInp15mer': GF.joinToPath(pDirRawInp, sFRawInp15mer),
@@ -84,12 +99,19 @@ dIO = {# --- general
        'sTargSeq': sTargSeq,
        'sPSite': sPSite,
        'sPosPSite': sPosPSite,
+       'sPep': sPep,
+       'sPepMod': sPepMod,
        'sCCode': sCCode,
+       'sCCodeSeq': sCCodeSeq,
+       'sPepPIP': sPepPIP,
        'sC15mer': sC15mer,
        'sLenSnip': sLenSnip,
+       'sExpName': sExpName,
        'sCodeTrunc': sCodeTrunc,
        # --- lists
        'lSCKinF': lSCKinF,
+       'lCXclDfr15merS': lCXclDfr15merS,
+       'lCXclDfr15merM': lCXclDfr15merM,
        # --- dictionaries
        # === derived values and input processing
        }

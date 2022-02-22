@@ -42,7 +42,7 @@ class ExpData(BaseClass):
         self.lDfrInp = [self.dfrKin, self.dfr15mer]
         for cDfr, sFPI in zip(self.lDfrInp, self.dITp['lSFProcInp']):
             self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI),
-                         saveAnyway=False)
+                         dropDup=True, saveAnyway=False)
 
     # --- methods for processing experimental data ----------------------------
     def filterRawDataKin(self, nDig=GC.R04):
@@ -99,28 +99,43 @@ class ExpData(BaseClass):
                 l[k] = s.split(GC.S_DOT)[0]
         self.dfr15mer[self.dITp['sCodeTrunc']] = l
 
-    # def combineInpDfr(self):
-    #     dEffTarg, dfrK, dfr15m = {}, self.dfrKin, self.dfr15mer
-    #     for sEC in dfrK[self.dITp['sEffCode']].unique():
-    #         dfrEC = dfrK[dfrK[self.dITp['sEffCode']] == sEC]
-    #         lTC = list(dfrEC[self.dITp['sTargCode']].unique())
-    #         dEffTarg[sEC] = {}
-    #         for sTC in lTC:
-    #             dfrTC = dfr15m[dfr15m[self.dITp['sCodeTrunc']] == sTC]
-    #             dEffTarg[sEC][sTC] = dfrTC
-    #     GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
-    #     dfrComb = SF.dDDfrToDfr(self.dITp, dDDfr=dEffTarg,
-    #                             idxCol=self.dfr15mer.columns)
-    #     pFResComb = GF.joinToPath(self.pDirRes, self.dITp['sFResComb'])
-    #     self.saveDfr(dfrComb, pF=pFResComb, saveAnyway=True)
+    def combine(self, lSCK, lSC15m, sFResComb, sMd=GC.S_SHORT):
+        dEffTarg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfr15mer,
+                                     lCDfr15m=lSC15m, sMd=sMd)
+        GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
+        dfrComb = GF.dDDfrToDfr(dDDfr=dEffTarg, lSColL=lSCK, lSColR=lSC15m)
+        pFResComb = GF.joinToPath(self.pDirRes, sFResComb)
+        self.saveDfr(dfrComb, pF=pFResComb, dropDup=True, saveAnyway=False)
+
+    def combineS(self):
+        lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
+        lSC15m = [s for s in self.dfr15mer.columns
+                  if s not in self.dITp['lCXclDfr15merS']]
+        self.combine(lSCK, lSC15m, self.dITp['sFResCombS'], sMd=GC.S_SHORT)
+
+    def combineM(self):
+        lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
+        lSC15m = [s for s in self.dfr15mer.columns
+                  if s not in self.dITp['lCXclDfr15merM']]
+        self.combine(lSCK, lSC15m, self.dITp['sFResCombM'], sMd=GC.S_MED)
+
+    def combineL(self):
+        lSCK, lSC15m = list(self.dfrKin.columns), list(self.dfr15mer.columns)
+        self.combine(lSCK, lSC15m, self.dITp['sFResCombL'], sMd=GC.S_LONG)
 
     def combineInpDfr(self):
-        dEffTarg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfr15mer)
-        GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
-        lSCK, lSC15m = list(self.dfrKin.columns), list(self.dfr15mer.columns)
-        dfrComb = SF.dDDfrToDfr(dDDfr=dEffTarg, lSColL=lSCK, lSColR=lSC15m)
-        pFResComb = GF.joinToPath(self.pDirRes, self.dITp['sFResComb'])
-        self.saveDfr(dfrComb, pF=pFResComb, saveAnyway=True)
+        if self.dITp['dBDoDfrRes'][GC.S_SHORT]:
+            print('Creating short combined result...')
+            self.combineS()
+            print('Created short combined result.')
+        if self.dITp['dBDoDfrRes'][GC.S_MED]:
+            print('Creating medium combined result...')
+            self.combineM()
+            print('Created medium combined result.')
+        if self.dITp['dBDoDfrRes'][GC.S_LONG]:
+            print('Creating long combined result...')
+            self.combineL()
+            print('Created long combined result.')
 
     def procExpData(self, nDigDsp=GC.R04):
         self.filterRawDataKin(nDig=nDigDsp)

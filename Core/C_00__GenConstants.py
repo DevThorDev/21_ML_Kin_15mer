@@ -58,10 +58,9 @@ S_WV80 = S_WAVE*80
 S_ARR_LR = '-->'
 S_ARR_RL = '<--'
 S_0 = '0'
-
-S_CAP_A = 'A'
-S_CAP_B = 'B'
-S_CAP_C = 'C'
+S_SHORT = 'short'
+S_MED = 'med'
+S_LONG = 'long'
 
 # --- file names, paths and extensions ----------------------------------------
 S_F_RAW_INP_KIN = 'KinaseTarget_202202'
@@ -91,11 +90,9 @@ S_EXT_PTH = 'pth'
 # --- predefined strings (2) --------------------------------------------------
 S_MODE = 'Mode'
 S_TYPE = 'Type'
-S_MD_A = S_CAP_A
-S_MD_B = S_CAP_B
-S_MD_C = S_CAP_C
 S_POS_P_SITE = 'PosPSite'
 S_LEN_SNIP = 'lenSnip'
+S_EXP_NAME = 'exp_name'
 S_CODE_TRUNC = 'code_trunc'
 
 # --- predefined numbers ------------------------------------------------------

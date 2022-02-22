@@ -71,9 +71,9 @@ class BaseClass:
         if os.path.isfile(pF):
             return GF.readCSV(pF=pF, iCol=iCol, dDTp=dDTp, cSep=cSep)
 
-    def saveDfr(self, cDfr, pF, saveAnyway=False):
+    def saveDfr(self, cDfr, pF, dropDup=True, saveAnyway=False):
         if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
             print('Saving DataFrame as *.csv file to path ' + pF)
-            GF.saveAsCSV(cDfr, pF, cSep=self.dITp['cSep'])
+            GF.saveAsCSV(cDfr, pF, cSep=self.dITp['cSep'], dropDup=dropDup)
 
 ###############################################################################

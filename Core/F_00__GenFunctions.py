@@ -35,8 +35,9 @@ def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
     if os.path.isfile(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
 
-def saveAsCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL):
+def saveAsCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, dropDup=True, igI=True):
     if pdDfr is not None:
+        pdDfr.drop_duplicates(inplace=True, ignore_index=igI)
         pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA)
 
 # --- String selection and manipulation functions -----------------------------
@@ -155,6 +156,17 @@ def printSizeDDDfr(dDDfr, modeF=False, nDig=GC.R04):
             dN = {len(cDSub): sum([cDfr.shape[0] for cDfr in cDSub.values()])}
             print(GC.S_DASH, cKMain, GC.S_ARR_LR, dN)
     print(GC.S_DS80)
+
+def dDDfrToDfr(dDDfr, lSColL, lSColR):
+    fullDfr = iniPdDfr(lSNmC=lSColL+lSColR)
+    for sKMain, cDSub in dDDfr.items():
+        for sKSub, rightDfr in cDSub.items():
+            leftDfr = iniPdDfr(lSNmR=rightDfr.index, lSNmC=lSColL)
+            leftDfr[lSColL[:len(sKMain)]] = sKMain
+            leftDfr[lSColL[-len(sKSub):]] = sKSub
+            subDfr = pd.concat([leftDfr, rightDfr], axis=1)
+            fullDfr = pd.concat([fullDfr, subDfr], axis=0)
+    return fullDfr.reset_index(drop=True)
 
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):

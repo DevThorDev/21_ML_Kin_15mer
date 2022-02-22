@@ -6,7 +6,7 @@ import Core.C_00__GenConstants as GC
 
 # --- general -----------------------------------------------------------------
 isTest = False              # True (just for testing) / False (standard run)
-cMode = GC.S_MD_B           # mode: S_MD_A / S_MD_B / S_MD_C
+cMode = GC.S_0              # mode: S_0
 nDigObj = GC.N_DIG_OBJ_2    # number of digits reserved for all input objects
 
 # --- file and folder names, extensions ---------------------------------------
