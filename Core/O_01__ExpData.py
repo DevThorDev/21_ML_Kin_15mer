@@ -20,6 +20,9 @@ class ExpData(BaseClass):
         self.dITp = copy.deepcopy(self.dIG[0])  # type of base class = 0
         for iTpU in lITpUpd + [iTp]:            # updated with types in list
             self.dITp.update(self.dIG[iTpU])
+        self.dPFRes = {GC.S_COMBINED: {GC.S_SHORT: None,
+                                       GC.S_MED: None,
+                                       GC.S_LONG: None}}
         self.readExpData()
         print('Initiated "ExpData" base object.')
 
@@ -105,7 +108,8 @@ class ExpData(BaseClass):
         GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
         dfrComb = GF.dDDfrToDfr(dDDfr=dEffTarg, lSColL=lSCK, lSColR=lSC15m)
         pFResComb = GF.joinToPath(self.pDirRes, sFResComb)
-        self.saveDfr(dfrComb, pF=pFResComb, dropDup=True, saveAnyway=False)
+        self.dPFRes[GC.S_COMBINED][sMd] = pFResComb
+        self.saveDfr(dfrComb, pF=pFResComb, dropDup=True, saveAnyway=True)
 
     def combineS(self):
         lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
@@ -136,6 +140,9 @@ class ExpData(BaseClass):
             print('Creating long combined result...')
             self.combineL()
             print('Created long combined result.')
+
+    def getInfoKin15mer(self, sMd=GC.S_SHORT):
+        dfrCombS = self.loadDfr(pF=self.dPFRes[GC.S_COMBINED][sMd])
 
     def procExpData(self, nDigDsp=GC.R04):
         self.filterRawDataKin(nDig=nDigDsp)

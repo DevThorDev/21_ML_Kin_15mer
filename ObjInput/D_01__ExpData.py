@@ -10,8 +10,8 @@ sOType = 'Experimental data (D_01__ExpData)'
 sNmSpec = 'Experimenal data for the ExpData class in O_01__ExpData'
 
 # --- flow control ------------------------------------------------------------
-dBDoDfrRes = {GC.S_SHORT: True,
-              GC.S_MED: True,
+dBDoDfrRes = {GC.S_SHORT: False,
+              GC.S_MED: False,
               GC.S_LONG: False}
 
 # --- names and paths of files and dirs ---------------------------------------

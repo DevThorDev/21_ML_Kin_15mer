@@ -61,6 +61,8 @@ S_0 = '0'
 S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'
+S_COMBINED = 'Combined'
+S_TEST = 'Test'
 
 # --- file names, paths and extensions ----------------------------------------
 S_F_RAW_INP_KIN = 'KinaseTarget_202202'
@@ -68,11 +70,11 @@ S_F_RAW_INP_15MER = 'phosphat_m15'
 
 DIR_INP = '13_Sysbio03_Phospho15mer'
 DIR_RAW_INP = '01_RawData'
-DIR_RAW_INP_TEST = '02_RawData_Test'
+DIR_RAW_INP_TEST = '02_RawData' + S_USC + S_TEST
 DIR_PROC_INP = '11_ProcInpData'
-DIR_PROC_INP_TEST = '12_ProcInpData_Test'
-DIR_RES = '31_ResCombined'
-DIR_RES_TEST = '32_ResCombined_Test'
+DIR_PROC_INP_TEST = '12_ProcInpData' + S_USC + S_TEST
+DIR_RES = '31_Res' + S_COMBINED
+DIR_RES_TEST = '32_Res' + S_COMBINED + S_USC + S_TEST
 
 P_DIR_INP = os.path.join('..', '..', DIR_INP)
 P_DIR_RAW_INP = os.path.join(P_DIR_INP, DIR_RAW_INP)

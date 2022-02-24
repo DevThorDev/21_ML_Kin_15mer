@@ -57,19 +57,15 @@ class BaseClass:
         self.dITp[cK] = cV
 
     # --- methods for loading and saving DataFrames ---------------------------
-    def loadDfr(self, pF, iC=None):
+    def loadDfr(self, pF, iC=None, dDTp=None, cSep=None):
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None"'
-        if os.path.isfile(pF):
-            cDfr = GF.readCSV(pF, iCol=iC, cSep=self.dITp['cSep'])
-            sPrt = 'Loading DataFrame from path ' + pF
-        print(sPrt)
-        return cDfr
-
-    def getFromCSV(self, pF, iCol=0, dDTp=None, cSep=None):
         if cSep is None:
             cSep = self.dITp['cSep']
         if os.path.isfile(pF):
-            return GF.readCSV(pF=pF, iCol=iCol, dDTp=dDTp, cSep=cSep)
+            cDfr = GF.readCSV(pF, iCol=iC, dDTp=dDTp, cSep=cSep)
+            sPrt = 'Loading DataFrame from path ' + pF
+        print(sPrt)
+        return cDfr
 
     def saveDfr(self, cDfr, pF, dropDup=True, saveAnyway=False):
         if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
