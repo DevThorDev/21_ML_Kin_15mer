@@ -20,10 +20,8 @@ class ExpData(BaseClass):
         self.dITp = copy.deepcopy(self.dIG[0])  # type of base class = 0
         for iTpU in lITpUpd + [iTp]:            # updated with types in list
             self.dITp.update(self.dIG[iTpU])
-        self.dPFRes = {GC.S_COMBINED: {GC.S_SHORT: None,
-                                       GC.S_MED: None,
-                                       GC.S_LONG: None}}
         self.readExpData()
+        self.fillDPFRes()
         print('Initiated "ExpData" base object.')
 
     # --- methods for reading experimental data -------------------------------
@@ -39,6 +37,16 @@ class ExpData(BaseClass):
             self.pDirProcInp = self.dITp['pDirProcInp']
             self.pDirRes = self.dITp['pDirRes']
         self.lDfrInp = [self.dfrKin, self.dfr15mer]
+
+    # --- methods for filling the result paths dictionary ---------------------
+    def fillDPFRes(self):
+        sPFCmbS = GF.joinToPath(self.pDirRes, self.dITp['sFResCombS'])
+        sPFCmbM = GF.joinToPath(self.pDirRes, self.dITp['sFResCombM'])
+        sPFCmbL = GF.joinToPath(self.pDirRes, self.dITp['sFResCombL'])
+        dPFCmb = {GC.S_SHORT: sPFCmbS, GC.S_MED: sPFCmbM, GC.S_LONG: sPFCmbL}
+        sPFI15mer = GF.joinToPath(self.pDirRes, self.dITp['sFResI15mer'])
+        self.dPFRes = {GC.S_COMBINED: dPFCmb,
+                       GC.S_INFO_MER: sPFI15mer}
 
     # --- methods for saving processed input data -----------------------------
     def saveProcInpDfrs(self):
@@ -102,30 +110,30 @@ class ExpData(BaseClass):
                 l[k] = s.split(GC.S_DOT)[0]
         self.dfr15mer[self.dITp['sCodeTrunc']] = l
 
-    def combine(self, lSCK, lSC15m, sFResComb, sMd=GC.S_SHORT):
+    # --- methods for combining experimental data -----------------------------
+    def combine(self, lSCK, lSC15m, sMd=GC.S_SHORT):
         dEffTarg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfr15mer,
                                      lCDfr15m=lSC15m, sMd=sMd)
         GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
         dfrComb = GF.dDDfrToDfr(dDDfr=dEffTarg, lSColL=lSCK, lSColR=lSC15m)
-        pFResComb = GF.joinToPath(self.pDirRes, sFResComb)
-        self.dPFRes[GC.S_COMBINED][sMd] = pFResComb
-        self.saveDfr(dfrComb, pF=pFResComb, dropDup=True, saveAnyway=True)
+        self.saveDfr(dfrComb, pF=self.dPFRes[GC.S_COMBINED][sMd], dropDup=True,
+                     saveAnyway=True)
 
     def combineS(self):
         lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
         lSC15m = [s for s in self.dfr15mer.columns
                   if s not in self.dITp['lCXclDfr15merS']]
-        self.combine(lSCK, lSC15m, self.dITp['sFResCombS'], sMd=GC.S_SHORT)
+        self.combine(lSCK, lSC15m, sMd=GC.S_SHORT)
 
     def combineM(self):
         lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
         lSC15m = [s for s in self.dfr15mer.columns
                   if s not in self.dITp['lCXclDfr15merM']]
-        self.combine(lSCK, lSC15m, self.dITp['sFResCombM'], sMd=GC.S_MED)
+        self.combine(lSCK, lSC15m, sMd=GC.S_MED)
 
     def combineL(self):
         lSCK, lSC15m = list(self.dfrKin.columns), list(self.dfr15mer.columns)
-        self.combine(lSCK, lSC15m, self.dITp['sFResCombL'], sMd=GC.S_LONG)
+        self.combine(lSCK, lSC15m, sMd=GC.S_LONG)
 
     def combineInpDfr(self):
         if self.dITp['dBDoDfrRes'][GC.S_SHORT]:
@@ -141,9 +149,7 @@ class ExpData(BaseClass):
             self.combineL()
             print('Created long combined result.')
 
-    def getInfoKin15mer(self, sMd=GC.S_SHORT):
-        dfrCombS = self.loadDfr(pF=self.dPFRes[GC.S_COMBINED][sMd])
-
+    # --- method calling sub-methods that process and combine exp. data -------
     def procExpData(self, nDigDsp=GC.R04):
         self.filterRawDataKin(nDig=nDigDsp)
         self.procColKin()
@@ -151,5 +157,30 @@ class ExpData(BaseClass):
         self.procCol15mer()
         self.saveProcInpDfrs()
         self.combineInpDfr()
+
+    # --- methods extracting info from processed/combined data ----------------
+    def getInfoKin15mer(self, sMd=GC.S_SHORT):
+        dE15m, dfrCombS = {}, self.loadDfr(pF=self.dPFRes[GC.S_COMBINED][sMd])
+        if dfrCombS is not None:
+            for dRec in dfrCombS.to_dict('records'):
+                # considering all effectors pooled
+                GF.addToDictL(dE15m, self.dITp['sAnyEff'],
+                              dRec[self.dITp['sC15mer']], lUniqEl=False)
+                # considering the different effectors separately
+                GF.addToDictL(dE15m, dRec[self.dITp['sEffCode']],
+                              dRec[self.dITp['sC15mer']], lUniqEl=False)
+        print('Length of dE15m:', len(dE15m))
+        dNMer, iC15m = {}, self.dITp['iCent15mer']
+        for k in range(iC15m + 1):
+            for sEff, lS15mer in dE15m.items():
+                for s15mer in lS15mer:
+                    sCent15mer = s15mer[(iC15m - k):(iC15m + k + 1)]
+                    GF.addToDictDNum(dNMer, sEff, sCent15mer)
+        dfrINmer = GF.dDNumToDfr(dNMer, lSCol=self.dITp['lSCDfrNMer'])
+        dfrINmer.sort_values(by=self.dITp['lSortCDfrNMer'],
+                             ascending=self.dITp['lSortDirAscDfrNMer'],
+                             inplace=True, ignore_index=True)
+        self.saveDfr(dfrINmer, pF=self.dPFRes[GC.S_INFO_MER], dropDup=False,
+                     saveAnyway=True)
 
 ###############################################################################

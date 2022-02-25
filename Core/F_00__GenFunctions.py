@@ -119,6 +119,15 @@ def addToDict2L(cD, cKMain, cKSub, cE, lUniqEl=False):
         cD[cKMain] = {}
     addToDictL(cD[cKMain], cKSub, cE, lUniqEl=lUniqEl)
 
+def addToDictDNum(d2N, cKMain, cKSub, nInc=1):
+    if cKMain in d2N:
+        if cKSub in d2N[cKMain]:
+            d2N[cKMain][cKSub] += nInc
+        else:
+            d2N[cKMain][cKSub] = nInc
+    else:
+        d2N[cKMain] = {cKSub: nInc}
+
 def addToDictDSpc(cDMain, cKMain, cKSub, cVSub=None):
     if cDMain[cKMain] == None:
         cDMain[cKMain] = {cKSub: cVSub}
@@ -156,6 +165,18 @@ def printSizeDDDfr(dDDfr, modeF=False, nDig=GC.R04):
             dN = {len(cDSub): sum([cDfr.shape[0] for cDfr in cDSub.values()])}
             print(GC.S_DASH, cKMain, GC.S_ARR_LR, dN)
     print(GC.S_DS80)
+
+def dDNumToDfr(dDNum, lSCol):
+    assert len(lSCol) >= 4
+    fullDfr = iniPdDfr(lSNmC=lSCol)
+    for sKMain, cDSub in dDNum.items():
+        subDfr = iniPdDfr(lSNmC=lSCol)
+        subDfr[lSCol[0]] = [sKMain]*len(cDSub)
+        subDfr[lSCol[1]] = list(cDSub)
+        subDfr[lSCol[2]] = [len(sK) for sK in cDSub]
+        subDfr[lSCol[3]] = list(cDSub.values())
+        fullDfr = pd.concat([fullDfr, subDfr], axis=0)
+    return fullDfr.reset_index(drop=True).convert_dtypes()
 
 def dDDfrToDfr(dDDfr, lSColL, lSColR):
     fullDfr = iniPdDfr(lSNmC=lSColL+lSColR)

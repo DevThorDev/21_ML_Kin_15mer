@@ -58,7 +58,7 @@ class BaseClass:
 
     # --- methods for loading and saving DataFrames ---------------------------
     def loadDfr(self, pF, iC=None, dDTp=None, cSep=None):
-        cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None"'
+        cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
         if cSep is None:
             cSep = self.dITp['cSep']
         if os.path.isfile(pF):

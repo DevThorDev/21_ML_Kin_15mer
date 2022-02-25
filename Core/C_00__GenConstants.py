@@ -27,6 +27,7 @@ S_WAVE = '~'
 S_VBAR = '|'
 S_SLASH = '/'
 S_NEWL = '\n'
+S_0 = '0'
 
 S_US02 = S_USC*2
 S_SP04 = S_SPACE*4
@@ -57,11 +58,13 @@ S_WV80 = S_WAVE*80
 
 S_ARR_LR = '-->'
 S_ARR_RL = '<--'
-S_0 = '0'
+S_MER = 'mer'
+
 S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'
 S_COMBINED = 'Combined'
+S_INFO_MER = 'InfoNmer'
 S_TEST = 'Test'
 
 # --- file names, paths and extensions ----------------------------------------
@@ -96,8 +99,14 @@ S_POS_P_SITE = 'PosPSite'
 S_LEN_SNIP = 'lenSnip'
 S_EXP_NAME = 'exp_name'
 S_CODE_TRUNC = 'code_trunc'
+S_ANY_EFF = 'AnyEffector'
+S_N_MER = 'N' + S_MER
+S_LEN_N_MER = 'len' + S_N_MER
+S_NUM_OCC = 'nOcc'
 
 # --- predefined numbers ------------------------------------------------------
+LEN_SNIPPET_DEF = 15
+I_CENT_15MER = LEN_SNIPPET_DEF//2
 R01 = 1
 R02 = 2
 R03 = 3
@@ -105,7 +114,11 @@ R04 = 4
 R08 = 8
 MAX_DELTA = 1.0E-14
 
+# --- predefined lists --------------------------------------------------------
+L_MER = [1, 3, 5, 7, 9, 11, 13, 15]
+
 # --- predefined dictionaries -------------------------------------------------
+D_MER = {n: str(n) + S_MER for n in L_MER}
 
 # --- predefined colours ------------------------------------------------------
 CLR_TAB_RED = 'tab:red'
