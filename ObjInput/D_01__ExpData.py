@@ -14,6 +14,9 @@ dBDoDfrRes = {GC.S_SHORT: False,
               GC.S_MED: False,
               GC.S_LONG: False}
 
+# --- lists (1) ---------------------------------------------------------------
+lLenNMer4ResIEff = [1, 3]
+
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
 sFRawInp15mer = GC.S_F_RAW_INP_15MER + GC.S_DOT + GC.S_EXT_CSV
@@ -23,6 +26,7 @@ sFResCombS = 'Combined_S_KinasesPho15mer_202202'
 sFResCombM = 'Combined_M_KinasesPho15mer_202202'
 sFResCombL = 'Combined_L_KinasesPho15mer_202202'
 sFResI15mer = 'Info15mer_NOcc_202202'
+sFResIEff = 'InfoEff_Prop15mer_202202'
 
 pDirRawInp = GC.P_DIR_RAW_INP
 pDirRawInp_Test = GC.P_DIR_RAW_INP_TEST
@@ -34,10 +38,13 @@ pDirRes_Test = GC.P_DIR_RES_TEST
 # --- numbers -----------------------------------------------------------------
 lenSnippetDef = GC.LEN_SNIPPET_DEF
 iCent15mer = GC.I_CENT_15MER
+rndDigProp = GC.R08
 
 mDsp = 1000
 
 # --- strings -----------------------------------------------------------------
+sUSC = GC.S_USC
+sUS02 = GC.S_US02
 s0 = GC.S_0
 sNULL = 'NULL'
 sSeq = 'Seq'
@@ -61,7 +68,7 @@ sNmer = GC.S_N_MER
 sLenNmer = GC.S_LEN_N_MER
 sNOcc = GC.S_NUM_OCC
 
-# --- lists -------------------------------------------------------------------
+# --- lists (2) ---------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
 lCXclDfr15merM = [sExpName, sCodeTrunc]
 lCXclDfr15merS = [sPep, sPepMod, sCCode, sCCodeSeq, sPepPIP] + lCXclDfr15merM
@@ -81,6 +88,9 @@ dIO = {# --- general
        'sNmSpec': sNmSpec,
        # --- flow control
        'dBDoDfrRes': dBDoDfrRes,
+       # --- lists (1)
+       'lLenNMer': lLenNMer4ResIEff,
+       'lSLenNMer': [str(n) for n in lLenNMer4ResIEff],
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInp15mer': sFProcInp15mer + GC.S_DOT + GC.S_EXT_CSV,
@@ -88,6 +98,7 @@ dIO = {# --- general
        'sFResCombM': sFResCombM + GC.S_DOT + GC.S_EXT_CSV,
        'sFResCombL': sFResCombL + GC.S_DOT + GC.S_EXT_CSV,
        'sFResI15mer': sFResI15mer + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResIEff': sFResIEff + GC.S_DOT + GC.S_EXT_CSV,
        'pFRawInpKin': GF.joinToPath(pDirRawInp, sFRawInpKin),
        'pFRawInpKin_T': GF.joinToPath(pDirRawInp_Test, sFRawInpKin),
        'pFRawInp15mer': GF.joinToPath(pDirRawInp, sFRawInp15mer),
@@ -99,8 +110,11 @@ dIO = {# --- general
        # --- numbers
        'lenSDef': lenSnippetDef,
        'iCent15mer': iCent15mer,
+       'rndDigProp': rndDigProp,
        'mDsp': mDsp,
        # --- strings
+       'sUSC': sUSC,
+       'sUS02': sUS02,
        's0': s0,
        'sNULL': sNULL,
        'sSeq': sSeq,
@@ -123,7 +137,7 @@ dIO = {# --- general
        'sNmer': sNmer,
        'sLenNmer': sLenNmer,
        'sNOcc': sNOcc,
-       # --- lists
+       # --- lists (2)
        'lSCKinF': lSCKinF,
        'lCXclDfr15merS': lCXclDfr15merS,
        'lCXclDfr15merM': lCXclDfr15merM,

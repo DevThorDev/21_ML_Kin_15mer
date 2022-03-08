@@ -31,14 +31,32 @@ def joinDirToPath(pF='', nmD='Directory'):
     else:
         return nmD
 
+def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
+    if len(sStart) > 0:
+        sF = sStart + sJoin + sF
+    if len(sEnd) > 0:
+        sF = sF + sJoin + sEnd
+    return sF
+
+def modSF(sF, sStart='', sEnd='', sJoin=''):
+    if GC.S_DOT in sF:
+        lSSpl = sF.split(GC.S_DOT)
+        sFMod = GC.S_DOT.join(lSSpl[:-1])
+        sFMod = addSStartSEnd(sFMod, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
+        return sFMod + GC.S_DOT + lSSpl[-1]
+    else:
+        return addSStartSEnd(sF, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
+
 def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
     if os.path.isfile(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
 
-def saveAsCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, dropDup=True, igI=True):
+def saveAsCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
+              dropDup=True, igI=True):
     if pdDfr is not None:
-        pdDfr.drop_duplicates(inplace=True, ignore_index=igI)
-        pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA)
+        if dropDup:
+            pdDfr.drop_duplicates(inplace=True, ignore_index=igI)
+        pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx)
 
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, sJoin=GC.S_USC):
@@ -144,6 +162,18 @@ def addToDictD(cD, cKMain, cKSub, lV=[]):
     else:
         cD[cKMain] = {cKSub: lV}
 
+def convDDNumToDDProp(dDNum, nDigRnd):
+    dDSum, dDProp = {}, {}
+    for cKM, cDSub in dDNum.items():
+        for cKS, cNum in cDSub.items():
+            addToDictDNum(dDSum, cKMain=cKM, cKSub=len(cKS), nInc=cNum)
+    for cKM, cDSub in dDNum.items():
+        dDProp[cKM] = {}
+        for cKS, cNum in cDSub.items():
+            cProp = round(dDNum[cKM][cKS]/dDSum[cKM][len(cKS)], nDigRnd)
+            dDProp[cKM][cKS] = cProp
+    return dDProp
+
 def printSizeDDDfr(dDDfr, modeF=False, nDig=GC.R04):
     nKMain, nKSub = len(dDDfr), sum([len(cDSub) for cDSub in dDDfr.values()])
     sumNLDfr = 0
@@ -165,18 +195,6 @@ def printSizeDDDfr(dDDfr, modeF=False, nDig=GC.R04):
             dN = {len(cDSub): sum([cDfr.shape[0] for cDfr in cDSub.values()])}
             print(GC.S_DASH, cKMain, GC.S_ARR_LR, dN)
     print(GC.S_DS80)
-
-def dDNumToDfr(dDNum, lSCol):
-    assert len(lSCol) >= 4
-    fullDfr = iniPdDfr(lSNmC=lSCol)
-    for sKMain, cDSub in dDNum.items():
-        subDfr = iniPdDfr(lSNmC=lSCol)
-        subDfr[lSCol[0]] = [sKMain]*len(cDSub)
-        subDfr[lSCol[1]] = list(cDSub)
-        subDfr[lSCol[2]] = [len(sK) for sK in cDSub]
-        subDfr[lSCol[3]] = list(cDSub.values())
-        fullDfr = pd.concat([fullDfr, subDfr], axis=0)
-    return fullDfr.reset_index(drop=True).convert_dtypes()
 
 def dDDfrToDfr(dDDfr, lSColL, lSColR):
     fullDfr = iniPdDfr(lSNmC=lSColL+lSColR)

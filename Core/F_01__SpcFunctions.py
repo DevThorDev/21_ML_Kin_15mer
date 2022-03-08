@@ -3,11 +3,11 @@
 # --- F_03__OTpFunctions.py ---------------------------------------------------
 ###############################################################################
 # import numpy as np
-# import pandas as pd
+import pandas as pd
 # import scipy.stats as stats
 
 import Core.C_00__GenConstants as GC
-# import Core.F_00__GenFunctions as GF
+import Core.F_00__GenFunctions as GF
 
 # --- Functions (O_00__BaseClass) ---------------------------------------------
 
@@ -45,5 +45,35 @@ def createDEffTarg(dITp, dfrK, dfr15m, lCDfr15m, sMd=GC.S_SHORT):
             dfrT = dfr15m[dfr15m[dITp['sCodeTrunc']] == tST[0]]
             dEffTarg[tSE][dT[tST]] = dfrT[lCDfr15m]
     return dEffTarg
+
+def dDNumToDfrINmer(dITp, dDNum):
+    lSCol = dITp['lSCDfrNMer']
+    assert len(lSCol) >= 4
+    fullDfr = GF.iniPdDfr(lSNmC=lSCol)
+    for sKMain, cDSub in dDNum.items():
+        subDfr = GF.iniPdDfr(lSNmC=lSCol)
+        subDfr[lSCol[0]] = [sKMain]*len(cDSub)
+        subDfr[lSCol[1]] = list(cDSub)
+        subDfr[lSCol[2]] = [len(sK) for sK in cDSub]
+        subDfr[lSCol[3]] = list(cDSub.values())
+        fullDfr = pd.concat([fullDfr, subDfr], axis=0)
+    return fullDfr.reset_index(drop=True).convert_dtypes()
+
+def dDNumToDfrIEff(dITp, dDNum):
+    d4Dfr, sEffCode, sAnyEff = {}, dITp['sEffCode'], dITp['sAnyEff']
+    dDPrp = GF.convDDNumToDDProp(dDNum=dDNum, nDigRnd=dITp['rndDigProp'])
+    assert sAnyEff in dDPrp
+    lSEff, lAllS15m = [s for s in dDPrp if s != sAnyEff], list(dDPrp[sAnyEff])
+    if len(dITp['lLenNMer']) > 0:
+        lAllS15m = [s for s in dDPrp[sAnyEff] if len(s) in dITp['lLenNMer']]
+    lAllS15m.sort(key=(lambda x: len(x)))
+    d4Dfr[sEffCode] = lSEff
+    for s15m in lAllS15m:
+        d4Dfr[s15m] = [0]*len(lSEff)
+    for s15m in lAllS15m:
+        for k, sEff in enumerate(lSEff):
+            if s15m in dDPrp[sEff]:
+                d4Dfr[s15m][k] = dDPrp[sEff][s15m]
+    return pd.DataFrame(d4Dfr).convert_dtypes()
 
 ###############################################################################

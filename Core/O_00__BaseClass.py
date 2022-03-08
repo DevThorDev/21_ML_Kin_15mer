@@ -67,9 +67,10 @@ class BaseClass:
         print(sPrt)
         return cDfr
 
-    def saveDfr(self, cDfr, pF, dropDup=True, saveAnyway=False):
+    def saveDfr(self, cDfr, pF, saveIdx=True, dropDup=True, saveAnyway=False):
         if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
             print('Saving DataFrame as *.csv file to path ' + pF)
-            GF.saveAsCSV(cDfr, pF, cSep=self.dITp['cSep'], dropDup=dropDup)
+            GF.saveAsCSV(cDfr, pF, cSep=self.dITp['cSep'], saveIdx=saveIdx,
+                         dropDup=dropDup)
 
 ###############################################################################

@@ -65,6 +65,7 @@ S_MED = 'med'
 S_LONG = 'long'
 S_COMBINED = 'Combined'
 S_INFO_MER = 'InfoNmer'
+S_INFO_EFF = 'InfoEff'
 S_TEST = 'Test'
 
 # --- file names, paths and extensions ----------------------------------------

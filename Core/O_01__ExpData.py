@@ -45,8 +45,13 @@ class ExpData(BaseClass):
         sPFCmbL = GF.joinToPath(self.pDirRes, self.dITp['sFResCombL'])
         dPFCmb = {GC.S_SHORT: sPFCmbS, GC.S_MED: sPFCmbM, GC.S_LONG: sPFCmbL}
         sPFI15mer = GF.joinToPath(self.pDirRes, self.dITp['sFResI15mer'])
+        sFE = self.dITp['sUSC'].join(self.dITp['lSLenNMer'])
+        sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE,
+                             sJoin=self.dITp['sUS02'])
+        sPFIEff = GF.joinToPath(self.pDirRes, sFResIEff)
         self.dPFRes = {GC.S_COMBINED: dPFCmb,
-                       GC.S_INFO_MER: sPFI15mer}
+                       GC.S_INFO_MER: sPFI15mer,
+                       GC.S_INFO_EFF: sPFIEff}
 
     # --- methods for saving processed input data -----------------------------
     def saveProcInpDfrs(self):
@@ -159,7 +164,20 @@ class ExpData(BaseClass):
         self.combineInpDfr()
 
     # --- methods extracting info from processed/combined data ----------------
-    def getInfoKin15mer(self, sMd=GC.S_SHORT):
+    def convDNmerToDfr(self, dNMer, stT):
+        dfrINmer = SF.dDNumToDfrINmer(self.dITp, dNMer)
+        dfrINmer.sort_values(by=self.dITp['lSortCDfrNMer'],
+                             ascending=self.dITp['lSortDirAscDfrNMer'],
+                             inplace=True, ignore_index=True)
+        self.saveDfr(dfrINmer, pF=self.dPFRes[GC.S_INFO_MER], saveIdx=True,
+                     dropDup=False, saveAnyway=True)
+        GF.showElapsedTime(stT)
+        dfrIEff = SF.dDNumToDfrIEff(self.dITp, dNMer)
+        self.saveDfr(dfrIEff, pF=self.dPFRes[GC.S_INFO_EFF], saveIdx=False,
+                     dropDup=False, saveAnyway=True)
+        GF.showElapsedTime(stT)
+
+    def getInfoKin15mer(self, stT, sMd=GC.S_SHORT):
         dE15m, dfrCombS = {}, self.loadDfr(pF=self.dPFRes[GC.S_COMBINED][sMd])
         if dfrCombS is not None:
             for dRec in dfrCombS.to_dict('records'):
@@ -169,18 +187,13 @@ class ExpData(BaseClass):
                 # considering the different effectors separately
                 GF.addToDictL(dE15m, dRec[self.dITp['sEffCode']],
                               dRec[self.dITp['sC15mer']], lUniqEl=False)
-        print('Length of dE15m:', len(dE15m))
         dNMer, iC15m = {}, self.dITp['iCent15mer']
         for k in range(iC15m + 1):
             for sEff, lS15mer in dE15m.items():
                 for s15mer in lS15mer:
                     sCent15mer = s15mer[(iC15m - k):(iC15m + k + 1)]
                     GF.addToDictDNum(dNMer, sEff, sCent15mer)
-        dfrINmer = GF.dDNumToDfr(dNMer, lSCol=self.dITp['lSCDfrNMer'])
-        dfrINmer.sort_values(by=self.dITp['lSortCDfrNMer'],
-                             ascending=self.dITp['lSortDirAscDfrNMer'],
-                             inplace=True, ignore_index=True)
-        self.saveDfr(dfrINmer, pF=self.dPFRes[GC.S_INFO_MER], dropDup=False,
-                     saveAnyway=True)
+        GF.showElapsedTime(stT)
+        self.convDNmerToDfr(dNMer, stT=stT)
 
 ###############################################################################
