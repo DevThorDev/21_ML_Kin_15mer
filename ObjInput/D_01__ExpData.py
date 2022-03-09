@@ -10,12 +10,13 @@ sOType = 'Experimental data (D_01__ExpData)'
 sNmSpec = 'Experimenal data for the ExpData class in O_01__ExpData'
 
 # --- flow control ------------------------------------------------------------
+procInput = False
 dBDoDfrRes = {GC.S_SHORT: False,
               GC.S_MED: False,
               GC.S_LONG: False}
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNMer4ResIEff = [1, 3]
+lLenNMer4ResIEff = [1]       # empty list: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
@@ -87,6 +88,7 @@ dIO = {# --- general
        'sOType': sOType,
        'sNmSpec': sNmSpec,
        # --- flow control
+       'procInput': procInput,
        'dBDoDfrRes': dBDoDfrRes,
        # --- lists (1)
        'lLenNMer': lLenNMer4ResIEff,

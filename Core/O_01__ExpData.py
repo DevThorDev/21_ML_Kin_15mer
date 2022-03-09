@@ -156,11 +156,12 @@ class ExpData(BaseClass):
 
     # --- method calling sub-methods that process and combine exp. data -------
     def procExpData(self, nDigDsp=GC.R04):
-        self.filterRawDataKin(nDig=nDigDsp)
-        self.procColKin()
-        self.filterRawData15mer(nDig=nDigDsp)
-        self.procCol15mer()
-        self.saveProcInpDfrs()
+        if self.dITp['procInput']:
+            self.filterRawDataKin(nDig=nDigDsp)
+            self.procColKin()
+            self.filterRawData15mer(nDig=nDigDsp)
+            self.procCol15mer()
+            self.saveProcInpDfrs()
         self.combineInpDfr()
 
     # --- methods extracting info from processed/combined data ----------------
