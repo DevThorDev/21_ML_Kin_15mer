@@ -11,6 +11,8 @@ import Core.F_01__SpcFunctions as SF
 from Core.O_00__BaseClass import BaseClass
 
 # -----------------------------------------------------------------------------
+
+
 class ExpData(BaseClass):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, iTp=1, lITpUpd=[]):
@@ -37,6 +39,9 @@ class ExpData(BaseClass):
             self.pDirProcInp = self.dITp['pDirProcInp']
             self.pDirRes = self.dITp['pDirRes']
         self.lDfrInp = [self.dfrKin, self.dfr15mer]
+        lC = list(self.dfrKin.columns) + list(self.dfr15mer.columns)
+        self.dfrResIGen = GF.iniPdDfr(lSNmC=lC,
+                                      lSNmR=self.dITp['lRowsResIGen'])
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFRes(self):
@@ -61,8 +66,18 @@ class ExpData(BaseClass):
                          dropDup=True, saveAnyway=False)
 
     # --- methods for processing experimental data ----------------------------
+    def fillDfrResIGen(self, cDfr, lR):
+        self.dfrResIGen.loc[lR[0], cDfr.columns] = cDfr.shape[0]
+        for sC in cDfr.columns:
+            nTotRaw = cDfr[sC].dropna().unique().size
+            nNaN = cDfr[sC].size - cDfr[sC].dropna().size
+            self.dfrResIGen.at[lR[1], sC] = nTotRaw
+            self.dfrResIGen.at[lR[2], sC] = nNaN
+
     def filterRawDataKin(self, nDig=GC.R04):
         cDfr, lColF = self.dfrKin, self.dITp['lSCKinF']
+        # add info regarding number of unique elements to self.dfrResIGen
+        self.fillDfrResIGen(cDfr, lR=self.dITp['lRowsResIGen'])
         # remove lines with "NaN" or "NULL" in all columns (excl. cColExcl)
         nR0 = cDfr.shape[0]
         cDfr.dropna(axis=0, subset=lColF, inplace=True)
@@ -91,6 +106,8 @@ class ExpData(BaseClass):
     def filterRawData15mer(self, nDig=GC.R04):
         cDfr, cCol = self.dfr15mer, self.dITp['sC15mer']
         nR0, sLenS = cDfr.shape[0], self.dITp['sLenSnip']
+        # add info regarding number of unique elements to self.dfrResIGen
+        self.fillDfrResIGen(cDfr, lR=self.dITp['lRowsResIGen'])
         # remove lines with "NaN" in the 15mer-column
         cDfr.dropna(axis=0, subset=[cCol], inplace=True)
         cDfr.reset_index(drop=True, inplace=True)
@@ -107,6 +124,8 @@ class ExpData(BaseClass):
               self.dITp['lenSDef'], ': ', nR1-nR2, ' of ', nR0, '\t(',
               round((nR1-nR2)/nR0*100., nDig), '%)', GC.S_NEWL, GC.S_ARR_LR,
               ' Remaining rows: ', nR2, GC.S_NEWL, GC.S_DS80, sep='')
+        pFResIGen = GF.joinToPath(self.pDirRes, self.dITp['sFResIGen'])
+        self.saveDfr(self.dfrResIGen, pF=pFResIGen, saveAnyway=True)
 
     def procCol15mer(self):
         l = [s for s in self.dfr15mer[self.dITp['sCCode']]]

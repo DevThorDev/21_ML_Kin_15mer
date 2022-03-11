@@ -10,7 +10,7 @@ sOType = 'Experimental data (D_01__ExpData)'
 sNmSpec = 'Experimenal data for the ExpData class in O_01__ExpData'
 
 # --- flow control ------------------------------------------------------------
-procInput = False
+procInput = True
 dBDoDfrRes = {GC.S_SHORT: False,
               GC.S_MED: False,
               GC.S_LONG: False}
@@ -21,11 +21,15 @@ lLenNMer4ResIEff = [1]       # empty list: all lengths considered
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
 sFRawInp15mer = GC.S_F_RAW_INP_15MER + GC.S_DOT + GC.S_EXT_CSV
+
 sFProcInpKin = 'KinasesAndTargets_202202'
 sFProcInp15mer = 'Pho15mer_202202'
+
 sFResCombS = 'Combined_S_KinasesPho15mer_202202'
 sFResCombM = 'Combined_M_KinasesPho15mer_202202'
 sFResCombL = 'Combined_L_KinasesPho15mer_202202'
+
+sFResIGen = 'InfoGen_Kin_15mer_202202'
 sFResI15mer = 'Info15mer_NOcc_202202'
 sFResIEff = 'InfoEff_Prop15mer_202202'
 
@@ -68,6 +72,9 @@ sAnyEff = GC.S_ANY_EFF
 sNmer = GC.S_N_MER
 sLenNmer = GC.S_LEN_N_MER
 sNOcc = GC.S_NUM_OCC
+sRowRaw = 'nRows_Raw'
+sTotalRaw = 'Total_Raw'
+sNaNRaw = 'nNaN_Raw'
 
 # --- lists (2) ---------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
@@ -75,6 +82,7 @@ lCXclDfr15merM = [sExpName, sCodeTrunc]
 lCXclDfr15merS = [sPep, sPepMod, sCCode, sCCodeSeq, sPepPIP] + lCXclDfr15merM
 lSortCDfrNMer = [sEffCode, sLenNmer, sNOcc, sNmer]
 lSortDirAscDfrNMer = [True, True, False, True]
+lRowsResIGen = [sRowRaw, sTotalRaw, sNaNRaw]
 
 # --- dictionaries ------------------------------------------------------------
 dMer = GC.D_MER
@@ -99,6 +107,7 @@ dIO = {# --- general
        'sFResCombS': sFResCombS + GC.S_DOT + GC.S_EXT_CSV,
        'sFResCombM': sFResCombM + GC.S_DOT + GC.S_EXT_CSV,
        'sFResCombL': sFResCombL + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResIGen': sFResIGen + GC.S_DOT + GC.S_EXT_CSV,
        'sFResI15mer': sFResI15mer + GC.S_DOT + GC.S_EXT_CSV,
        'sFResIEff': sFResIEff + GC.S_DOT + GC.S_EXT_CSV,
        'pFRawInpKin': GF.joinToPath(pDirRawInp, sFRawInpKin),
@@ -146,6 +155,7 @@ dIO = {# --- general
        'lSCDfrNMer': [sEffCode, sNmer, sLenNmer, sNOcc],
        'lSortCDfrNMer': lSortCDfrNMer,
        'lSortDirAscDfrNMer': lSortDirAscDfrNMer,
+       'lRowsResIGen': lRowsResIGen,
        # --- dictionaries
        'dMer': dMer,
        # === derived values and input processing
