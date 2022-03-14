@@ -15,8 +15,8 @@ class BaseClass:
         self.descO = 'Base class'
         self.dIG = inpDat.dI
         self.dITp = copy.deepcopy(self.dIG[0])      # type of base class = 0
-        self.dfrKin, self.dfr15mer = None, None
-        self.lDfrInp = [self.dfrKin, self.dfr15mer]
+        self.dfrKin, self.dfrNmer = None, None
+        self.lDfrInp = [self.dfrKin, self.dfrNmer]
         print('Initiated "BaseClass" base object.')
 
     # --- print methods -------------------------------------------------------
@@ -39,7 +39,7 @@ class BaseClass:
         print(self.dfrKin)
         print(GC.S_DS80)
         print(GC.S_DS31, '15-polymer data:', GC.S_DS31)
-        print(self.dfr15mer)
+        print(self.dfrNmer)
         print(GC.S_DS80)
 
     # --- methods for retrieving values and modifying the input dictionary ----

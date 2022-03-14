@@ -137,7 +137,9 @@ def addToDict2L(cD, cKMain, cKSub, cE, lUniqEl=False):
         cD[cKMain] = {}
     addToDictL(cD[cKMain], cKSub, cE, lUniqEl=lUniqEl)
 
-def addToDictDNum(d2N, cKMain, cKSub, nInc=1):
+def addToDictDNum(d2N, cKMain, cKSub, nInc=1, bothDir=False):
+    if bothDir and cKSub[::-1] < cKSub:    # reverse cKSub string
+        cKSub = cKSub[::-1]
     if cKMain in d2N:
         if cKSub in d2N[cKMain]:
             d2N[cKMain][cKSub] += nInc

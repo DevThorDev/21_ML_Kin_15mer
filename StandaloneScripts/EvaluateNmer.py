@@ -80,7 +80,7 @@ S_COL_SD_REP = S_COL + 'SDRep'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_SNIPPET_DEF = 15
-I_CENT_15MER = LEN_SNIPPET_DEF//2
+I_CENT_N_MER = LEN_SNIPPET_DEF//2
 
 # --- file name extensions ----------------------------------------------------
 xtCSV = S_DOT + S_CSV
@@ -97,41 +97,41 @@ L_S_OV_STATS_REP = [S_OV_MN_REP, S_OV_SD_REP, S_OV_MIN_REP, S_OV_MAX_REP]
 # ### INPUT ###################################################################
 # --- flow control ------------------------------------------------------------
 readProcInpKin = True
-readProcInp15mer = True
+readProcInpNmer = True
 readResCombS = True
-readResProp15mer = True
+readResPropNmer = True
 
 # --- names and paths of files and dirs ---------------------------------------
 pDirProcInp = P_DIR_PROC_INP
 pDirRes = P_DIR_RES
 sFProcInpKin = 'KinasesAndTargets_202202'
-sFProcInp15mer = 'Pho15mer_202202'
+sFProcInpNmer = 'Pho15mer_202202'
 sFResCombS = 'Combined_S_KinasesPho15mer_202202'
-sFResProp15mer = 'InfoEff_Prop15mer_202202__1_3'
+sFResPropNmer = 'InfoEff_Prop15mer_202202__1_3'
 
 # --- numbers -----------------------------------------------------------------
 lenSnippetDef = LEN_SNIPPET_DEF
-iCent15mer = I_CENT_15MER
+iCentNmer = I_CENT_N_MER
 
 # --- dictionaries ------------------------------------------------------------
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
         'readProcInpKin': readProcInpKin,
-        'readProcInp15mer': readProcInp15mer,
+        'readProcInpNmer': readProcInpNmer,
         'readResCombS': readResCombS,
-        'readResProp15mer': readResProp15mer,
+        'readResPropNmer': readResPropNmer,
         # --- names and paths of files and dirs -------------------------------
         'pDirProcInp': pDirProcInp,
         'pDirRes': pDirRes,
         'sFProcInpKin': sFProcInpKin,
-        'sFProcInp15mer': sFProcInp15mer,
+        'sFProcInpNmer': sFProcInpNmer,
         'sFResCombS': sFResCombS,
-        'sFResProp15mer': sFResProp15mer,
+        'sFResPropNmer': sFResPropNmer,
         'pFProcInpKin': os.path.join(pDirProcInp, sFProcInpKin + xtCSV),
-        'pFProcInp15mer': os.path.join(pDirProcInp, sFProcInp15mer + xtCSV),
+        'pFProcInpNmer': os.path.join(pDirProcInp, sFProcInpNmer + xtCSV),
         'pFResCombS': os.path.join(pDirRes, sFResCombS + xtCSV),
-        'pFResProp15mer': os.path.join(pDirRes, sFResProp15mer + xtCSV),
+        'pFResPropNmer': os.path.join(pDirRes, sFResPropNmer + xtCSV),
         # --- strings ---------------------------------------------------------
         's0': S_0,
         'sO': S_CAP_O,
@@ -191,7 +191,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'lSOvStatsRep': L_S_OV_STATS_REP,
         # --- numbers ---------------------------------------------------------
         'lenSnippetDef': lenSnippetDef,
-        'iCent15mer': iCent15mer,
+        'iCentNmer': iCentNmer,
         'NSit': len(L_S_MN_SD)*len(L_S_MIX_TP)*len(L_S_MET_PHO)*len(L_S_GT),
         # --- dictionaries ----------------------------------------------------
         }
@@ -216,6 +216,10 @@ def readCSV(pF, iCol=None, dDTp=None, cSep=S_SEMICOL):
 def saveAsCSV(pdDfr, pF, reprNA='', cSep=S_SEMICOL):
     if pdDfr is not None:
         pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA)
+
+# --- Functions for filling dictionaries --------------------------------------
+def fillDNumBothDir(d1Dir):
+    pass
 
 # # --- Helper functions --------------------------------------------------------
 # def conVDRepToList(dInpMnSD, tSit, iT=1):
@@ -323,18 +327,18 @@ print('='*80, '\n', '-'*31, ' EvaluateNMer.py ', '-'*32, '\n', sep='')
 if dInp['readProcInpKin']:
     dfrKinIn = readCSV(dInp['pFProcInpKin'], iCol=0)
     # print(dfrKinIn)
-if dInp['readProcInp15mer']:
-    dfr15merIn = readCSV(dInp['pFProcInp15mer'], iCol=0)
-    # print(dfr15merIn)
+if dInp['readProcInpNmer']:
+    dfrNmerIn = readCSV(dInp['pFProcInpNmer'], iCol=0)
+    # print(dfrNmerIn)
 if dInp['readResCombS']:
     dfrResCombS = readCSV(dInp['pFResCombS'], iCol=0)
-if dInp['readResProp15mer']:
-    dfrResProp15mer = readCSV(dInp['pFResProp15mer'], iCol=0)
+if dInp['readResPropNmer']:
+    dfrResPropNmer = readCSV(dInp['pFResPropNmer'], iCol=0)
 serKin = dfrKinIn['Effector'].unique()
-ser15mer = dfr15merIn['c15mer'].unique()
+serNmer = dfrNmerIn['cNmer'].unique()
 print('Number of different Kinases:', serKin.size)
-print('Number of different 15mer chains:', ser15mer.size)
+print('Number of different Nmer chains:', serNmer.size)
 print('Shape of dfrResCombS:', dfrResCombS.shape)
-print('Shape of dfrResProp15mer:', dfrResProp15mer.shape)
+print('Shape of dfrResPropNmer:', dfrResPropNmer.shape)
 
 ###############################################################################

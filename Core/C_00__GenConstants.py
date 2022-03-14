@@ -64,13 +64,16 @@ S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'
 S_COMBINED = 'Combined'
+S_FULL = 'Full'
 S_INFO_MER = 'InfoNmer'
 S_INFO_EFF = 'InfoEff'
+S_INFO_EFF_F = S_INFO_EFF + S_FULL
+S_INFO_GEN = 'InfoGen'
 S_TEST = 'Test'
 
 # --- file names, paths and extensions ----------------------------------------
 S_F_RAW_INP_KIN = 'KinaseTarget_202202'
-S_F_RAW_INP_15MER = 'phosphat_m15'
+S_F_RAW_INP_N_MER = 'phosphat_m15'
 
 DIR_INP = '13_Sysbio03_Phospho15mer'
 DIR_RAW_INP = '01_RawData'
@@ -107,7 +110,7 @@ S_NUM_OCC = 'nOcc'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_SNIPPET_DEF = 15
-I_CENT_15MER = LEN_SNIPPET_DEF//2
+I_CENT_N_MER = LEN_SNIPPET_DEF//2
 R01 = 1
 R02 = 2
 R03 = 3

@@ -36,14 +36,14 @@ def getSerTTarg(dITp, dfrK, tSE, sMd=GC.S_SHORT):
         dT = {t2: t6 for t2, t6 in zip(serTTarg, serTDfrE)}
     return serTTarg, dT
 
-def createDEffTarg(dITp, dfrK, dfr15m, lCDfr15m, sMd=GC.S_SHORT):
+def createDEffTarg(dITp, dfrK, dfrNmer, lCDfrNmer, sMd=GC.S_SHORT):
     dEffTarg, serTEff = getSerTEff(dITp, dfrK, sMd=sMd)
     for tSE in serTEff.unique():
         dEffTarg[tSE] = {}
         serTTarg, dT = getSerTTarg(dITp, dfrK, tSE, sMd=sMd)
         for tST in serTTarg.unique():
-            dfrT = dfr15m[dfr15m[dITp['sCodeTrunc']] == tST[0]]
-            dEffTarg[tSE][dT[tST]] = dfrT[lCDfr15m]
+            dfrT = dfrNmer[dfrNmer[dITp['sCodeTrunc']] == tST[0]]
+            dEffTarg[tSE][dT[tST]] = dfrT[lCDfrNmer]
     return dEffTarg
 
 def dDNumToDfrINmer(dITp, dDNum):
@@ -59,21 +59,23 @@ def dDNumToDfrINmer(dITp, dDNum):
         fullDfr = pd.concat([fullDfr, subDfr], axis=0)
     return fullDfr.reset_index(drop=True).convert_dtypes()
 
-def dDNumToDfrIEff(dITp, dDNum):
+def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
     d4Dfr, sEffCode, sAnyEff = {}, dITp['sEffCode'], dITp['sAnyEff']
     dDPrp = GF.convDDNumToDDProp(dDNum=dDNum, nDigRnd=dITp['rndDigProp'])
     assert sAnyEff in dDPrp
-    lSEff, lAllS15m = [s for s in dDPrp if s != sAnyEff], list(dDPrp[sAnyEff])
+    lSEff, lAllSNmer = [s for s in dDPrp if s != sAnyEff], list(dDPrp[sAnyEff])
+    if wAnyEff:
+        lSEff = list(dDPrp)
     if len(dITp['lLenNMer']) > 0:
-        lAllS15m = [s for s in dDPrp[sAnyEff] if len(s) in dITp['lLenNMer']]
-    lAllS15m.sort(key=(lambda x: len(x)))
+        lAllSNmer = [s for s in dDPrp[sAnyEff] if len(s) in dITp['lLenNMer']]
+    lAllSNmer.sort(key=(lambda x: len(x)))
     d4Dfr[sEffCode] = lSEff
-    for s15m in lAllS15m:
-        d4Dfr[s15m] = [0]*len(lSEff)
-    for s15m in lAllS15m:
+    for sNmer in lAllSNmer:
+        d4Dfr[sNmer] = [0]*len(lSEff)
+    for sNmer in lAllSNmer:
         for k, sEff in enumerate(lSEff):
-            if s15m in dDPrp[sEff]:
-                d4Dfr[s15m][k] = dDPrp[sEff][s15m]
+            if sNmer in dDPrp[sEff]:
+                d4Dfr[sNmer][k] = dDPrp[sEff][sNmer]
     return pd.DataFrame(d4Dfr).convert_dtypes()
 
 ###############################################################################
