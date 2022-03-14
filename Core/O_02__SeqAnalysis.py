@@ -24,6 +24,12 @@ class SeqAnalysis(BaseClass):
         print('Initiated "SeqAnalysis" base object.')
 
     # --- methods for reading the input DataFrame -----------------------------
+    def genDLenSeq(self):
+        self.dLenSeq, lSq = {}, [s for s in self.dfrIEff.columns
+                                 if s not in [self.dITp['sEffCode']]]
+        for sSq in lSq:
+            GF.addToDictL(self.dLenSeq, cK=len(sSq), cE=sSq)
+
     def loadDfrIEff(self):
         if self.dIG['isTest']:
             self.pDirRes = self.dITp['pDirRes_T']
@@ -31,22 +37,23 @@ class SeqAnalysis(BaseClass):
             self.pDirRes = self.dITp['pDirRes']
         pFIEffInp = GF.joinToPath(self.pDirRes, self.dITp['sFIEffInp'])
         self.dfrIEff = self.loadDfr(pF=pFIEffInp)
-        self.dLenSeq, lSq = {}, [s for s in self.dfrIEff.columns
-                                 if s not in [self.dITp['sEffCode']]]
-        for sSq in lSq:
-            GF.addToDictL(self.dLenSeq, cK=len(sSq), cE=sSq)
-        if self.dITp['sAnyEff'] in self.dfrIEff:
-            serAnyEff = self.dfrIEff.loc[self.dITp['sAnyEff'], :]
-            for k in self.dLenSeq:
-                maxV = max(serAnyEff.loc[self.dLenSeq[k]])
-                if maxV > 0:
-                    serAnyEff.loc[self.dLenSeq[k]] /= maxV
+        self.genDLenSeq()
 
     # --- methods for performing the Nmer-sequence analysis -------------------
+    def getRelLikelihoods(self, sEff=None):
+        if sEff is None:
+            sEff = self.dITp['sAnyEff']
+        if sEff in self.dfrIEff.index:
+            serSEff = self.dfrIEff.loc[sEff, :]
+            for k in self.dLenSeq:
+                maxV = max(serSEff.loc[self.dLenSeq[k]])
+                if maxV > 0:
+                    serSEff.loc[self.dLenSeq[k]] /= maxV
+
     def performAnalysis(self, lSSeq):
         for cSSeq in lSSeq:
             cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
-    
+
     # --- methods for filling the result paths dictionary ---------------------
 
     # --- methods for printing results ----------------------------------------
@@ -70,5 +77,5 @@ class NmerSeq():
         if type(self.sSeq) == str and len(self.sSeq) == dITp['lenSDef']:
             for k in range(iCNmer + 1):
                 self.dPrf[2*k + 1] = self.sSeq[(iCNmer - k):(iCNmer + k + 1)]
-        
+
 ###############################################################################
