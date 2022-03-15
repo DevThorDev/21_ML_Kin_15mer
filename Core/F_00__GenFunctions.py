@@ -201,6 +201,20 @@ def printSizeDDDfr(dDDfr, modeF=False, nDig=GC.R04):
             print(GC.S_DASH, cKMain, GC.S_ARR_LR, dN)
     print(GC.S_DS80)
 
+def dLV3CToDfr(dLV):
+    return pd.DataFrame(dLV)
+
+def d3ValToDfr(d3V, lSCol, minLenL=5):
+    assert len(lSCol) >= minLenL
+    dLV = {}
+    for cKMain, cDSub1 in d3V.items():
+        for cKSub1, cDSub2 in cDSub1.items():
+            for cKSub2, cV in cDSub2.items():
+                lElRow = [cKMain, cKSub1, cKSub2, len(cKSub2), cV]
+                for sC, cV in zip(lSCol[:minLenL], lElRow):
+                    addToDictL(dLV, cK=sC, cE=cV)
+    return pd.DataFrame(dLV)
+
 def dDDfrToDfr(dDDfr, lSColL, lSColR):
     fullDfr = iniPdDfr(lSNmC=lSColL+lSColR)
     for sKMain, cDSub in dDDfr.items():
@@ -227,6 +241,17 @@ def flattenIt(cIterable, retArr=False):
     if retArr:
         itFlat = np.array(itFlat)
     return itFlat
+
+def getItStartToEnd(cIt, iStart=None, iEnd=None):
+    if iStart is not None:
+        iStart = max(iStart, 0)
+    else:
+        iStart = 0
+    if iEnd is not None:
+        iEnd = min(iEnd, len(cIt))
+    else:
+        iEnd = len(cIt)
+    return cIt[iStart:iEnd]
 
 # --- Functions performing numpy array calculation and manipulation -----------
 def getArrCartProd(it1, it2):

@@ -33,9 +33,7 @@ GF.showElapsedTime(startTime)
 # cData.printDITp()
 # cData.printInpDfrs()
 cSeqAnalysis = SeqAnalysis(inpDatG)
-cSeqAnalysis.performAnalysis(lSSeq=['AAAAPGLSPKTTTKS', 'KKAAAASSDVEEVKT',
-                                    'EIIEVMASKTKIYIV', 'FESTTSFSSIPLQPI'],
-                             lEff=[None, 'AT1G01140', 'AT4G23650'])
+cSeqAnalysis.performAnalysis(lEff=[None, 'AT1G01140', 'AT4G23650'])
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

@@ -78,4 +78,20 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
                 d4Dfr[sNmer][k] = dDPrp[sEff][sNmer]
     return pd.DataFrame(d4Dfr).convert_dtypes()
 
+# --- Functions (O_02__SeqAnalysis) -------------------------------------------
+def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
+    dLh, wtLh, lS3C = {}, 0., dITp['lSCDfrLhV']
+    assert len(lS3C) >= 3
+    for lenSnip, sSnip in dSqProfile.items():
+        if lenSnip <= mxLSnip:
+            cLh = 0.
+            if sSnip in serLh.index:
+                cLh = serLh.at[sSnip]
+            dLh[sSnip] = cLh
+            if lenSnip in dITp['dWtsLenSeq']:
+                wtLh += cLh*dITp['dWtsLenSeq'][lenSnip]
+    GF.addToDictD(d3, cKMain=cSSq, cKSub=cEff, cVSub=dLh)
+    for sC, cV in zip(lS3C[:3], [cSSq, cEff, wtLh]):
+        GF.addToDictL(dLV, cK=sC, cE=cV)
+
 ###############################################################################

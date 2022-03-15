@@ -75,6 +75,9 @@ S_TEST = 'Test'
 S_F_RAW_INP_KIN = 'KinaseTarget_202202'
 S_F_RAW_INP_N_MER = 'phosphat_m15'
 
+S_F_PROC_INP_KIN = 'KinasesAndTargets_202202'
+S_F_PROC_INP_N_MER = 'Pho15mer_202202'
+
 DIR_INP = '13_Sysbio03_Phospho15mer'
 DIR_RAW_INP = '01_RawData'
 DIR_RAW_INP_TEST = '02_RawData' + S_USC + S_TEST
@@ -99,7 +102,10 @@ S_EXT_PTH = 'pth'
 # --- predefined strings (2) --------------------------------------------------
 S_MODE = 'Mode'
 S_TYPE = 'Type'
+S_EFF_CODE = 'Effector'
+S_C_N_MER = 'c15mer'
 S_POS_P_SITE = 'PosPSite'
+S_SNIPPET = 'Snippet'
 S_LEN_SNIP = 'lenSnip'
 S_EXP_NAME = 'exp_name'
 S_CODE_TRUNC = 'code_trunc'

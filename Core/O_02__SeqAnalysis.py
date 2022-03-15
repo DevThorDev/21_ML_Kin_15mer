@@ -6,7 +6,7 @@ import copy
 
 # import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
-# import Core.F_01__SpcFunctions as SF
+import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 
@@ -32,12 +32,25 @@ class SeqAnalysis(BaseClass):
 
     def loadDfrIEff(self):
         if self.dIG['isTest']:
+            self.pDirProcInp = self.dITp['pDirProcInp_T']
             self.pDirRes = self.dITp['pDirRes_T']
         else:
+            self.pDirProcInp = self.dITp['pDirProcInp']
             self.pDirRes = self.dITp['pDirRes']
         pFIEffInp = GF.joinToPath(self.pDirRes, self.dITp['sFIEffInp'])
         self.dfrIEff = self.loadDfr(pF=pFIEffInp, iC=0)
         self.genDLenSeq()
+
+    # --- methods for obtaining the list of input Nmer-sequences --------------
+    def getLInpNmerSeq(self):
+        sCNmer, self.lInpNmerSeq = self.dITp['sCNmer'], []
+        [iS, iE] = self.dITp['lIStartEnd']
+        pFInpSeq = GF.joinToPath(self.pDirProcInp, self.dITp['sFProcInpNmer'])
+        self.dfrInpSeq = self.loadDfr(pF=pFInpSeq, iC=0)
+        if sCNmer in self.dfrInpSeq.columns:
+            lSNmerFull = list(self.dfrInpSeq[sCNmer].unique())
+            self.lInpNmerSeq = GF.getItStartToEnd(lSNmerFull, iS, iE)
+        return self.lInpNmerSeq
 
     # --- methods for performing the Nmer-sequence analysis -------------------
     def getRelLikelihoods(self, cEff=None):
@@ -50,36 +63,33 @@ class SeqAnalysis(BaseClass):
                 maxV = max(serEff.loc[self.dLenSeq[k]])
                 if maxV > 0:
                     serEff.loc[self.dLenSeq[k]] /= maxV
-        return serEff, maxLenSnip
+        return serEff, cEff, maxLenSnip
 
-    def performAnalysis(self, lSSeq, lEff=[None]):
+    def performAnalysis(self, lEff=[None], lSSeq=None):
         if self.dITp['analyseSeq']:
-            dISSeq = {}
+            if lSSeq is None:
+                lSSeq = self.getLInpNmerSeq()
+            dLV, d3, k = {}, {}, 0
             for cSSeq in lSSeq:
                 cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
                 for cEff in lEff:
-                    serLlh, maxLSnip = self.getRelLikelihoods(cEff)
-                    dLlh, wtLlh = {}, 0.
-                    for lenSnip, sSnip in cNmerSeq.dPrf.items():
-                        if lenSnip <= maxLSnip:
-                            cLlh = 0.
-                            if sSnip in serLlh.index:
-                                cLlh = serLlh.at[sSnip]
-                            dLlh[sSnip] = cLlh
-                            if lenSnip in self.dITp['dWtsLenSeq']:
-                                wtLlh += cLlh*self.dITp['dWtsLenSeq'][lenSnip]
-                    GF.addToDictD(dISSeq, cSSeq, cEff, cVSub=(wtLlh, dLlh))
-            print('dISSeq:')
-            print(dISSeq)
-
-    # --- methods for filling the result paths dictionary ---------------------
+                    serLlh, cEff, maxLSnip = self.getRelLikelihoods(cEff)
+                    SF.calcDictLikelihood(self.dITp, dLV, d3, cNmerSeq.dPrf,
+                                          serLlh, maxLSnip, cSSeq, cEff)
+                    k += 1
+                    print('Processed', k, 'of', len(lSSeq)*len(lEff), '...')
+            self.saveDfrRelLikelihood(dLV, d3, lSCD3=self.dITp['lSCDfrLhD'])
 
     # --- methods for printing results ----------------------------------------
 
     # --- methods for saving data ---------------------------------------------
-    # def saveResultSeqAnalysis(self):
-    #     self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI),
-    #                  dropDup=True, saveAnyway=False)
+    def saveDfrRelLikelihood(self, dLV, d3, lSCD3):
+        dfrVal = GF.dLV3CToDfr(dLV)
+        pFDfrVal = GF.joinToPath(self.pDirRes, self.dITp['sFResWtLh'])
+        self.saveDfr(dfrVal, pF=pFDfrVal, dropDup=False, saveAnyway=True)
+        dfrDict = GF.d3ValToDfr(d3, lSCD3)
+        pFDfrDict = GF.joinToPath(self.pDirRes, self.dITp['sFResRelLh'])
+        self.saveDfr(dfrDict, pF=pFDfrDict, dropDup=False, saveAnyway=True)
 
 # -----------------------------------------------------------------------------
 class NmerSeq():
@@ -87,7 +97,6 @@ class NmerSeq():
     def __init__(self, dITp, sSq=''):
         self.sSeq = sSq
         self.createProfileDict(dITp)
-        print('Initiated "NmerSeq" base object.')
 
     # --- methods for creating the profile dictionary -------------------------
     def createProfileDict(self, dITp):

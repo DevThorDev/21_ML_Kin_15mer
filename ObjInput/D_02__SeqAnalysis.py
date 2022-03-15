@@ -12,20 +12,37 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 # --- flow control ------------------------------------------------------------
 analyseSeq = True
 
-# --- lists (1) ---------------------------------------------------------------
-
 # --- names and paths of files and dirs ---------------------------------------
-sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3'
+sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
+sFResWtLh = GC.S_US02.join(['WtLikelihood', sFIEffInp])
+sFResRelLh = GC.S_US02.join(['RelLikelihood', sFIEffInp])
 
 # --- numbers -----------------------------------------------------------------
+iStartLInpNmerSeq = 0          # number or None
+iEndLInpNmerSeq = 1000          # number or None
 
 # --- strings -----------------------------------------------------------------
+sCNmer = GC.S_C_N_MER
+sEffCode = GC.S_EFF_CODE
+sSnippet = GC.S_SNIPPET
+sLenSnip = GC.S_LEN_SNIP
+sWtLikelihood = 'wtLikelihood'
+sRelLikelihood = 'relLikelihood'
 
-# --- lists (2) ---------------------------------------------------------------
+# --- lists -------------------------------------------------------------------
+lIStartEnd = [iStartLInpNmerSeq, iEndLInpNmerSeq]
+lSCDfrLhV = [sCNmer, sEffCode, sWtLikelihood]
+lSCDfrLhD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelLikelihood]
 
 # --- dictionaries ------------------------------------------------------------
 dWtsLenSeq = {1: 0.1,
-              3: 0.9}
+              3: 0.5,
+              5: 0.25,
+              7: 0.15,
+              9: 0.0,
+              11: 0.0,
+              13: 0.0,
+              15: 0.0}
 
 # === assertions ==============================================================
 
@@ -37,12 +54,24 @@ dIO = {# --- general
        'sNmSpec': sNmSpec,
        # --- flow control
        'analyseSeq': analyseSeq,
-       # --- lists (1)
        # --- names and paths of files and dirs
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers
+       'iStartLInpNmerSeq': iStartLInpNmerSeq,
+       'iEndLInpNmerSeq': iEndLInpNmerSeq,
        # --- strings
-       # --- lists (2)
+       'sCNmer': sCNmer,
+       'sEffCode': sEffCode,
+       'sSnippet': sSnippet,
+       'sLenSnip': sLenSnip,
+       'sWtLikelihood': sWtLikelihood,
+       'sRelLikelihood': sRelLikelihood,
+       # --- lists
+       'lIStartEnd': lIStartEnd,
+       'lSCDfrLhV': lSCDfrLhV,
+       'lSCDfrLhD': lSCDfrLhD,
        # --- dictionaries
        'dWtsLenSeq': dWtsLenSeq,
        # === derived values and input processing
