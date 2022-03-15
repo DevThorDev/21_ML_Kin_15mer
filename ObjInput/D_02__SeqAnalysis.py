@@ -44,6 +44,7 @@ dIO = {# --- general
        # --- strings
        # --- lists (2)
        # --- dictionaries
+       'dWtsLenSeq': dWtsLenSeq,
        # === derived values and input processing
        }
 

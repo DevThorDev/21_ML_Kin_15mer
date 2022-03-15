@@ -9,6 +9,7 @@ from Control.A_00__GenInput import dictInpG
 from Core.C_00__GenConstants import S_OBJINP
 from Core.I_01__InpData import InputData
 from Core.O_01__ExpData import ExpData
+from Core.O_02__SeqAnalysis import SeqAnalysis
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -31,6 +32,10 @@ GF.showElapsedTime(startTime)
 # cData.printDIG()
 # cData.printDITp()
 # cData.printInpDfrs()
+cSeqAnalysis = SeqAnalysis(inpDatG)
+cSeqAnalysis.performAnalysis(lSSeq=['AAAAPGLSPKTTTKS', 'KKAAAASSDVEEVKT',
+                                    'EIIEVMASKTKIYIV', 'FESTTSFSSIPLQPI'],
+                             lEff=[None, 'AT1G01140', 'AT4G23650'])
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

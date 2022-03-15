@@ -15,7 +15,7 @@ dBDoDfrRes = {GC.S_SHORT: False,
               GC.S_MED: False,
               GC.S_LONG: False}
 createInfoNmer = False
-createInfoEff = True
+createInfoEff = False
 createInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------

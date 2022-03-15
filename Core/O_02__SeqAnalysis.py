@@ -36,23 +36,41 @@ class SeqAnalysis(BaseClass):
         else:
             self.pDirRes = self.dITp['pDirRes']
         pFIEffInp = GF.joinToPath(self.pDirRes, self.dITp['sFIEffInp'])
-        self.dfrIEff = self.loadDfr(pF=pFIEffInp)
+        self.dfrIEff = self.loadDfr(pF=pFIEffInp, iC=0)
         self.genDLenSeq()
 
     # --- methods for performing the Nmer-sequence analysis -------------------
-    def getRelLikelihoods(self, sEff=None):
-        if sEff is None:
-            sEff = self.dITp['sAnyEff']
-        if sEff in self.dfrIEff.index:
-            serSEff = self.dfrIEff.loc[sEff, :]
+    def getRelLikelihoods(self, cEff=None):
+        serEff, maxLenSnip = None, max([len(s) for s in self.dfrIEff.columns])
+        if cEff is None:
+            cEff = self.dITp['sAnyEff']
+        if cEff in self.dfrIEff.index:
+            serEff = self.dfrIEff.loc[cEff, :]
             for k in self.dLenSeq:
-                maxV = max(serSEff.loc[self.dLenSeq[k]])
+                maxV = max(serEff.loc[self.dLenSeq[k]])
                 if maxV > 0:
-                    serSEff.loc[self.dLenSeq[k]] /= maxV
+                    serEff.loc[self.dLenSeq[k]] /= maxV
+        return serEff, maxLenSnip
 
-    def performAnalysis(self, lSSeq):
-        for cSSeq in lSSeq:
-            cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
+    def performAnalysis(self, lSSeq, lEff=[None]):
+        if self.dITp['analyseSeq']:
+            dISSeq = {}
+            for cSSeq in lSSeq:
+                cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
+                for cEff in lEff:
+                    serLlh, maxLSnip = self.getRelLikelihoods(cEff)
+                    dLlh, wtLlh = {}, 0.
+                    for lenSnip, sSnip in cNmerSeq.dPrf.items():
+                        if lenSnip <= maxLSnip:
+                            cLlh = 0.
+                            if sSnip in serLlh.index:
+                                cLlh = serLlh.at[sSnip]
+                            dLlh[sSnip] = cLlh
+                            if lenSnip in self.dITp['dWtsLenSeq']:
+                                wtLlh += cLlh*self.dITp['dWtsLenSeq'][lenSnip]
+                    GF.addToDictD(dISSeq, cSSeq, cEff, cVSub=(wtLlh, dLlh))
+            print('dISSeq:')
+            print(dISSeq)
 
     # --- methods for filling the result paths dictionary ---------------------
 

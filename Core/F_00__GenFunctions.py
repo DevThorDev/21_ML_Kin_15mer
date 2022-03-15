@@ -154,15 +154,18 @@ def addToDictDSpc(cDMain, cKMain, cKSub, cVSub=None):
     elif type(cDMain[cKMain]) == dict:
         cDMain[cKMain][cKSub] = cVSub
 
-def addToDictD(cD, cKMain, cKSub, lV=[]):
+def addToDictD(cD, cKMain, cKSub, cVSub=[], allowRpl=False):
     if cKMain in cD:
         if cKSub not in cD[cKMain]:
-            cD[cKMain][cKSub] = lV
+            cD[cKMain][cKSub] = cVSub
         else:
-            print('ERROR: Key', cKSub, 'already in', cD[cKMain], '\nlV =', lV)
-            assert False
+            if allowRpl:
+                cD[cKMain][cKSub] = cVSub
+            else:
+                print('ERROR: Key', cKSub, 'already in', cD[cKMain])
+                assert False
     else:
-        cD[cKMain] = {cKSub: lV}
+        cD[cKMain] = {cKSub: cVSub}
 
 def convDDNumToDDProp(dDNum, nDigRnd):
     dDSum, dDProp = {}, {}
