@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-# --- F_03__OTpFunctions.py ---------------------------------------------------
+# --- F_01__SpcFunctions.py ---------------------------------------------------
 ###############################################################################
 # import numpy as np
 import pandas as pd
@@ -80,8 +80,8 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
 
 # --- Functions (O_02__SeqAnalysis) -------------------------------------------
 def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
-    dLh, wtLh, lS3C = {}, 0., dITp['lSCDfrLhV']
-    assert len(lS3C) >= 3
+    dLh, wtLh, lSCWtLh = {}, 0., dITp['lSCDfrLhV']
+    assert len(lSCWtLh) >= 3
     for lenSnip, sSnip in dSqProfile.items():
         if lenSnip <= mxLSnip:
             cLh = 0.
@@ -90,8 +90,10 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             dLh[sSnip] = cLh
             if lenSnip in dITp['dWtsLenSeq']:
                 wtLh += cLh*dITp['dWtsLenSeq'][lenSnip]
-    GF.addToDictD(d3, cKMain=cSSq, cKSub=cEff, cVSub=dLh)
-    for sC, cV in zip(lS3C[:3], [cSSq, cEff, wtLh]):
-        GF.addToDictL(dLV, cK=sC, cE=cV)
+    if dITp['calcRelLh']:
+        GF.addToDictD(d3, cKMain=cSSq, cKSub=cEff, cVSub=dLh)
+    if dITp['calcWtLh']:
+        for sC, cV in zip(lSCWtLh[:3], [cSSq, cEff, wtLh]):
+            GF.addToDictL(dLV, cK=sC, cE=cV)
 
 ###############################################################################

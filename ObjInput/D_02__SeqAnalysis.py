@@ -10,16 +10,21 @@ sOType = 'Nmer-sequence analysis (D_02__SeqAnalysis)'
 sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 
 # --- flow control ------------------------------------------------------------
-analyseSeq = True
+calcWtLh = False
+calcRelLh = False
 
 # --- names and paths of files and dirs ---------------------------------------
 sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
-sFResWtLh = GC.S_US02.join(['WtLikelihood', sFIEffInp])
-sFResRelLh = GC.S_US02.join(['RelLikelihood', sFIEffInp])
+sFCombInp = 'Combined_S_KinasesPho15mer_202202'
+
+sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
+sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 
 # --- numbers -----------------------------------------------------------------
-iStartLInpNmerSeq = 0          # number or None
+iStartLInpNmerSeq = 0           # number or None
 iEndLInpNmerSeq = 1000          # number or None
+
+mDsp = 200
 
 # --- strings -----------------------------------------------------------------
 sCNmer = GC.S_C_N_MER
@@ -28,10 +33,11 @@ sSnippet = GC.S_SNIPPET
 sLenSnip = GC.S_LEN_SNIP
 sWtLikelihood = 'wtLikelihood'
 sRelLikelihood = 'relLikelihood'
+sInCombRes = 'inCombRes'
 
 # --- lists -------------------------------------------------------------------
 lIStartEnd = [iStartLInpNmerSeq, iEndLInpNmerSeq]
-lSCDfrLhV = [sCNmer, sEffCode, sWtLikelihood]
+lSCDfrLhV = [sCNmer, sEffCode, sWtLikelihood, sInCombRes]
 lSCDfrLhD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelLikelihood]
 
 # --- dictionaries ------------------------------------------------------------
@@ -53,14 +59,17 @@ dIO = {# --- general
        'sOType': sOType,
        'sNmSpec': sNmSpec,
        # --- flow control
-       'analyseSeq': analyseSeq,
+       'calcWtLh': calcWtLh,
+       'calcRelLh': calcRelLh,
        # --- names and paths of files and dirs
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
+       'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers
        'iStartLInpNmerSeq': iStartLInpNmerSeq,
        'iEndLInpNmerSeq': iEndLInpNmerSeq,
+       'mDsp': mDsp,
        # --- strings
        'sCNmer': sCNmer,
        'sEffCode': sEffCode,
@@ -68,6 +77,7 @@ dIO = {# --- general
        'sLenSnip': sLenSnip,
        'sWtLikelihood': sWtLikelihood,
        'sRelLikelihood': sRelLikelihood,
+       'sInCombRes': sInCombRes,
        # --- lists
        'lIStartEnd': lIStartEnd,
        'lSCDfrLhV': lSCDfrLhV,

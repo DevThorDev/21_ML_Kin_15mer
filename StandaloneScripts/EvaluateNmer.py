@@ -13,8 +13,8 @@ S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'
 S_COMBINED = 'Combined'
-S_INFO_MER = 'InfoNmer'
-S_INFO_EFF = 'InfoEff'
+S_I_MER = 'InfoNmer'
+S_I_EFF = 'InfoEff'
 
 # --- file names, paths and extensions ----------------------------------------
 DIR_INP = '13_Sysbio03_Phospho15mer'

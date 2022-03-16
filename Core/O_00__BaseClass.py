@@ -14,10 +14,15 @@ class BaseClass:
         self.idO = 'O_00'
         self.descO = 'Base class'
         self.dIG = inpDat.dI
-        self.dITp = copy.deepcopy(self.dIG[0])      # type of base class = 0
+        self.getDITp()
         self.dfrKin, self.dfrNmer = None, None
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
         print('Initiated "BaseClass" base object.')
+
+    def getDITp(self, iTpBase=0, iTp=0, lITpUpd=[]):
+        self.dITp = copy.deepcopy(self.dIG[iTpBase])    # type of base class: 0
+        for iTpUpd in lITpUpd + [iTp]:             # updated with types in list
+            self.dITp.update(self.dIG[iTpUpd])
 
     # --- print methods -------------------------------------------------------
     def __str__(self):
@@ -57,6 +62,14 @@ class BaseClass:
         self.dITp[cK] = cV
 
     # --- methods for loading and saving DataFrames ---------------------------
+    def getPDir(self):
+        if self.dIG['isTest']:
+            self.pDirProcInp = self.dITp['pDirProcInp_T']
+            self.pDirRes = self.dITp['pDirRes_T']
+        else:
+            self.pDirProcInp = self.dITp['pDirProcInp']
+            self.pDirRes = self.dITp['pDirRes']
+    
     def loadDfr(self, pF, iC=None, dDTp=None, cSep=None):
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
         if cSep is None:

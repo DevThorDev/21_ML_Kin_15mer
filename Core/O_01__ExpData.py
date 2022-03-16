@@ -2,8 +2,6 @@
 ###############################################################################
 # --- O_01__ExpData.py --------------------------------------------------------
 ###############################################################################
-import copy
-
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
 import Core.F_01__SpcFunctions as SF
@@ -17,9 +15,8 @@ class ExpData(BaseClass):
         super().__init__(inpDat)
         self.idO = 'O_01'
         self.descO = 'Experimental data'
-        self.dITp = copy.deepcopy(self.dIG[0])  # type of base class = 0
-        for iTpU in lITpUpd + [iTp]:            # updated with types in list
-            self.dITp.update(self.dIG[iTpU])
+        self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
+        self.getPDir()
         self.readExpData()
         self.fillDPFRes()
         print('Initiated "ExpData" base object.')
@@ -29,37 +26,34 @@ class ExpData(BaseClass):
         if self.dIG['isTest']:
             self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin_T'])
             self.dfrNmer = self.loadDfr(pF=self.dITp['pFRawInpNmer_T'])
-            self.pDirProcInp = self.dITp['pDirProcInp_T']
-            self.pDirRes = self.dITp['pDirRes_T']
         else:
             self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin'])
             self.dfrNmer = self.loadDfr(pF=self.dITp['pFRawInpNmer'])
-            self.pDirProcInp = self.dITp['pDirProcInp']
-            self.pDirRes = self.dITp['pDirRes']
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
         lC = list(self.dfrKin.columns) + list(self.dfrNmer.columns)
+        self.dfrComb = None
         if self.dITp['createInfoGen']:
             self.dfrResIGen = GF.iniPdDfr(lSNmC=lC, lSNmR=self.dITp['lRResIG'])
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFRes(self):
-        sJ, sFl, pDirRes = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
-        sPFCmbS = GF.joinToPath(pDirRes, self.dITp['sFResCombS'])
-        sPFCmbM = GF.joinToPath(pDirRes, self.dITp['sFResCombM'])
-        sPFCmbL = GF.joinToPath(pDirRes, self.dITp['sFResCombL'])
+        sJ, sFl, pRes = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
+        sPFCmbS = GF.joinToPath(pRes, self.dITp['sFResCombS'])
+        sPFCmbM = GF.joinToPath(pRes, self.dITp['sFResCombM'])
+        sPFCmbL = GF.joinToPath(pRes, self.dITp['sFResCombL'])
         dPFCmb = {GC.S_SHORT: sPFCmbS, GC.S_MED: sPFCmbM, GC.S_LONG: sPFCmbL}
-        sPFINmer = GF.joinToPath(pDirRes, self.dITp['sFResINmer'])
+        sPFINmer = GF.joinToPath(pRes, self.dITp['sFResINmer'])
         sFE = self.dITp['sUSC'].join(self.dITp['lSLenNMer'])
         sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE, sJoin=sJ)
         if len(sFE) > 0:
-            sFl = sJ.join([self.dITp['sFull'], sFE])
+            sFl = sJ.join([sFl, sFE])
         sFResIEffF = GF.modSF(self.dITp['sFResIEff'], sEnd=sFl, sJoin=sJ)
-        sPFResIGen = GF.joinToPath(pDirRes, self.dITp['sFResIGen'])
+        sPFResIGen = GF.joinToPath(pRes, self.dITp['sFResIGen'])
         self.dPFRes = {GC.S_COMBINED: dPFCmb,
-                       GC.S_INFO_MER: sPFINmer,
-                       GC.S_INFO_EFF: GF.joinToPath(pDirRes, sFResIEff),
-                       GC.S_INFO_EFF_F: GF.joinToPath(pDirRes, sFResIEffF),
-                       GC.S_INFO_GEN: sPFResIGen}
+                       GC.S_I_MER: sPFINmer,
+                       GC.S_I_EFF: GF.joinToPath(pRes, sFResIEff),
+                       GC.S_I_EFF_F: GF.joinToPath(pRes, sFResIEffF),
+                       GC.S_I_GEN: sPFResIGen}
 
     # --- methods for printing results ----------------------------------------
     def printFilteredRawDataKin(self, lC, nR0, nR1, nR2, nDig=GC.R04):
@@ -147,13 +141,13 @@ class ExpData(BaseClass):
 
     # --- methods for combining experimental data -----------------------------
     def combine(self, lSCK, lSCNmer, iSt=0, sMd=GC.S_SHORT):
-        dEffTarg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfrNmer,
-                                     lCDfrNmer=lSCNmer, sMd=sMd)
-        GF.printSizeDDDfr(dDDfr=dEffTarg, modeF=True)
-        dfrComb = GF.dDDfrToDfr(dDDfr=dEffTarg, lSColL=lSCK, lSColR=lSCNmer)
-        self.saveDfr(dfrComb, pF=self.dPFRes[GC.S_COMBINED][sMd], dropDup=True,
-                     saveAnyway=True)
-        self.fillDfrResIGen(dfrComb, lR=self.dITp['lRResIG'], iSt=iSt)
+        dEffTg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfrNmer,
+                                   lCDfrNmer=lSCNmer, sMd=sMd)
+        GF.printSizeDDDfr(dDDfr=dEffTg, modeF=True)
+        self.dfrComb = GF.dDDfrToDfr(dDDfr=dEffTg, lSColL=lSCK, lSColR=lSCNmer)
+        self.saveDfr(self.dfrComb, pF=self.dPFRes[GC.S_COMBINED][sMd],
+                     dropDup=True, saveAnyway=True)
+        self.fillDfrResIGen(self.dfrComb, lR=self.dITp['lRResIG'], iSt=iSt)
 
     def combineS(self, iSt=0):
         lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
@@ -185,7 +179,7 @@ class ExpData(BaseClass):
             self.combineL(iSt=6)
             print('Created long combined result.')
         if self.dITp['createInfoGen']:
-            self.saveDfr(self.dfrResIGen, pF=self.dPFRes[GC.S_INFO_GEN])
+            self.saveDfr(self.dfrResIGen, pF=self.dPFRes[GC.S_I_GEN])
 
     # --- method calling sub-methods that process and combine exp. data -------
     def procExpData(self, nDigDsp=GC.R04):
@@ -198,28 +192,32 @@ class ExpData(BaseClass):
         self.combineInpDfr()
 
     # --- methods extracting info from processed/combined data ----------------
-    def convDNmerToDfr(self, dNMer, stT):
+    def convDNmerToDfr(self, dNMer, stT, sIEff, sIEffF):
         if self.dITp['createInfoNmer']:
             dfrINmer = SF.dDNumToDfrINmer(self.dITp, dNMer)
             dfrINmer.sort_values(by=self.dITp['lSortCDfrNMer'],
                                  ascending=self.dITp['lSortDirAscDfrNMer'],
                                  inplace=True, ignore_index=True)
-            self.saveDfr(dfrINmer, pF=self.dPFRes[GC.S_INFO_MER], saveIdx=True,
+            self.saveDfr(dfrINmer, pF=self.dPFRes[GC.S_I_MER], saveIdx=True,
                          dropDup=False, saveAnyway=True)
             GF.showElapsedTime(stT)
         if self.dITp['createInfoEff']:
             dfrIEff = SF.dDNumToDfrIEff(self.dITp, dNMer)
-            self.saveDfr(dfrIEff, pF=self.dPFRes[GC.S_INFO_EFF], saveIdx=False,
+            self.saveDfr(dfrIEff, pF=self.dPFRes[sIEff], saveIdx=False,
                          dropDup=False, saveAnyway=True)
             dfrIEffF = SF.dDNumToDfrIEff(self.dITp, dNMer, wAnyEff=True)
-            self.saveDfr(dfrIEffF, pF=self.dPFRes[GC.S_INFO_EFF_F],
+            self.saveDfr(dfrIEffF, pF=self.dPFRes[sIEffF],
                          saveIdx=False, dropDup=False, saveAnyway=True)
             GF.showElapsedTime(stT)
 
-    def getInfoKinNmer(self, stT, sMd=GC.S_SHORT):
-        dENmer, dfrCombS = {}, self.loadDfr(pF=self.dPFRes[GC.S_COMBINED][sMd])
-        if dfrCombS is not None:
-            for dRec in dfrCombS.to_dict('records'):
+    def getInfoKinNmer(self, stT, sIEff, sIEffF, cDfr=None, sMd=GC.S_SHORT):
+        dENmer = {}
+        if cDfr is None:
+            if self.dfrComb is None:
+                self.dfrComb = self.loadDfr(pF=self.dPFRes[GC.S_COMBINED][sMd])
+            cDfr = self.dfrComb
+        if cDfr is not None:
+            for dRec in cDfr.to_dict('records'):
                 # considering all effectors pooled
                 GF.addToDictL(dENmer, self.dITp['sAnyEff'],
                               dRec[self.dITp['sCNmer']], lUniqEl=False)
@@ -233,6 +231,6 @@ class ExpData(BaseClass):
                     sCentNmer = sNmer[(iCNmer - k):(iCNmer + k + 1)]
                     GF.addToDictDNum(dNMer, sEff, sCentNmer)
         GF.showElapsedTime(stT)
-        self.convDNmerToDfr(dNMer, stT=stT)
+        self.convDNmerToDfr(dNMer, stT=stT, sIEff=sIEff, sIEffF=sIEffF)
 
 ###############################################################################

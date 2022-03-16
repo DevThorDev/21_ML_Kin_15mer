@@ -10,6 +10,7 @@ from Core.C_00__GenConstants import S_OBJINP
 from Core.I_01__InpData import InputData
 from Core.O_01__ExpData import ExpData
 from Core.O_02__SeqAnalysis import SeqAnalysis
+from Core.O_03__Validation import Validation
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -27,13 +28,19 @@ print(cData)
 GF.showElapsedTime(startTime)
 cData.procExpData()
 GF.showElapsedTime(startTime)
-cData.getInfoKinNmer(startTime)
+cData.getInfoKinNmer(stT=startTime, sIEff=GC.S_I_EFF, sIEffF=GC.S_I_EFF_F)
 GF.showElapsedTime(startTime)
 # cData.printDIG()
 # cData.printDITp()
 # cData.printInpDfrs()
 cSeqAnalysis = SeqAnalysis(inpDatG)
+GF.showElapsedTime(startTime)
 cSeqAnalysis.performAnalysis(lEff=[None, 'AT1G01140', 'AT4G23650'])
+GF.showElapsedTime(startTime)
+cValidation = Validation(inpDatG)
+cValidation.splitInpData()
+cValidation.printTestObj(printDfrComb=True)
+cValidation.createResultsTrain(stT=startTime)
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

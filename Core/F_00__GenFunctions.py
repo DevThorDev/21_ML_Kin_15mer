@@ -251,7 +251,7 @@ def getItStartToEnd(cIt, iStart=None, iEnd=None):
         iEnd = min(iEnd, len(cIt))
     else:
         iEnd = len(cIt)
-    return cIt[iStart:iEnd]
+    return cIt[iStart:iEnd], iStart, iEnd
 
 # --- Functions performing numpy array calculation and manipulation -----------
 def getArrCartProd(it1, it2):
@@ -413,6 +413,15 @@ def calcArrRunMnSD(lArr, cCt=0):
     return arrMn, finalRunSD(arrM2, cCt)
 
 # --- Functions related to reshuffling and drawing of random numbers ----------
+def drawListInt(minInt=0, maxInt=1, nIntDrawn=1, wRepl=True, sortL=False):
+    minInt, maxInt = min(minInt, maxInt), max(minInt, maxInt)
+    lI = list(RNG().choice(maxInt - minInt, size=nIntDrawn, replace=wRepl))
+    if minInt != 0:
+        lI = [k + minInt for k in lI]
+    if sortL:
+        lI.sort()
+    return lI
+
 def shuffleArr(cArr, cAx=0):
     RNG().shuffle(cArr, axis=cAx)
     return cArr

@@ -65,10 +65,16 @@ S_MED = 'med'
 S_LONG = 'long'
 S_COMBINED = 'Combined'
 S_FULL = 'Full'
-S_INFO_MER = 'InfoNmer'
-S_INFO_EFF = 'InfoEff'
-S_INFO_EFF_F = S_INFO_EFF + S_FULL
-S_INFO_GEN = 'InfoGen'
+S_TEST = 'Test'
+S_TRAIN = 'Train'
+S_I_MER = 'InfoNmer'
+S_I_EFF = 'InfoEff'
+S_I_EFF_TEST = S_USC.join([S_I_EFF, S_TEST])
+S_I_EFF_TRAIN = S_USC.join([S_I_EFF, S_TRAIN])
+S_I_EFF_F = S_I_EFF + S_FULL
+S_I_EFF_F_TEST = S_USC.join([S_I_EFF_F, S_TEST])
+S_I_EFF_F_TRAIN = S_USC.join([S_I_EFF_F, S_TRAIN])
+S_I_GEN = 'InfoGen'
 S_TEST = 'Test'
 
 # --- file names, paths and extensions ----------------------------------------

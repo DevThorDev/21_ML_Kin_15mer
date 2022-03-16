@@ -2,8 +2,6 @@
 ###############################################################################
 # --- O_11__Plotter.py --------------------------------------------------------
 ###############################################################################
-import copy
-
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
 import Core.F_02__PltFunctions as PF
@@ -18,9 +16,7 @@ class Plotter(BaseClass):
         super().__init__(inpDat)
         self.idO = 'O_11'
         self.descO = 'Plotter'
-        self.dITp = copy.deepcopy(self.dIG[0])  # type of base class = 0
-        for iTpU in lITpUpd + [iTp]:            # updated with types in list
-            self.dITp.update(self.dIG[iTpU])
+        self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         print('Initiated "Plotter" base object.')
 
 # --- path modification methods -----------------------------------------------

@@ -15,11 +15,11 @@ dBDoDfrRes = {GC.S_SHORT: False,
               GC.S_MED: False,
               GC.S_LONG: False}
 createInfoNmer = False
-createInfoEff = False
+createInfoEff = True
 createInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNMer4ResIEff = [1]       # empty list: all lengths considered
+lLenNMer4ResIEff = [1, 3, 5, 7]       # empty list: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
@@ -47,8 +47,6 @@ pDirRes_Test = GC.P_DIR_RES_TEST
 lenSnippetDef = GC.LEN_SNIPPET_DEF
 iCentNmer = GC.I_CENT_N_MER
 rndDigProp = GC.R08
-
-mDsp = 1000
 
 # --- strings -----------------------------------------------------------------
 sUSC = GC.S_USC
@@ -145,7 +143,6 @@ dIO = {# --- general
        'lenSDef': lenSnippetDef,
        'iCentNmer': iCentNmer,
        'rndDigProp': rndDigProp,
-       'mDsp': mDsp,
        # --- strings
        'sUSC': sUSC,
        'sUS02': sUS02,
