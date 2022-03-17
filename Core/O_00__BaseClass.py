@@ -15,8 +15,8 @@ class BaseClass:
         self.descO = 'Base class'
         self.dIG = inpDat.dI
         self.getDITp()
-        self.dfrKin, self.dfrNmer = None, None
-        self.lDfrInp = [self.dfrKin, self.dfrNmer]
+        self.iniDfrs()
+        self.fillDTpDfrBase()
         print('Initiated "BaseClass" base object.')
 
     def getDITp(self, iTpBase=0, iTp=0, lITpUpd=[]):
@@ -61,7 +61,33 @@ class BaseClass:
             print('Adding entry (', cK, GC.S_COL, cV, ') to type dictionary')
         self.dITp[cK] = cV
 
-    # --- methods for loading and saving DataFrames ---------------------------
+    # --- methods for initialising the DataFrames -----------------------------
+    def iniDfrs(self):
+        self.dfrKin, self.dfrNmer = None, None
+        self.lDfrInp = [self.dfrKin, self.dfrNmer]
+        self.dfrComb, self.dfrTrain, self.dfrTest = None, None, None
+
+    # --- methods for filling the DataFrame type dictionary -------------------
+    def fillDTpDfrBase(self):
+        sDfrC, sNMer = self.dITp['sCDfrComb'], self.dITp['sNmer']
+        sEff, sEffF = self.dITp['sEff'], self.dITp['sEffF']
+        self.dTpDfr = {self.dITp['sBase']: {},
+                       self.dITp['sTrain']: {},
+                       self.dITp['sTest']: {}}
+        self.dTpDfr[self.dITp['sBase']][sDfrC] = self.dfrComb
+        self.dTpDfr[self.dITp['sTrain']][sDfrC] = self.dfrTrain
+        self.dTpDfr[self.dITp['sTest']][sDfrC] = self.dfrTest
+        self.dTpDfr[self.dITp['sBase']][sNMer] = self.dITp['sImer']
+        self.dTpDfr[self.dITp['sTrain']][sNMer] = self.dITp['sImerTrain']
+        self.dTpDfr[self.dITp['sTest']][sNMer] = self.dITp['sImerTest']
+        self.dTpDfr[self.dITp['sBase']][sEff] = self.dITp['sIEff']
+        self.dTpDfr[self.dITp['sTrain']][sEff] = self.dITp['sIEffTrain']
+        self.dTpDfr[self.dITp['sTest']][sEff] = self.dITp['sIEffTest']
+        self.dTpDfr[self.dITp['sBase']][sEffF] = self.dITp['sIEffF']
+        self.dTpDfr[self.dITp['sTrain']][sEffF] = self.dITp['sIEffFTrain']
+        self.dTpDfr[self.dITp['sTest']][sEffF] = self.dITp['sIEffFTest']
+
+        # --- methods for loading and saving DataFrames ---------------------------
     def getPDir(self):
         if self.dIG['isTest']:
             self.pDirProcInp = self.dITp['pDirProcInp_T']
@@ -69,7 +95,7 @@ class BaseClass:
         else:
             self.pDirProcInp = self.dITp['pDirProcInp']
             self.pDirRes = self.dITp['pDirRes']
-    
+
     def loadDfr(self, pF, iC=None, dDTp=None, cSep=None):
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
         if cSep is None:

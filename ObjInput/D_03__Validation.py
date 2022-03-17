@@ -12,6 +12,15 @@ sNmSpec = 'Input data for the Validation class in O_03__Validation'
 # --- flow control ------------------------------------------------------------
 predictWTrain = True
 
+saveCombTrain = True
+saveCombTest = True
+
+genInfoNmerTrain = True
+genInfoNmerTest = True      # not used yet
+
+genInfoEffTrain = True
+genInfoEffTest = True       # not used yet
+
 # --- names and paths of files and dirs ---------------------------------------
 sFCombInp = 'Combined_S_KinasesPho15mer_202202'
 
@@ -44,6 +53,12 @@ dIO = {# --- general
        'sNmSpec': sNmSpec,
        # --- flow control
        'predictWTrain': predictWTrain,
+       'saveCombTrain': saveCombTrain,
+       'saveCombTest': saveCombTest,
+       'genInfoNmerTrain': genInfoNmerTrain,
+       'genInfoNmerTest': genInfoNmerTest,
+       'genInfoEffTrain': genInfoEffTrain,
+       'genInfoEffTest': genInfoEffTest,
        # --- names and paths of files and dirs
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
        # 'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,

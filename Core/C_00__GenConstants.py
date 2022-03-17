@@ -64,10 +64,18 @@ S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'
 S_COMBINED = 'Combined'
+S_COMBINED_INP = S_COMBINED + 'Input'
+S_COMBINED_OUT = S_COMBINED + 'Output'
 S_FULL = 'Full'
+S_BASE = 'Base'
 S_TRAIN = 'Train'
 S_TEST = 'Test'
+S_C_DFR_COMB = 'cDfrComb'
+S_B_GEN_INFO_N_MER = 'bGenInfoNmer'
+S_B_GEN_INFO_EFF = 'bGenInfoEff'
 S_I_MER = 'InfoNmer'
+S_I_MER_TRAIN = S_USC.join([S_I_MER, S_TRAIN])
+S_I_MER_TEST = S_USC.join([S_I_MER, S_TEST])
 S_I_EFF = 'InfoEff'
 S_I_EFF_TRAIN = S_USC.join([S_I_EFF, S_TRAIN])
 S_I_EFF_TEST = S_USC.join([S_I_EFF, S_TEST])
@@ -107,6 +115,10 @@ S_EXT_PTH = 'pth'
 # --- predefined strings (2) --------------------------------------------------
 S_MODE = 'Mode'
 S_TYPE = 'Type'
+S_N_MER = 'N' + S_MER
+S_LEN_N_MER = 'len' + S_N_MER
+S_EFF = 'Eff'
+S_EFF_F = S_EFF + S_FULL
 S_EFF_CODE = 'Effector'
 S_C_N_MER = 'c15mer'
 S_POS_P_SITE = 'PosPSite'
@@ -115,8 +127,6 @@ S_LEN_SNIP = 'lenSnip'
 S_EXP_NAME = 'exp_name'
 S_CODE_TRUNC = 'code_trunc'
 S_ANY_EFF = 'AnyEffector'
-S_N_MER = 'N' + S_MER
-S_LEN_N_MER = 'len' + S_N_MER
 S_NUM_OCC = 'nOcc'
 
 # --- predefined numbers ------------------------------------------------------
@@ -128,6 +138,7 @@ R03 = 3
 R04 = 4
 R08 = 8
 MAX_DELTA = 1.0E-14
+MAX_LEN_L_DSP = 5
 
 # --- predefined lists --------------------------------------------------------
 L_MER = [1, 3, 5, 7, 9, 11, 13, 15]

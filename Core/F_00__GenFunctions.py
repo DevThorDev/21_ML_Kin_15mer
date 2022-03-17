@@ -87,6 +87,13 @@ def getSF(sMid, iStart=None, iEnd=None, sPre='', sPost='', sSpl=GC.S_USC):
         lS = [getPartStr(sMid, iStart=iStart, iEnd=iEnd, sSpl=sSpl)]
     return joinS(lS)
 
+def addSCentNmerToDict(dNum, dENmer, iCNmer):
+    for k in range(iCNmer + 1):
+        for sEff, lSNmer in dENmer.items():
+            for sNmer in lSNmer:
+                sCentNmer = sNmer[(iCNmer - k):(iCNmer + k + 1)]
+                addToDictDNum(dNum, sEff, sCentNmer)
+
 # --- Functions performing calculations with scalars --------------------------
 def isEq(x, xCmp, maxDlt=GC.MAX_DELTA):
     return abs(x - xCmp) < maxDlt

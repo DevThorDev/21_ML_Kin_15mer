@@ -14,12 +14,12 @@ procInput = False
 dBDoDfrRes = {GC.S_SHORT: False,
               GC.S_MED: False,
               GC.S_LONG: False}
-createInfoNmer = False
-createInfoEff = True
-createInfoGen = False
+genInfoNmer = False
+genInfoEff = False
+genInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNMer4ResIEff = [1, 3, 5, 7]       # empty list: all lengths considered
+lLenNMer4ResIEff = [1, 3, 5]       # empty list: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
@@ -89,8 +89,6 @@ sNaNProcI = 'nNaN_ProcI'
 sNaNCombL = 'nNaN_CombL'
 sNaNCombM = 'nNaN_CombM'
 sNaNCombS = 'nNaN_CombS'
-sTrain = GC.S_TRAIN
-sTest = GC.S_TEST
 
 # --- lists (2) ---------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
@@ -118,9 +116,9 @@ dIO = {# --- general
        # --- flow control
        'procInput': procInput,
        'dBDoDfrRes': dBDoDfrRes,
-       'createInfoNmer': createInfoNmer,
-       'createInfoEff': createInfoEff,
-       'createInfoGen': createInfoGen,
+       'genInfoNmer': genInfoNmer,
+       'genInfoEff': genInfoEff,
+       'genInfoGen': genInfoGen,
        # --- lists (1)
        'lLenNMer': lLenNMer4ResIEff,
        'lSLenNMer': [str(n) for n in lLenNMer4ResIEff],
@@ -171,8 +169,6 @@ dIO = {# --- general
        'sNmer': sNmer,
        'sLenNmer': sLenNmer,
        'sNOcc': sNOcc,
-       'sTrain': sTrain,
-       'sTest': sTest,
        # --- lists (2)
        'lSCKinF': lSCKinF,
        'lCXclDfrNmerS': lCXclDfrNmerS,

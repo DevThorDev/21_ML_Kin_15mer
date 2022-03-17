@@ -95,10 +95,10 @@ class SeqAnalysis(BaseClass):
         pFDfrDict = GF.joinToPath(self.pDirRes, self.dITp['sFResRelLh'])
         if self.dITp['calcWtLh']:
             dfrVal = GF.dLV3CToDfr(dLV)
-            self.saveDfr(dfrVal, pF=pFDfrVal, dropDup=False, saveAnyway=True)
+            self.saveDfr(dfrVal, pF=pFDfrVal, saveAnyway=True)
         if self.dITp['calcRelLh']:
             dfrDict = GF.d3ValToDfr(d3, lSCD3)
-            self.saveDfr(dfrDict, pF=pFDfrDict, dropDup=False, saveAnyway=True)
+            self.saveDfr(dfrDict, pF=pFDfrDict, saveAnyway=True)
 
 # -----------------------------------------------------------------------------
 class NmerSeq():

@@ -10,12 +10,14 @@ sOType = 'Nmer-sequence analysis (D_02__SeqAnalysis)'
 sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 
 # --- flow control ------------------------------------------------------------
-calcWtLh = False
-calcRelLh = False
+calcWtLh = True
+calcRelLh = True
 
 # --- names and paths of files and dirs ---------------------------------------
-sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
-sFCombInp = 'Combined_S_KinasesPho15mer_202202'
+# sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
+# sFCombInp = 'Combined_S_KinasesPho15mer_202202'
+sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5__Train'
+sFCombInp = 'Combined_S__Train__KinasesPho15mer_202202'
 
 sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])

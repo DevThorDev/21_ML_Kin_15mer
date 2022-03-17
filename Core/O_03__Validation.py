@@ -17,67 +17,82 @@ class Validation(ExpData):
         self.descO = 'Validation of analysis of Nmer-sequences'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.getPDir()
-        self.fillDPF()
+        self.fillDPFVal()
+        self.fillDTpDfrVal()
         self.loadInpDfr()
         print('Initiated "Validation" base object.')
 
     # --- methods for filling the result paths dictionary ---------------------
-    def fillDPF(self):
-        self.fillDPFRes()
-        sJ, sFlFE, pRes = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
+    def fillDPFVal(self):
+        sJ, sFlFE, pR = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
         sFE = self.dITp['sUSC'].join(self.dITp['lSLenNMer'])
         if len(sFE) > 0:
             sFlFE = sJ.join([sFlFE, sFE])
-        sFIEffTrain = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
-                               sEnd=sJ.join([sFE, self.dITp['sTrain']]))
-        sFIEffFTrain = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
-                                sEnd=sJ.join([sFlFE, self.dITp['sTrain']]))
-        sFIEffTest = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
-                              sEnd=sJ.join([sFE, self.dITp['sTest']]))
-        sFIEffFTest = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
-                               sEnd=sJ.join([sFlFE, self.dITp['sTest']]))
-        pFCombInp = GF.joinToPath(pRes, self.dITp['sFCombInp'])
-        pFCombTrain = GF.joinToPath(pRes, self.dITp['sFCombTrain'])
-        pFCombTest = GF.joinToPath(pRes, self.dITp['sFCombTest'])
-        self.dPFRes[GC.S_COMBINED] = pFCombInp
-        self.dPFRes[self.dITp['sTrain']] = pFCombTrain
-        self.dPFRes[self.dITp['sTest']] = pFCombTest
-        self.dPFRes[GC.S_I_EFF_TRAIN] = GF.joinToPath(pRes, sFIEffTrain)
-        self.dPFRes[GC.S_I_EFF_F_TRAIN] = GF.joinToPath(pRes, sFIEffFTrain)
-        self.dPFRes[GC.S_I_EFF_TEST] = GF.joinToPath(pRes, sFIEffTest)
-        self.dPFRes[GC.S_I_EFF_F_TEST] = GF.joinToPath(pRes, sFIEffFTest)
+        pFCombInp = GF.joinToPath(pR, self.dITp['sFCombInp'])
+        dPFTrain = {self.dITp['sCombinedInp']: pFCombInp}
+        dPFTest = {self.dITp['sCombinedInp']: pFCombInp}
+        for sTp, sFComb, cD in zip(['sTrain', 'sTest'],
+                                   ['sFCombTrain', 'sFCombTest'],
+                                   [dPFTrain, dPFTest]):
+            sFINmer = GF.modSF(self.dITp['sFResINmer'], sJoin=sJ,
+                               sEnd=sJ.join([sFE, self.dITp[sTp]]))
+            sFIEff = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
+                              sEnd=sJ.join([sFE, self.dITp[sTp]]))
+            sFIEffF = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
+                               sEnd=sJ.join([sFlFE, self.dITp[sTp]]))
+            pFComb = GF.joinToPath(pR, self.dITp[sFComb])
+            cD[self.dITp['sCombinedOut']] = pFComb
+            cD[self.dITp['sImer']] = GF.joinToPath(pR, sFINmer)
+            cD[self.dITp['sIEff']] = GF.joinToPath(pR, sFIEff)
+            cD[self.dITp['sIEffF']] = GF.joinToPath(pR, sFIEffF)
+            self.dPF[self.dITp[sTp]] = cD
+
+    # --- methods for filling the DataFrame type dictionary -------------------
+    def fillDTpDfrVal(self):
+        sBGIN, sBGIE = self.dITp['sBGenInfoNmer'], self.dITp['sBGenInfoEff']
+        self.dTpDfr[self.dITp['sTrain']][sBGIN] = self.dITp['genInfoNmerTrain']
+        self.dTpDfr[self.dITp['sTrain']][sBGIE] = self.dITp['genInfoEffTrain']
+        self.dTpDfr[self.dITp['sTest']][sBGIN] = self.dITp['genInfoNmerTest']
+        self.dTpDfr[self.dITp['sTest']][sBGIE] = self.dITp['genInfoEffTest']
 
     # --- methods for reading the input DataFrame -----------------------------
     def loadInpDfr(self):
-        self.dfrComb = self.loadDfr(pF=self.dPFRes[GC.S_COMBINED], iC=0)
+        pFCombInp = self.dPF[self.dITp['sTrain']][self.dITp['sCombinedInp']]
+        self.dfrComb = self.loadDfr(pF=pFCombInp, iC=0)
         assert self.dfrComb is not None
+        self.dTpDfr[self.dITp['sBase']][self.dITp['sCDfrComb']] = self.dfrComb
         self.nRecTrain = round(self.dfrComb.shape[0]*self.dITp['share4Train'])
         self.nRecTest = self.dfrComb.shape[0] - self.nRecTrain
 
     # --- methods for splitting the input data set ----------------------------
     def splitInpData(self):
         k, N, bF, bT = self.nRecTest, self.dfrComb.shape[0], False, True
+        sDfrC = self.dITp['sCDfrComb']
         self.lITest = GF.drawListInt(maxInt=N, nIntDrawn=k, wRepl=bF, sortL=bT)
         self.lITrain = [n for n in range(N) if n not in self.lITest]
         self.dfrTrain = self.dfrComb.iloc[self.lITrain, :].reset_index(drop=bT)
         self.dfrTest = self.dfrComb.iloc[self.lITest, :].reset_index(drop=bT)
+        self.dTpDfr[self.dITp['sTrain']][sDfrC] = self.dfrTrain
+        self.dTpDfr[self.dITp['sTest']][sDfrC] = self.dfrTest
         self.saveTrainTestData()
 
     # --- methods for printing objects ----------------------------------------
-    def printTestObj(self, printDfrComb=False):
+    def printTestObj(self, printDfrComb=False, mL=GC.MAX_LEN_L_DSP):
         if printDfrComb:
             print(GC.S_DS80, GC.S_NEWL, 'Full combined DataFrame:', sep='')
             print(self.dfrComb)
         print(GC.S_DS80, GC.S_NEWL, 'Number of records train DataFrame:',
               GC.S_NEWL, self.nRecTrain, sep='')
-        print(GC.S_DS80, GC.S_NEWL, 'First 5 indices train DataFrame:', sep='')
-        print(self.lITrain[:5], ' (length = ', len(self.lITrain), ')', sep='')
+        print(GC.S_DS80, GC.S_NEWL, 'First ', mL, ' indices train DataFrame:',
+              sep='')
+        print(self.lITrain[:mL], ' (length = ', len(self.lITrain), ')', sep='')
         print(GC.S_DS80, GC.S_NEWL, 'Train DataFrame:', sep='')
         print(self.dfrTrain)
         print(GC.S_DS80, GC.S_NEWL, 'Number of records test DataFrame:',
               GC.S_NEWL, self.nRecTest, sep='')
-        print(GC.S_DS80, GC.S_NEWL, 'First 5 indices test DataFrame:', sep='')
-        print(self.lITest[:5], ' (length = ', len(self.lITest), ')', sep='')
+        print(GC.S_DS80, GC.S_NEWL, 'First ', mL, ' indices test DataFrame:',
+              sep='')
+        print(self.lITest[:mL], ' (length = ', len(self.lITest), ')', sep='')
         print(GC.S_DS80, GC.S_NEWL, 'Test DataFrame:', sep='')
         print(self.dfrTest, GC.S_NEWL, GC.S_DS80, sep='')
 
@@ -85,16 +100,16 @@ class Validation(ExpData):
     def createResultsTrain(self, stT):
         if self.dITp['predictWTrain']:
             self.splitInpData()
-            self.getInfoKinNmer(stT=stT, sIEff=GC.S_I_EFF_TRAIN,
-                                sIEffF=GC.S_I_EFF_F_TRAIN,
-                                tpDfr=self.dITp['sTrain'])
+            if self.dITp['genInfoEffTrain']:
+                self.getInfoKinNmer(stT=stT, tpDfr=self.dITp['sTrain'])
 
     # --- methods for saving DataFrames ---------------------------------------
     def saveTrainTestData(self):
-        if self.dITp['predictWTrain']:
-            self.saveDfr(self.dfrTrain, pF=self.dPFRes[self.dITp['sTrain']],
-                         dropDup=False, saveAnyway=True)
-            self.saveDfr(self.dfrTest, pF=self.dPFRes[self.dITp['sTest']],
-                         dropDup=False, saveAnyway=True)
+        if self.dITp['saveCombTrain']:
+            pFOut = self.dPF[self.dITp['sTrain']][self.dITp['sCombinedOut']]
+            self.saveDfr(self.dfrTrain, pF=pFOut, saveAnyway=True)
+        if self.dITp['saveCombTest']:
+            pFOut = self.dPF[self.dITp['sTest']][self.dITp['sCombinedOut']]
+            self.saveDfr(self.dfrTest, pF=pFOut, saveAnyway=True)
 
 ###############################################################################
