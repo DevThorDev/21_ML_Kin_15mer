@@ -89,6 +89,8 @@ sNaNProcI = 'nNaN_ProcI'
 sNaNCombL = 'nNaN_CombL'
 sNaNCombM = 'nNaN_CombM'
 sNaNCombS = 'nNaN_CombS'
+sTrain = GC.S_TRAIN
+sTest = GC.S_TEST
 
 # --- lists (2) ---------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
@@ -169,6 +171,8 @@ dIO = {# --- general
        'sNmer': sNmer,
        'sLenNmer': sLenNmer,
        'sNOcc': sNOcc,
+       'sTrain': sTrain,
+       'sTest': sTest,
        # --- lists (2)
        'lSCKinF': lSCKinF,
        'lCXclDfrNmerS': lCXclDfrNmerS,
