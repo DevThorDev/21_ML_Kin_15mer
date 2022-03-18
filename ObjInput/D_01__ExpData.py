@@ -19,7 +19,7 @@ genInfoEff = False
 genInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNMer4ResIEff = [1, 3, 5]       # empty list: all lengths considered
+lLenNMer4ResIEff = [1, 3, 5, 7]       # empty list: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV

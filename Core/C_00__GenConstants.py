@@ -115,6 +115,7 @@ S_EXT_PTH = 'pth'
 # --- predefined strings (2) --------------------------------------------------
 S_MODE = 'Mode'
 S_TYPE = 'Type'
+S_DATA = 'Data'
 S_N_MER = 'N' + S_MER
 S_LEN_N_MER = 'len' + S_N_MER
 S_EFF = 'Eff'
@@ -128,6 +129,9 @@ S_EXP_NAME = 'exp_name'
 S_CODE_TRUNC = 'code_trunc'
 S_ANY_EFF = 'AnyEffector'
 S_NUM_OCC = 'nOcc'
+S_ALL_SEQ_N_MER = 'AllSeq15mer'
+S_TRAIN_DATA = S_TRAIN + S_DATA
+S_TEST_DATA = S_TEST + S_DATA
 
 # --- predefined numbers ------------------------------------------------------
 LEN_SNIPPET_DEF = 15

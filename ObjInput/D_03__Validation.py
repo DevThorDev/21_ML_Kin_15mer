@@ -3,14 +3,13 @@
 # --- D_03__Validation.py -----------------------------------------------------
 ###############################################################################
 import Core.C_00__GenConstants as GC
-# import Core.F_00__GenFunctions as GF
 
 # --- general -----------------------------------------------------------------
 sOType = 'Validation of Nmer-sequence analysis (D_03__Validation)'
 sNmSpec = 'Input data for the Validation class in O_03__Validation'
 
 # --- flow control ------------------------------------------------------------
-predictWTrain = True
+predictWTrain = False
 
 saveCombTrain = True
 saveCombTest = True
@@ -24,11 +23,8 @@ genInfoEffTest = True       # not used yet
 # --- names and paths of files and dirs ---------------------------------------
 sFCombInp = 'Combined_S_KinasesPho15mer_202202'
 
-# sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
-# sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
-
 # --- numbers -----------------------------------------------------------------
-share4Test = 0.4        # share of input records reserved for test data
+share4Test = 0.25        # share of input records reserved for test data
 
 # --- strings -----------------------------------------------------------------
 
@@ -40,10 +36,8 @@ share4Test = 0.4        # share of input records reserved for test data
 assert share4Test >= 0 and share4Test <= 1
 
 # === derived values and input processing =====================================
-lSSpl = sFCombInp.split(GC.S_USC)
-lSStart, lSEnd = [GC.S_USC.join(lSSpl[:2])], [GC.S_USC.join(lSSpl[2:])]
-sFCombTrain = GC.S_US02.join(lSStart + [GC.S_TRAIN] + lSEnd)
-sFCombTest = GC.S_US02.join(lSStart + [GC.S_TEST] + lSEnd)
+sFCombTrain = GC.S_US02.join([sFCombInp, GC.S_TRAIN])
+sFCombTest = GC.S_US02.join([sFCombInp, GC.S_TEST])
 
 share4Train = 1. - share4Test
 

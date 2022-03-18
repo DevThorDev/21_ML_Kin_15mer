@@ -25,21 +25,20 @@ class Validation(ExpData):
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFVal(self):
         sJ, sFlFE, pR = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
-        sFE = self.dITp['sUSC'].join(self.dITp['lSLenNMer'])
+        sFE = GF.joinS(self.dITp['lSLenNMer'])
         if len(sFE) > 0:
-            sFlFE = sJ.join([sFlFE, sFE])
+            sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
         pFCombInp = GF.joinToPath(pR, self.dITp['sFCombInp'])
         dPFTrain = {self.dITp['sCombinedInp']: pFCombInp}
         dPFTest = {self.dITp['sCombinedInp']: pFCombInp}
         for sTp, sFComb, cD in zip(['sTrain', 'sTest'],
                                    ['sFCombTrain', 'sFCombTest'],
                                    [dPFTrain, dPFTest]):
-            sFINmer = GF.modSF(self.dITp['sFResINmer'], sJoin=sJ,
-                               sEnd=sJ.join([sFE, self.dITp[sTp]]))
-            sFIEff = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
-                              sEnd=sJ.join([sFE, self.dITp[sTp]]))
-            sFIEffF = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ,
-                               sEnd=sJ.join([sFlFE, self.dITp[sTp]]))
+            sE = GF.joinS([sFE, self.dITp[sTp]], sJoin=sJ)
+            sEFl = GF.joinS([sFlFE, self.dITp[sTp]], sJoin=sJ)
+            sFINmer = GF.modSF(self.dITp['sFResINmer'], sJoin=sJ, sEnd=sE)
+            sFIEff = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ, sEnd=sE)
+            sFIEffF = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ, sEnd=sEFl)
             pFComb = GF.joinToPath(pR, self.dITp[sFComb])
             cD[self.dITp['sCombinedOut']] = pFComb
             cD[self.dITp['sImer']] = GF.joinToPath(pR, sFINmer)

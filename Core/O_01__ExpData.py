@@ -44,10 +44,10 @@ class ExpData(BaseClass):
         dPFComb = {GC.S_SHORT: sPFCombS, GC.S_MED: sPFCombM,
                    GC.S_LONG: sPFCombL}
         sPFINmer = GF.joinToPath(pR, self.dITp['sFResINmer'])
-        sFE = self.dITp['sUSC'].join(self.dITp['lSLenNMer'])
+        sFE = GF.joinS(self.dITp['lSLenNMer'])
         sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE, sJoin=sJ)
         if len(sFE) > 0:
-            sFlFE = sJ.join([sFlFE, sFE])
+            sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
         sFResIEffF = GF.modSF(self.dITp['sFResIEff'], sEnd=sFlFE, sJoin=sJ)
         sPFResIGen = GF.joinToPath(pR, self.dITp['sFResIGen'])
         dPFBase = {self.dITp['sCombined']: dPFComb,

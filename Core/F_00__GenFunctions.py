@@ -41,7 +41,7 @@ def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
 def modSF(sF, sStart='', sEnd='', sJoin=''):
     if GC.S_DOT in sF:
         lSSpl = sF.split(GC.S_DOT)
-        sFMod = GC.S_DOT.join(lSSpl[:-1])
+        sFMod = joinS(lSSpl[:-1], sJoin=GC.S_DOT)
         sFMod = addSStartSEnd(sFMod, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
         return sFMod + GC.S_DOT + lSSpl[-1]
     else:
@@ -60,7 +60,7 @@ def saveAsCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
 
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, sJoin=GC.S_USC):
-    return sJoin.join([str(s) for s in itS]).strip()
+    return sJoin.join([str(s) for s in itS if len(str(s)) > 0]).strip()
 
 def getPartStr(s, iStart=None, iEnd=None, sSpl=GC.S_USC):
     if iStart is None:
@@ -73,6 +73,12 @@ def getPartStr(s, iStart=None, iEnd=None, sSpl=GC.S_USC):
             return joinS(s.split(sSpl)[iStart:], sJoin=sSpl)
         else:
             return joinS(s.split(sSpl)[iStart:iEnd], sJoin=sSpl)
+
+def getPartSF(sF, iStart=None, iEnd=None, sDot=GC.S_DOT, sSpl=GC.S_USC):
+    sFNoXt = sF
+    if sDot in sF:
+        sFNoXt = joinS(sF.split(sDot)[:-1], sJoin=sDot)
+    return getPartStr(s=sFNoXt, iStart=iStart, iEnd=iEnd, sSpl=sSpl)
 
 def extSID(sID, n, N, preChar=GC.S_0):
     return joinS([sID, preChar*(len(str(N)) - len(str(n))) + str(n)])
