@@ -78,6 +78,11 @@ S_ROW_SD_REP = S_ROW + 'SDRep'
 S_COL_MN_REP = S_COL + 'MeanRep'
 S_COL_SD_REP = S_COL + 'SDRep'
 
+S_EFF = 'Effector'
+S_ANY_EFF = 'AnyEffector'
+S_N_MER = 'Nmer'
+S_LEN_N_MER = 'lenNmer'
+
 # --- predefined numbers ------------------------------------------------------
 LEN_SNIPPET_DEF = 15
 I_CENT_N_MER = LEN_SNIPPET_DEF//2
@@ -96,24 +101,34 @@ L_S_OV_STATS_REP = [S_OV_MN_REP, S_OV_SD_REP, S_OV_MIN_REP, S_OV_MAX_REP]
 
 # ### INPUT ###################################################################
 # --- flow control ------------------------------------------------------------
-readProcInpKin = True
+readProcInpKin = False
 readProcInpNmer = True
-readResCombS = True
-readResPropNmer = True
+readResCombS = False
+readResPropNmer = False
 
 # --- names and paths of files and dirs ---------------------------------------
 pDirProcInp = P_DIR_PROC_INP
 pDirRes = P_DIR_RES
 sFProcInpKin = 'KinasesAndTargets_202202'
 sFProcInpNmer = 'Pho15mer_202202'
+sFResINmerNOcc = 'Info15mer_NOcc_202202__1_3_5_7__Train'
 sFResCombS = 'Combined_S_KinasesPho15mer_202202'
-sFResPropNmer = 'InfoEff_Prop15mer_202202__1_3'
+sFResPropNmer = 'InfoEff_Prop15mer_202202__1_3_5_7'
 
 # --- numbers -----------------------------------------------------------------
 lenSnippetDef = LEN_SNIPPET_DEF
 iCentNmer = I_CENT_N_MER
+iStartCS = 0
+iEndCS = 10
+
+# --- lists -------------------------------------------------------------------
+lSEff = [None]
 
 # --- dictionaries ------------------------------------------------------------
+
+# === derived input and assertions ============================================
+if None in lSEff:
+    lSEff = [S_ANY_EFF] + [sEff for sEff in lSEff if sEff is not None]
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
@@ -130,6 +145,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'sFResPropNmer': sFResPropNmer,
         'pFProcInpKin': os.path.join(pDirProcInp, sFProcInpKin + xtCSV),
         'pFProcInpNmer': os.path.join(pDirProcInp, sFProcInpNmer + xtCSV),
+        'pFResINmerNOcc': os.path.join(pDirRes, sFResINmerNOcc + xtCSV),
         'pFResCombS': os.path.join(pDirRes, sFResCombS + xtCSV),
         'pFResPropNmer': os.path.join(pDirRes, sFResPropNmer + xtCSV),
         # --- strings ---------------------------------------------------------
@@ -189,6 +205,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'lSMetPho': L_S_MET_PHO,
         'lSGT': L_S_GT,
         'lSOvStatsRep': L_S_OV_STATS_REP,
+        'lSEff': lSEff,
         # --- numbers ---------------------------------------------------------
         'lenSnippetDef': lenSnippetDef,
         'iCentNmer': iCentNmer,
@@ -221,18 +238,40 @@ def saveAsCSV(pdDfr, pF, reprNA='', cSep=S_SEMICOL):
 def fillDNumBothDir(d1Dir):
     pass
 
+def getDNmer(dfrINmerNOcc, dINmerNOccSL):
+    print('Dictionary columns:')
+    print(dfrINmerNOcc.columns.to_list())
+    lNmer, lLenNmer = list(dfrINmerNOcc[S_N_MER]), list(dfrINmerNOcc[S_LEN_N_MER])
+    assert len(lNmer) == len(lLenNmer)
+    for sNmer, cLenNmer in zip(lNmer, lLenNmer):
+        addToDictL(dINmerNOccSL, cLenNmer, sNmer)
+
+def scanCodeSeq():
+    pass
+
 # # --- Helper functions --------------------------------------------------------
 # def conVDRepToList(dInpMnSD, tSit, iT=1):
 #     assert len(dInpMnSD[tSit]) >= iT + 1
 #     dLRep = dInpMnSD[tSit][iT]
 #     return sorted(list(set.union(*[set(cL) for cL in dLRep.values()])))
+def findAllSSubInStr(sFull, sSub, overLap=False):
+    i = sFull.find(sSub)
+    while i >= 0:
+        yield i
+        i = sFull.find(sSub, i + (1 if overLap else len(sSub)))
 
-# def addToDictL(cD, cK, cE, lUniqEl=False):
-#     if cK in cD:
-#         if not lUniqEl or cE not in cD[cK]:
-#             cD[cK].append(cE)
-#     else:
-#         cD[cK] = [cE]
+def addToDictL(cD, cK, cE, lUniqEl=False):
+    if cK in cD:
+        if not lUniqEl or cE not in cD[cK]:
+            cD[cK].append(cE)
+    else:
+        cD[cK] = [cE]
+
+def printDINmerNOcc(cDINmerNOcc, maxLenL=3):
+    for cK, cL in cDINmerNOcc.items():
+        print(cK, ': (', len(cL), ' elements)', cL[:maxLenL], '...', sep='')
+    print('Total number of sequences:', sum([len(cL) for cL in
+                                             cDINmerNOcc.values()]))
 
 # # --- Functions initialising numpy arrays and pandas DataFrames ---------------
 # def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
@@ -326,19 +365,26 @@ def fillDNumBothDir(d1Dir):
 print('='*80, '\n', '-'*31, ' EvaluateNMer.py ', '-'*32, '\n', sep='')
 if dInp['readProcInpKin']:
     dfrKinIn = readCSV(dInp['pFProcInpKin'], iCol=0)
+    serKin = dfrKinIn['Effector'].unique()
+    print('Number of different Kinases:', serKin.size)
     # print(dfrKinIn)
 if dInp['readProcInpNmer']:
     dfrNmerIn = readCSV(dInp['pFProcInpNmer'], iCol=0)
+    serNmer = dfrNmerIn['c15mer'].unique()
+    serCodeSeq = dfrNmerIn['code_seq'].unique()
+    dfrINmerNOcc = readCSV(dInp['pFResINmerNOcc'], iCol=0)
+    dfrINmerNOccF = dfrINmerNOcc[dfrINmerNOcc[S_EFF].isin(dInp['lSEff'])]
+    dINmerNOccFS = {}
+    getDNmer(dfrINmerNOcc=dfrINmerNOccF, dINmerNOccSL=dINmerNOccFS)
+    printDINmerNOcc(dINmerNOccFS)
+    print('Number of different Nmer chains:', serNmer.size)
+    print('Number of different code sequences:', serCodeSeq.size)
     # print(dfrNmerIn)
 if dInp['readResCombS']:
     dfrResCombS = readCSV(dInp['pFResCombS'], iCol=0)
+    print('Shape of dfrResCombS:', dfrResCombS.shape)
 if dInp['readResPropNmer']:
     dfrResPropNmer = readCSV(dInp['pFResPropNmer'], iCol=0)
-serKin = dfrKinIn['Effector'].unique()
-serNmer = dfrNmerIn['cNmer'].unique()
-print('Number of different Kinases:', serKin.size)
-print('Number of different Nmer chains:', serNmer.size)
-print('Shape of dfrResCombS:', dfrResCombS.shape)
-print('Shape of dfrResPropNmer:', dfrResPropNmer.shape)
+    print('Shape of dfrResPropNmer:', dfrResPropNmer.shape)
 
 ###############################################################################
