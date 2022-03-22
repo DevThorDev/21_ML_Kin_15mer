@@ -60,6 +60,7 @@ S_ARR_LR = '-->'
 S_ARR_RL = '<--'
 S_MER = 'mer'
 
+S_X_SHORT = 'Xshort'
 S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'

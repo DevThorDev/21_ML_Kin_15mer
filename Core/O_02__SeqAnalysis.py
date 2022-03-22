@@ -6,7 +6,7 @@
 import Core.F_00__GenFunctions as GF
 import Core.F_01__SpcFunctions as SF
 
-from Core.O_00__BaseClass import BaseClass
+from Core.O_00__BaseClass import BaseClass, NmerSeq
 
 # -----------------------------------------------------------------------------
 class SeqAnalysis(BaseClass):
@@ -113,19 +113,5 @@ class SeqAnalysis(BaseClass):
         if self.dITp['calcRelLh']:
             dfrDict = GF.d3ValToDfr(d3, lSCD3)
             self.saveDfr(dfrDict, pF=pFDfrDict, saveAnyway=True)
-
-# -----------------------------------------------------------------------------
-class NmerSeq():
-    # --- initialisation of the class -----------------------------------------
-    def __init__(self, dITp, sSq=''):
-        self.sSeq = sSq
-        self.createProfileDict(dITp)
-
-    # --- methods for creating the profile dictionary -------------------------
-    def createProfileDict(self, dITp):
-        self.dPrf, iCNmer = {}, dITp['iCentNmer']
-        if type(self.sSeq) == str and len(self.sSeq) == dITp['lenSDef']:
-            for k in range(iCNmer + 1):
-                self.dPrf[2*k + 1] = self.sSeq[(iCNmer - k):(iCNmer + k + 1)]
 
 ###############################################################################

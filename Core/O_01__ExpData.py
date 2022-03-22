@@ -38,11 +38,12 @@ class ExpData(BaseClass):
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFExp(self):
         sJ, sFlFE, pR = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
+        sPFCombXS = GF.joinToPath(pR, self.dITp['sFResCombXS'])
         sPFCombS = GF.joinToPath(pR, self.dITp['sFResCombS'])
         sPFCombM = GF.joinToPath(pR, self.dITp['sFResCombM'])
         sPFCombL = GF.joinToPath(pR, self.dITp['sFResCombL'])
-        dPFComb = {GC.S_SHORT: sPFCombS, GC.S_MED: sPFCombM,
-                   GC.S_LONG: sPFCombL}
+        dPFComb = {GC.S_X_SHORT: sPFCombXS, GC.S_SHORT: sPFCombS,
+                   GC.S_MED: sPFCombM, GC.S_LONG: sPFCombL}
         sPFINmer = GF.joinToPath(pR, self.dITp['sFResINmer'])
         sFE = GF.joinS(self.dITp['lSLenNMer'])
         sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE, sJoin=sJ)
@@ -79,6 +80,14 @@ class ExpData(BaseClass):
               self.dITp['lenSDef'], ': ', nR1-nR2, ' of ', nR0, '\t(',
               round((nR1-nR2)/nR0*100., nDig), '%)', GC.S_NEWL, GC.S_ARR_LR,
               ' Remaining rows: ', nR2, GC.S_NEWL, GC.S_DS80, sep='')
+
+    # --- methods for loading data --------------------------------------------
+    def loadProcInpDfrs(self):
+        pFProcInp = GF.joinToPath(self.pDirProcInp, self.dITp['sFProcInpKin'])
+        self.dfrKin = self.loadDfr(pF=pFProcInp, iC=0)
+        pFProcInp = GF.joinToPath(self.pDirProcInp, self.dITp['sFProcInpNmer'])
+        self.dfrNmer = self.loadDfr(pF=pFProcInp, iC=0)
+        self.lDfrInp = [self.dfrKin, self.dfrNmer]
 
     # --- methods for saving data ---------------------------------------------
     def saveProcInpDfrs(self):
@@ -148,7 +157,7 @@ class ExpData(BaseClass):
         self.dfrNmer[self.dITp['sCodeTrunc']] = l
 
     # --- methods for combining experimental data -----------------------------
-    def combine(self, lSCK, lSCNmer, iSt=0, sMd=GC.S_SHORT):
+    def combine(self, lSCK, lSCNmer, iSt=0, sMd=GC.S_X_SHORT):
         dEffTg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfrNmer,
                                    lCDfrNmer=lSCNmer, sMd=sMd)
         GF.printSizeDDDfr(dDDfr=dEffTg, modeF=True)
@@ -158,6 +167,12 @@ class ExpData(BaseClass):
         self.saveDfr(self.dfrComb, pF=self.dPF[sBase][sComb][sMd],
                      dropDup=True, saveAnyway=True)
         self.fillDfrResIGen(self.dfrComb, lR=self.dITp['lRResIG'], iSt=iSt)
+
+    def combineXS(self, iSt=0):
+        lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
+        lSCNmer = [s for s in self.dfrNmer.columns
+                  if s not in self.dITp['lCXclDfrNmerXS']]
+        self.combine(lSCK, lSCNmer, iSt=iSt, sMd=GC.S_X_SHORT)
 
     def combineS(self, iSt=0):
         lSCK = [self.dITp['sEffCode'], self.dITp['sTargCode']]
@@ -176,17 +191,21 @@ class ExpData(BaseClass):
         self.combine(lSCK, lSCNmer, iSt=iSt, sMd=GC.S_LONG)
 
     def combineInpDfr(self, tpDfr):
+        if self.dITp['dBDoDfrRes'][GC.S_X_SHORT]:
+            print('Creating extra short combined result...')
+            self.combineXS(iSt=self.dITp['iStXS'])
+            print('Created extra short combined result.')
         if self.dITp['dBDoDfrRes'][GC.S_SHORT]:
             print('Creating short combined result...')
-            self.combineS(iSt=12)
+            self.combineS(iSt=self.dITp['iStS'])
             print('Created short combined result.')
         if self.dITp['dBDoDfrRes'][GC.S_MED]:
             print('Creating medium combined result...')
-            self.combineM(iSt=9)
+            self.combineM(iSt=self.dITp['iStM'])
             print('Created medium combined result.')
         if self.dITp['dBDoDfrRes'][GC.S_LONG]:
             print('Creating long combined result...')
-            self.combineL(iSt=6)
+            self.combineL(iSt=self.dITp['iStL'])
             print('Created long combined result.')
         if self.dITp['genInfoGen']:
             self.saveDfr(self.dfrResIGen, self.dPF[tpDfr][self.dITp['sIGen']])
@@ -199,10 +218,12 @@ class ExpData(BaseClass):
             self.filterRawDataNmer(nDig=nDigDsp)
             self.procColNmer()
             self.saveProcInpDfrs()
+        else:
+            self.loadProcInpDfrs()
         self.combineInpDfr(tpDfr=self.dITp['sBase'])
 
     # --- methods extracting info from processed/combined/training/test data --
-    def getCombDfr(self, tpDfr, sMd=GC.S_SHORT):
+    def getCombDfr(self, tpDfr, sMd=GC.S_X_SHORT):
         cDfr, sTrain, sTest = None, self.dITp['sTrain'], self.dITp['sTrain']
         cDfr = self.dTpDfr[tpDfr][self.dITp['sCDfrComb']]
         if cDfr is None and tpDfr == self.dITp['sBase']:
@@ -229,7 +250,7 @@ class ExpData(BaseClass):
                          saveIdx=False, saveAnyway=True)
             GF.showElapsedTime(stT)
 
-    def getInfoKinNmer(self, stT, tpDfr, sMd=GC.S_SHORT):
+    def getInfoKinNmer(self, stT, tpDfr, sMd=GC.S_X_SHORT):
         dENmer, dNMer, iCNmer = {}, {}, self.dITp['iCentNmer']
         cDfr = self.getCombDfr(tpDfr=tpDfr, sMd=sMd)
         if cDfr is not None:

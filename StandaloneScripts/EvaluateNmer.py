@@ -9,6 +9,7 @@ import pandas as pd
 
 # ### CONSTANTS ###############################################################
 # --- strings (1) -------------------------------------------------------------
+S_X_SHORT = 'Xshort'
 S_SHORT = 'short'
 S_MED = 'med'
 S_LONG = 'long'
@@ -209,6 +210,8 @@ dInp = {# --- flow control ----------------------------------------------------
         # --- numbers ---------------------------------------------------------
         'lenSnippetDef': lenSnippetDef,
         'iCentNmer': iCentNmer,
+        'iStartCS': iStartCS,
+        'iEndCS': iEndCS,
         'NSit': len(L_S_MN_SD)*len(L_S_MIX_TP)*len(L_S_MET_PHO)*len(L_S_GT),
         # --- dictionaries ----------------------------------------------------
         }
@@ -259,6 +262,9 @@ def findAllSSubInStr(sFull, sSub, overLap=False):
     while i >= 0:
         yield i
         i = sFull.find(sSub, i + (1 if overLap else len(sSub)))
+
+def startPosToCentPos(iPSt, sSeq):
+    return iPSt + len(sSeq)//2
 
 def addToDictL(cD, cK, cE, lUniqEl=False):
     if cK in cD:
@@ -374,9 +380,12 @@ if dInp['readProcInpNmer']:
     serCodeSeq = dfrNmerIn['code_seq'].unique()
     dfrINmerNOcc = readCSV(dInp['pFResINmerNOcc'], iCol=0)
     dfrINmerNOccF = dfrINmerNOcc[dfrINmerNOcc[S_EFF].isin(dInp['lSEff'])]
+    # dINmerNOccFS creation BEGIN
     dINmerNOccFS = {}
     getDNmer(dfrINmerNOcc=dfrINmerNOccF, dINmerNOccSL=dINmerNOccFS)
     printDINmerNOcc(dINmerNOccFS)
+    # dINmerNOccFS creation END
+    lSnipL3 = dINmerNOccFS[3]
     print('Number of different Nmer chains:', serNmer.size)
     print('Number of different code sequences:', serCodeSeq.size)
     # print(dfrNmerIn)

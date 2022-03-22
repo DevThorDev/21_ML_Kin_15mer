@@ -100,6 +100,15 @@ def addSCentNmerToDict(dNum, dENmer, iCNmer):
                 sCentNmer = sNmer[(iCNmer - k):(iCNmer + k + 1)]
                 addToDictDNum(dNum, sEff, sCentNmer)
 
+def findAllSSubInStr(sFull, sSub, overLap=False):
+    i = sFull.find(sSub)
+    while i >= 0:
+        yield i
+        i = sFull.find(sSub, i + (1 if overLap else len(sSub)))
+
+def startPosToCentPos(iPSt, sSeq):
+    return iPSt + len(sSeq)//2
+
 # --- Functions performing calculations with scalars --------------------------
 def isEq(x, xCmp, maxDlt=GC.MAX_DELTA):
     return abs(x - xCmp) < maxDlt
@@ -238,6 +247,12 @@ def dDDfrToDfr(dDDfr, lSColL, lSColR):
             subDfr = pd.concat([leftDfr, rightDfr], axis=1)
             fullDfr = pd.concat([fullDfr, subDfr], axis=0)
     return fullDfr.reset_index(drop=True)
+
+def fillDNOcc(dfrNOcc, dNOcc, sNmer=GC.S_N_MER, sLenNmer=GC.S_LEN_N_MER):
+    lNmer, lLenNmer = list(dfrNOcc[sNmer]), list(dfrNOcc[sLenNmer])
+    assert len(lNmer) == len(lLenNmer)
+    for sNmer, cLenNmer in zip(lNmer, lLenNmer):
+        addToDictL(dNOcc, cLenNmer, sNmer)
 
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):

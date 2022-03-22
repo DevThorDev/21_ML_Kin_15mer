@@ -21,7 +21,7 @@ genInfoEffTrain = True
 genInfoEffTest = True       # not used yet
 
 # --- names and paths of files and dirs ---------------------------------------
-sFCombInp = 'Combined_S_KinasesPho15mer_202202'
+sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 
 # --- numbers -----------------------------------------------------------------
 share4Test = 0.25        # share of input records reserved for test data

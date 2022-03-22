@@ -112,4 +112,54 @@ class BaseClass:
             GF.saveAsCSV(cDfr, pF, cSep=self.dITp['cSep'], saveIdx=saveIdx,
                          dropDup=dropDup)
 
+# -----------------------------------------------------------------------------
+class Seq():
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, sSq=''):
+        assert type(sSq) == str
+        self.sSeq = sSq
+        self.sPCent = None
+
+# -----------------------------------------------------------------------------
+class NmerSeq(Seq):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, dITp, sSq='', iPCt=None):
+        super().__init__(sSq=sSq)
+        assert len(self.sSeq) == dITp['lenSDef']
+        if iPCt is None:        # no index of centre given --> standalone Nmer
+            iPCt = dITp['iCentNmer']
+        self.iPCent = iPCt
+        self.sPCent = sSq[dITp['iCentNmer']]
+        self.createProfileDict(dITp)
+
+    # --- methods for creating and getting the profile dictionary -------------
+    def createProfileDict(self, dITp):
+        self.dPrf, iCNmer = {}, dITp['iCentNmer']
+        for k in range(iCNmer + 1):
+            self.dPrf[2*k + 1] = self.sSeq[(iCNmer - k):(iCNmer + k + 1)]
+    
+    def getProfileDict(self, maxLenSeq=None):
+        dPrf = self.dPrf
+        if maxLenSeq is not None:
+            dPrf = {lenSeq: sSeq for lenSeq, sSeq in self.dPrf.items()
+                    if lenSeq <= maxLenSeq}
+        return dPrf
+
+# -----------------------------------------------------------------------------
+class FullSeq(Seq):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, dITp, sSq='', lIPosPyl=[]):
+        super().__init__(sSq=sSq)
+        iCNmer = dITp['iCentNmer']
+        self.lIPyl = sorted([i for i in lIPosPyl
+                             if (i >= iCNmer and i < len(self.sSeq) - iCNmer)])
+        self.createNmerDict(dITp, iCNmer)
+
+    # --- methods for creating the Nmer dictionary ----------------------------
+    def createNmerDict(self, dITp, iCNmer):
+        self.dNmer = {}
+        for iPyl in self.lIPyl:
+            sNmerSeq = self.sSeq[(iPyl - iCNmer):(iPyl + iCNmer + 1)]
+            self.dNmer[iPyl] = NmerSeq(dITp, sSq=sNmerSeq, iPCt=iPyl)
+
 ###############################################################################

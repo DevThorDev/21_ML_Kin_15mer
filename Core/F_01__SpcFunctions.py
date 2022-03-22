@@ -12,9 +12,9 @@ import Core.F_00__GenFunctions as GF
 # --- Functions (O_00__BaseClass) ---------------------------------------------
 
 # --- Functions (O_01__ExpData) -----------------------------------------------
-def getSerTEff(dITp, dfrK, sMd=GC.S_SHORT):
+def getSerTEff(dITp, dfrK, sMd=GC.S_X_SHORT):
     dEffTarg, serTEff = {}, []
-    if sMd in [GC.S_SHORT, GC.S_MED]:
+    if sMd in [GC.S_X_SHORT, GC.S_SHORT, GC.S_MED]:
         serKEff = dfrK[dITp['sEffCode']]
         serTEff = serKEff.apply(lambda x: (x,))
     elif sMd == GC.S_LONG:
@@ -22,8 +22,8 @@ def getSerTEff(dITp, dfrK, sMd=GC.S_SHORT):
         serTEff = dfrKEff.apply(lambda x: tuple(x), axis=1)
     return dEffTarg, serTEff
 
-def getSerTTarg(dITp, dfrK, tSE, sMd=GC.S_SHORT):
-    if sMd in [GC.S_SHORT, GC.S_MED]:
+def getSerTTarg(dITp, dfrK, tSE, sMd=GC.S_X_SHORT):
+    if sMd in [GC.S_X_SHORT, GC.S_SHORT, GC.S_MED]:
         dfrE = dfrK[dfrK[dITp['sEffCode']] == tSE[0]]
         serTTarg = dfrE[dITp['sTargCode']].apply(lambda x: (x,))
         dT = {t: t for t in serTTarg}
@@ -36,7 +36,7 @@ def getSerTTarg(dITp, dfrK, tSE, sMd=GC.S_SHORT):
         dT = {t2: t6 for t2, t6 in zip(serTTarg, serTDfrE)}
     return serTTarg, dT
 
-def createDEffTarg(dITp, dfrK, dfrNmer, lCDfrNmer, sMd=GC.S_SHORT):
+def createDEffTarg(dITp, dfrK, dfrNmer, lCDfrNmer, sMd=GC.S_X_SHORT):
     dEffTarg, serTEff = getSerTEff(dITp, dfrK, sMd=sMd)
     for tSE in serTEff.unique():
         dEffTarg[tSE] = {}

@@ -11,12 +11,13 @@ sNmSpec = 'Input data for the ExpData class in O_01__ExpData'
 
 # --- flow control ------------------------------------------------------------
 procInput = False
-dBDoDfrRes = {GC.S_SHORT: False,
-              GC.S_MED: False,
-              GC.S_LONG: False}
-genInfoNmer = False
-genInfoEff = False
-genInfoGen = False
+dBDoDfrRes = {GC.S_X_SHORT: True,
+              GC.S_SHORT: True,
+              GC.S_MED: True,
+              GC.S_LONG: True}
+genInfoNmer = True
+genInfoEff = True
+genInfoGen = True
 
 # --- lists (1) ---------------------------------------------------------------
 lLenNMer4ResIEff = [1, 3, 5, 7]       # empty list: all lengths considered
@@ -28,6 +29,7 @@ sFRawInpNmer = GC.S_F_RAW_INP_N_MER + GC.S_DOT + GC.S_EXT_CSV
 sFProcInpKin = GC.S_F_PROC_INP_KIN
 sFProcInpNmer = GC.S_F_PROC_INP_N_MER
 
+sFResCombXS = 'Combined_XS_KinasesPho15mer_202202'
 sFResCombS = 'Combined_S_KinasesPho15mer_202202'
 sFResCombM = 'Combined_M_KinasesPho15mer_202202'
 sFResCombL = 'Combined_L_KinasesPho15mer_202202'
@@ -79,28 +81,33 @@ sRowProcI = 'nRows_ProcI'
 sRowCombL = 'nRows_CombL'
 sRowCombM = 'nRows_CombM'
 sRowCombS = 'nRows_CombS'
+sRowCombXS = 'nRows_CombXS'
 sTotalRaw = 'Total_Raw'
 sTotalProcI = 'Total_ProcI'
 sTotalCombL = 'Total_CombL'
 sTotalCombM = 'Total_CombM'
 sTotalCombS = 'Total_CombS'
+sTotalCombXS = 'Total_CombXS'
 sNaNRaw = 'nNaN_Raw'
 sNaNProcI = 'nNaN_ProcI'
 sNaNCombL = 'nNaN_CombL'
 sNaNCombM = 'nNaN_CombM'
 sNaNCombS = 'nNaN_CombS'
+sNaNCombXS = 'nNaN_CombXS'
 
 # --- lists (2) ---------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
 lCXclDfrNmerM = [sExpName, sCodeTrunc]
-lCXclDfrNmerS = [sPep, sPepMod, sCCode, sCCodeSeq, sPepPIP] + lCXclDfrNmerM
+lCXclDfrNmerS = [sPep, sPepMod, sCCode] + lCXclDfrNmerM
+lCXclDfrNmerXS = [sCCodeSeq, sPepPIP] + lCXclDfrNmerS
 lSortCDfrNMer = [sEffCode, sLenNmer, sNOcc, sNmer]
 lSortDirAscDfrNMer = [True, True, False, True]
 lRowsResIGen = [sRowRaw, sTotalRaw, sNaNRaw,
                 sRowProcI, sTotalProcI, sNaNProcI,
                 sRowCombL, sTotalCombL, sNaNCombL,
                 sRowCombM, sTotalCombM, sNaNCombM,
-                sRowCombS, sTotalCombS, sNaNCombS]
+                sRowCombS, sTotalCombS, sNaNCombS,
+                sRowCombXS, sTotalCombXS, sNaNCombXS]
 
 # --- dictionaries ------------------------------------------------------------
 dMer = GC.D_MER
@@ -108,6 +115,10 @@ dMer = GC.D_MER
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
+iStXS = lRowsResIGen.index(sRowCombXS)
+iStS = lRowsResIGen.index(sRowCombS)
+iStM = lRowsResIGen.index(sRowCombM)
+iStL = lRowsResIGen.index(sRowCombL)
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -125,6 +136,7 @@ dIO = {# --- general
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInpNmer': sFProcInpNmer + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResCombXS': sFResCombXS + GC.S_DOT + GC.S_EXT_CSV,
        'sFResCombS': sFResCombS + GC.S_DOT + GC.S_EXT_CSV,
        'sFResCombM': sFResCombM + GC.S_DOT + GC.S_EXT_CSV,
        'sFResCombL': sFResCombL + GC.S_DOT + GC.S_EXT_CSV,
@@ -171,6 +183,7 @@ dIO = {# --- general
        'sNOcc': sNOcc,
        # --- lists (2)
        'lSCKinF': lSCKinF,
+       'lCXclDfrNmerXS': lCXclDfrNmerXS,
        'lCXclDfrNmerS': lCXclDfrNmerS,
        'lCXclDfrNmerM': lCXclDfrNmerM,
        'lSCDfrNMer': [sEffCode, sNmer, sLenNmer, sNOcc],
@@ -180,7 +193,10 @@ dIO = {# --- general
        # --- dictionaries
        'dMer': dMer,
        # === derived values and input processing
-       }
+       'iStXS': iStXS,
+       'iStS': iStS,
+       'iStM': iStM,
+       'iStL': iStL}
 dIO['lSFProcInp'] = [dIO['sFProcInpKin'], dIO['sFProcInpNmer']]
 
 ###############################################################################
