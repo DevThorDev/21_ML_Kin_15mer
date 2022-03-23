@@ -113,7 +113,7 @@ class BaseClass:
                          dropDup=dropDup)
 
 # -----------------------------------------------------------------------------
-class Seq():
+class Seq:
     # --- initialisation of the class -----------------------------------------
     def __init__(self, sSq=''):
         assert type(sSq) == str
@@ -153,13 +153,20 @@ class FullSeq(Seq):
         iCNmer = dITp['iCentNmer']
         self.lIPyl = sorted([i for i in lIPosPyl
                              if (i >= iCNmer and i < len(self.sSeq) - iCNmer)])
-        self.createNmerDict(dITp, iCNmer)
+        self.createNmerDict(dITp)
 
-    # --- methods for creating the Nmer dictionary ----------------------------
-    def createNmerDict(self, dITp, iCNmer):
-        self.dNmer = {}
+    # --- method for creating the Nmer dictionary ----------------------------
+    def createNmerDict(self, dITp):
+        self.dNmer, iCNmer = {},  dITp['iCentNmer']
         for iPyl in self.lIPyl:
             sNmerSeq = self.sSeq[(iPyl - iCNmer):(iPyl + iCNmer + 1)]
             self.dNmer[iPyl] = NmerSeq(dITp, sSq=sNmerSeq, iPCt=iPyl)
+
+    # --- method for storing the positions of a sequence in the full sequence -
+    def checkPosSeq(self, sSeq2F):
+        lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
+        lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
+        dIPos = {iPos: b for iPos, b in zip(lIPos, lB)}
+        return {sSeq2F: (dIPos, sum(lB), len(lB) - sum(lB))}
 
 ###############################################################################

@@ -36,6 +36,7 @@ sIEffF = GC.S_I_EFF_F
 sIEffFTrain = GC.S_I_EFF_F_TRAIN
 sIEffFTest = GC.S_I_EFF_F_TEST
 sIGen = GC.S_I_GEN
+sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -66,6 +67,10 @@ dIO = {# --- general
        'sIEffF': sIEffF,
        'sIEffFTrain': sIEffFTrain,
        'sIEffFTest': sIEffFTest,
-       'sIGen': sIGen}
+       'sIGen': sIGen,
+       'sCapXS': sCapXS,
+       'sCapS': sCapS,
+       'sCapM': sCapM,
+       'sCapL': sCapL}
 
 ###############################################################################

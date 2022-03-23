@@ -47,15 +47,16 @@ def createDEffTarg(dITp, dfrK, dfrNmer, lCDfrNmer, sMd=GC.S_X_SHORT):
     return dEffTarg
 
 def dDNumToDfrINmer(dITp, dDNum):
-    lSCol = dITp['lSCDfrNMer']
+    lSCol, lLenNMer = dITp['lSCDfrNMer'], dITp['lLenNMer']
     assert len(lSCol) >= 4
     fullDfr = GF.iniPdDfr(lSNmC=lSCol)
     for sKMain, cDSub in dDNum.items():
+        cDSubR = {cK: cV for cK, cV in cDSub.items() if len(cK) in lLenNMer}
         subDfr = GF.iniPdDfr(lSNmC=lSCol)
-        subDfr[lSCol[0]] = [sKMain]*len(cDSub)
-        subDfr[lSCol[1]] = list(cDSub)
-        subDfr[lSCol[2]] = [len(sK) for sK in cDSub]
-        subDfr[lSCol[3]] = list(cDSub.values())
+        subDfr[lSCol[0]] = [sKMain]*len(cDSubR)
+        subDfr[lSCol[1]] = list(cDSubR)
+        subDfr[lSCol[2]] = [len(sK) for sK in cDSubR]
+        subDfr[lSCol[3]] = list(cDSubR.values())
         fullDfr = pd.concat([fullDfr, subDfr], axis=0)
     return fullDfr.reset_index(drop=True).convert_dtypes()
 
@@ -79,6 +80,10 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
     return pd.DataFrame(d4Dfr).convert_dtypes()
 
 # --- Functions (O_02__SeqAnalysis) -------------------------------------------
+def modLSF(dITp, lSKeyF, sFE):
+    for sKeyF in lSKeyF:
+        dITp[sKeyF] = GF.modSF(dITp[sKeyF], sEnd=sFE, sJoin=dITp['sUS02'])
+
 def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
     dLh, wtLh, lSCWtLh = {}, 0., dITp['lSCDfrLhV']
     assert len(lSCWtLh) >= 3

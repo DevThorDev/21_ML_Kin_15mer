@@ -41,29 +41,32 @@ class SeqAnalysis(BaseClass):
     # --- methods for obtaining the list of input Nmer-sequences --------------
     def getPDirSFResEnd(self, pDirR=None):
         sFResEnd, sTest, sTrain = '', self.dITp['sTest'], self.dITp['sTrain']
-        if self.dITp['sFSSeqCheck'] == self.dITp['sFProcInpNmer']:
+        sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sCapS']])
+        if self.dITp['sFSeqCheck'] == self.dITp['sFProcInpNmer']:
             pDirR, sFResEnd = self.pDirProcInp, self.dITp['sAllSeqNmer']
-        elif GF.getPartSF(sF=self.dITp['sFSSeqCheck'], iStart=-1) == sTest:
+        elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iEnd=2) == sCombS:
+            pDirR, sFResEnd = self.pDirRes, sCombS
+        elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iStart=-1) == sTest:
             pDirR, sFResEnd = self.pDirRes, self.dITp['sTestData']
-        elif GF.getPartSF(sF=self.dITp['sFSSeqCheck'], iStart=-1) == sTrain:
+        elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iStart=-1) == sTrain:
             pDirR, sFResEnd = self.pDirRes, self.dITp['sTrainData']
         return pDirR, sFResEnd
 
     def getlInpSeq(self):
-        sCNmer, self.lInpSeq, pDir = self.dITp['sCNmer'], [], self.pDirRes
+        self.lNmerSeq, self.lFullSeq, pDir = [], [], self.pDirRes
         [iS, iE] = self.dITp['lIStartEnd']
         pDir, e = self.getPDirSFResEnd(pDirR=pDir)
-        pFInpSeq = GF.joinToPath(pDir, self.dITp['sFSSeqCheck'])
+        pFInpSeq = GF.joinToPath(pDir, self.dITp['sFSeqCheck'])
         self.dfrInpSeq = self.loadDfr(pF=pFInpSeq, iC=0)
-        if sCNmer in self.dfrInpSeq.columns:
-            lSNmerFull = list(self.dfrInpSeq[sCNmer].unique())
-            self.lInpSeq, iS, iE = GF.getItStartToEnd(lSNmerFull, iS, iE)
-            e = GF.joinS([e, iS, iE])
-            self.dITp['sFResWtLh'] = GF.modSF(self.dITp['sFResWtLh'], sEnd=e,
-                                              sJoin=self.dITp['sUS02'])
-            self.dITp['sFResRelLh'] = GF.modSF(self.dITp['sFResRelLh'], sEnd=e,
-                                               sJoin=self.dITp['sUS02'])
-        return self.lInpSeq
+        if self.dITp['sCNmer'] in self.dfrInpSeq.columns:
+            lSNmerFull = list(self.dfrInpSeq[self.dITp['sCNmer']].unique())
+            self.lNmerSeq, iS, iE = GF.getItStartToEnd(lSNmerFull, iS, iE)
+        if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
+            lSFullSeqs = list(self.dfrInpSeq[self.dITp['sCCodeSeq']].unique())
+            self.lFullSeq, iS, iE = GF.getItStartToEnd(lSFullSeqs, iS, iE)
+        e = GF.joinS([e, iS, iE])
+        SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'], sFE=e)
+        return self.lNmerSeq
 
     # --- methods for performing the Nmer-sequence analysis -------------------
     def getRelLikelihoods(self, cEff=None):

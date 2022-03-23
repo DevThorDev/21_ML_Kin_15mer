@@ -28,6 +28,7 @@ S_VBAR = '|'
 S_SLASH = '/'
 S_NEWL = '\n'
 S_0 = '0'
+S_CAP_XS, S_CAP_S, S_CAP_M, S_CAP_L = 'XS', 'S', 'M', 'L'
 
 S_US02 = S_USC*2
 S_SP04 = S_SPACE*4

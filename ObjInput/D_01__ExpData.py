@@ -11,16 +11,16 @@ sNmSpec = 'Input data for the ExpData class in O_01__ExpData'
 
 # --- flow control ------------------------------------------------------------
 procInput = False
-dBDoDfrRes = {GC.S_X_SHORT: True,
-              GC.S_SHORT: True,
-              GC.S_MED: True,
-              GC.S_LONG: True}
-genInfoNmer = True
-genInfoEff = True
-genInfoGen = True
+dBDoDfrRes = {GC.S_X_SHORT: False,
+              GC.S_SHORT: False,
+              GC.S_MED: False,
+              GC.S_LONG: False}
+genInfoNmer = False
+genInfoEff = False
+genInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNMer4ResIEff = [1, 3, 5, 7]       # empty list: all lengths considered
+lLenNMer = [1, 3, 5, 7]         # empty list: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
@@ -131,8 +131,8 @@ dIO = {# --- general
        'genInfoEff': genInfoEff,
        'genInfoGen': genInfoGen,
        # --- lists (1)
-       'lLenNMer': lLenNMer4ResIEff,
-       'lSLenNMer': [str(n) for n in lLenNMer4ResIEff],
+       'lLenNMer': lLenNMer,
+       'lSLenNMer': [str(n) for n in lLenNMer],
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInpNmer': sFProcInpNmer + GC.S_DOT + GC.S_EXT_CSV,

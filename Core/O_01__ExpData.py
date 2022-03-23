@@ -38,24 +38,24 @@ class ExpData(BaseClass):
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFExp(self):
         sJ, sFlFE, pR = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
-        sPFCombXS = GF.joinToPath(pR, self.dITp['sFResCombXS'])
-        sPFCombS = GF.joinToPath(pR, self.dITp['sFResCombS'])
-        sPFCombM = GF.joinToPath(pR, self.dITp['sFResCombM'])
-        sPFCombL = GF.joinToPath(pR, self.dITp['sFResCombL'])
-        dPFComb = {GC.S_X_SHORT: sPFCombXS, GC.S_SHORT: sPFCombS,
-                   GC.S_MED: sPFCombM, GC.S_LONG: sPFCombL}
-        sPFINmer = GF.joinToPath(pR, self.dITp['sFResINmer'])
+        pFCombXS = GF.joinToPath(pR, self.dITp['sFResCombXS'])
+        pFCombS = GF.joinToPath(pR, self.dITp['sFResCombS'])
+        pFCombM = GF.joinToPath(pR, self.dITp['sFResCombM'])
+        pFCombL = GF.joinToPath(pR, self.dITp['sFResCombL'])
+        dPFComb = {GC.S_X_SHORT: pFCombXS, GC.S_SHORT: pFCombS,
+                   GC.S_MED: pFCombM, GC.S_LONG: pFCombL}
         sFE = GF.joinS(self.dITp['lSLenNMer'])
+        sFResINmer = GF.modSF(self.dITp['sFResINmer'], sEnd=sFE, sJoin=sJ)
         sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE, sJoin=sJ)
         if len(sFE) > 0:
             sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
         sFResIEffF = GF.modSF(self.dITp['sFResIEff'], sEnd=sFlFE, sJoin=sJ)
-        sPFResIGen = GF.joinToPath(pR, self.dITp['sFResIGen'])
+        pFResIGen = GF.joinToPath(pR, self.dITp['sFResIGen'])
         dPFBase = {self.dITp['sCombined']: dPFComb,
-                   self.dITp['sImer']: sPFINmer,
+                   self.dITp['sImer']: GF.joinToPath(pR, sFResINmer),
                    self.dITp['sIEff']: GF.joinToPath(pR, sFResIEff),
                    self.dITp['sIEffF']: GF.joinToPath(pR, sFResIEffF),
-                   self.dITp['sIGen']: sPFResIGen}
+                   self.dITp['sIGen']: pFResIGen}
         self.dPF = {self.dITp['sBase']: dPFBase}
 
     # --- methods for filling the DataFrame type dictionary -------------------
@@ -160,7 +160,7 @@ class ExpData(BaseClass):
     def combine(self, lSCK, lSCNmer, iSt=0, sMd=GC.S_X_SHORT):
         dEffTg = SF.createDEffTarg(self.dITp, self.dfrKin, self.dfrNmer,
                                    lCDfrNmer=lSCNmer, sMd=sMd)
-        GF.printSizeDDDfr(dDDfr=dEffTg, modeF=True)
+        GF.printSizeDDDfr(dDDfr=dEffTg, modeF=False)
         self.dfrComb = GF.dDDfrToDfr(dDDfr=dEffTg, lSColL=lSCK, lSColR=lSCNmer)
         self.dTpDfr[self.dITp['sBase']][self.dITp['sCDfrComb']] = self.dfrComb
         sBase, sComb = self.dITp['sBase'], self.dITp['sCombined']
@@ -208,6 +208,7 @@ class ExpData(BaseClass):
             self.combineL(iSt=self.dITp['iStL'])
             print('Created long combined result.')
         if self.dITp['genInfoGen']:
+            self.dfrResIGen = self.dfrResIGen.convert_dtypes()
             self.saveDfr(self.dfrResIGen, self.dPF[tpDfr][self.dITp['sIGen']])
 
     # --- method calling sub-methods that process and combine exp. data -------

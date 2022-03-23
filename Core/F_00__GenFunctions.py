@@ -109,6 +109,10 @@ def findAllSSubInStr(sFull, sSub, overLap=False):
 def startPosToCentPos(iPSt, sSeq):
     return iPSt + len(sSeq)//2
 
+def getLCentPosSSub(sFull, sSub, overLap=False):
+    return [startPosToCentPos(iSt, sSub)
+            for iSt in findAllSSubInStr(sFull, sSub, overLap=overLap)]
+
 # --- Functions performing calculations with scalars --------------------------
 def isEq(x, xCmp, maxDlt=GC.MAX_DELTA):
     return abs(x - xCmp) < maxDlt
@@ -246,7 +250,7 @@ def dDDfrToDfr(dDDfr, lSColL, lSColR):
             leftDfr[lSColL[-len(sKSub):]] = sKSub
             subDfr = pd.concat([leftDfr, rightDfr], axis=1)
             fullDfr = pd.concat([fullDfr, subDfr], axis=0)
-    return fullDfr.reset_index(drop=True)
+    return fullDfr.reset_index(drop=True).convert_dtypes()
 
 def fillDNOcc(dfrNOcc, dNOcc, sNmer=GC.S_N_MER, sLenNmer=GC.S_LEN_N_MER):
     lNmer, lLenNmer = list(dfrNOcc[sNmer]), list(dfrNOcc[sLenNmer])
