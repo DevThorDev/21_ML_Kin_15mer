@@ -11,12 +11,12 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 # --- flow control ------------------------------------------------------------
 calcWtProb = True
 calcRelProb = True
-calcWtLh = True
-calcRelLh = True
+calcWtLh = False
+calcRelLh = False
 
 # --- names and paths of files and dirs ---------------------------------------
-# sFSeqCheck = GC.S_F_PROC_INP_N_MER
-sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
+sFSeqCheck = GC.S_F_PROC_INP_N_MER
+# sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
 sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
 sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
@@ -29,7 +29,7 @@ sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None           # number or None
-iEndLInpNmerSeq = 100          # number or None
+iEndLInpNmerSeq = 10          # number or None
 
 mDsp = 200
 

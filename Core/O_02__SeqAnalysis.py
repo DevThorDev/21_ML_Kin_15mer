@@ -6,7 +6,7 @@
 import Core.F_00__GenFunctions as GF
 import Core.F_01__SpcFunctions as SF
 
-from Core.O_00__BaseClass import BaseClass, NmerSeq
+from Core.O_00__BaseClass import BaseClass, NmerSeq, FullSeq
 
 # -----------------------------------------------------------------------------
 class SeqAnalysis(BaseClass):
@@ -16,6 +16,7 @@ class SeqAnalysis(BaseClass):
         self.idO = 'O_02'
         self.descO = 'Analysis of Nmer-sequences'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
+        self.lFullSeq, self.lNmerSeq = [], []
         self.getPDir()
         self.loadInpDfrs()
         print('Initiated "SeqAnalysis" base object.')
@@ -52,21 +53,30 @@ class SeqAnalysis(BaseClass):
             pDirR, sFResEnd = self.pDirRes, self.dITp['sTrainData']
         return pDirR, sFResEnd
 
+    def getLIPosPyl(self, sFSeq):
+        lIPosPyl, cDfr = [], self.dfrInpSeq
+        if self.dITp['sPepPIP'] in cDfr.columns:
+            dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']] == sFSeq]
+            lIPosPyl = dfrCSeq[self.dITp['sPepPIP']].unique()
+        return [i - 1 for i in lIPosPyl]
+
     def getlInpSeq(self):
-        self.lNmerSeq, self.lFullSeq, pDir = [], [], self.pDirRes
         [iS, iE] = self.dITp['lIStartEnd']
-        pDir, e = self.getPDirSFResEnd(pDirR=pDir)
+        pDir, e = self.getPDirSFResEnd(pDirR=self.pDirRes)
         pFInpSeq = GF.joinToPath(pDir, self.dITp['sFSeqCheck'])
         self.dfrInpSeq = self.loadDfr(pF=pFInpSeq, iC=0)
         if self.dITp['sCNmer'] in self.dfrInpSeq.columns:
-            lSNmerFull = list(self.dfrInpSeq[self.dITp['sCNmer']].unique())
-            self.lNmerSeq, iS, iE = GF.getItStartToEnd(lSNmerFull, iS, iE)
+            lSNmerSeq = list(self.dfrInpSeq[self.dITp['sCNmer']].unique())
+            lSNmerSeq, iS, iE = GF.getItStartToEnd(lSNmerSeq, iS, iE)
         if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
-            lSFullSeqs = list(self.dfrInpSeq[self.dITp['sCCodeSeq']].unique())
-            self.lFullSeq, iS, iE = GF.getItStartToEnd(lSFullSeqs, iS, iE)
+            lSFullSeq = list(self.dfrInpSeq[self.dITp['sCCodeSeq']].unique())
+            lSFullSeq, iS, iE = GF.getItStartToEnd(lSFullSeq, iS, iE)
+            for sFS in lSFullSeq:
+                lI = self.getLIPosPyl(sFSeq=sFS)
+                self.lFullSeq.append(FullSeq(self.dITp, sSq=sFS, lIPosPyl=lI))
         e = GF.joinS([e, iS, iE])
         SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'], sFE=e)
-        return self.lNmerSeq
+        return lSNmerSeq
 
     # --- methods for performing the Nmer-sequence analysis -------------------
     def getRelLikelihoods(self, cEff=None):
@@ -87,13 +97,14 @@ class SeqAnalysis(BaseClass):
             if sNmer in self.lCombSeq:
                 dLV[self.dITp['sInCombRes']][k] = 1
 
-    def performAnalysis(self, lEff=[None], lSSeq=None):
+    def performLhAnalysis(self, lEff=[None], lSSeq=None):
         if self.dITp['calcWtLh'] or self.dITp['calcRelLh']:
             if lSSeq is None:
                 lSSeq = self.getlInpSeq()
             dLV, d3, k, N = {}, {}, 0, len(lSSeq)*len(lEff)
             for cSSeq in lSSeq:
                 cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
+                self.lNmerSeq.append(cNmerSeq)
                 for cEff in lEff:
                     serLh, cEff, maxLSnip = self.getRelLikelihoods(cEff)
                     SF.calcDictLikelihood(self.dITp, dLV, d3, cNmerSeq.dPrf,
@@ -103,6 +114,38 @@ class SeqAnalysis(BaseClass):
                     if k%self.dITp['mDsp'] == 0:
                         print('Processed', k, 'of', N, '...')
             self.saveDfrRelLikelihood(dLV, d3, lSCD3=self.dITp['lSCDfrLhD'])
+
+    def performProbAnalysis(self, lEff=[None], lSSeq=None):
+        if self.dITp['calcWtProb'] or self.dITp['calcRelProb']:
+            if lSSeq is None:
+                lSSeq = self.getlInpSeq()
+            # dLV, d3, k, N = {}, {}, 0, len(lSSeq)*len(lEff)
+            for cSSeq in lSSeq:
+                cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
+                self.lNmerSeq.append(cNmerSeq)
+            print('-'*80, '\nself.lNmerSeq:', sep='')
+            for cSeq in self.lNmerSeq:
+                print(cSeq)
+            print('-'*80, '\nself.lFullSeq:', sep='')
+            for cSeq in self.lFullSeq:
+                print(cSeq)
+                # cSeq.printNmerDict()
+                l = ['GLSPK', 'IVGSAYY', 'LSD', 'XYZ', 'T']
+                dIPosCSeq = cSeq.getDictPosSeq(lSSeq2F=l)
+                print('dIPosCSeq:')
+                print(dIPosCSeq)
+            # dLV, d3, k, N = {}, {}, 0, len(lSSeq)*len(lEff)
+            # for cSSeq in lSSeq:
+            #     cNmerSeq = NmerSeq(self.dITp, sSq=cSSeq)
+            #     for cEff in lEff:
+            #         serLh, cEff, maxLSnip = self.getRelLikelihoods(cEff)
+            #         SF.calcDictLikelihood(self.dITp, dLV, d3, cNmerSeq.dPrf,
+            #                               serLh, maxLSnip, cSSeq, cEff)
+            #         self.complementDLV(dLV)
+            #         k += 1
+            #         if k%self.dITp['mDsp'] == 0:
+            #             print('Processed', k, 'of', N, '...')
+            # self.saveDfrRelLikelihood(dLV, d3, lSCD3=self.dITp['lSCDfrLhD'])
 
     # --- methods for printing results ----------------------------------------
 

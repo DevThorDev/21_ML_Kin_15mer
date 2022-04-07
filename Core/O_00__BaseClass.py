@@ -120,6 +120,13 @@ class Seq:
         self.sSeq = sSq
         self.sPCent = None
 
+    # --- print methods -------------------------------------------------------
+    def __str__(self):
+        sIn = (GC.S_WV80 + GC.S_NEWL + GC.S_SP04 + 'Sequence string: ' +
+               self.sSeq + GC.S_NEWL + 'has central position ' +
+               self.sPCent + GC.S_NEWL + GC.S_WV80)
+        return sIn
+
 # -----------------------------------------------------------------------------
 class NmerSeq(Seq):
     # --- initialisation of the class -----------------------------------------
@@ -132,12 +139,21 @@ class NmerSeq(Seq):
         self.sPCent = sSq[dITp['iCentNmer']]
         self.createProfileDict(dITp)
 
+    # --- print methods -------------------------------------------------------
+    def __str__(self):
+        sIn = (GC.S_WV80 + GC.S_NEWL + GC.S_SP04 + 'Sequence string: ' +
+               self.sSeq + GC.S_NEWL + 'has central position index ' +
+               str(self.iPCent) + GC.S_NEWL + 'and central position ' +
+               self.sPCent + GC.S_NEWL + 'The position dictionary is:' +
+               GC.S_NEWL + str(self.dPrf) + GC.S_NEWL + GC.S_WV80)
+        return sIn
+
     # --- methods for creating and getting the profile dictionary -------------
     def createProfileDict(self, dITp):
         self.dPrf, iCNmer = {}, dITp['iCentNmer']
         for k in range(iCNmer + 1):
             self.dPrf[2*k + 1] = self.sSeq[(iCNmer - k):(iCNmer + k + 1)]
-    
+
     def getProfileDict(self, maxLenSeq=None):
         dPrf = self.dPrf
         if maxLenSeq is not None:
@@ -155,6 +171,22 @@ class FullSeq(Seq):
                              if (i >= iCNmer and i < len(self.sSeq) - iCNmer)])
         self.createNmerDict(dITp)
 
+    # --- print methods -------------------------------------------------------
+    def __str__(self):
+        sIn = (GC.S_WV80 + GC.S_NEWL + GC.S_SP04 + 'Sequence string: ' +
+               self.sSeq + GC.S_NEWL + 'has list of Pyl indices ' +
+               str(self.lIPyl) + GC.S_NEWL +  GC.S_WV80)
+        return sIn
+
+    def printNmerDict(self, printSeq=False):
+        if printSeq:
+            print('The Nmer dictionary of the sequence', self.sSeq, 'is:')
+        else:
+            print('The Nmer dictionary corresponding to this sequence is:')
+        for iPyl, cNmerSeq in self.dNmer.items():
+            print('Pyl index ', iPyl, ':', sep='')
+            print(cNmerSeq)
+
     # --- method for creating the Nmer dictionary ----------------------------
     def createNmerDict(self, dITp):
         self.dNmer, iCNmer = {},  dITp['iCentNmer']
@@ -163,10 +195,14 @@ class FullSeq(Seq):
             self.dNmer[iPyl] = NmerSeq(dITp, sSq=sNmerSeq, iPCt=iPyl)
 
     # --- method for storing the positions of a sequence in the full sequence -
-    def checkPosSeq(self, sSeq2F):
-        lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
-        lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
-        dIPos = {iPos: b for iPos, b in zip(lIPos, lB)}
-        return {sSeq2F: (dIPos, sum(lB), len(lB) - sum(lB))}
+    def getDictPosSeq(self, lSSeq2F):
+        dIPos = {}
+        for sSeq2F in lSSeq2F:
+            lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
+            lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
+            dIPos[sSeq2F] = ({iPos: b for iPos, b in zip(lIPos, lB)},
+                             len(lB), sum(lB))
+        return dIPos
+        # return {sSeq2F: (dIPos, sum(lB), len(lB) - sum(lB))}
 
 ###############################################################################
