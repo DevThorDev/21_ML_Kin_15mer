@@ -123,6 +123,32 @@ def isInSeqSet(x, cSqSet, maxDlt=GC.MAX_DELTA):
             return True
     return False
 
+# --- Functions handling iterators (lists/tuples or dictionaries) -------------
+def restrIt(cIt, lRestrLen=[], useLenS=False):
+    if len(lRestrLen) > 0:
+        if type(cIt) in [list, tuple]:
+            if useLenS:     # use string length (assuming s is a string)
+                lRet = [s for s in cIt if len(s) in lRestrLen]
+            else:           # use element directly (assuming k is an int)
+                lRet = [k for k in cIt if k in lRestrLen]
+            if type(cIt) == tuple:
+                return tuple(lRet)
+            else:
+                return lRet
+        elif type(cIt) == dict:
+            if useLenS:     # use string length (assuming sK is a string)
+                return {sK: v for sK, v in cIt.items() if len(sK) in lRestrLen}
+            else:           # use element directly (assuming cK is an int)
+                return {cK: v for cK, v in cIt.items() if cK in lRestrLen}
+    else:
+        return cIt
+
+def restrInt(cIt, lRestrLen=[]):
+    return restrIt(cIt=cIt, lRestrLen=lRestrLen)
+
+def restrLenS(cIt, lRestrLen=[]):
+    return restrIt(cIt=cIt, lRestrLen=lRestrLen, useLenS=True)
+
 # --- Functions handling dictionaries -----------------------------------------
 def addIfAbsent(lD, cK, cV=None):
     for cD in lD:

@@ -132,6 +132,9 @@ S_CODE_TRUNC = 'code_trunc'
 S_ANY_EFF = 'AnyEffector'
 S_NUM_OCC = 'nOcc'
 S_ALL_SEQ_N_MER = 'AllSeq15mer'
+S_SEQ_CHECK = 'SeqCheck'
+S_I_EFF_INP = 'IEffInp'
+S_COMB_INP = 'CombInp'
 S_TRAIN_DATA = S_TRAIN + S_DATA
 S_TEST_DATA = S_TEST + S_DATA
 

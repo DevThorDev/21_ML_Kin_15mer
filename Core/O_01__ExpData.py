@@ -22,7 +22,7 @@ class ExpData(BaseClass):
         self.fillDTpDfrExp()
         print('Initiated "ExpData" base object.')
 
-    # --- methods for reading experimental data -------------------------------
+    # --- methods for loading experimental data -------------------------------
     def readExpData(self):
         if self.dIG['isTest']:
             self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin_T'])

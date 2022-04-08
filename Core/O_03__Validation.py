@@ -54,7 +54,7 @@ class Validation(ExpData):
         self.dTpDfr[self.dITp['sTest']][sBGIN] = self.dITp['genInfoNmerTest']
         self.dTpDfr[self.dITp['sTest']][sBGIE] = self.dITp['genInfoEffTest']
 
-    # --- methods for reading the input DataFrame -----------------------------
+    # --- methods for loading data --------------------------------------------
     def loadInpDfr(self):
         pFCombInp = self.dPF[self.dITp['sTrain']][self.dITp['sCombinedInp']]
         self.dfrComb = self.loadDfr(pF=pFCombInp, iC=0)

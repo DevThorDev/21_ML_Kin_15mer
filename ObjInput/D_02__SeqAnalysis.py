@@ -14,6 +14,8 @@ calcRelProb = True
 calcWtLh = False
 calcRelLh = False
 
+useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
+
 # --- names and paths of files and dirs ---------------------------------------
 sFSeqCheck = GC.S_F_PROC_INP_N_MER
 # sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
@@ -43,6 +45,9 @@ sRelProb = 'relProb'
 sWtLikelihood = 'wtLikelihood'
 sRelLikelihood = 'relLikelihood'
 sInCombRes = 'inCombRes'
+sSeqCheck = GC.S_SEQ_CHECK
+sIEffInp = GC.S_I_EFF_INP
+sCombInp = GC.S_COMB_INP
 sAllSeqNmer = GC.S_ALL_SEQ_N_MER
 sTrainData = GC.S_TRAIN_DATA
 sTestData = GC.S_TEST_DATA
@@ -76,6 +81,7 @@ dIO = {# --- general
        'calcRelProb': calcRelProb,
        'calcWtLh': calcWtLh,
        'calcRelLh': calcRelLh,
+       'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
        'sFSeqCheck': sFSeqCheck + GC.S_DOT + GC.S_EXT_CSV,
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
@@ -98,6 +104,9 @@ dIO = {# --- general
        'sWtLikelihood': sWtLikelihood,
        'sRelLikelihood': sRelLikelihood,
        'sInCombRes': sInCombRes,
+       'sSeqCheck': sSeqCheck,
+       'sIEffInp': sIEffInp,
+       'sCombInp': sCombInp,
        'sAllSeqNmer': sAllSeqNmer,
        'sTrainData': sTrainData,
        'sTestData': sTestData,

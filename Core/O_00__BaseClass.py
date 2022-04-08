@@ -65,6 +65,7 @@ class BaseClass:
     def iniDfrs(self):
         self.dfrKin, self.dfrNmer = None, None
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
+        self.dfrIEff, self.dfrInpSeq, self.dfrInpNmer = None, None, None
         self.dfrComb, self.dfrTrain, self.dfrTest = None, None, None
 
     # --- methods for filling the DataFrame type dictionary -------------------
