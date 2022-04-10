@@ -197,13 +197,14 @@ class FullSeq(Seq):
 
     # --- method for storing the positions of a sequence in the full sequence -
     def getDictPosSeq(self, lSSeq2F):
-        dIPos = {}
+        dIPosSeq = {}
         for sSeq2F in lSSeq2F:
             lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
             lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
-            dIPos[sSeq2F] = ({iPos: b for iPos, b in zip(lIPos, lB)},
-                             len(lB), sum(lB))
-        return dIPos
+            # dIPos[sSeq2F] = ({iPos: b for iPos, b in zip(lIPos, lB)},
+            #                  len(lB), sum(lB))
+            dIPosSeq[sSeq2F] = (lIPos, lB)
+        return dIPosSeq
         # return {sSeq2F: (dIPos, sum(lB), len(lB) - sum(lB))}
 
 ###############################################################################

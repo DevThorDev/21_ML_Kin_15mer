@@ -284,6 +284,9 @@ def fillDNOcc(dfrNOcc, dNOcc, sNmer=GC.S_N_MER, sLenNmer=GC.S_LEN_N_MER):
     for sNmer, cLenNmer in zip(lNmer, lLenNmer):
         addToDictL(dNOcc, cLenNmer, sNmer)
 
+def dictToDfr(cD):
+    return pd.DataFrame(cD)
+
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):
     return [cB for cB in cIt] == [True]*len(cIt)

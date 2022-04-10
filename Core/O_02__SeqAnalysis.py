@@ -28,13 +28,14 @@ class SeqAnalysis(BaseClass):
             print('Length-', cLen, '-sequence list (list length = ', len(lSeq),
                   '):\n\t', lSeq, sep='')
 
-    def printDictIPos(self):
+    def printDictIPosProbPyl(self):
         print(GC.S_DS80, '\nPosition index dictionary:\n', GC.S_DS80, sep='')
-        for sFullSeq, dSub in self.dIPos.items():
-            print('*** Sequence', sFullSeq)
-            for cLen, cV in dSub.items():
-                print('+ Length', cLen)
-                print('\t', cV, sep='')
+        for sFullSeq, dSub in self.dIPosProbPyl.items():
+            print(GC.S_ST04, ' Full sequence ', GC.S_STAR*61)
+            print(sFullSeq)
+            for cLen, dIPosSeq in dSub.items():
+                print(GC.S_PL04, ' Nmers with length ', cLen, ' have Pyl ',
+                      'index dictionary:', GC.S_NEWL, dIPosSeq, sep='')
 
     # --- methods for loading data --------------------------------------------
     def getPDirSFResEnd(self, pDirR=None):
@@ -98,14 +99,14 @@ class SeqAnalysis(BaseClass):
                 self.lFullSeq.append(FullSeq(self.dITp, sSq=sSq, lIPosPyl=lI))
         e = GF.joinS([e, iS, iE])
         SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'], sFE=e)
-        
+
     # --- methods for generating the {seq. length: seq. list} dictionary ------
     def genDLenSeq(self):
         # iCol = self.loadInpNmer()
         if self.dITp['useNmerSeqFrom'] in [self.dITp['sSeqCheck'],
                                            self.dITp['sCombInp']]:
             for cNmerSeq in self.lNmerSeq:
-                for cLen, sSeq in cNmerSeq.dPrf.items(): 
+                for cLen, sSeq in cNmerSeq.dPrf.items():
                     GF.addToDictL(self.dLenSeq, cK=cLen, cE=sSeq, lUniqEl=True)
         elif self.dITp['useNmerSeqFrom'] == self.dITp['sIEffInp']:
             lSEffCode = [self.dITp['sEffCode']]
@@ -150,18 +151,20 @@ class SeqAnalysis(BaseClass):
 
     def performProbAnalysis(self, lEff=[None], lSSeq=None):
         if self.dITp['calcWtProb'] or self.dITp['calcRelProb']:
-            self.dIPos = {}
             self.getLInpSeq(lSSeq=lSSeq)
             self.genDLenSeq()
+            self.dIPosProbPyl = {}
             for cSeq in self.lFullSeq:
-                self.dIPos[cSeq.sSeq] = {}
                 cD = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNMer'])
                 for cLen, lSSeqNmer in cD.items():
                     # dIPosCSeq = cSeq.getDictPosSeq(lSSeq2F=lSSeqNmer)
                     # print('dIPosCSeq:')
                     # print(dIPosCSeq)
-                    self.dIPos[cSeq.sSeq][cLen] = cSeq.getDictPosSeq(lSSeq2F=lSSeqNmer)
-            self.printDictIPos()
+                    dIPosSeq = cSeq.getDictPosSeq(lSSeq2F=lSSeqNmer)
+                    # self.dIPosProbPyl[cSeq.sSeq] = (cLen, dIPosSeq)
+                    GF.addToDictD(self.dIPosProbPyl, cSeq.sSeq, cLen, dIPosSeq)
+            self.printDictIPosProbPyl()
+            self.saveDfrRelProb()
             # dLV, d3, k, N = {}, {}, 0, len(lSSeq)*len(lEff)
             # print('-'*80, '\nself.lNmerSeq:', sep='')
             # for cSeq in self.lNmerSeq:
@@ -196,5 +199,22 @@ class SeqAnalysis(BaseClass):
         if self.dITp['calcRelLh']:
             dfrDict = GF.d3ValToDfr(d3, lSCD3)
             self.saveDfr(dfrDict, pF=pFDfrDict, saveAnyway=True)
+
+    def saveDfrRelProb(self, lSCol=['FullSeq', 'lenNmer', 'Nmer', 'Prob']):
+        pFDfrVal = GF.joinToPath(self.pDirRes, self.dITp['sFResWtP'])
+        # pFDfrDict = GF.joinToPath(self.pDirRes, self.dITp['sFResRelP'])
+        if self.dITp['calcWtProb']:
+            dLV = {}
+            for cKMain, cDSub1 in self.dIPosProbPyl.items():
+                for cKSub1, cDSub2 in cDSub1.items():
+                    for cKSub2, (lIPos, lB) in cDSub2.items():
+                        cProb = None
+                        if len(lB) > 0:
+                            cProb = sum(lB)/len(lB)
+                        lElRow = [cKMain, cKSub1, cKSub2, cProb]
+                        # for sC, cV in zip(lSCol[:minLenL], lElRow):
+                        for sC, cV in zip(lSCol, lElRow):
+                            GF.addToDictL(dLV, cK=sC, cE=cV)
+            self.saveDfr(GF.dictToDfr(dLV), pF=pFDfrVal, saveAnyway=True)
 
 ###############################################################################
