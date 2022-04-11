@@ -200,11 +200,87 @@ class FullSeq(Seq):
         dIPosSeq = {}
         for sSeq2F in lSSeq2F:
             lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
-            lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
-            # dIPos[sSeq2F] = ({iPos: b for iPos, b in zip(lIPos, lB)},
-            #                  len(lB), sum(lB))
-            dIPosSeq[sSeq2F] = (lIPos, lB)
+            if len(lIPos) > 0:
+                lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
+                dIPosSeq[sSeq2F] = (lIPos, lB, sum(lB)/len(lB))
         return dIPosSeq
         # return {sSeq2F: (dIPos, sum(lB), len(lB) - sum(lB))}
+
+# -----------------------------------------------------------------------------
+class Timing:
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, stT=None, rndDig=GC.R02):
+        self.stT = stT
+        self.rdDig=rndDig
+        self.elT_02_1_getLInpSeq = 0.
+        self.elT_02_2_genDLenSeq = 0.
+        self.elT_02_3_performLhAnalysis = 0.
+        self.elT_02_4_performProbAnalysis_A = 0.
+        self.elT_02_5_performProbAnalysis_B = 0.
+        self.elT_02_6_performProbAnalysis_C = 0.
+        self.elT_02_7_performProbAnalysis_D = 0.
+        self.elT_Sum = 0.
+        self.updateLElTimes()
+        self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
+                      'performProbAnalysis_A', 'performProbAnalysis_B',
+                      'performProbAnalysis_C', 'performProbAnalysis_D']
+        assert len(self.lSMth) == len(self.lElT)
+
+    # --- update methods ------------------------------------------------------
+    def updateLElTimes(self):
+        self.lElT = [self.elT_02_1_getLInpSeq, self.elT_02_2_genDLenSeq,
+                     self.elT_02_3_performLhAnalysis,
+                     self.elT_02_4_performProbAnalysis_A,
+                     self.elT_02_5_performProbAnalysis_B,
+                     self.elT_02_6_performProbAnalysis_C,
+                     self.elT_02_7_performProbAnalysis_D]
+
+    def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
+        if stTMth is not None and endTMth is not None:
+            elT = endTMth - stTMth
+            if iMth == 1:
+                self.elT_02_1_getLInpSeq += elT
+            elif iMth == 2:
+                self.elT_02_2_genDLenSeq += elT
+            elif iMth == 3:
+                self.elT_02_3_performLhAnalysis += elT
+            elif iMth == 4:
+                self.elT_02_4_performProbAnalysis_A += elT
+            elif iMth == 5:
+                self.elT_02_5_performProbAnalysis_B += elT
+            elif iMth == 6:
+                self.elT_02_6_performProbAnalysis_C += elT
+            elif iMth == 7:
+                self.elT_02_7_performProbAnalysis_D += elT
+            self.elT_Sum += elT
+            self.updateLElTimes()
+
+    # --- print methods -------------------------------------------------------
+    def __str__(self):
+        sIn = (GC.S_WV80 + GC.S_NEWL + GC.S_SP04 + 'Time (s) used in:' +
+               GC.S_NEWL + 'Method "getLInpSeq":\t\t\t' +
+               str(round(self.elT_02_1_getLInpSeq, self.rdDig)) + GC.S_NEWL +
+               'Method "genDLenSeq":\t\t\t' +
+               str(round(self.elT_02_2_genDLenSeq, self.rdDig)) + GC.S_NEWL +
+               'Method "performLhAnalysis":\t\t' +
+               str(round(self.elT_02_3_performLhAnalysis, self.rdDig)) +
+               GC.S_NEWL + 'Method "performProbAnalysis_A":\t' +
+               str(round(self.elT_02_4_performProbAnalysis_A, self.rdDig)) +
+               GC.S_NEWL + 'Method "performProbAnalysis_B":\t' +
+               str(round(self.elT_02_5_performProbAnalysis_B, self.rdDig)) +
+               GC.S_NEWL + 'Method "performProbAnalysis_C":\t' +
+               str(round(self.elT_02_6_performProbAnalysis_C, self.rdDig)) +
+               GC.S_NEWL + 'Method "performProbAnalysis_D":\t' +
+               str(round(self.elT_02_7_performProbAnalysis_D, self.rdDig)) +
+               GC.S_NEWL + GC.S_WV80)
+        return sIn
+
+    def printRelTimes(self):
+        print(GC.S_WV80)
+        for sMth, cElT in zip(self.lSMth, self.lElT):
+            sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'
+            sWS = GC.S_SPACE*(6 - len(sX))
+            print(GC.S_SP04 + sWS + sX + '\t(share of time in "' + sMth + '")')
+        print(GC.S_WV80)
 
 ###############################################################################

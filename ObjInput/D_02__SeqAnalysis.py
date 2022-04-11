@@ -31,9 +31,9 @@ sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None           # number or None
-iEndLInpNmerSeq = 100          # number or None
+iEndLInpNmerSeq = 1500          # number or None
 
-mDsp = 200
+mDsp = 100
 
 # --- strings -----------------------------------------------------------------
 sCNmer = GC.S_C_N_MER

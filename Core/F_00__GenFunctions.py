@@ -284,8 +284,11 @@ def fillDNOcc(dfrNOcc, dNOcc, sNmer=GC.S_N_MER, sLenNmer=GC.S_LEN_N_MER):
     for sNmer, cLenNmer in zip(lNmer, lLenNmer):
         addToDictL(dNOcc, cLenNmer, sNmer)
 
-def dictToDfr(cD):
-    return pd.DataFrame(cD)
+def dictToDfr(cD, dropNA=True, dropHow='any'):
+    if dropNA:
+        return pd.DataFrame(cD).dropna(axis=0, how=dropHow)
+    else:
+        return pd.DataFrame(cD)
 
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):
@@ -561,22 +564,31 @@ def startSimu():
     print('Process and handle data and generate plots.')
     return startTime
 
-def printElapsedTimeSim(stT, cT, sPre='Time', nDig=GC.R04):
-    # calculate and display elapsed time
-    elT = round(cT - stT, nDig)
-    print(sPre, 'elapsed:', elT, 'seconds, this is', round(elT/60, nDig),
-          'minutes or', round(elT/3600, nDig), 'hours or',
-          round(elT/(3600*24), nDig), 'days.')
+def printElapsedTimeSim(stT=None, cT=None, sPre='Time', nDig=GC.R04):
+    if stT is not None and cT is not None:
+        # calculate and display elapsed time
+        elT = round(cT - stT, nDig)
+        print(sPre, 'elapsed:', elT, 'seconds, this is', round(elT/60, nDig),
+              'minutes or', round(elT/3600, nDig), 'hours or',
+              round(elT/(3600*24), nDig), 'days.')
 
-def showElapsedTime(startTime):
-    print(GC.S_DS80)
-    printElapsedTimeSim(startTime, time.time(), 'Time')
-    print(GC.S_SP04 + 'Current time:', time.ctime(time.time()), GC.S_SP04)
-    print(GC.S_DS80)
+def showElapsedTime(startTime=None):
+    if startTime is not None:
+        print(GC.S_DS80)
+        printElapsedTimeSim(startTime, time.time(), 'Time')
+        print(GC.S_SP04 + 'Current time:', time.ctime(time.time()), GC.S_SP04)
+        print(GC.S_DS80)
 
-def endSimu(startTime):
-    print(GC.S_DS80)
-    printElapsedTimeSim(startTime, time.time(), 'Total time')
-    print(GC.S_ST24 + ' DONE', time.ctime(time.time()), GC.S_ST25)
+def showProgress(N, n=0, modeDisp=1, varText='', startTime=None):
+    if (n + 1)%modeDisp == 0:
+        print('Processed ', n + 1, ' of ', N, ' ', varText, ' (',
+              round((n + 1)/N*100., GC.R02), '%).', sep='')
+        showElapsedTime(startTime=startTime)
+
+def endSimu(startTime=None):
+    if startTime is not None:
+        print(GC.S_DS80)
+        printElapsedTimeSim(startTime, time.time(), 'Total time')
+        print(GC.S_ST24 + ' DONE', time.ctime(time.time()), GC.S_ST25)
 
 ###############################################################################
