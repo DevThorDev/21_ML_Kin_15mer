@@ -9,10 +9,10 @@ sOType = 'Nmer-sequence analysis (D_02__SeqAnalysis)'
 sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 
 # --- flow control ------------------------------------------------------------
-calcWtProb = True
-calcRelProb = True
 calcWtLh = False
 calcRelLh = False
+calcWtProb = True
+calcRelProb = True
 
 useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
 
@@ -24,14 +24,14 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
-sFResWtP = GC.S_US02.join(['WtProb'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResRelP = GC.S_US02.join(['RelProb'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
+sFResWtProb = GC.S_US02.join(['WtProb'] + sFIEffInp.split(GC.S_US02)[1:])
+sFResRelProb = GC.S_US02.join(['RelProb'] + sFIEffInp.split(GC.S_US02)[1:])
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None           # number or None
-iEndLInpNmerSeq = 1500          # number or None
+iEndLInpNmerSeq = 500          # number or None
 
 mDsp = 100
 
@@ -40,10 +40,11 @@ sCNmer = GC.S_C_N_MER
 sEffCode = GC.S_EFF_CODE
 sSnippet = GC.S_SNIPPET
 sLenSnip = GC.S_LEN_SNIP
-sWtProb = 'wtProb'
-sRelProb = 'relProb'
 sWtLikelihood = 'wtLikelihood'
 sRelLikelihood = 'relLikelihood'
+sWtProb = 'wtProb'
+sRelProb = 'relProb'
+sEstProb = 'estProb'
 sInCombRes = 'inCombRes'
 sSeqCheck = GC.S_SEQ_CHECK
 sIEffInp = GC.S_I_EFF_INP
@@ -56,6 +57,13 @@ sTestData = GC.S_TEST_DATA
 lIStartEnd = [iStartLInpNmerSeq, iEndLInpNmerSeq]
 lSCDfrLhV = [sCNmer, sEffCode, sWtLikelihood, sInCombRes]
 lSCDfrLhD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelLikelihood]
+
+lSCDfrProbS = [sSnippet, sLenSnip, sEstProb]
+lSrtByDfrProbS = [sLenSnip, sEstProb, sSnippet]
+lSrtAscDfrProbS = [True, False, True]
+
+lSCDfrProbV = [sCNmer, sEffCode, sWtProb, sInCombRes]
+lSCDfrProbD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelProb]
 
 # --- dictionaries ------------------------------------------------------------
 dWtsLenSeq = {1: 0.1,
@@ -70,26 +78,26 @@ dWtsLenSeq = {1: 0.1,
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-lSKeyFRes = ['sFResWtP', 'sFResRelP', 'sFResWtLh', 'sFResRelLh']
+lSKeyFRes = ['sFResWtLh', 'sFResRelLh', 'sFResWtProb', 'sFResRelProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
        'sOType': sOType,
        'sNmSpec': sNmSpec,
        # --- flow control
-       'calcWtProb': calcWtProb,
-       'calcRelProb': calcRelProb,
        'calcWtLh': calcWtLh,
        'calcRelLh': calcRelLh,
+       'calcWtProb': calcWtProb,
+       'calcRelProb': calcRelProb,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
        'sFSeqCheck': sFSeqCheck + GC.S_DOT + GC.S_EXT_CSV,
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResWtP': sFResWtP + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResRelP': sFResRelP + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers
        'iStartLInpNmerSeq': iStartLInpNmerSeq,
        'iEndLInpNmerSeq': iEndLInpNmerSeq,
@@ -114,6 +122,11 @@ dIO = {# --- general
        'lIStartEnd': lIStartEnd,
        'lSCDfrLhV': lSCDfrLhV,
        'lSCDfrLhD': lSCDfrLhD,
+       'lSCDfrProbS': lSCDfrProbS,
+       'lSrtByDfrProbS': lSrtByDfrProbS,
+       'lSrtAscDfrProbS': lSrtAscDfrProbS,
+       'lSCDfrProbV': lSCDfrProbV,
+       'lSCDfrProbD': lSCDfrProbD,
        # --- dictionaries
        'dWtsLenSeq': dWtsLenSeq,
        # === derived values and input processing

@@ -284,11 +284,19 @@ def fillDNOcc(dfrNOcc, dNOcc, sNmer=GC.S_N_MER, sLenNmer=GC.S_LEN_N_MER):
     for sNmer, cLenNmer in zip(lNmer, lLenNmer):
         addToDictL(dNOcc, cLenNmer, sNmer)
 
-def dictToDfr(cD, dropNA=True, dropHow='any'):
+def dictToDfr(cD, dropNA=True, dropHow='any', srtBy=None, srtAsc=None):
     if dropNA:
-        return pd.DataFrame(cD).dropna(axis=0, how=dropHow)
+        pdDfr = pd.DataFrame(cD).dropna(axis=0, how=dropHow)
     else:
-        return pd.DataFrame(cD)
+        pdDfr = pd.DataFrame(cD)
+    if srtBy is not None:
+        if srtAsc is not None:
+            pdDfr.sort_values(axis=0, by=srtBy, ascending=srtAsc, inplace=True,
+                              ignore_index=True)
+        else:
+            pdDfr.sort_values(axis=0, by=srtBy, inplace=True,
+                              ignore_index=True)
+    return pdDfr
 
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):
@@ -316,6 +324,15 @@ def getItStartToEnd(cIt, iStart=None, iEnd=None):
     else:
         iEnd = len(cIt)
     return cIt[iStart:iEnd], iStart, iEnd
+
+# --- Functions performing general calculations -------------------------------
+# def calcMeanProb(cDIProb):
+#     meanProb = 0.
+#     for cProb in cDIProb.values():
+#         # if cProb is not None:
+#         #     meanProb += cProb/len(cDIProb)
+#         meanProb += cProb/len(cDIProb)
+#     return meanProb
 
 # --- Functions performing numpy array calculation and manipulation -----------
 def getArrCartProd(it1, it2):
@@ -579,11 +596,12 @@ def showElapsedTime(startTime=None):
         print(GC.S_SP04 + 'Current time:', time.ctime(time.time()), GC.S_SP04)
         print(GC.S_DS80)
 
-def showProgress(N, n=0, modeDisp=1, varText='', startTime=None):
+def showProgress(N, n=0, modeDisp=1, varText='', startTime=None, showT=False):
     if (n + 1)%modeDisp == 0:
         print('Processed ', n + 1, ' of ', N, ' ', varText, ' (',
               round((n + 1)/N*100., GC.R02), '%).', sep='')
-        showElapsedTime(startTime=startTime)
+        if showT:
+            showElapsedTime(startTime=startTime)
 
 def endSimu(startTime=None):
     if startTime is not None:
