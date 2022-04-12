@@ -27,7 +27,8 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 
 sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResSnipProb = GC.S_US02.join(['SnipProb'] + sFIEffInp.split(GC.S_US02)[1:])
+sFResSnipProbS = GC.S_US02.join(['SnipProbS'] + sFIEffInp.split(GC.S_US02)[1:])
+sFResSnipProbX = GC.S_US02.join(['SnipProbX'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResWtProb = GC.S_US02.join(['WtProb'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResRelProb = GC.S_US02.join(['RelProb'] + sFIEffInp.split(GC.S_US02)[1:])
 
@@ -80,8 +81,8 @@ dWtsLenSeq = {1: 0.1,
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-lSKeyFRes = ['sFResWtLh', 'sFResRelLh', 'sFResSnipProb', 'sFResWtProb',
-             'sFResRelProb']
+lSKeyFRes = ['sFResWtLh', 'sFResRelLh', 'sFResSnipProbS', 'sFResSnipProbX',
+             'sFResWtProb', 'sFResRelProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -101,7 +102,8 @@ dIO = {# --- general
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResSnipProb': sFResSnipProb + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResSnipProbS': sFResSnipProbS + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResSnipProbX': sFResSnipProbX + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers

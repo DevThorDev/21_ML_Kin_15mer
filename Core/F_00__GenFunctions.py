@@ -177,6 +177,13 @@ def extractFromDictL(cD, lKeys):
                 lRet.append(GC.S_WAVE)
     return lRet
 
+def addToDictMnV(cD, cK, cEl, nEl):
+    assert nEl > 0
+    if cK in cD:
+        cD[cK] += cEl/nEl
+    else:
+        cD[cK] = cEl/nEl
+
 def addToDictL(cD, cK, cE, lUniqEl=False):
     if cK in cD:
         if not lUniqEl or cE not in cD[cK]:
