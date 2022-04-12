@@ -37,11 +37,12 @@ class ExpData(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFExp(self):
-        sJ, sFlFE, pR = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
-        pFCombXS = GF.joinToPath(pR, self.dITp['sFResCombXS'])
-        pFCombS = GF.joinToPath(pR, self.dITp['sFResCombS'])
-        pFCombM = GF.joinToPath(pR, self.dITp['sFResCombM'])
-        pFCombL = GF.joinToPath(pR, self.dITp['sFResCombL'])
+        sJ, sFlFE = self.dITp['sUS02'], self.dITp['sFull']
+        pRCmb, pRInf = self.pDirResComb, self.pDirResInfo
+        pFCombXS = GF.joinToPath(pRCmb, self.dITp['sFResCombXS'])
+        pFCombS = GF.joinToPath(pRCmb, self.dITp['sFResCombS'])
+        pFCombM = GF.joinToPath(pRCmb, self.dITp['sFResCombM'])
+        pFCombL = GF.joinToPath(pRCmb, self.dITp['sFResCombL'])
         dPFComb = {GC.S_X_SHORT: pFCombXS, GC.S_SHORT: pFCombS,
                    GC.S_MED: pFCombM, GC.S_LONG: pFCombL}
         sFE = GF.joinS(self.dITp['lSLenNMer'])
@@ -50,11 +51,11 @@ class ExpData(BaseClass):
         if len(sFE) > 0:
             sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
         sFResIEffF = GF.modSF(self.dITp['sFResIEff'], sEnd=sFlFE, sJoin=sJ)
-        pFResIGen = GF.joinToPath(pR, self.dITp['sFResIGen'])
+        pFResIGen = GF.joinToPath(pRInf, self.dITp['sFResIGen'])
         dPFBase = {self.dITp['sCombined']: dPFComb,
-                   self.dITp['sImer']: GF.joinToPath(pR, sFResINmer),
-                   self.dITp['sIEff']: GF.joinToPath(pR, sFResIEff),
-                   self.dITp['sIEffF']: GF.joinToPath(pR, sFResIEffF),
+                   self.dITp['sImer']: GF.joinToPath(pRInf, sFResINmer),
+                   self.dITp['sIEff']: GF.joinToPath(pRInf, sFResIEff),
+                   self.dITp['sIEffF']: GF.joinToPath(pRInf, sFResIEffF),
                    self.dITp['sIGen']: pFResIGen}
         self.dPF = {self.dITp['sBase']: dPFBase}
 
@@ -91,8 +92,8 @@ class ExpData(BaseClass):
 
     # --- methods for saving data ---------------------------------------------
     def saveProcInpDfrs(self):
-        self.lDfrInp = [self.dfrKin, self.dfrNmer]
-        for cDfr, sFPI in zip(self.lDfrInp, self.dITp['lSFProcInp']):
+        self.lDfrInp, lF = [self.dfrKin, self.dfrNmer], self.dITp['lSFProcInp']
+        for cDfr, sFPI in zip(self.lDfrInp, lF):
             self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI),
                          dropDup=True, saveAnyway=False)
 

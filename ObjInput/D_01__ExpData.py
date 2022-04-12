@@ -42,8 +42,12 @@ pDirRawInp = GC.P_DIR_RAW_INP
 pDirRawInp_Test = GC.P_DIR_RAW_INP_TEST
 pDirProcInp = GC.P_DIR_PROC_INP
 pDirProcInp_Test = GC.P_DIR_PROC_INP_TEST
-pDirRes = GC.P_DIR_RES
-pDirRes_Test = GC.P_DIR_RES_TEST
+pDirResComb = GC.P_DIR_RES_COMB
+pDirResComb_Test = GC.P_DIR_RES_COMB_TEST
+pDirResInfo = GC.P_DIR_RES_INFO
+pDirResInfo_Test = GC.P_DIR_RES_INFO_TEST
+pDirResProb = GC.P_DIR_RES_PROB
+pDirResProb_Test = GC.P_DIR_RES_PROB_TEST
 
 # --- numbers -----------------------------------------------------------------
 lenSnippetDef = GC.LEN_SNIPPET_DEF
@@ -149,8 +153,12 @@ dIO = {# --- general
        'pFRawInpNmer_T': GF.joinToPath(pDirRawInp_Test, sFRawInpNmer),
        'pDirProcInp': pDirProcInp,
        'pDirProcInp_T': pDirProcInp_Test,
-       'pDirRes': pDirRes,
-       'pDirRes_T': pDirRes_Test,
+       'pDirResComb': pDirResComb,
+       'pDirResComb_T': pDirResComb_Test,
+       'pDirResInfo': pDirResInfo,
+       'pDirResInfo_T': pDirResInfo_Test,
+       'pDirResProb': pDirResProb,
+       'pDirResProb_T': pDirResProb_Test,
        # --- numbers
        'lenSDef': lenSnippetDef,
        'iCentNmer': iCentNmer,

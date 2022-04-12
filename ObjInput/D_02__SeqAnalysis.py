@@ -11,6 +11,7 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 # --- flow control ------------------------------------------------------------
 calcWtLh = False
 calcRelLh = False
+calcSnipProb = True
 calcWtProb = True
 calcRelProb = True
 
@@ -26,12 +27,13 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 
 sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
+sFResSnipProb = GC.S_US02.join(['SnipProb'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResWtProb = GC.S_US02.join(['WtProb'] + sFIEffInp.split(GC.S_US02)[1:])
 sFResRelProb = GC.S_US02.join(['RelProb'] + sFIEffInp.split(GC.S_US02)[1:])
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None           # number or None
-iEndLInpNmerSeq = 500          # number or None
+iEndLInpNmerSeq = 300          # number or None
 
 mDsp = 100
 
@@ -42,9 +44,9 @@ sSnippet = GC.S_SNIPPET
 sLenSnip = GC.S_LEN_SNIP
 sWtLikelihood = 'wtLikelihood'
 sRelLikelihood = 'relLikelihood'
+sSnipProb = 'snipProb'
 sWtProb = 'wtProb'
 sRelProb = 'relProb'
-sEstProb = 'estProb'
 sInCombRes = 'inCombRes'
 sSeqCheck = GC.S_SEQ_CHECK
 sIEffInp = GC.S_I_EFF_INP
@@ -58,8 +60,8 @@ lIStartEnd = [iStartLInpNmerSeq, iEndLInpNmerSeq]
 lSCDfrLhV = [sCNmer, sEffCode, sWtLikelihood, sInCombRes]
 lSCDfrLhD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelLikelihood]
 
-lSCDfrProbS = [sSnippet, sLenSnip, sEstProb]
-lSrtByDfrProbS = [sLenSnip, sEstProb, sSnippet]
+lSCDfrProbS = [sSnippet, sLenSnip, sSnipProb]
+lSrtByDfrProbS = [sLenSnip, sSnipProb, sSnippet]
 lSrtAscDfrProbS = [True, False, True]
 
 lSCDfrProbV = [sCNmer, sEffCode, sWtProb, sInCombRes]
@@ -78,7 +80,8 @@ dWtsLenSeq = {1: 0.1,
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-lSKeyFRes = ['sFResWtLh', 'sFResRelLh', 'sFResWtProb', 'sFResRelProb']
+lSKeyFRes = ['sFResWtLh', 'sFResRelLh', 'sFResSnipProb', 'sFResWtProb',
+             'sFResRelProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -87,6 +90,8 @@ dIO = {# --- general
        # --- flow control
        'calcWtLh': calcWtLh,
        'calcRelLh': calcRelLh,
+       'calcSnipProb': calcSnipProb,
+       'calcSnipProb': calcSnipProb,
        'calcWtProb': calcWtProb,
        'calcRelProb': calcRelProb,
        'useNmerSeqFrom': useNmerSeqFrom,
@@ -96,6 +101,7 @@ dIO = {# --- general
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResSnipProb': sFResSnipProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers
@@ -107,6 +113,7 @@ dIO = {# --- general
        'sEffCode': sEffCode,
        'sSnippet': sSnippet,
        'sLenSnip': sLenSnip,
+       'sSnipProb': sSnipProb,
        'sWtProb': sWtProb,
        'sRelProb': sRelProb,
        'sWtLikelihood': sWtLikelihood,

@@ -24,8 +24,8 @@ class Validation(ExpData):
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPFVal(self):
-        sJ, sFlFE, pR = self.dITp['sUS02'], self.dITp['sFull'], self.pDirRes
-        sFE = GF.joinS(self.dITp['lSLenNMer'])
+        sJ, sFlFE = self.dITp['sUS02'], self.dITp['sFull']
+        pR, sFE = self.pDirResComb, GF.joinS(self.dITp['lSLenNMer'])
         if len(sFE) > 0:
             sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
         pFCombInp = GF.joinToPath(pR, self.dITp['sFCombInp'])

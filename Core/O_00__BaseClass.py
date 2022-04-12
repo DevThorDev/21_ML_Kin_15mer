@@ -92,10 +92,14 @@ class BaseClass:
     def getPDir(self):
         if self.dIG['isTest']:
             self.pDirProcInp = self.dITp['pDirProcInp_T']
-            self.pDirRes = self.dITp['pDirRes_T']
+            self.pDirResComb = self.dITp['pDirResComb_T']
+            self.pDirResInfo = self.dITp['pDirResInfo_T']
+            self.pDirResProb = self.dITp['pDirResProb_T']
         else:
             self.pDirProcInp = self.dITp['pDirProcInp']
-            self.pDirRes = self.dITp['pDirRes']
+            self.pDirResComb = self.dITp['pDirResComb']
+            self.pDirResInfo = self.dITp['pDirResInfo']
+            self.pDirResProb = self.dITp['pDirResProb']
 
     def loadDfr(self, pF, iC=None, dDTp=None, cSep=None):
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
@@ -258,29 +262,30 @@ class Timing:
     # --- print methods -------------------------------------------------------
     def __str__(self):
         sIn = (GC.S_WV80 + GC.S_NEWL + GC.S_SP04 + 'Time (s) used in:' +
-               GC.S_NEWL + 'Method "getLInpSeq":\t\t\t' +
+               GC.S_NEWL + 'Method 1 | "getLInpSeq":\t\t\t' +
                str(round(self.elT_02_1_getLInpSeq, self.rdDig)) + GC.S_NEWL +
-               'Method "genDLenSeq":\t\t\t' +
+               'Method 2 | "genDLenSeq":\t\t\t' +
                str(round(self.elT_02_2_genDLenSeq, self.rdDig)) + GC.S_NEWL +
-               'Method "performLhAnalysis":\t\t' +
+               'Method 3 | "performLhAnalysis":\t\t' +
                str(round(self.elT_02_3_performLhAnalysis, self.rdDig)) +
-               GC.S_NEWL + 'Method "performProbAnalysis_A":\t' +
+               GC.S_NEWL + 'Method 4 | "performProbAnalysis_A":\t' +
                str(round(self.elT_02_4_performProbAnalysis_A, self.rdDig)) +
-               GC.S_NEWL + 'Method "performProbAnalysis_B":\t' +
+               GC.S_NEWL + 'Method 5 | "performProbAnalysis_B":\t' +
                str(round(self.elT_02_5_performProbAnalysis_B, self.rdDig)) +
-               GC.S_NEWL + 'Method "performProbAnalysis_C":\t' +
+               GC.S_NEWL + 'Method 6 | "performProbAnalysis_C":\t' +
                str(round(self.elT_02_6_performProbAnalysis_C, self.rdDig)) +
-               GC.S_NEWL + 'Method "performProbAnalysis_D":\t' +
+               GC.S_NEWL + 'Method 7 | "performProbAnalysis_D":\t' +
                str(round(self.elT_02_7_performProbAnalysis_D, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 
     def printRelTimes(self):
         print(GC.S_WV80)
-        for sMth, cElT in zip(self.lSMth, self.lElT):
+        for k, (sMth, cElT) in enumerate(zip(self.lSMth, self.lElT)):
             sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'
             sWS = GC.S_SPACE*(6 - len(sX))
-            print(GC.S_SP04 + sWS + sX + '\t(share of time in "' + sMth + '")')
+            print(GC.S_SP04 + sWS + sX + '\t(share of time in Method ' +
+                  str(k + 1) + ' | "' + sMth + '")')
         print(GC.S_WV80)
 
 ###############################################################################
