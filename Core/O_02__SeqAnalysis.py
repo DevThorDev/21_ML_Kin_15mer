@@ -87,15 +87,10 @@ class SeqAnalysis(BaseClass):
         # print('Obtained list of Pyl position indices.')
         return [i - 1 for i in lIPosPyl]
 
-    def getLInpSeq(self, cTim, lSSeq=None, stT=None):
-        cStT = time.time()
-        [iS, iE], lSNmerSeq = self.dITp['lIStartEnd'], lSSeq
-        pDir, e = self.getPDirSFResEnd(pDirR=self.pDirResComb)
-        pFInpSeq = GF.joinToPath(pDir, self.dITp['sFSeqCheck'])
-        mDsp, sFS, sNS = self.dITp['mDsp'], 'full sequences', 'Nmer sequences'
-        self.dfrInpSeq = self.loadDfr(pF=pFInpSeq, iC=0)
+    def getLFullSeq(self, iS=None, iE=None, stT=None):
         if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
             print('Creating list of full input sequences...')
+            mDsp, sFS = self.dITp['mDsp'], 'full sequences'
             lSFullSeq = list(self.dfrInpSeq[self.dITp['sCCodeSeq']].unique())
             lSFullSeq, iS, iE = GF.getItStartToEnd(lSFullSeq, iS, iE)
             for n, sSq in enumerate(lSFullSeq):
@@ -104,7 +99,11 @@ class SeqAnalysis(BaseClass):
                 GF.showProgress(N=len(lSFullSeq), n=n, modeDisp=mDsp,
                                 varText=sFS, startTime=stT)
             print('Created list of full input sequences...')
+        return lSFullSeq, iS, iE
+
+    def getLNmerSeq(self, lSFullSeq=[], lSNmerSeq=[], stT=None):
         print('Creating list of Nmer input sequences...')
+        mDsp, sNS = self.dITp['mDsp'], 'Nmer sequences'
         if lSNmerSeq is None and self.dITp['sCNmer'] in self.dfrInpSeq.columns:
             if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
                 # reduce to Nmer sequences with corresponding full sequences
@@ -117,9 +116,18 @@ class SeqAnalysis(BaseClass):
             self.lNmerSeq.append(NmerSeq(self.dITp, sSq=sSq))
             GF.showProgress(N=len(lSNmerSeq), n=n, modeDisp=mDsp, varText=sNS,
                             startTime=stT)
+        print('Created list of Nmer input sequences.')
+
+    def getLInpSeq(self, cTim, lSSeq=None, stT=None):
+        cStT = time.time()
+        [iS, iE], lSNmerSeq = self.dITp['lIStartEnd'], lSSeq
+        pDir, e = self.getPDirSFResEnd(pDirR=self.pDirResComb)
+        pFInpSeq = GF.joinToPath(pDir, self.dITp['sFSeqCheck'])
+        self.dfrInpSeq = self.loadDfr(pF=pFInpSeq, iC=0)
+        lSFullSeq, iS, iE = self.getLFullSeq()
+        self.getLNmerSeq(lSFullSeq, lSNmerSeq)
         e = GF.joinS([e, iS, iE])
         SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'], sFE=e)
-        print('Created list of Nmer input sequences.')
         cTim.updateTimes(iMth=1, stTMth=cStT, endTMth=time.time())
 
     # --- methods for generating the {seq. length: seq. list} dictionary ------
@@ -191,15 +199,17 @@ class SeqAnalysis(BaseClass):
             GF.addToDictD(self.dSnipProbX, sSS, cSeqF.sSeq, cProb)
 
     def calcSnipProbTable(self):
-        lLenNMer = self.dITp['lLenNMer']
-        lSC = [self.dITp['sCNmer']] + self.dITp['lSLenMerCHdr']
-        arrProb = GF.iniNpArr(shape=(len(self.lNmerSeq), len(lLenNMer)))
+        lSSeq = [cSeq.sSeq for cSeq in self.lNmerSeq]
+        arrProb = GF.iniNpArr(shape=(len(lSSeq), len(self.dITp['lLenNmer'])))
         for i, cNmerS in enumerate(self.lNmerSeq):
-            dProf = cNmerS.getProfileDict(maxLenSeq=max(lLenNMer))
+            dProf = cNmerS.getProfileDict(maxLenSeq=max(self.dITp['lLenNmer']))
             for j, sSS in enumerate(dProf.values()):
                 if sSS in self.dSnipProbS:
                     arrProb[i, j] = self.dSnipProbS[sSS]
-
+        self.dfrProbTbl = GF.iniPdDfr(arrProb, lSNmR=lSSeq,
+                                      lSNmC=self.dITp['lSCLenMerProb'])
+        pFDfrProbTbl = GF.joinToPath(self.pDirResProb, self.dITp['sFProbTbl'])
+        self.saveDfr(self.dfrProbTbl, pF=pFDfrProbTbl, saveAnyway=True)
 
     def performProbAnalysis(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if (self.dITp['calcSnipProb'] or self.dITp['calcWtProb'] or
@@ -210,7 +220,7 @@ class SeqAnalysis(BaseClass):
             self.dSnipProbS, self.dSnipProbX, N = {}, {}, len(self.lFullSeq)
             for n, cSeqF in enumerate(self.lFullSeq):
                 cStT = time.time()
-                cD = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNMer'])
+                cD = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNmer'])
                 cTim.updateTimes(iMth=4, stTMth=cStT, endTMth=time.time())
                 for cLen, lSSeqNmer in cD.items():
                     cStT = time.time()
@@ -228,7 +238,8 @@ class SeqAnalysis(BaseClass):
             self.saveDfrSnipProbX()
             cTim.updateTimes(iMth=7, stTMth=cStT, endTMth=time.time())
             print('Saved Nmer sequence probability DataFrame.')
-            self.printDictSnipProbX(lSnipLen=[1])
+            # self.printDictSnipProbX(lSnipLen=[1])
+            self.calcSnipProbTable()
 
     # --- methods for printing results ----------------------------------------
 

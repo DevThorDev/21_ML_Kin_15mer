@@ -47,11 +47,11 @@ def createDEffTarg(dITp, dfrK, dfrNmer, lCDfrNmer, sMd=GC.S_X_SHORT):
     return dEffTarg
 
 def dDNumToDfrINmer(dITp, dDNum):
-    lSCol = dITp['lSCDfrNMer']
+    lSCol = dITp['lSCDfrNmer']
     assert len(lSCol) >= 4
     fullDfr = GF.iniPdDfr(lSNmC=lSCol)
     for sKMain, cDSub in dDNum.items():
-        cDSubR = GF.restrLenS(cDSub, lRestrLen=dITp['lLenNMer'])
+        cDSubR = GF.restrLenS(cDSub, lRestrLen=dITp['lLenNmer'])
         subDfr = GF.iniPdDfr(lSNmC=lSCol)
         subDfr[lSCol[0]] = [sKMain]*len(cDSubR)
         subDfr[lSCol[1]] = list(cDSubR)
@@ -67,7 +67,7 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
     lSEff, lAllSNmer = [s for s in dDPrp if s != sAnyEff], list(dDPrp[sAnyEff])
     if wAnyEff:
         lSEff = list(dDPrp)
-    lAllSNmer = GF.restrLenS(lAllSNmer, lRestrLen=dITp['lLenNMer'])
+    lAllSNmer = GF.restrLenS(lAllSNmer, lRestrLen=dITp['lLenNmer'])
     lAllSNmer.sort(key=(lambda x: len(x)))
     d4Dfr[sEffCode] = lSEff
     for sNmer in lAllSNmer:

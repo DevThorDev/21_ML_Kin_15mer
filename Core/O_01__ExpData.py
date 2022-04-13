@@ -45,7 +45,7 @@ class ExpData(BaseClass):
         pFCombL = GF.joinToPath(pRCmb, self.dITp['sFResCombL'])
         dPFComb = {GC.S_X_SHORT: pFCombXS, GC.S_SHORT: pFCombS,
                    GC.S_MED: pFCombM, GC.S_LONG: pFCombL}
-        sFE = GF.joinS(self.dITp['lSLenNMer'])
+        sFE = GF.joinS(self.dITp['lSLenNmer'])
         sFResINmer = GF.modSF(self.dITp['sFResINmer'], sEnd=sFE, sJoin=sJ)
         sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE, sJoin=sJ)
         if len(sFE) > 0:
@@ -234,26 +234,26 @@ class ExpData(BaseClass):
             cDfr = self.loadDfr(self.dPF[tpDfr][self.dITp['sCombinedInp']])
         return cDfr
 
-    def convDNmerToDfr(self, dNMer, stT, tpDfr):
+    def convDNmerToDfr(self, dNmer, stT, tpDfr):
         if self.dTpDfr[tpDfr][self.dITp['sBGenInfoNmer']]:
-            dfrINmer = SF.dDNumToDfrINmer(self.dITp, dNMer)
-            dfrINmer.sort_values(by=self.dITp['lSortCDfrNMer'],
-                                 ascending=self.dITp['lSortDirAscDfrNMer'],
+            dfrINmer = SF.dDNumToDfrINmer(self.dITp, dNmer)
+            dfrINmer.sort_values(by=self.dITp['lSortCDfrNmer'],
+                                 ascending=self.dITp['lSortDirAscDfrNmer'],
                                  inplace=True, ignore_index=True)
             self.saveDfr(dfrINmer, pF=self.dPF[tpDfr][self.dITp['sImer']],
                          saveIdx=True, saveAnyway=True)
             GF.showElapsedTime(stT)
         if self.dTpDfr[tpDfr][self.dITp['sBGenInfoEff']]:
-            dfrIEff = SF.dDNumToDfrIEff(self.dITp, dNMer)
+            dfrIEff = SF.dDNumToDfrIEff(self.dITp, dNmer)
             self.saveDfr(dfrIEff, pF=self.dPF[tpDfr][self.dITp['sIEff']],
                          saveIdx=False, saveAnyway=True)
-            dfrIEffF = SF.dDNumToDfrIEff(self.dITp, dNMer, wAnyEff=True)
+            dfrIEffF = SF.dDNumToDfrIEff(self.dITp, dNmer, wAnyEff=True)
             self.saveDfr(dfrIEffF, pF=self.dPF[tpDfr][self.dITp['sIEffF']],
                          saveIdx=False, saveAnyway=True)
             GF.showElapsedTime(stT)
 
     def getInfoKinNmer(self, stT, tpDfr, sMd=GC.S_X_SHORT):
-        dENmer, dNMer, iCNmer = {}, {}, self.dITp['iCentNmer']
+        dENmer, dNmer, iCNmer = {}, {}, self.dITp['iCentNmer']
         cDfr = self.getCombDfr(tpDfr=tpDfr, sMd=sMd)
         if cDfr is not None:
             for dRec in cDfr.to_dict('records'):
@@ -263,8 +263,8 @@ class ExpData(BaseClass):
                 # considering the different effectors separately
                 GF.addToDictL(dENmer, dRec[self.dITp['sEffCode']],
                               dRec[self.dITp['sCNmer']], lUniqEl=False)
-        GF.addSCentNmerToDict(dNMer, dENmer, iCNmer)
+        GF.addSCentNmerToDict(dNmer, dENmer, iCNmer)
         GF.showElapsedTime(stT)
-        self.convDNmerToDfr(dNMer, stT, tpDfr=tpDfr)
+        self.convDNmerToDfr(dNmer, stT, tpDfr=tpDfr)
 
 ###############################################################################

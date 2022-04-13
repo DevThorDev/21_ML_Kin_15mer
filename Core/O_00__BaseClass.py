@@ -70,7 +70,7 @@ class BaseClass:
 
     # --- methods for filling the DataFrame type dictionary -------------------
     def fillDTpDfrBase(self):
-        sDfrC, sNMer = self.dITp['sCDfrComb'], self.dITp['sNmer']
+        sDfrC, sNmer = self.dITp['sCDfrComb'], self.dITp['sNmer']
         sEff, sEffF = self.dITp['sEff'], self.dITp['sEffF']
         self.dTpDfr = {self.dITp['sBase']: {},
                        self.dITp['sTrain']: {},
@@ -78,9 +78,9 @@ class BaseClass:
         self.dTpDfr[self.dITp['sBase']][sDfrC] = self.dfrComb
         self.dTpDfr[self.dITp['sTrain']][sDfrC] = self.dfrTrain
         self.dTpDfr[self.dITp['sTest']][sDfrC] = self.dfrTest
-        self.dTpDfr[self.dITp['sBase']][sNMer] = self.dITp['sImer']
-        self.dTpDfr[self.dITp['sTrain']][sNMer] = self.dITp['sImerTrain']
-        self.dTpDfr[self.dITp['sTest']][sNMer] = self.dITp['sImerTest']
+        self.dTpDfr[self.dITp['sBase']][sNmer] = self.dITp['sImer']
+        self.dTpDfr[self.dITp['sTrain']][sNmer] = self.dITp['sImerTrain']
+        self.dTpDfr[self.dITp['sTest']][sNmer] = self.dITp['sImerTest']
         self.dTpDfr[self.dITp['sBase']][sEff] = self.dITp['sIEff']
         self.dTpDfr[self.dITp['sTrain']][sEff] = self.dITp['sIEffTrain']
         self.dTpDfr[self.dITp['sTest']][sEff] = self.dITp['sIEffTest']

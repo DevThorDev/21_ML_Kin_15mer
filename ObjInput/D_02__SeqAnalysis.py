@@ -25,16 +25,18 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
-sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResSnipProbS = GC.S_US02.join(['SnipProbS'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResSnipProbX = GC.S_US02.join(['SnipProbX'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResWtProb = GC.S_US02.join(['WtProb'] + sFIEffInp.split(GC.S_US02)[1:])
-sFResRelProb = GC.S_US02.join(['RelProb'] + sFIEffInp.split(GC.S_US02)[1:])
+sFE = sFIEffInp.split(GC.S_US02)[1:]
+sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFE)
+sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFE)
+sFResSnipProbS = GC.S_US02.join(['SnipProbS'] + sFE)
+sFResSnipProbX = GC.S_US02.join(['SnipProbX'] + sFE)
+sFProbTbl = GC.S_US02.join(['ProbTable'] + sFE)
+sFResWtProb = GC.S_US02.join(['WtProb'] + sFE)
+sFResRelProb = GC.S_US02.join(['RelProb'] + sFE)
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None           # number or None
-iEndLInpNmerSeq = 300          # number or None
+iEndLInpNmerSeq = None          # number or None
 
 mDsp = 100
 
@@ -104,6 +106,7 @@ dIO = {# --- general
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResSnipProbS': sFResSnipProbS + GC.S_DOT + GC.S_EXT_CSV,
        'sFResSnipProbX': sFResSnipProbX + GC.S_DOT + GC.S_EXT_CSV,
+       'sFProbTbl': sFProbTbl + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers

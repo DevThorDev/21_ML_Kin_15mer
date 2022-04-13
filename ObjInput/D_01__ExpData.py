@@ -20,7 +20,7 @@ genInfoEff = False
 genInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNMer = [1, 3, 5, 7]         # empty list: all lengths considered
+lLenNmer = [1, 3, 5, 7]         # empty list: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
@@ -105,8 +105,8 @@ lSCKinF = [sEffCode, sTargCode]
 lCXclDfrNmerM = [sExpName, sCodeTrunc]
 lCXclDfrNmerS = [sPep, sPepMod, sCCode] + lCXclDfrNmerM
 lCXclDfrNmerXS = [sCCodeSeq, sPepPIP] + lCXclDfrNmerS
-lSortCDfrNMer = [sEffCode, sLenNmer, sNOcc, sNmer]
-lSortDirAscDfrNMer = [True, True, False, True]
+lSortCDfrNmer = [sEffCode, sLenNmer, sNOcc, sNmer]
+lSortDirAscDfrNmer = [True, True, False, True]
 lRowsResIGen = [sRowRaw, sTotalRaw, sNaNRaw,
                 sRowProcI, sTotalProcI, sNaNProcI,
                 sRowCombL, sTotalCombL, sNaNCombL,
@@ -120,6 +120,10 @@ dMer = GC.D_MER
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
+lSCLenMer = [str(n) + GC.S_MER for n in lLenNmer]
+lSCLenMerProb = [str(n) + GC.S_MER + GC.S_USC + GC.S_PROB for n in lLenNmer]
+lSCLenMerFound = [str(n) + GC.S_MER + GC.S_USC + GC.S_FOUND for n in lLenNmer]
+lSCLenMerTotal = [str(n) + GC.S_MER + GC.S_USC + GC.S_TOTAL for n in lLenNmer]
 iStXS = lRowsResIGen.index(sRowCombXS)
 iStS = lRowsResIGen.index(sRowCombS)
 iStM = lRowsResIGen.index(sRowCombM)
@@ -136,9 +140,12 @@ dIO = {# --- general
        'genInfoEff': genInfoEff,
        'genInfoGen': genInfoGen,
        # --- lists (1)
-       'lLenNMer': lLenNMer,
-       'lSLenNMer': [str(n) for n in lLenNMer],
-       'lSLenMerCHdr': [str(n) + GC.S_MER for n in lLenNMer],
+       'lLenNmer': lLenNmer,
+       'lSLenNmer': [str(n) for n in lLenNmer],
+       'lSCLenMer': lSCLenMer,
+       'lSCLenMerProb': lSCLenMerProb,
+       'lSCLenMerFound': lSCLenMerFound,
+       'lSCLenMerTotal': lSCLenMerTotal,
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInpNmer': sFProcInpNmer + GC.S_DOT + GC.S_EXT_CSV,
@@ -197,9 +204,9 @@ dIO = {# --- general
        'lCXclDfrNmerXS': lCXclDfrNmerXS,
        'lCXclDfrNmerS': lCXclDfrNmerS,
        'lCXclDfrNmerM': lCXclDfrNmerM,
-       'lSCDfrNMer': [sEffCode, sNmer, sLenNmer, sNOcc],
-       'lSortCDfrNMer': lSortCDfrNMer,
-       'lSortDirAscDfrNMer': lSortDirAscDfrNMer,
+       'lSCDfrNmer': [sEffCode, sNmer, sLenNmer, sNOcc],
+       'lSortCDfrNmer': lSortCDfrNmer,
+       'lSortDirAscDfrNmer': lSortDirAscDfrNmer,
        'lRResIG': lRowsResIGen,
        # --- dictionaries
        'dMer': dMer,
