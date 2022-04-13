@@ -60,6 +60,7 @@ sUS02 = GC.S_US02
 s0 = GC.S_0
 sNULL = 'NULL'
 sSeq = 'Seq'
+sMer = GC.S_MER
 sFull = GC.S_FULL
 sEffCode = GC.S_EFF_CODE
 sEffSeq = 'EffectorSeq'
@@ -137,6 +138,7 @@ dIO = {# --- general
        # --- lists (1)
        'lLenNMer': lLenNMer,
        'lSLenNMer': [str(n) for n in lLenNMer],
+       'lSLenMerCHdr': [str(n) + GC.S_MER for n in lLenNMer],
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInpNmer': sFProcInpNmer + GC.S_DOT + GC.S_EXT_CSV,
@@ -169,6 +171,7 @@ dIO = {# --- general
        's0': s0,
        'sNULL': sNULL,
        'sSeq': sSeq,
+       'sMer': sMer,
        'sFull': sFull,
        'sEffCode': sEffCode,
        'sEffSeq': sEffSeq,

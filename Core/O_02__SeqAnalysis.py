@@ -190,6 +190,17 @@ class SeqAnalysis(BaseClass):
                 GF.addToDictMnV(self.dSnipProbS, cK=sSS, cEl=cProb, nEl=nFS)
             GF.addToDictD(self.dSnipProbX, sSS, cSeqF.sSeq, cProb)
 
+    def calcSnipProbTable(self):
+        lLenNMer = self.dITp['lLenNMer']
+        lSC = [self.dITp['sCNmer']] + self.dITp['lSLenMerCHdr']
+        arrProb = GF.iniNpArr(shape=(len(self.lNmerSeq), len(lLenNMer)))
+        for i, cNmerS in enumerate(self.lNmerSeq):
+            dProf = cNmerS.getProfileDict(maxLenSeq=max(lLenNMer))
+            for j, sSS in enumerate(dProf.values()):
+                if sSS in self.dSnipProbS:
+                    arrProb[i, j] = self.dSnipProbS[sSS]
+
+
     def performProbAnalysis(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if (self.dITp['calcSnipProb'] or self.dITp['calcWtProb'] or
             self.dITp['calcRelProb']):
