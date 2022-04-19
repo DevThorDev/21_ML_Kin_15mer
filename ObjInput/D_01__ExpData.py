@@ -120,10 +120,16 @@ dMer = GC.D_MER
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-lSCLenMer = [str(n) + GC.S_MER for n in lLenNmer]
-lSCLenMerProb = [str(n) + GC.S_MER + GC.S_USC + GC.S_PROB for n in lLenNmer]
-lSCLenMerFound = [str(n) + GC.S_MER + GC.S_USC + GC.S_FOUND for n in lLenNmer]
-lSCLenMerTotal = [str(n) + GC.S_MER + GC.S_USC + GC.S_TOTAL for n in lLenNmer]
+lSCXt = ['', GC.S_PYL, GC.S_TOTAL, GC.S_PROB]
+lSCMer = [str(n) + GC.S_MER for n in lLenNmer]
+lSCMerPyl = [s + GC.S_USC + GC.S_PYL for s in lSCMer]
+lSCMerTotal = [s + GC.S_USC + GC.S_TOTAL for s in lSCMer]
+lSCMerProb = [s + GC.S_USC + GC.S_PROB for s in lSCMer]
+dSCMerAll = {n: [sCSq, sCPy, sCTt, sCPr] for (n, sCSq, sCPy, sCTt, sCPr) in
+             zip(lLenNmer, lSCMer, lSCMerPyl, lSCMerTotal, lSCMerProb)}
+lSCMerAll = []
+for l in dSCMerAll.values():
+    lSCMerAll += l
 iStXS = lRowsResIGen.index(sRowCombXS)
 iStS = lRowsResIGen.index(sRowCombS)
 iStM = lRowsResIGen.index(sRowCombM)
@@ -142,10 +148,12 @@ dIO = {# --- general
        # --- lists (1)
        'lLenNmer': lLenNmer,
        'lSLenNmer': [str(n) for n in lLenNmer],
-       'lSCLenMer': lSCLenMer,
-       'lSCLenMerProb': lSCLenMerProb,
-       'lSCLenMerFound': lSCLenMerFound,
-       'lSCLenMerTotal': lSCLenMerTotal,
+       'lSCXt': lSCXt,
+       'lSCMer': lSCMer,
+       'lSCMerPyl': lSCMerPyl,
+       'lSCMerTotal': lSCMerTotal,
+       'lSCMerProb': lSCMerProb,
+       'lSCMerAll': lSCMerAll,
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
        'sFProcInpNmer': sFProcInpNmer + GC.S_DOT + GC.S_EXT_CSV,
@@ -210,6 +218,7 @@ dIO = {# --- general
        'lRResIG': lRowsResIGen,
        # --- dictionaries
        'dMer': dMer,
+       'dSCMerAll': dSCMerAll,
        # === derived values and input processing
        'iStXS': iStXS,
        'iStS': iStS,

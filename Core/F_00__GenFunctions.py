@@ -80,6 +80,12 @@ def getPartSF(sF, iStart=None, iEnd=None, sDot=GC.S_DOT, sSpl=GC.S_USC):
         sFNoXt = joinS(sF.split(sDot)[:-1], sJoin=sDot)
     return getPartStr(s=sFNoXt, iStart=iStart, iEnd=iEnd, sSpl=sSpl)
 
+def extS(s, sXt='', sSep=GC.S_USC):
+    if len(sXt) > 0:
+        return sSep.join([s, sXt])
+    else:
+        return s
+
 def extSID(sID, n, N, preChar=GC.S_0):
     return joinS([sID, preChar*(len(str(N)) - len(str(n))) + str(n)])
 

@@ -198,16 +198,37 @@ class SeqAnalysis(BaseClass):
                 GF.addToDictMnV(self.dSnipProbS, cK=sSS, cEl=cProb, nEl=nFS)
             GF.addToDictD(self.dSnipProbX, sSS, cSeqF.sSeq, cProb)
 
+    def probAnalysisLoop(self, cTim, N, stT=None):
+        for n, cSeqF in enumerate(self.lFullSeq):
+            cStT = time.time()
+            cD = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNmer'])
+            cTim.updateTimes(iMth=4, stTMth=cStT, endTMth=time.time())
+            for cLen, lSSeqNmer in cD.items():
+                cStT = time.time()
+                dIPosSeq = cSeqF.getDictPosSeq(lSSeq2F=lSSeqNmer)
+                cTim.updateTimes(iMth=5, stTMth=cStT, endTMth=time.time())
+                cStT = time.time()
+                self.addCProbToDict(cSeqF, dIPosSeq)
+                cTim.updateTimes(iMth=6, stTMth=cStT, endTMth=time.time())
+            GF.showProgress(N=N, n=n, modeDisp=self.dITp['mDsp'],
+                            varText='full sequences', startTime=stT)
+        print('Performed calculation of Nmer sequence probabilities.')
+
     def calcSnipProbTable(self):
         lSSeq = [cSeq.sSeq for cSeq in self.lNmerSeq]
-        arrProb = GF.iniNpArr(shape=(len(lSSeq), len(self.dITp['lLenNmer'])))
+        nLen, nXt = len(self.dITp['lLenNmer']), len(self.dITp['lSCXt'])
+        arrProb = GF.iniNpArr(shape=(len(lSSeq), nLen*nXt))
         for i, cNmerS in enumerate(self.lNmerSeq):
             dProf = cNmerS.getProfileDict(maxLenSeq=max(self.dITp['lLenNmer']))
             for j, sSS in enumerate(dProf.values()):
-                if sSS in self.dSnipProbS:
-                    arrProb[i, j] = self.dSnipProbS[sSS]
+                arrProb[i, j*nXt] = sSS
+                if sSS in self.dSnipProbX:
+                    arrProb[i, j*nXt + 1] = sum(self.dSnipProbX[sSS].values())
+                    arrProb[i, j*nXt + 2] = len(self.dSnipProbX[sSS])
+                    x = arrProb[i, j*nXt + 1]/arrProb[i, j*nXt + 2]
+                    arrProb[i, j*nXt + 3] = round(x, GC.R08)
         self.dfrProbTbl = GF.iniPdDfr(arrProb, lSNmR=lSSeq,
-                                      lSNmC=self.dITp['lSCLenMerProb'])
+                                      lSNmC=self.dITp['lSCMerAll'])
         pFDfrProbTbl = GF.joinToPath(self.pDirResProb, self.dITp['sFProbTbl'])
         self.saveDfr(self.dfrProbTbl, pF=pFDfrProbTbl, saveAnyway=True)
 
@@ -218,26 +239,13 @@ class SeqAnalysis(BaseClass):
             self.genDLenSeq(cTim=cTim, stT=stT)
             print('Performing calculation of Nmer sequence probabilities...')
             self.dSnipProbS, self.dSnipProbX, N = {}, {}, len(self.lFullSeq)
-            for n, cSeqF in enumerate(self.lFullSeq):
-                cStT = time.time()
-                cD = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNmer'])
-                cTim.updateTimes(iMth=4, stTMth=cStT, endTMth=time.time())
-                for cLen, lSSeqNmer in cD.items():
-                    cStT = time.time()
-                    dIPosSeq = cSeqF.getDictPosSeq(lSSeq2F=lSSeqNmer)
-                    cTim.updateTimes(iMth=5, stTMth=cStT, endTMth=time.time())
-                    cStT = time.time()
-                    self.addCProbToDict(cSeqF, dIPosSeq)
-                    cTim.updateTimes(iMth=6, stTMth=cStT, endTMth=time.time())
-                GF.showProgress(N=N, n=n, modeDisp=self.dITp['mDsp'],
-                                varText='full sequences', startTime=stT)
-            print('Performed calculation of Nmer sequence probabilities.')
+            self.probAnalysisLoop(cTim=cTim, N=N, stT=stT)
             cStT = time.time()
             self.saveDfrSnipProbS()
             self.saveDfrSnipProbX()
             cTim.updateTimes(iMth=7, stTMth=cStT, endTMth=time.time())
             print('Saved Nmer sequence probability DataFrame.')
-            # self.printDictSnipProbX(lSnipLen=[7], cSnip='AQRTLHG')
+            self.printDictSnipProbX(lSnipLen=[7], cSnip='AQRTLHG')
             self.calcSnipProbTable()
 
     # --- methods for printing results ----------------------------------------
