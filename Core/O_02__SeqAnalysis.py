@@ -30,14 +30,14 @@ class SeqAnalysis(BaseClass):
             print('Length-', cLen, '-sequence list (list length = ', len(lSeq),
                   '):\n\t', lSeq, sep='')
 
-    def printDictSnipProbX(self, lSnipLen=None, maxLenSeqF=GC.R08):
+    def printDictSnipProbX(self, lSnipLen=None, cSnip=None, maxLenSeqF=GC.R24):
         print(GC.S_DS80, '\nNmer snippet probability extended dictionary:\n',
               GC.S_DS80, sep='')
         for sSnip, dSub in self.dSnipProbX.items():
             if lSnipLen is None or len(sSnip) in lSnipLen:
-                print(GC.S_DS04, ' Nmer snippet ', sSnip, GC.S_COL, sep='')
-                for sSeqF, cProb in dSub.items():
-                    if cProb > 0:
+                if sSnip is None or sSnip == cSnip:
+                    print(GC.S_DS04, ' Nmer snippet ', sSnip, GC.S_COL, sep='')
+                    for sSeqF, cProb in dSub.items():
                         print(sSeqF[:maxLenSeqF], GC.S_DT03, GC.S_COL,
                               GC.S_SPACE, round(cProb, GC.R06), sep='')
 
@@ -231,14 +231,13 @@ class SeqAnalysis(BaseClass):
                     cTim.updateTimes(iMth=6, stTMth=cStT, endTMth=time.time())
                 GF.showProgress(N=N, n=n, modeDisp=self.dITp['mDsp'],
                                 varText='full sequences', startTime=stT)
-            # self.printDictIPossProbPyl()
             print('Performed calculation of Nmer sequence probabilities.')
             cStT = time.time()
             self.saveDfrSnipProbS()
             self.saveDfrSnipProbX()
             cTim.updateTimes(iMth=7, stTMth=cStT, endTMth=time.time())
             print('Saved Nmer sequence probability DataFrame.')
-            # self.printDictSnipProbX(lSnipLen=[1])
+            # self.printDictSnipProbX(lSnipLen=[7], cSnip='AQRTLHG')
             self.calcSnipProbTable()
 
     # --- methods for printing results ----------------------------------------

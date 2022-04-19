@@ -165,6 +165,7 @@ R03 = 3
 R04 = 4
 R06 = 6
 R08 = 8
+R24 = 24
 MAX_DELTA = 1.0E-14
 MAX_LEN_L_DSP = 5
 
