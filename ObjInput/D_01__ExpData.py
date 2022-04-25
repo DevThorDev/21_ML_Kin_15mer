@@ -127,9 +127,7 @@ lSCMerTotal = [s + GC.S_USC + GC.S_TOTAL for s in lSCMer]
 lSCMerProb = [s + GC.S_USC + GC.S_PROB for s in lSCMer]
 dSCMerAll = {n: [sCSq, sCPy, sCTt, sCPr] for (n, sCSq, sCPy, sCTt, sCPr) in
              zip(lLenNmer, lSCMer, lSCMerPyl, lSCMerTotal, lSCMerProb)}
-lSCMerAll = []
-for l in dSCMerAll.values():
-    lSCMerAll += l
+lSCMerAll = GF.flattenIt(dSCMerAll.values())
 iStXS = lRowsResIGen.index(sRowCombXS)
 iStS = lRowsResIGen.index(sRowCombS)
 iStM = lRowsResIGen.index(sRowCombM)

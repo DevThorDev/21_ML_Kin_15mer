@@ -57,7 +57,7 @@ class Validation(ExpData):
     # --- methods for loading data --------------------------------------------
     def loadInpDfr(self):
         pFCombInp = self.dPF[self.dITp['sTrain']][self.dITp['sCombinedInp']]
-        self.dfrComb = self.loadDfr(pF=pFCombInp, iC=0)
+        self.dfrComb = self.loadData(pF=pFCombInp, iC=0)
         assert self.dfrComb is not None
         self.dTpDfr[self.dITp['sBase']][self.dITp['sCDfrComb']] = self.dfrComb
         self.nRecTrain = round(self.dfrComb.shape[0]*self.dITp['share4Train'])

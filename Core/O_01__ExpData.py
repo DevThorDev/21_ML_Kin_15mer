@@ -25,11 +25,11 @@ class ExpData(BaseClass):
     # --- methods for loading experimental data -------------------------------
     def readExpData(self):
         if self.dIG['isTest']:
-            self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin_T'])
-            self.dfrNmer = self.loadDfr(pF=self.dITp['pFRawInpNmer_T'])
+            self.dfrKin = self.loadData(pF=self.dITp['pFRawInpKin_T'])
+            self.dfrNmer = self.loadData(pF=self.dITp['pFRawInpNmer_T'])
         else:
-            self.dfrKin = self.loadDfr(pF=self.dITp['pFRawInpKin'])
-            self.dfrNmer = self.loadDfr(pF=self.dITp['pFRawInpNmer'])
+            self.dfrKin = self.loadData(pF=self.dITp['pFRawInpKin'])
+            self.dfrNmer = self.loadData(pF=self.dITp['pFRawInpNmer'])
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
         lC = list(self.dfrKin.columns) + list(self.dfrNmer.columns)
         if self.dITp['genInfoGen']:
@@ -85,9 +85,9 @@ class ExpData(BaseClass):
     # --- methods for loading data --------------------------------------------
     def loadProcInpDfrs(self):
         pFProcInp = GF.joinToPath(self.pDirProcInp, self.dITp['sFProcInpKin'])
-        self.dfrKin = self.loadDfr(pF=pFProcInp, iC=0)
+        self.dfrKin = self.loadData(pF=pFProcInp, iC=0)
         pFProcInp = GF.joinToPath(self.pDirProcInp, self.dITp['sFProcInpNmer'])
-        self.dfrNmer = self.loadDfr(pF=pFProcInp, iC=0)
+        self.dfrNmer = self.loadData(pF=pFProcInp, iC=0)
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
 
     # --- methods for saving data ---------------------------------------------
@@ -229,9 +229,9 @@ class ExpData(BaseClass):
         cDfr, sTrain, sTest = None, self.dITp['sTrain'], self.dITp['sTrain']
         cDfr = self.dTpDfr[tpDfr][self.dITp['sCDfrComb']]
         if cDfr is None and tpDfr == self.dITp['sBase']:
-            cDfr = self.loadDfr(self.dPF[tpDfr][self.dITp['sCombined']][sMd])
+            cDfr = self.loadData(self.dPF[tpDfr][self.dITp['sCombined']][sMd])
         elif cDfr is None and tpDfr in [sTrain, sTest]:
-            cDfr = self.loadDfr(self.dPF[tpDfr][self.dITp['sCombinedInp']])
+            cDfr = self.loadData(self.dPF[tpDfr][self.dITp['sCombinedInp']])
         return cDfr
 
     def convDNmerToDfr(self, dNmer, stT, tpDfr):

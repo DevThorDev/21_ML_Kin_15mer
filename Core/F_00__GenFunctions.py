@@ -51,8 +51,12 @@ def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
     if os.path.isfile(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
 
-def saveAsCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
-              dropDup=True, igI=True):
+def saveCSV(pdObj, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True):
+    if pdObj is not None:
+        pdObj.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx)
+
+def checkDupSaveCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
+                    dropDup=True, igI=True):
     if pdDfr is not None:
         if dropDup:
             pdDfr.drop_duplicates(inplace=True, ignore_index=igI)
@@ -357,26 +361,39 @@ def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
     else:       # ignore shape
         return np.array(data)
 
+# --- Functions performing pandas Series manipulation -------------------------
+def concLSer(lSer, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
+    return pd.concat(lSer, axis=concAx, ignore_index=ignIdx,
+                     verify_integrity=verifInt, sort=srtDfr)
+
+def concLSerAx0(lSer, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLSer(lSer, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+
+def concLSerAx1(lSer, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLSer(lSer, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
+                    srtDfr=srtDfr)
+
 # --- Functions performing pandas DataFrame calculation and manipulation ------
-def iniPdSer(data=None, lSNmI=[], shape=(0,), fillV=np.nan):
+def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
     assert len(shape) == 1
-    if len(lSNmI) == 0:
+    if lSNmI is None or len(lSNmI) == 0:
         if data is None:
-            return pd.Series(np.full(shape, fillV))
+            return pd.Series(np.full(shape, fillV), name=nameS)
         else:
-            return pd.Series(data)
+            return pd.Series(data, name=nameS)
     else:
         if data is None:
-            return pd.Series(np.full(len(lSNmI), fillV), index=lSNmI)
+            return pd.Series(np.full(len(lSNmI), fillV), index=lSNmI,
+                             name=nameS)
         else:
             assert data.size == len(lSNmI)
-            return pd.Series(data, index=lSNmI)
+            return pd.Series(data, index=lSNmI, name=nameS)
 
 def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
     assert len(shape) == 2
     nR, nC = shape
-    if len(lSNmC) == 0:
-        if len(lSNmR) == 0:
+    if lSNmC is None or len(lSNmC) == 0:
+        if lSNmR is None or len(lSNmR) == 0:
             if data is None:
                 return pd.DataFrame(np.full(shape, fillV))
             else:
@@ -388,7 +405,7 @@ def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
             else:
                 return pd.DataFrame(data, index=lSNmR)
     else:
-        if len(lSNmR) == 0:
+        if lSNmR is None or len(lSNmR) == 0:
             if data is None:
                 return pd.DataFrame(np.full((nR, len(lSNmC)), fillV),
                                     columns=lSNmC)

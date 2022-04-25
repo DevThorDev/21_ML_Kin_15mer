@@ -15,6 +15,7 @@ class BaseClass:
         self.descO = 'Base class'
         self.dIG = inpDat.dI
         self.getDITp()
+        self.iniDicts()
         self.iniDfrs()
         self.fillDTpDfrBase()
         print('Initiated "BaseClass" base object.')
@@ -61,7 +62,11 @@ class BaseClass:
             print('Adding entry (', cK, GC.S_COL, cV, ') to type dictionary')
         self.dITp[cK] = cV
 
-    # --- methods for initialising the DataFrames -----------------------------
+    # --- methods for initialising the dictionaries and DataFrames ------------
+    def iniDicts(self):
+        self.dTpDfr = None
+        self.dSnipProbS, self.dSnipProbX = None, None
+    
     def iniDfrs(self):
         self.dfrKin, self.dfrNmer = None, None
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
@@ -101,21 +106,35 @@ class BaseClass:
             self.pDirResInfo = self.dITp['pDirResInfo']
             self.pDirResProb = self.dITp['pDirResProb']
 
-    def loadDfr(self, pF, iC=None, dDTp=None, cSep=None):
+    def loadData(self, pF, iC=None, dDTp=None, cSep=None):
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
         if cSep is None:
             cSep = self.dITp['cSep']
         if os.path.isfile(pF):
             cDfr = GF.readCSV(pF, iCol=iC, dDTp=dDTp, cSep=cSep)
-            sPrt = 'Loading DataFrame from path ' + pF
+            sPrt = 'Loading data from path ' + pF
         print(sPrt)
         return cDfr
 
-    def saveDfr(self, cDfr, pF, saveIdx=True, dropDup=False, saveAnyway=False):
+    def loadSerOrList(self, pF, iC=None, toList=False, dDTp=None, cSep=None):
+        cSer = self.loadData(pF, iC=iC, dDTp=dDTp, cSep=cSep).iloc[:, 0]
+        if toList:
+            return cSer.to_list()
+        else:
+            return cSer
+
+    def saveDfr(self, cDfr, pF, saveIdx=True, dropDup=False, saveAnyway=True):
         if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
             print('Saving DataFrame as *.csv file to path ' + pF)
-            GF.saveAsCSV(cDfr, pF, cSep=self.dITp['cSep'], saveIdx=saveIdx,
-                         dropDup=dropDup)
+            GF.checkDupSaveCSV(cDfr, pF, cSep=self.dITp['cSep'],
+                               saveIdx=saveIdx, dropDup=dropDup)
+
+    def saveListAsSer(self, cL, pF, saveIdx=True, lSIdx=None, sName=None,
+                      saveAnyway=True):
+        if (not os.path.isfile(pF) or saveAnyway) and cL is not None:
+            print('Saving list as pandas Series *.csv file to path ' + pF)
+            cSer = GF.iniPdSer(cL, lSNmI=lSIdx, nameS=sName)
+            GF.saveCSV(cSer, pF=pF, cSep=self.dITp['cSep'], saveIdx=saveIdx)
 
 # -----------------------------------------------------------------------------
 class Seq:

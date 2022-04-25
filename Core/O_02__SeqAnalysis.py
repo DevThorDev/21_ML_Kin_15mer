@@ -2,7 +2,7 @@
 ###############################################################################
 # --- O_02__SeqAnalysis.py ----------------------------------------------------
 ###############################################################################
-import time
+import os, time
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
@@ -20,6 +20,7 @@ class SeqAnalysis(BaseClass):
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.lFullSeq, self.lNmerSeq = [], []
         self.getPDir()
+        self.fillDPFVal()
         self.loadInpDfrs()
         print('Initiated "SeqAnalysis" base object.')
 
@@ -41,50 +42,64 @@ class SeqAnalysis(BaseClass):
                         print(sSeqF[:maxLenSeqF], GC.S_DT03, GC.S_COL,
                               GC.S_SPACE, round(cProb, GC.R06), sep='')
 
-    # --- methods for loading data --------------------------------------------
-    def getPDirSFResEnd(self, pDirR=None):
+    # --- methods for filling the result paths dictionary ---------------------
+    def getPDirRes(self, pDirR=None):
+        sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sCapS']])
+        setSTT = {self.dITp['sTest'], self.dITp['sTrain']}
+        if self.dITp['sFSeqCheck'] == self.dITp['sFProcInpNmer']:
+            pDirR = self.pDirProcInp
+        elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iEnd=2) == sCombS:
+            pDirR = self.pDirResComb
+        elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iStart=-1) in setSTT:
+            pDirR = self.pDirResComb
+        return pDirR
+
+    def fillDPFVal(self):
+        pI, pC, pP = self.pDirResInfo, self.pDirResComb, self.pDirResProb
+        self.dPF = {'IEffInp': GF.joinToPath(pI, self.dITp['sFIEffInp']),
+                    'CombInp': GF.joinToPath(pC, self.dITp['sFCombInp'])}
+        self.dPF['SeqCheck'] = GF.joinToPath(self.getPDirRes(pDirR=pC),
+                                             self.dITp['sFSeqCheck'])
+        self.dPF['LInpSeq'] = GF.joinToPath(pP, self.dITp['sFLInpSeq'])
+        self.dPF['ResWtLh'] = GF.joinToPath(pP, self.dITp['sFResWtLh'])
+        self.dPF['ResRelLh'] = GF.joinToPath(pP, self.dITp['sFResRelLh'])
+        self.dPF['SnipProbS'] = GF.joinToPath(pP, self.dITp['sFSnipProbS'])
+        self.dPF['SnipProbX'] = GF.joinToPath(pP, self.dITp['sFSnipProbX'])
+        self.dPF['ProbTbl'] = GF.joinToPath(pP, self.dITp['sFProbTbl'])
+
+    def updateDPFVal(self):
+        pP = self.pDirResProb
+        self.dPF['SnipProbS'] = GF.joinToPath(pP, self.dITp['sFSnipProbS'])
+        self.dPF['SnipProbX'] = GF.joinToPath(pP, self.dITp['sFSnipProbX'])
+
+    # --- methods for modifying file names ------------------------------------
+    def getSFResEnd(self):
         sFResEnd, sTest, sTrain = '', self.dITp['sTest'], self.dITp['sTrain']
         sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sCapS']])
         if self.dITp['sFSeqCheck'] == self.dITp['sFProcInpNmer']:
-            pDirR, sFResEnd = self.pDirProcInp, self.dITp['sAllSeqNmer']
+            sFResEnd = self.dITp['sAllSeqNmer']
         elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iEnd=2) == sCombS:
-            pDirR, sFResEnd = self.pDirResComb, sCombS
+            sFResEnd = sCombS
         elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iStart=-1) == sTest:
-            pDirR, sFResEnd = self.pDirResComb, self.dITp['sTestData']
+            sFResEnd = self.dITp['sTestData']
         elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iStart=-1) == sTrain:
-            pDirR, sFResEnd = self.pDirResComb, self.dITp['sTrainData']
-        return pDirR, sFResEnd
+            sFResEnd = self.dITp['sTrainData']
+        return sFResEnd
 
-    # def loadInpNmer(self):
-    #     self.dfrInpNmer, pFInp, iC = None, None, None
-    #     if self.dITp['useNmerSeqFrom'] == self.dITp['sSeqCheck']:
-    #         pDir, _ = self.getPDirSFResEnd(pDirR=self.pDirResComb)
-    #         pFInp, iC = GF.joinToPath(pDir, self.dITp['sFSeqCheck']), 0
-    #     elif self.dITp['useNmerSeqFrom'] == self.dITp['sIEffInp']:
-    #         pFInp = GF.joinToPath(self.pDirResComb, self.dITp['sFIEffInp'])
-    #     elif self.dITp['useNmerSeqFrom'] == self.dITp['sCombInp']:
-    #         pFInp, iC = GF.joinToPath(self.pDirResComb, self.dITp['sFCombInp']), 0
-    #     if pFInp is not None:
-    #         self.dfrInpNmer = self.loadDfr(pF=pFInp, iC=iC)
-    #     return iC
-
+    # --- methods for loading data --------------------------------------------
     def loadInpDfrs(self):
         self.lCombSeq, self.dLenSeq = [], {}
-        pFIEffInp = GF.joinToPath(self.pDirResInfo, self.dITp['sFIEffInp'])
-        pFCombInp = GF.joinToPath(self.pDirResComb, self.dITp['sFCombInp'])
-        self.dfrIEff = self.loadDfr(pF=pFIEffInp, iC=0)
-        self.dfrComb = self.loadDfr(pF=pFCombInp, iC=0)
+        self.dfrIEff = self.loadData(pF=self.dPF['IEffInp'], iC=0)
+        self.dfrComb = self.loadData(pF=self.dPF['CombInp'], iC=0)
         if self.dfrComb is not None:
             self.lCombSeq = list(self.dfrComb[self.dITp['sCNmer']].unique())
 
     # --- methods for obtaining the list of input Nmer-sequences --------------
     def getLIPosPyl(self, sFullSeq):
-        # print('Obtaining list of Pyl position indices...')
         lIPosPyl, cDfr = [], self.dfrInpSeq
         if self.dITp['sPepPIP'] in cDfr.columns:
             dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']] == sFullSeq]
             lIPosPyl = dfrCSeq[self.dITp['sPepPIP']].unique()
-        # print('Obtained list of Pyl position indices.')
         return [i - 1 for i in lIPosPyl]
 
     def getLFullSeq(self, iS=None, iE=None, stT=None):
@@ -101,33 +116,38 @@ class SeqAnalysis(BaseClass):
             print('Created list of full input sequences...')
         return lSFullSeq, iS, iE
 
-    def getLNmerSeq(self, lSFullSeq=[], lSNmerSeq=[], stT=None):
+    def getLNmerSeq(self, lSFullSq=[], lSNmerSq=[], stT=None):
         print('Creating list of Nmer input sequences...')
         mDsp, sNS = self.dITp['mDsp'], 'Nmer sequences'
-        if lSNmerSeq is None and self.dITp['sCNmer'] in self.dfrInpSeq.columns:
+        if lSNmerSq is None and self.dITp['sCNmer'] in self.dfrInpSeq.columns:
             if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
                 # reduce to Nmer sequences with corresponding full sequences
                 cDfr = self.dfrInpSeq
-                dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']].isin(lSFullSeq)]
-                lSNmerSeq = list(dfrCSeq[self.dITp['sCNmer']].unique())
+                dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']].isin(lSFullSq)]
+                lSNmerSq = list(dfrCSeq[self.dITp['sCNmer']].unique())
             else:
-                lSNmerSeq = list(self.dfrInpSeq[self.dITp['sCNmer']].unique())
-        for n, sSq in enumerate(lSNmerSeq):
+                lSNmerSq = list(self.dfrInpSeq[self.dITp['sCNmer']].unique())
+        for n, sSq in enumerate(lSNmerSq):
             self.lNmerSeq.append(NmerSeq(self.dITp, sSq=sSq))
-            GF.showProgress(N=len(lSNmerSeq), n=n, modeDisp=mDsp, varText=sNS,
+            GF.showProgress(N=len(lSNmerSq), n=n, modeDisp=mDsp, varText=sNS,
                             startTime=stT)
         print('Created list of Nmer input sequences.')
+        return lSNmerSq
 
-    def getLInpSeq(self, cTim, lSSeq=None, stT=None):
+    def getLInpSeq(self, cTim, lSSeq=None, readF=True, stT=None):
         cStT = time.time()
         [iS, iE], lSNmerSeq = self.dITp['lIStartEnd'], lSSeq
-        pDir, e = self.getPDirSFResEnd(pDirR=self.pDirResComb)
-        pFInpSeq = GF.joinToPath(pDir, self.dITp['sFSeqCheck'])
-        self.dfrInpSeq = self.loadDfr(pF=pFInpSeq, iC=0)
+        if os.path.isfile(self.dPF['LInpSeq']) and lSNmerSeq is None and readF:
+            lSNmerSeq = self.loadSerOrList(pF=self.dPF['LInpSeq'], iC=0,
+                                           toList=True)
+        self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
         lSFullSeq, iS, iE = self.getLFullSeq()
-        self.getLNmerSeq(lSFullSeq, lSNmerSeq)
-        e = GF.joinS([e, iS, iE])
-        SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'], sFE=e)
+        lSNmerSeq = self.getLNmerSeq(lSFullSeq, lSNmerSeq)
+        SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'],
+                  sFE=GF.joinS([self.getSFResEnd(), iS, iE]))
+        self.updateDPFVal()
+        self.saveListAsSer(lSNmerSeq, pF=self.dPF['LInpSeq'],
+                           sName=self.dITp['sNmer'])
         cTim.updateTimes(iMth=1, stTMth=cStT, endTMth=time.time())
 
     # --- methods for generating the {seq. length: seq. list} dictionary ------
@@ -214,24 +234,6 @@ class SeqAnalysis(BaseClass):
                             varText='full sequences', startTime=stT)
         print('Performed calculation of Nmer sequence probabilities.')
 
-    def calcSnipProbTable(self):
-        lSSeq = [cSeq.sSeq for cSeq in self.lNmerSeq]
-        nLen, nXt = len(self.dITp['lLenNmer']), len(self.dITp['lSCXt'])
-        arrProb = GF.iniNpArr(shape=(len(lSSeq), nLen*nXt))
-        for i, cNmerS in enumerate(self.lNmerSeq):
-            dProf = cNmerS.getProfileDict(maxLenSeq=max(self.dITp['lLenNmer']))
-            for j, sSS in enumerate(dProf.values()):
-                arrProb[i, j*nXt] = sSS
-                if sSS in self.dSnipProbX:
-                    arrProb[i, j*nXt + 1] = sum(self.dSnipProbX[sSS].values())
-                    arrProb[i, j*nXt + 2] = len(self.dSnipProbX[sSS])
-                    x = arrProb[i, j*nXt + 1]/arrProb[i, j*nXt + 2]
-                    arrProb[i, j*nXt + 3] = round(x, GC.R08)
-        self.dfrProbTbl = GF.iniPdDfr(arrProb, lSNmR=lSSeq,
-                                      lSNmC=self.dITp['lSCMerAll'])
-        pFDfrProbTbl = GF.joinToPath(self.pDirResProb, self.dITp['sFProbTbl'])
-        self.saveDfr(self.dfrProbTbl, pF=pFDfrProbTbl, saveAnyway=True)
-
     def performProbAnalysis(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if (self.dITp['calcSnipProb'] or self.dITp['calcWtProb'] or
             self.dITp['calcRelProb']):
@@ -246,25 +248,42 @@ class SeqAnalysis(BaseClass):
             cTim.updateTimes(iMth=7, stTMth=cStT, endTMth=time.time())
             print('Saved Nmer sequence probability DataFrame.')
             self.printDictSnipProbX(lSnipLen=[7], cSnip='AQRTLHG')
-            self.calcSnipProbTable()
+            self.calcProbTable(cTim=cTim, lSSeq=lSSeq, stT=stT)
+
+    def calcProbTable(self, cTim, lSSeq=None, stT=None):
+        if not self.dITp['convToProbTbl']:
+            return None
+        self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, stT=stT)
+        self.loadSnipProbX()
+        lSSeq, nSeq = [cSeq.sSeq for cSeq in self.lNmerSeq], len(self.lNmerSeq)
+        lSC, nXt =  self.dITp['lSCMerAll'], len(self.dITp['lSCXt'])
+        lSerD = [GF.iniPdSer(shape=(nSeq,), nameS=sC) for sC in lSC]
+        for i, cNmerS in enumerate(self.lNmerSeq):
+            dProf = cNmerS.getProfileDict(maxLenSeq=max(self.dITp['lLenNmer']))
+            for j, sSS in enumerate(dProf.values()):
+                lSerD[j*nXt][i] = sSS
+                if sSS in self.dSnipProbX:
+                    lSerD[j*nXt + 1][i] = sum(self.dSnipProbX[sSS].values())
+                    lSerD[j*nXt + 2][i] = len(self.dSnipProbX[sSS])
+                    x = lSerD[j*nXt + 1][i]/lSerD[j*nXt + 2][i]
+                    lSerD[j*nXt + 3][i] = round(x, GC.R08)
+        self.dfrProbTbl = GF.iniPdDfr(GF.concLSerAx1(lSerD), lSNmR=lSSeq,
+                                      lSNmC=lSC)
+        self.saveDfr(self.dfrProbTbl, pF=self.dPF['ProbTbl'], saveAnyway=True)
 
     # --- methods for printing results ----------------------------------------
 
-    # --- methods for saving data ---------------------------------------------
+    # --- methods for saving and loading data ---------------------------------
     def saveDfrRelLikelihood(self, dLV, d3, lSCD3):
-        pFDfrVal = GF.joinToPath(self.pDirResProb, self.dITp['sFResWtLh'])
-        pFDfrDict = GF.joinToPath(self.pDirResProb, self.dITp['sFResRelLh'])
         if self.dITp['calcWtLh']:
             dfrVal = GF.dLV3CToDfr(dLV)
-            self.saveDfr(dfrVal, pF=pFDfrVal, saveAnyway=True)
+            self.saveDfr(dfrVal, pF=self.dPF['ResWtLh'], saveAnyway=True)
         if self.dITp['calcRelLh']:
             dfrDict = GF.d3ValToDfr(d3, lSCD3)
-            self.saveDfr(dfrDict, pF=pFDfrDict, saveAnyway=True)
+            self.saveDfr(dfrDict, pF=self.dPF['ResRelLh'], saveAnyway=True)
 
     def saveDfrSnipProbS(self):
         if self.dITp['calcSnipProb']:
-            pRes, sFRes = self.pDirResProb, self.dITp['sFResSnipProbS']
-            pFDfrSnipProb = GF.joinToPath(pRes, sFRes)
             dLV, lSCDfr = {}, self.dITp['lSCDfrProbS']
             for sSnip, cProb in self.dSnipProbS.items():
                 lElRow = [sSnip, len(sSnip), round(cProb, GC.R06)]
@@ -272,12 +291,10 @@ class SeqAnalysis(BaseClass):
                     GF.addToDictL(dLV, cK=sC, cE=cV)
             self.saveDfr(GF.dictToDfr(dLV, srtBy=self.dITp['lSrtByDfrProbS'],
                                       srtAsc=self.dITp['lSrtAscDfrProbS']),
-                         pF=pFDfrSnipProb, saveAnyway=True)
+                         pF=self.dPF['SnipProbS'], saveAnyway=True)
 
     def saveDfrSnipProbX(self):
         if self.dITp['calcSnipProb']:
-            pRes, sFRes = self.pDirResProb, self.dITp['sFResSnipProbX']
-            pFDfrSnipProb = GF.joinToPath(pRes, sFRes)
             dLV, lSCDfr = {}, self.dITp['lSCDfrProbS']
             for sSnip, cDSub in self.dSnipProbX.items():
                 cProb = round(sum(cDSub.values())/len(cDSub), GC.R06)
@@ -286,6 +303,13 @@ class SeqAnalysis(BaseClass):
                     GF.addToDictL(dLV, cK=sC, cE=cV)
             self.saveDfr(GF.dictToDfr(dLV, srtBy=self.dITp['lSrtByDfrProbS'],
                                       srtAsc=self.dITp['lSrtAscDfrProbS']),
-                         pF=pFDfrSnipProb, saveAnyway=True)
+                         pF=self.dPF['SnipProbX'], saveAnyway=True)
+
+    def loadSnipProbX(self, reLoad=False):
+        pFDfr = self.dPF['SnipProbX']
+        if ((reLoad or self.dSnipProbX is None) and os.path.isfile(pFDfr)):
+            self.dSnipProbX = self.loadData(pFDfr, iC=0).to_dict(orient='list')
+        elif (self.dSnipProbX is None and not os.path.isfile(pFDfr)):
+            self.dSnipProbX = {}
 
 ###############################################################################

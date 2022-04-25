@@ -11,9 +11,10 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 # --- flow control ------------------------------------------------------------
 calcWtLh = False
 calcRelLh = False
-calcSnipProb = True
-calcWtProb = True
-calcRelProb = True
+calcSnipProb = False
+calcWtProb = False
+calcRelProb = False
+convToProbTbl = True
 
 useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
 
@@ -26,10 +27,11 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
 sFE = sFIEffInp.split(GC.S_US02)[1:]
+sFLInpSeq = GC.S_US02.join(['ListInputSeq'] + sFE)
 sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFE)
 sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFE)
-sFResSnipProbS = GC.S_US02.join(['SnipProbS'] + sFE)
-sFResSnipProbX = GC.S_US02.join(['SnipProbX'] + sFE)
+sFSnipProbS = GC.S_US02.join(['SnipProbS'] + sFE)
+sFSnipProbX = GC.S_US02.join(['SnipProbX'] + sFE)
 sFProbTbl = GC.S_US02.join(['ProbTable'] + sFE)
 sFResWtProb = GC.S_US02.join(['WtProb'] + sFE)
 sFResRelProb = GC.S_US02.join(['RelProb'] + sFE)
@@ -83,8 +85,8 @@ dWtsLenSeq = {1: 0.1,
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-lSKeyFRes = ['sFResWtLh', 'sFResRelLh', 'sFResSnipProbS', 'sFResSnipProbX',
-             'sFResWtProb', 'sFResRelProb']
+lSKeyFRes = ['sFLInpSeq', 'sFResWtLh', 'sFResRelLh', 'sFSnipProbS',
+             'sFSnipProbX', 'sFResWtProb', 'sFResRelProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -97,15 +99,17 @@ dIO = {# --- general
        'calcSnipProb': calcSnipProb,
        'calcWtProb': calcWtProb,
        'calcRelProb': calcRelProb,
+       'convToProbTbl': convToProbTbl,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
        'sFSeqCheck': sFSeqCheck + GC.S_DOT + GC.S_EXT_CSV,
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
+       'sFLInpSeq': sFLInpSeq + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResSnipProbS': sFResSnipProbS + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResSnipProbX': sFResSnipProbX + GC.S_DOT + GC.S_EXT_CSV,
+       'sFSnipProbS': sFSnipProbS + GC.S_DOT + GC.S_EXT_CSV,
+       'sFSnipProbX': sFSnipProbX + GC.S_DOT + GC.S_EXT_CSV,
        'sFProbTbl': sFProbTbl + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
