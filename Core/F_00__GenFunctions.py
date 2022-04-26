@@ -51,16 +51,18 @@ def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
     if os.path.isfile(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
 
-def saveCSV(pdObj, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True):
+def saveCSV(pdObj, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True, iLbl=None):
     if pdObj is not None:
-        pdObj.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx)
+        pdObj.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx,
+                     index_label=iLbl)
 
 def checkDupSaveCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
-                    dropDup=True, igI=True):
+                    iLbl=None, dropDup=True, igI=True):
     if pdDfr is not None:
         if dropDup:
             pdDfr.drop_duplicates(inplace=True, ignore_index=igI)
-        pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx)
+        pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx,
+                     index_label=iLbl)
 
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, sJoin=GC.S_USC):

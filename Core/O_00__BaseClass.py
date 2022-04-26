@@ -65,8 +65,8 @@ class BaseClass:
     # --- methods for initialising the dictionaries and DataFrames ------------
     def iniDicts(self):
         self.dTpDfr = None
-        self.dSnipProbS, self.dSnipProbX = None, None
-    
+        self.dSnipS, self.dSnipX = None, None
+
     def iniDfrs(self):
         self.dfrKin, self.dfrNmer = None, None
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
@@ -123,11 +123,12 @@ class BaseClass:
         else:
             return cSer
 
-    def saveDfr(self, cDfr, pF, saveIdx=True, dropDup=False, saveAnyway=True):
+    def saveDfr(self, cDfr, pF, saveIdx=True, idxLbl=None, dropDup=False,
+                saveAnyway=True):
         if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
             print('Saving DataFrame as *.csv file to path ' + pF)
             GF.checkDupSaveCSV(cDfr, pF, cSep=self.dITp['cSep'],
-                               saveIdx=saveIdx, dropDup=dropDup)
+                               saveIdx=saveIdx, iLbl=idxLbl, dropDup=dropDup)
 
     def saveListAsSer(self, cL, pF, saveIdx=True, lSIdx=None, sName=None,
                       saveAnyway=True):
@@ -225,9 +226,10 @@ class FullSeq(Seq):
             lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
             if len(lIPos) > 0:
                 lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
-                dIPosSeq[sSeq2F] = (lIPos, lB, sum(lB)/len(lB))
+                nPyl, nOcc = sum(lB), len(lB)
+                cPrb = round(nPyl/nOcc, GC.R08)
+                dIPosSeq[sSeq2F] = (lIPos, lB, nPyl, nOcc, cPrb)
         return dIPosSeq
-        # return {sSeq2F: (dIPos, sum(lB), len(lB) - sum(lB))}
 
 # -----------------------------------------------------------------------------
 class Timing:
