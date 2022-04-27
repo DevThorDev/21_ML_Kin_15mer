@@ -134,6 +134,7 @@ S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'
 S_EXT_PDF = 'pdf'
 S_EXT_PTH = 'pth'
+S_EXT_BIN = 'bin'
 
 # --- predefined strings (2) --------------------------------------------------
 S_MODE = 'Mode'

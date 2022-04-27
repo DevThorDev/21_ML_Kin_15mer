@@ -2,7 +2,7 @@
 ###############################################################################
 # --- F_00__GenFunctions.py ---------------------------------------------------
 ###############################################################################
-import os, time, itertools
+import os, pickle, itertools, time
 
 import numpy as np
 from numpy.random import default_rng as RNG
@@ -63,6 +63,22 @@ def checkDupSaveCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
             pdDfr.drop_duplicates(inplace=True, ignore_index=igI)
         pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx,
                      index_label=iLbl)
+
+def pickleSaveDict(cD, pF=('Dict' + GC.S_DOT + GC.S_EXT_BIN)):
+    try:
+        with open(pF, 'wb') as fDict:
+            pickle.dump(cD, fDict)
+    except:
+        print('ERROR: Dumping dictionary to', pF, 'failed.')
+
+def pickleLoadDict(pF=('Dict' + GC.S_DOT + GC.S_EXT_BIN), reLoad=False):
+    cD = None
+    if os.path.isfile(pF) and (cD is None or len(cD) == 0 or reLoad):
+        with open(pF, 'rb') as fDict:
+            cD = pickle.load(fDict)
+    if cD is None:
+        print('ERROR: Loading dictionary from', pF, 'failed.')
+    return cD
 
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, sJoin=GC.S_USC):
@@ -134,6 +150,14 @@ def isInSeqSet(x, cSqSet, maxDlt=GC.MAX_DELTA):
         if isEq(x, cEl, maxDlt=maxDlt):
             return True
     return False
+
+def calcPylProb(cSS, dCSS):
+    nFSeq, nPyl, nTtl, cPrb = len(dCSS), 0, 0, 0.
+    for tV in dCSS.values():
+        nPyl += tV[0]
+        nTtl += tV[1]
+        cPrb += tV[2]/nFSeq
+    return [cSS, nPyl, nTtl, cPrb]
 
 # --- Functions handling iterators (lists/tuples or dictionaries) -------------
 def restrIt(cIt, lRestrLen=[], useLenS=False):
@@ -343,15 +367,6 @@ def getItStartToEnd(cIt, iStart=None, iEnd=None):
     else:
         iEnd = len(cIt)
     return cIt[iStart:iEnd], iStart, iEnd
-
-# --- Functions performing general calculations -------------------------------
-# def calcMeanProb(cDIProb):
-#     meanProb = 0.
-#     for cProb in cDIProb.values():
-#         # if cProb is not None:
-#         #     meanProb += cProb/len(cDIProb)
-#         meanProb += cProb/len(cDIProb)
-#     return meanProb
 
 # --- Functions performing numpy array calculation and manipulation -----------
 def getArrCartProd(it1, it2):

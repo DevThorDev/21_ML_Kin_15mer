@@ -244,11 +244,13 @@ class Timing:
         self.elT_02_5_performProbAnalysis_B = 0.
         self.elT_02_6_performProbAnalysis_C = 0.
         self.elT_02_7_performProbAnalysis_D = 0.
+        self.elT_02_8_calcProbTable = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
         self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
                       'performProbAnalysis_A', 'performProbAnalysis_B',
-                      'performProbAnalysis_C', 'performProbAnalysis_D']
+                      'performProbAnalysis_C', 'performProbAnalysis_D',
+                      'calcProbTable']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -258,7 +260,8 @@ class Timing:
                      self.elT_02_4_performProbAnalysis_A,
                      self.elT_02_5_performProbAnalysis_B,
                      self.elT_02_6_performProbAnalysis_C,
-                     self.elT_02_7_performProbAnalysis_D]
+                     self.elT_02_7_performProbAnalysis_D,
+                     self.elT_02_8_calcProbTable]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
         if stTMth is not None and endTMth is not None:
@@ -277,6 +280,8 @@ class Timing:
                 self.elT_02_6_performProbAnalysis_C += elT
             elif iMth == 7:
                 self.elT_02_7_performProbAnalysis_D += elT
+            elif iMth == 8:
+                self.elT_02_8_calcProbTable += elT
             self.elT_Sum += elT
             self.updateLElTimes()
 
@@ -297,10 +302,13 @@ class Timing:
                str(round(self.elT_02_6_performProbAnalysis_C, self.rdDig)) +
                GC.S_NEWL + 'Method 7 | "performProbAnalysis_D":\t' +
                str(round(self.elT_02_7_performProbAnalysis_D, self.rdDig)) +
+               GC.S_NEWL + 'Method 8 | "calcProbTable":\t' +
+               str(round(self.elT_02_8_calcProbTable, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 
     def printRelTimes(self):
+        assert len(self.lSMth) == len(self.lElT)
         print(GC.S_WV80)
         for k, (sMth, cElT) in enumerate(zip(self.lSMth, self.lElT)):
             sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'

@@ -39,8 +39,10 @@ cSeqAnalysis = SeqAnalysis(inpDatG)
 GF.showElapsedTime(startTime)
 # cSeqAnalysis.performLhAnalysis(lEff=[None, 'AT1G01140', 'AT4G23650'])
 cSeqAnalysis.performLhAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
+
 cSeqAnalysis.performProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
-cSeqAnalysis.calcProbTable(cTim=cTiming, stT=startTime)
+# cSeqAnalysis.calcProbTable(cTim=cTiming, stT=startTime)
+
 GF.showElapsedTime(startTime)
 cValidation = Validation(inpDatG)
 cValidation.createResultsTrain(stT=startTime)

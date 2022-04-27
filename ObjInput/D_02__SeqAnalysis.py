@@ -11,10 +11,10 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 # --- flow control ------------------------------------------------------------
 calcWtLh = False
 calcRelLh = False
-calcSnipS = False
-calcSnipX = False
-saveAsDfrS = False
-saveAsDfrX = False
+calcSnipS = True
+calcSnipX = True
+saveAsDfrS = True
+saveAsDfrX = True
 calcWtProb = False
 calcRelProb = False
 convSnipXToProbTbl = True
@@ -76,9 +76,10 @@ lSCDfrLhD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelLikelihood]
 lSCDfrProbS = [sSnippet, sLenSnip, sSnipProb]
 lSrtByDfrProbS = [sLenSnip, sSnipProb, sSnippet]
 lSrtAscDfrProbS = [True, False, True]
-lSCDfrProbX = [sSnippet, sLenSnip, sSnipPyl, sSnipTtl, sSnipProb]
-lSrtByDfrProbX = [sSnippet, sLenSnip, sSnipProb, sSnipPyl]
-lSrtAscDfrProbX = [True, False, False, True]
+lSCDfrProbX = [sSnippet, sSnipPyl, sSnipTtl, sSnipProb]
+lSCDfrWFullSProbX = [sSnippet, sFullSeq, sSnipPyl, sSnipTtl, sSnipProb]
+lSrtByDfrProbX = [sSnippet, sSnipProb, sSnipPyl]
+lSrtAscDfrProbX = [True, False, True]
 
 lSCDfrProbV = [sCNmer, sEffCode, sWtProb, sInCombRes]
 lSCDfrProbD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelProb]
@@ -122,8 +123,8 @@ dIO = {# --- general
        'sFLInpSeq': sFLInpSeq + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
-       'sFSnipDictS': sFSnipDictS + GC.S_DOT + GC.S_EXT_CSV,
-       'sFSnipDictX': sFSnipDictX + GC.S_DOT + GC.S_EXT_CSV,
+       'sFSnipDictS': sFSnipDictS + GC.S_DOT + GC.S_EXT_BIN,
+       'sFSnipDictX': sFSnipDictX + GC.S_DOT + GC.S_EXT_BIN,
        'sFSnipDfrS': sFSnipDfrS + GC.S_DOT + GC.S_EXT_CSV,
        'sFSnipDfrX': sFSnipDfrX + GC.S_DOT + GC.S_EXT_CSV,
        'sFProbTbl': sFProbTbl + GC.S_DOT + GC.S_EXT_CSV,
@@ -161,6 +162,7 @@ dIO = {# --- general
        'lSrtByDfrProbS': lSrtByDfrProbS,
        'lSrtAscDfrProbS': lSrtAscDfrProbS,
        'lSCDfrProbX': lSCDfrProbX,
+       'lSCDfrWFullSProbX': lSCDfrWFullSProbX,
        'lSrtByDfrProbX': lSrtByDfrProbX,
        'lSrtAscDfrProbX': lSrtAscDfrProbX,
        'lSCDfrProbV': lSCDfrProbV,
