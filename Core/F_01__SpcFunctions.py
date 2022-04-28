@@ -79,6 +79,21 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
     return pd.DataFrame(d4Dfr).convert_dtypes()
 
 # --- Functions (O_02__SeqAnalysis) -------------------------------------------
+def getLSFullSeq(dITp, dfrInpSeq, iS=None, iE=None):
+    lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']].unique())
+    return GF.getItStartToEnd(lSFullSeq, iS, iE)
+
+def getLSNmerSeq(dITp, dfrInpSeq, lSFullSeq=[], lSNmerSeq=[]):
+    if lSNmerSeq is None and dITp['sCNmer'] in dfrInpSeq.columns:
+        if dITp['sCCodeSeq'] in dfrInpSeq.columns:
+            # reduce to Nmer sequences with corresponding full sequences
+            cDfr = dfrInpSeq
+            dfrCSeq = cDfr[cDfr[dITp['sCCodeSeq']].isin(lSFullSeq)]
+            lSNmerSeq = list(dfrCSeq[dITp['sCNmer']].unique())
+        else:
+            lSNmerSeq = list(dfrInpSeq[dITp['sCNmer']].unique())
+    return lSNmerSeq
+
 def modLSF(dITp, lSKeyF, sFE):
     for sKeyF in lSKeyF:
         dITp[sKeyF] = GF.modSF(dITp[sKeyF], sEnd=sFE, sJoin=dITp['sUS02'])

@@ -95,7 +95,7 @@ class SeqAnalysis(BaseClass):
         self.lCombSeq, self.dLenSeq = [], {}
         self.dfrIEff = self.loadData(pF=self.dPF['IEffInp'], iC=0)
         self.dfrComb = self.loadData(pF=self.dPF['CombInp'], iC=0)
-        if self.dfrComb is not None:
+        if GF.Xist(self.dfrComb) and self.dITp['sCNmer'] in self.dfrComb:
             self.lCombSeq = list(self.dfrComb[self.dITp['sCNmer']].unique())
 
     # --- methods for obtaining the list of input Nmer-sequences --------------
@@ -106,37 +106,35 @@ class SeqAnalysis(BaseClass):
             lIPosPyl = dfrCSeq[self.dITp['sPepPIP']].unique()
         return [i - 1 for i in lIPosPyl]
 
+    def reduceLSFullSeq(self, lSNmer=[], iS=None, iE=None):
+        if not self.dITp['reduceFullToNmerSeq']:
+            return None
+        lSFull, iS, iE = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE)
+        lSNmer = SF.getLSNmerSeq(self.dITp)
+
     def getLFullSeq(self, iS=None, iE=None, stT=None):
         if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
             print('Creating list of full input sequences...')
             mDsp, sFS = self.dITp['mDsp'], 'full sequences [getLFullSeq]'
-            lSFullSeq = list(self.dfrInpSeq[self.dITp['sCCodeSeq']].unique())
-            lSFullSeq, iS, iE = GF.getItStartToEnd(lSFullSeq, iS, iE)
-            for n, sSq in enumerate(lSFullSeq):
+            lSFull, iS, iE = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE)
+            for n, sSq in enumerate(lSFull):
                 lI = self.getLIPosPyl(sFullSeq=sSq)
                 self.lFullSeq.append(FullSeq(self.dITp, sSq=sSq, lIPosPyl=lI))
-                GF.showProgress(N=len(lSFullSeq), n=n, modeDisp=mDsp,
+                GF.showProgress(N=len(lSFull), n=n, modeDisp=mDsp,
                                 varText=sFS, startTime=stT)
             print('Created list of full input sequences...')
-        return lSFullSeq, iS, iE
+        return lSFull, iS, iE
 
-    def getLNmerSeq(self, lSFullSq=[], lSNmerSq=[], stT=None):
+    def getLNmerSeq(self, lSFull=[], lSNmer=[], stT=None):
         print('Creating list of Nmer input sequences...')
         mDsp, sNS = self.dITp['mDsp'], 'Nmer sequences [getLNmerSeq]'
-        if lSNmerSq is None and self.dITp['sCNmer'] in self.dfrInpSeq.columns:
-            if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
-                # reduce to Nmer sequences with corresponding full sequences
-                cDfr = self.dfrInpSeq
-                dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']].isin(lSFullSq)]
-                lSNmerSq = list(dfrCSeq[self.dITp['sCNmer']].unique())
-            else:
-                lSNmerSq = list(self.dfrInpSeq[self.dITp['sCNmer']].unique())
-        for n, sSq in enumerate(lSNmerSq):
+        lSNmer = SF.getLSNmerSeq(self.dITp, self.dfrInpSeq, lSFull, lSNmer)
+        for n, sSq in enumerate(lSNmer):
             self.lNmerSeq.append(NmerSeq(self.dITp, sSq=sSq))
-            GF.showProgress(N=len(lSNmerSq), n=n, modeDisp=mDsp, varText=sNS,
+            GF.showProgress(N=len(lSNmer), n=n, modeDisp=mDsp, varText=sNS,
                             startTime=stT)
         print('Created list of Nmer input sequences.')
-        return lSNmerSq
+        return lSNmer
 
     def getLInpSeq(self, cTim, lSSeq=None, readF=True, stT=None):
         cStT = time.time()
@@ -265,7 +263,7 @@ class SeqAnalysis(BaseClass):
     def calcProbTable(self, cTim, lSSeq=None, stT=None):
         if not self.dITp['convSnipXToProbTbl']:
             return None
-        if self.lNmerSeq is None or len(self.lNmerSeq) == 0:
+        if not GF.Xist(self.lNmerSeq):
             self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, stT=stT)
         cStT = time.time()
         self.dSnipX = GF.pickleLoadDict(pF=self.dPF['SnipDictX'], reLoad=True)
@@ -309,7 +307,7 @@ class SeqAnalysis(BaseClass):
                             srtAsc=self.dITp['lSrtAscDfrProbS'])
 
     def saveDfrSnipS(self):
-        if self.dSnipS is not None and len(self.dSnipS) > 0:
+        if GF.Xist(self.dSnipS):
             GF.pickleSaveDict(cD=self.dSnipS, pF=self.dPF['SnipDictS'])
             if self.dITp['saveAsDfrS']:
                 self.dfrSnipS = self.convDictToDfrS()
@@ -328,7 +326,7 @@ class SeqAnalysis(BaseClass):
                             srtAsc=self.dITp['lSrtAscDfrProbX'])
 
     def saveDfrSnipX(self):
-        if self.dSnipX is not None and len(self.dSnipX) > 0:
+        if GF.Xist(self.dSnipX):
             GF.pickleSaveDict(cD=self.dSnipX, pF=self.dPF['SnipDictX'])
             if self.dITp['saveAsDfrX']:
                 self.dfrSnipX = self.convDictToDfrX()
@@ -338,7 +336,7 @@ class SeqAnalysis(BaseClass):
 
     def loadDfrSnipX(self, reLoad=False):
         pFDfr = self.dPF['SnipDfrX']
-        if ((reLoad or self.dSnipX is None) and os.path.isfile(pFDfr)):
+        if ((reLoad or not GF.Xist(self.dSnipX)) and os.path.isfile(pFDfr)):
             self.dfrSnipX = self.loadData(pFDfr, iC=0)
         elif not (self.dSnipX is None or os.path.isfile(pFDfr)):
             self.dfrSnipX = self.convDictToDfrX()

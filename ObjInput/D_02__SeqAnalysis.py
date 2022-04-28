@@ -17,6 +17,8 @@ saveAsDfrS = True
 saveAsDfrX = True
 calcWtProb = False
 calcRelProb = False
+
+reduceFullToNmerSeq = True
 convSnipXToProbTbl = True
 
 useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
@@ -114,6 +116,7 @@ dIO = {# --- general
        'saveAsDfrX': saveAsDfrX,
        'calcWtProb': calcWtProb,
        'calcRelProb': calcRelProb,
+       'reduceFullToNmerSeq': reduceFullToNmerSeq,
        'convSnipXToProbTbl': convSnipXToProbTbl,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs

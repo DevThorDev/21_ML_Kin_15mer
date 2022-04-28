@@ -80,6 +80,20 @@ def pickleLoadDict(pF=('Dict' + GC.S_DOT + GC.S_EXT_BIN), reLoad=False):
         print('ERROR: Loading dictionary from', pF, 'failed.')
     return cD
 
+# --- Functions checking whether a data structure is filled -------------------
+def Xist(cDat):
+    if cDat is not None:
+        if type(cDat) in [str, tuple, list, dict]:
+            if len(cDat) > 0:
+                return True
+        elif type(cDat) == pd.core.series.Series:
+            if cDat.shape[0] > 0:
+                return True
+        elif type(cDat) in [np.ndarray, pd.core.frame.DataFrame]:
+            if cDat.shape[0] > 0 and cDat.shape[1] > 0:
+                return True
+    return False
+
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, sJoin=GC.S_USC):
     return sJoin.join([str(s) for s in itS if len(str(s)) > 0]).strip()
