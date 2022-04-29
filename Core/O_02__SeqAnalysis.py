@@ -100,39 +100,54 @@ class SeqAnalysis(BaseClass):
 
     # --- methods for obtaining the list of input Nmer-sequences --------------
     def getLIPosPyl(self, sFullSeq):
-        lIPosPyl, cDfr = [], self.dfrInpSeq
-        if self.dITp['sPepPIP'] in cDfr.columns:
-            dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']] == sFullSeq]
-            lIPosPyl = dfrCSeq[self.dITp['sPepPIP']].unique()
-        return [i - 1 for i in lIPosPyl]
+        if self.dITp['reduceFullToNmerSeq']:
+            return [self.dITp['iCentNmer']]
+        else:
+            lIPosPyl, cDfr = [], self.dfrInpSeq
+            if self.dITp['sPepPIP'] in cDfr.columns:
+                dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']] == sFullSeq]
+                lIPosPyl = dfrCSeq[self.dITp['sPepPIP']].unique()
+            return [i - 1 for i in lIPosPyl]
 
-    def reduceLSFullSeq(self, lSNmer=[], iS=None, iE=None):
+    def fillLFullSeq(self, lSFullSeq=[], sTxt='', stT=None):
+        for n, sSq in enumerate(lSFullSeq):
+            lI = self.getLIPosPyl(sFullSeq=sSq)
+            self.lFullSeq.append(FullSeq(self.dITp, sSq=sSq, lIPosPyl=lI))
+            GF.showProgress(N=len(lSFullSeq), n=n, modeDisp=self.dITp['mDsp'],
+                            varText=sTxt, startTime=stT)
+        print('Created list of full input sequences.')
+
+    def getRedLFullSeq(self, lSNmer=[], iS=None, iE=None, stT=None):
         if not self.dITp['reduceFullToNmerSeq']:
-            return None
+            return None, iS, iE
         lSFull, iS, iE = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE)
-        lSNmer = SF.getLSNmerSeq(self.dITp)
+        lSNmer = SF.getLSNmerSeq(self.dITp, self.dfrInpSeq, lSFull, lSNmer)
+        lSFullRed, sNS = [], 'Nmer sequences [getRedLFullSeq]'
+        sFS = 'full sequences [getRedLFullSeq]'
+        for n, sNMer in enumerate(lSNmer):
+            GF.fillCondList(elCond=sNMer, lToFill=lSFullRed, lLoop=lSFull)
+            GF.showProgress(N=len(lSNmer), n=n, modeDisp=self.dITp['mDsp'],
+                            varText=sNS, startTime=stT)
+        self.fillLFullSeq(lSFullSeq=lSFullRed, sTxt=sFS, stT=stT)
+        return lSFullRed, iS, iE
 
     def getLFullSeq(self, iS=None, iE=None, stT=None):
+        lSFull = None
         if self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns:
             print('Creating list of full input sequences...')
-            mDsp, sFS = self.dITp['mDsp'], 'full sequences [getLFullSeq]'
+            sFS = 'full sequences [getLFullSeq]'
             lSFull, iS, iE = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE)
-            for n, sSq in enumerate(lSFull):
-                lI = self.getLIPosPyl(sFullSeq=sSq)
-                self.lFullSeq.append(FullSeq(self.dITp, sSq=sSq, lIPosPyl=lI))
-                GF.showProgress(N=len(lSFull), n=n, modeDisp=mDsp,
-                                varText=sFS, startTime=stT)
-            print('Created list of full input sequences...')
+            self.fillLFullSeq(lSFullSeq=lSFull, sTxt=sFS, stT=stT)
         return lSFull, iS, iE
 
     def getLNmerSeq(self, lSFull=[], lSNmer=[], stT=None):
         print('Creating list of Nmer input sequences...')
-        mDsp, sNS = self.dITp['mDsp'], 'Nmer sequences [getLNmerSeq]'
+        sNS = 'Nmer sequences [getLNmerSeq]'
         lSNmer = SF.getLSNmerSeq(self.dITp, self.dfrInpSeq, lSFull, lSNmer)
         for n, sSq in enumerate(lSNmer):
             self.lNmerSeq.append(NmerSeq(self.dITp, sSq=sSq))
-            GF.showProgress(N=len(lSNmer), n=n, modeDisp=mDsp, varText=sNS,
-                            startTime=stT)
+            GF.showProgress(N=len(lSNmer), n=n, modeDisp=self.dITp['mDsp'],
+                            varText=sNS, startTime=stT)
         print('Created list of Nmer input sequences.')
         return lSNmer
 
@@ -143,8 +158,12 @@ class SeqAnalysis(BaseClass):
             lSNmerSeq = self.loadSerOrList(pF=self.dPF['LInpSeq'], iC=0,
                                            toList=True)
         self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
-        lSFullSeq, iS, iE = self.getLFullSeq()
-        lSNmerSeq = self.getLNmerSeq(lSFullSeq, lSNmerSeq)
+        if self.dITp['reduceFullToNmerSeq']:
+            lSFullSeq, iS, iE = self.getRedLFullSeq(lSNmerSeq, iS, iE, stT=stT)
+        # if not (self.dITp['reduceFullToNmerSeq'] and GF.Xist(lSFullSeq)):
+        else:
+            lSFullSeq, iS, iE = self.getLFullSeq(iS, iE, stT=stT)
+        lSNmerSeq = self.getLNmerSeq(lSFullSeq, lSNmerSeq, stT=stT)
         SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'],
                   sFE=GF.joinS([self.getSFResEnd(), iS, iE]))
         self.updateDPFVal()
@@ -232,7 +251,7 @@ class SeqAnalysis(BaseClass):
         cDLenSeq = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNmer'])
         cTim.updateTimes(iMth=4, stTMth=cStT, endTMth=time.time())
         for n, cSeqF in enumerate(self.lFullSeq):
-            for cLen, lSSeqNmer in cDLenSeq.items():
+            for lSSeqNmer in cDLenSeq.values():
                 cStT = time.time()
                 dIPosSeq = cSeqF.getDictPosSeq(lSSeq2F=lSSeqNmer)
                 cTim.updateTimes(iMth=5, stTMth=cStT, endTMth=time.time())
@@ -330,7 +349,8 @@ class SeqAnalysis(BaseClass):
             GF.pickleSaveDict(cD=self.dSnipX, pF=self.dPF['SnipDictX'])
             if self.dITp['saveAsDfrX']:
                 self.dfrSnipX = self.convDictToDfrX()
-                self.dfrSnipX.index = self.dfrSnipX[self.dITp['sSnippet']]
+                lIdx = self.dfrSnipX[self.dITp['sSnippet']].to_list()
+                self.dfrSnipX.index = lIdx
                 self.saveDfr(self.dfrSnipX, pF=self.dPF['SnipDfrX'],
                              saveIdx=True, idxLbl=False, saveAnyway=True)
 

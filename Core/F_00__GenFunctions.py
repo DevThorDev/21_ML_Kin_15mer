@@ -199,6 +199,14 @@ def restrInt(cIt, lRestrLen=[]):
 def restrLenS(cIt, lRestrLen=[]):
     return restrIt(cIt=cIt, lRestrLen=lRestrLen, useLenS=True)
 
+# --- Functions handling lists ------------------------------------------------
+def fillCondList(elCond, lToFill=[], lLoop=[], lUniqEl=True):
+    for elCheckContain in lLoop:
+        if elCond in elCheckContain:
+            if not lUniqEl or elCond not in lToFill:
+                lToFill.append(elCond)
+            break
+
 # --- Functions handling dictionaries -----------------------------------------
 def addIfAbsent(lD, cK, cV=None):
     for cD in lD:

@@ -24,24 +24,37 @@ convSnipXToProbTbl = True
 useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
 
 # --- names and paths of files and dirs ---------------------------------------
-sFSeqCheck = GC.S_F_PROC_INP_N_MER
+# sFSeqCheck = GC.S_F_PROC_INP_N_MER
+sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
 # sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
+
 sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
 sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
 sFE = sFIEffInp.split(GC.S_US02)[1:]
-sFLInpSeq = GC.S_US02.join(['ListInputSeq'] + sFE)
-sFResWtLh = GC.S_US02.join(['WtLikelihood'] + sFE)
-sFResRelLh = GC.S_US02.join(['RelLikelihood'] + sFE)
-sFSnipDictS = GC.S_US02.join(['SnipDictS'] + sFE)
-sFSnipDictX = GC.S_US02.join(['SnipDictX'] + sFE)
-sFSnipDfrS = GC.S_US02.join(['SnipDfrS'] + sFE)
-sFSnipDfrX = GC.S_US02.join(['SnipDfrX'] + sFE)
-sFProbTbl = GC.S_US02.join(['ProbTable'] + sFE)
-sFResWtProb = GC.S_US02.join(['WtProb'] + sFE)
-sFResRelProb = GC.S_US02.join(['RelProb'] + sFE)
+sFLInpSeq = GC.S_US02.join(['ListNmerInputSeq'] + sFE)
+
+sFResWtLh = GC.S_US02.join(['WtLikelihood_FullSeq'] + sFE)
+sFResRelLh = GC.S_US02.join(['RelLikelihood_FullSeq'] + sFE)
+sFSnipDictS = GC.S_US02.join(['SnipDictS_FullSeq'] + sFE)
+sFSnipDictX = GC.S_US02.join(['SnipDictX_FullSeq'] + sFE)
+sFSnipDfrS = GC.S_US02.join(['SnipDfrS_FullSeq'] + sFE)
+sFSnipDfrX = GC.S_US02.join(['SnipDfrX_FullSeq'] + sFE)
+sFProbTbl = GC.S_US02.join(['ProbTable_FullSeq'] + sFE)
+sFResWtProb = GC.S_US02.join(['WtProb_FullSeq'] + sFE)
+sFResRelProb = GC.S_US02.join(['RelProb_FullSeq'] + sFE)
+if reduceFullToNmerSeq:
+    sFResWtLh = GC.S_US02.join(['WtLikelihood_RedSeq'] + sFE)
+    sFResRelLh = GC.S_US02.join(['RelLikelihood_RedSeq'] + sFE)
+    sFSnipDictS = GC.S_US02.join(['SnipDictS_RedSeq'] + sFE)
+    sFSnipDictX = GC.S_US02.join(['SnipDictX_RedSeq'] + sFE)
+    sFSnipDfrS = GC.S_US02.join(['SnipDfrS_RedSeq'] + sFE)
+    sFSnipDfrX = GC.S_US02.join(['SnipDfrX_RedSeq'] + sFE)
+    sFProbTbl = GC.S_US02.join(['ProbTable_RedSeq'] + sFE)
+    sFResWtProb = GC.S_US02.join(['WtProb_RedSeq'] + sFE)
+    sFResRelProb = GC.S_US02.join(['RelProb_RedSeq'] + sFE)
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None            # number or None
