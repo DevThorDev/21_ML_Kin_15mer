@@ -117,13 +117,13 @@ class SeqAnalysis(BaseClass):
                             varText=sTxt, startTime=stT)
         print('Created list of full input sequences.')
 
-    def getRedLFullSeq(self, lSNmer=[], iS=None, iE=None, stT=None):
+    def getDFullSeq(self, lSNmer=[], iS=None, iE=None, stT=None):
         if not self.dITp['reduceFullToNmerSeq']:
             return None, iS, iE
         lSFull, iS, iE = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE)
         lSNmer = SF.getLSNmerSeq(self.dITp, self.dfrInpSeq, lSFull, lSNmer)
-        lSFullRed, sNS = [], 'Nmer sequences [getRedLFullSeq]'
-        sFS = 'full sequences [getRedLFullSeq]'
+        lSFullRed, sNS = [], 'Nmer sequences [getDFullSeq]'
+        sFS = 'full sequences [getDFullSeq]'
         for n, sNMer in enumerate(lSNmer):
             GF.fillCondList(elCond=sNMer, lToFill=lSFullRed, lLoop=lSFull)
             GF.showProgress(N=len(lSNmer), n=n, modeDisp=self.dITp['mDsp'],
@@ -159,7 +159,7 @@ class SeqAnalysis(BaseClass):
                                            toList=True)
         self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
         if self.dITp['reduceFullToNmerSeq']:
-            lSFullSeq, iS, iE = self.getRedLFullSeq(lSNmerSeq, iS, iE, stT=stT)
+            dSFullSeq, iS, iE = self.getDFullSeq(lSNmerSeq, iS, iE, stT=stT)
         # if not (self.dITp['reduceFullToNmerSeq'] and GF.Xist(lSFullSeq)):
         else:
             lSFullSeq, iS, iE = self.getLFullSeq(iS, iE, stT=stT)
