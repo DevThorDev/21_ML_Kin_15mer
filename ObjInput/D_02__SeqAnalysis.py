@@ -17,8 +17,8 @@ saveAsDfrS = True
 saveAsDfrX = True
 calcWtProb = False
 calcRelProb = False
+calcCondProb = True
 
-reduceFullToNmerSeq = True
 convSnipXToProbTbl = True
 
 useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
@@ -42,19 +42,11 @@ sFSnipDictS = GC.S_US02.join(['SnipDictS_FullSeq'] + sFE)
 sFSnipDictX = GC.S_US02.join(['SnipDictX_FullSeq'] + sFE)
 sFSnipDfrS = GC.S_US02.join(['SnipDfrS_FullSeq'] + sFE)
 sFSnipDfrX = GC.S_US02.join(['SnipDfrX_FullSeq'] + sFE)
-sFProbTbl = GC.S_US02.join(['ProbTable_FullSeq'] + sFE)
+sFProbTblFS = GC.S_US02.join(['ProbTable_FullSeq'] + sFE)
+sFProbTblCP = GC.S_US02.join(['ProbTable_CondProb'] + sFE)
 sFResWtProb = GC.S_US02.join(['WtProb_FullSeq'] + sFE)
 sFResRelProb = GC.S_US02.join(['RelProb_FullSeq'] + sFE)
-if reduceFullToNmerSeq:
-    sFResWtLh = GC.S_US02.join(['WtLikelihood_RedSeq'] + sFE)
-    sFResRelLh = GC.S_US02.join(['RelLikelihood_RedSeq'] + sFE)
-    sFSnipDictS = GC.S_US02.join(['SnipDictS_RedSeq'] + sFE)
-    sFSnipDictX = GC.S_US02.join(['SnipDictX_RedSeq'] + sFE)
-    sFSnipDfrS = GC.S_US02.join(['SnipDfrS_RedSeq'] + sFE)
-    sFSnipDfrX = GC.S_US02.join(['SnipDfrX_RedSeq'] + sFE)
-    sFProbTbl = GC.S_US02.join(['ProbTable_RedSeq'] + sFE)
-    sFResWtProb = GC.S_US02.join(['WtProb_RedSeq'] + sFE)
-    sFResRelProb = GC.S_US02.join(['RelProb_RedSeq'] + sFE)
+
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None            # number or None
@@ -129,7 +121,7 @@ dIO = {# --- general
        'saveAsDfrX': saveAsDfrX,
        'calcWtProb': calcWtProb,
        'calcRelProb': calcRelProb,
-       'reduceFullToNmerSeq': reduceFullToNmerSeq,
+       'calcCondProb': calcCondProb,
        'convSnipXToProbTbl': convSnipXToProbTbl,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
@@ -143,7 +135,8 @@ dIO = {# --- general
        'sFSnipDictX': sFSnipDictX + GC.S_DOT + GC.S_EXT_BIN,
        'sFSnipDfrS': sFSnipDfrS + GC.S_DOT + GC.S_EXT_CSV,
        'sFSnipDfrX': sFSnipDfrX + GC.S_DOT + GC.S_EXT_CSV,
-       'sFProbTbl': sFProbTbl + GC.S_DOT + GC.S_EXT_CSV,
+       'sFProbTblFS': sFProbTblFS + GC.S_DOT + GC.S_EXT_CSV,
+       'sFProbTblCP': sFProbTblCP + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers

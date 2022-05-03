@@ -186,6 +186,24 @@ class NmerSeq(Seq):
                     if lenSeq <= maxLenSeq}
         return dPrf
 
+    # --- method for storing the conditional probabilities of subSnips --------
+    def getCondProbSubSnip(self, lFullSeq=None):
+        if lFullSeq is None and GF.Xist(self.lFullSeq):
+            lFullSeq = self.lFullSeq
+        if not GF.Xist(lFullSeq):
+            print('ERROR: List of full sequences is', lFullSeq)
+            assert False
+        dCondProbSnip = {}
+        for lenSnipSub in self.dITp['lLenNmer']:
+            for cSeqF in lFullSeq:
+                lIP = GF.getLCentPosSSub(cSeqF.sSeq, sSub=self.sSeq, overLap=True)
+                if len(lIP) > 0:
+                    lB = [(1 if iPos in cSeqF.lIPyl else 0) for iPos in lIP]
+                    nPyl, nOcc = sum(lB), len(lB)
+                    cPrb = round(nPyl/nOcc, GC.R08)
+                    dIPosSeq[sSeq2F] = (lIP, lB, nPyl, nOcc, cPrb)
+        return dIPosSeq
+
 # -----------------------------------------------------------------------------
 class FullSeq(Seq):
     # --- initialisation of the class -----------------------------------------

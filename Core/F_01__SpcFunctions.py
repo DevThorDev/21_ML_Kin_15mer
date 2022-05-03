@@ -83,14 +83,14 @@ def getLSFullSeq(dITp, dfrInpSeq, iS=None, iE=None):
     lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']].unique())
     return GF.getItStartToEnd(lSFullSeq, iS, iE)
 
-def getLSNmerSeq(dITp, dfrInpSeq, lSFull=[], lSNmer=[]):
+def getLSNmer(dITp, dfrInpSeq, lSFull=[], lSNmer=[]):
     if lSNmer is None and dITp['sCNmer'] in dfrInpSeq.columns:
         if dITp['sCCodeSeq'] in dfrInpSeq.columns:
-            if dITp['reduceFullToNmerSeq']:
-                dfrCSeq = dfrInpSeq
-            else:
-                # reduce to Nmer sequences with corresponding full sequences
-                dfrCSeq = dfrInpSeq[dfrInpSeq[dITp['sCCodeSeq']].isin(lSFull)]
+            # if dITp['reduceFullToNmerSeq']:
+            #     dfrCSeq = dfrInpSeq
+            # else:
+            # reduce to Nmer sequences with corresponding full sequences
+            dfrCSeq = dfrInpSeq[dfrInpSeq[dITp['sCCodeSeq']].isin(lSFull)]
             lSNmer = list(dfrCSeq[dITp['sCNmer']].unique())
         else:
             lSNmer = list(dfrInpSeq[dITp['sCNmer']].unique())
