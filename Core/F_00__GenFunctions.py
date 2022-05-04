@@ -142,7 +142,7 @@ def addSCentNmerToDict(dNum, dENmer, iCNmer):
                 sCentNmer = sNmer[(iCNmer - k):(iCNmer + k + 1)]
                 addToDictDNum(dNum, sEff, sCentNmer)
 
-def findAllSSubInStr(sFull, sSub, overLap=False):
+def findAllSSubInStr(sFull, sSub, overLap=True):
     i = sFull.find(sSub)
     while i >= 0:
         yield i
@@ -151,7 +151,7 @@ def findAllSSubInStr(sFull, sSub, overLap=False):
 def startPosToCentPos(iPSt, sSeq):
     return iPSt + len(sSeq)//2
 
-def getLCentPosSSub(sFull, sSub, overLap=False):
+def getLCentPosSSub(sFull, sSub, overLap=True):
     return [startPosToCentPos(iSt, sSub)
             for iSt in findAllSSubInStr(sFull, sSub, overLap=overLap)]
 
@@ -206,6 +206,16 @@ def fillCondList(elCond, lToFill=[], lLoop=[], lUniqEl=True):
             if not lUniqEl or elCond not in lToFill:
                 lToFill.append(elCond)
             break
+
+def fillLValSnip(lValSnip, lIdxPos=[], lIdxPyl=[]):
+    if len(lIdxPos) > 0:
+        lB = [(1 if iPos in lIdxPyl else 0) for iPos in lIdxPos]
+        nPyl, nOcc = sum(lB), len(lB)
+        lValSnip[0] += nPyl
+        lValSnip[1] += nOcc
+        lValSnip[2] += nPyl/nOcc
+        return 1
+    return 0
 
 # --- Functions handling dictionaries -----------------------------------------
 def addIfAbsent(lD, cK, cV=None):
@@ -349,11 +359,12 @@ def fillDNOcc(dfrNOcc, dNOcc, sNmer=GC.S_N_MER, sLenNmer=GC.S_LEN_N_MER):
     for sNmer, cLenNmer in zip(lNmer, lLenNmer):
         addToDictL(dNOcc, cLenNmer, sNmer)
 
-def dictToDfr(cD, dropNA=True, dropHow='any', srtBy=None, srtAsc=None):
+def dictToDfr(cD, idxDfr=None, dropNA=False, dropHow='any', srtBy=None,
+              srtAsc=None):
     if dropNA:
-        pdDfr = pd.DataFrame(cD).dropna(axis=0, how=dropHow)
+        pdDfr = pd.DataFrame(cD, index=idxDfr).dropna(axis=0, how=dropHow)
     else:
-        pdDfr = pd.DataFrame(cD)
+        pdDfr = pd.DataFrame(cD, index=idxDfr)
     if srtBy is not None:
         if srtAsc is not None:
             pdDfr.sort_values(axis=0, by=srtBy, ascending=srtAsc, inplace=True,

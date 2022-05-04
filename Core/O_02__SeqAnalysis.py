@@ -19,7 +19,7 @@ class SeqAnalysis(BaseClass):
         self.descO = 'Analysis of Nmer-sequences'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.lSFull, self.lSNmer, self.lFullSeq, self.lNmerSeq = [], [], [], []
-        self.dCondProbSnip = {}
+        self.d2CondProbSnip = {}
         self.getPDir()
         self.fillDPFVal()
         self.loadInpDfrs()
@@ -102,9 +102,6 @@ class SeqAnalysis(BaseClass):
 
     # --- methods for obtaining the list of input Nmer-sequences --------------
     def getLIPosPyl(self, sFullSeq):
-        # if self.dITp['reduceFullToNmerSeq']:
-        #     return [self.dITp['iCentNmer']]
-        # else:
         lIPosPyl, cDfr = [], self.dfrInpSeq
         if self.dITp['sPepPIP'] in cDfr.columns:
             dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']] == sFullSeq]
@@ -142,23 +139,19 @@ class SeqAnalysis(BaseClass):
 
     def getLInpSeq(self, cTim, lSSeq=None, readF=True, stT=None):
         cStT = time.time()
-        [iS, iE], self.lSNmer = self.dITp['lIStartEnd'], lSSeq
-        if readF:
-            if os.path.isfile(self.dPF['LInpSeq']) and self.lSNmer is None:
-                self.lSNmer = self.loadSerOrList(pF=self.dPF['LInpSeq'], iC=0,
-                                                 toList=True)
+        pFIS, self.lSNmer, saveLS = self.dPF['LInpSeq'], lSSeq, True
+        [iS, iE] = self.dITp['lIStartEnd']
+        if os.path.isfile(pFIS) and self.lSNmer is None and readF:
+            self.lSNmer = self.loadSerOrList(pF=pFIS, iC=0, toList=True)
+            saveLS = False
         self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
-        # if self.dITp['reduceFullToNmerSeq']:
-        #     dSFullSeq, iS, iE = self.getDCondProbSnip(lSNmerSeq, iS, iE, stT=stT)
-        # else:
-        #     lSFullSeq, iS, iE = self.getLFullSeq(iS, iE, stT=stT)
         iS, iE = self.getLFullSeq(iS, iE, stT=stT)
         self.getLNmerSeq(stT=stT)
         SF.modLSF(self.dITp, lSKeyF=self.dITp['lSKeyFRes'],
                   sFE=GF.joinS([self.getSFResEnd(), iS, iE]))
         self.updateDPFVal()
-        self.saveListAsSer(self.lSNmer, pF=self.dPF['LInpSeq'],
-                           sName=self.dITp['sNmer'])
+        if saveLS:
+            self.saveListAsSer(self.lSNmer, pF=pFIS, sName=self.dITp['sNmer'])
         cTim.updateTimes(iMth=1, stTMth=cStT, endTMth=time.time())
 
     # --- methods for generating the {seq. length: seq. list} dictionary ------
@@ -204,6 +197,7 @@ class SeqAnalysis(BaseClass):
 
     def lhAnalysisLoop(self, lEff=[None], lSSeq=None, stT=None):
         dLV, d3, k, N = {}, {}, 0, len(lSSeq)*len(lEff)
+        sNS = 'Nmer sequences [lhAnalysisLoop]'
         for cNmerSeq in self.lNmerSeq:
             for cEff in lEff:
                 serLh, cEff, maxLSnip = self.getRelLikelihoods(cEff)
@@ -212,8 +206,7 @@ class SeqAnalysis(BaseClass):
                 self.complementDLV(dLV)
                 k += 1
                 GF.showProgress(N=N, n=k, modeDisp=self.dITp['mDsp'],
-                                varText='Nmer sequences [lhAnalysisLoop]',
-                                startTime=stT)
+                                varText=sNS, startTime=stT)
         return dLV, d3
 
     def performLhAnalysis(self, cTim, lEff=[None], lSSeq=None, stT=None):
@@ -240,6 +233,7 @@ class SeqAnalysis(BaseClass):
         cStT = time.time()
         cDLenSeq = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNmer'])
         cTim.updateTimes(iMth=4, stTMth=cStT, endTMth=time.time())
+        sFS = 'full sequences [probAnalysisLoop]'
         for n, cSeqF in enumerate(self.lFullSeq):
             for lSSeqNmer in cDLenSeq.values():
                 cStT = time.time()
@@ -249,8 +243,7 @@ class SeqAnalysis(BaseClass):
                 self.addToDictSnip(cSeqF, dIPosSeq)
                 cTim.updateTimes(iMth=6, stTMth=cStT, endTMth=time.time())
             GF.showProgress(N=N, n=n, modeDisp=self.dITp['mDsp'],
-                            varText='full sequences [probAnalysisLoop]',
-                            startTime=stT)
+                            varText=sFS, startTime=stT)
         print('Performed calculation of Nmer sequence probabilities.')
 
     def performProbAnalysis(self, cTim, lEff=[None], lSSeq=None, stT=None):
@@ -269,6 +262,18 @@ class SeqAnalysis(BaseClass):
             self.printDictSnipX(lSnipLen=[7], cSnip='AQRTLHG')
             self.calcProbTable(cTim=cTim, lSSeq=lSSeq, stT=stT)
 
+    def probTableLoop(self, lSerD, nXt, nSeq=0, stT=None):
+        sNS = 'Nmer sequences [calcProbTable]'
+        for i, cNmerS in enumerate(self.lNmerSeq):
+            dProf = cNmerS.getProfileDict(maxLenSeq=max(self.dITp['lLenNmer']))
+            for j, sSS in enumerate(dProf.values()):
+                if sSS in self.dSnipX:
+                    lDat = GF.calcPylProb(cSS=sSS, dCSS=self.dSnipX[sSS])
+                    for k, sCX in enumerate(self.dITp['lSCDfrProbX']):
+                        lSerD[j*nXt + k].at[i] = lDat[k]
+            GF.showProgress(N=nSeq, n=i, modeDisp=self.dITp['mDsp'],
+                            varText=sNS, startTime=stT)
+
     def calcProbTable(self, cTim, lSSeq=None, stT=None):
         if not self.dITp['convSnipXToProbTbl']:
             return None
@@ -279,31 +284,31 @@ class SeqAnalysis(BaseClass):
         lSSeq, nSeq = [cSeq.sSeq for cSeq in self.lNmerSeq], len(self.lNmerSeq)
         lSC, nXt =  self.dITp['lSCMerAll'], len(self.dITp['lSCXt'])
         lSerD = [GF.iniPdSer(shape=(nSeq,), nameS=sC) for sC in lSC]
-        for i, cNmerS in enumerate(self.lNmerSeq):
-            dProf = cNmerS.getProfileDict(maxLenSeq=max(self.dITp['lLenNmer']))
-            for j, sSS in enumerate(dProf.values()):
-                if sSS in self.dSnipX:
-                    lDat = GF.calcPylProb(cSS=sSS, dCSS=self.dSnipX[sSS])
-                    for k, sCX in enumerate(self.dITp['lSCDfrProbX']):
-                        lSerD[j*nXt + k].at[i] = lDat[k]
-            GF.showProgress(N=nSeq, n=i, modeDisp=self.dITp['mDsp'],
-                            varText='Nmer sequences [calcProbTable]',
-                            startTime=stT)
+        self.probTableLoop(lSerD, nXt=nXt, nSeq=nSeq, stT=stT)
         self.dfrProbTbl = GF.concLSerAx1(lSerD)
         self.dfrProbTbl.index = lSSeq
-        self.saveDfr(self.dfrProbTbl, pF=self.dPF['ProbTblFS'], saveAnyway=True)
+        self.saveDfr(self.dfrProbTbl, pF=self.dPF['ProbTblFS'],
+                     saveAnyway=True)
         cTim.updateTimes(iMth=8, stTMth=cStT, endTMth=time.time())
 
-    def getDCondProbSnip(self):
-        for cNmerSeq in self.lNmerSeq:
-            self.dCondProbSnip[cNmerSeq.sSeq] = cNmerSeq.getCondProbSubSnip()
+    def getD2CondProbSnip(self, stT=None):
+        nSeq, sNS = len(self.lNmerSeq), 'Nmer sequences [getD2CondProbSnip]'
+        for i, cNmerS in enumerate(self.lNmerSeq):
+            dSub = cNmerS.getCondProbSubSnip(self.dITp, lFullSeq=self.lFullSeq)
+            self.d2CondProbSnip[cNmerS.sSeq] = dSub
+            GF.showProgress(N=nSeq, n=i, modeDisp=self.dITp['mDsp'],
+                            varText=sNS, startTime=stT)
 
     def performCondProbAnalysis(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if self.dITp['calcCondProb']:
             self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, stT=stT)
-            if not GF.Xist(self.dCondProbSnip):
-                self.getDCondProbSnip(cTim=cTim, lSSeq=lSSeq, stT=stT)
-
+            cStT = time.time()
+            if not GF.Xist(self.d2CondProbSnip):
+                self.getD2CondProbSnip(stT=stT)
+            cTim.updateTimes(iMth=9, stTMth=cStT, endTMth=time.time())
+            cStT = time.time()
+            self.saveD2CondProbSnipAsDfr()
+            cTim.updateTimes(iMth=10, stTMth=cStT, endTMth=time.time())
 
     # --- methods for printing results ----------------------------------------
 
@@ -324,7 +329,7 @@ class SeqAnalysis(BaseClass):
             for sC, cV in zip(lSCDfr, lElRow):
                 GF.addToDictL(dLV, cK=sC, cE=cV)
         return GF.dictToDfr(dLV, srtBy=self.dITp['lSrtByDfrProbS'],
-                            srtAsc=self.dITp['lSrtAscDfrProbS'])
+                            srtAsc=self.dITp['lSrtAscDfrProbS'], dropNA=True)
 
     def saveDfrSnipS(self):
         if GF.Xist(self.dSnipS):
@@ -343,7 +348,7 @@ class SeqAnalysis(BaseClass):
                 for sC, cV in zip(lSCDfr, lElRow):
                     GF.addToDictL(dLV, cK=sC, cE=cV)
         return GF.dictToDfr(dLV, srtBy=self.dITp['lSrtByDfrProbX'],
-                            srtAsc=self.dITp['lSrtAscDfrProbX'])
+                            srtAsc=self.dITp['lSrtAscDfrProbX'], dropNA=True)
 
     def saveDfrSnipX(self):
         if GF.Xist(self.dSnipX):
@@ -369,5 +374,19 @@ class SeqAnalysis(BaseClass):
             assert False
         else:
             return self.dfrSnipX.to_dict(orient='dict')
+
+    def saveD2CondProbSnipAsDfr(self):
+        if GF.Xist(self.d2CondProbSnip):
+            dLV, lSCDfr = {}, self.dITp['lSCMerAll']
+            for cDSub in self.d2CondProbSnip.values():
+                lElRow = []
+                for sSnip, lV in cDSub.items():
+                    lElRow += ([sSnip] + lV)
+                assert len(lElRow) == len(lSCDfr)
+                for sC, cV in zip(lSCDfr, lElRow):
+                    GF.addToDictL(dLV, cK=sC, cE=cV)
+            dfrVal = GF.dictToDfr(dLV, idxDfr=list(self.d2CondProbSnip))
+            self.saveDfr(dfrVal, pF=self.dPF['ProbTblCP'], saveIdx=True,
+                         idxLbl=self.dITp['sCNmer'], saveAnyway=True)
 
 ###############################################################################

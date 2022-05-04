@@ -169,7 +169,7 @@ class NmerSeq(Seq):
         sIn = (GC.S_WV80 + GC.S_NEWL + GC.S_SP04 + 'Sequence string: ' +
                self.sSeq + GC.S_NEWL + 'has central position index ' +
                str(self.iPCent) + GC.S_NEWL + 'and central position ' +
-               self.sPCent + GC.S_NEWL + 'The position dictionary is:' +
+               self.sPCent + GC.S_NEWL + 'The profile dictionary is:' +
                GC.S_NEWL + str(self.dPrf) + GC.S_NEWL + GC.S_WV80)
         return sIn
 
@@ -187,22 +187,22 @@ class NmerSeq(Seq):
         return dPrf
 
     # --- method for storing the conditional probabilities of subSnips --------
-    def getCondProbSubSnip(self, lFullSeq=None):
-        if lFullSeq is None and GF.Xist(self.lFullSeq):
-            lFullSeq = self.lFullSeq
+    def getCondProbSubSnip(self, dITp, lFullSeq):
         if not GF.Xist(lFullSeq):
             print('ERROR: List of full sequences is', lFullSeq)
             assert False
-        dCondProbSnip = {}
-        for lenSnipSub in self.dITp['lLenNmer']:
+        dCondP = {}
+        dProf = self.getProfileDict(maxLenSeq=max(dITp['lLenNmer']))
+        for sSnip in dProf.values():
+            lV, n = [0, 0, 0.], 0
             for cSeqF in lFullSeq:
-                lIP = GF.getLCentPosSSub(cSeqF.sSeq, sSub=self.sSeq, overLap=True)
-                if len(lIP) > 0:
-                    lB = [(1 if iPos in cSeqF.lIPyl else 0) for iPos in lIP]
-                    nPyl, nOcc = sum(lB), len(lB)
-                    cPrb = round(nPyl/nOcc, GC.R08)
-                    dIPosSeq[sSeq2F] = (lIP, lB, nPyl, nOcc, cPrb)
-        return dIPosSeq
+                lIPos = GF.getLCentPosSSub(sFull=cSeqF.sSeq, sSub=sSnip)
+                n += GF.fillLValSnip(lV, lIdxPos=lIPos, lIdxPyl=cSeqF.lIPyl)
+            if n > 0:
+                dCondP[sSnip] = (lV[:-1] + [lV[-1]/n])
+            else:
+                dCondP[sSnip] = lV
+        return dCondP
 
 # -----------------------------------------------------------------------------
 class FullSeq(Seq):
@@ -241,7 +241,7 @@ class FullSeq(Seq):
     def getDictPosSeq(self, lSSeq2F):
         dIPosSeq = {}
         for sSeq2F in lSSeq2F:
-            lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F, overLap=True)
+            lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F)
             if len(lIPos) > 0:
                 lB = [(1 if iPos in self.lIPyl else 0) for iPos in lIPos]
                 nPyl, nOcc = sum(lB), len(lB)
@@ -263,12 +263,15 @@ class Timing:
         self.elT_02_6_performProbAnalysis_C = 0.
         self.elT_02_7_performProbAnalysis_D = 0.
         self.elT_02_8_calcProbTable = 0.
+        self.elT_02_9_getD2CondProbSnip = 0.
+        self.elT_02_10_saveD2CondProbSnipAsDfr = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
         self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
                       'performProbAnalysis_A', 'performProbAnalysis_B',
                       'performProbAnalysis_C', 'performProbAnalysis_D',
-                      'calcProbTable']
+                      'calcProbTable', 'getD2CondProbSnip',
+                      'saveD2CondProbSnipAsDfr']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -279,7 +282,9 @@ class Timing:
                      self.elT_02_5_performProbAnalysis_B,
                      self.elT_02_6_performProbAnalysis_C,
                      self.elT_02_7_performProbAnalysis_D,
-                     self.elT_02_8_calcProbTable]
+                     self.elT_02_8_calcProbTable,
+                     self.elT_02_9_getD2CondProbSnip,
+                     self.elT_02_10_saveD2CondProbSnipAsDfr]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
         if stTMth is not None and endTMth is not None:
@@ -300,6 +305,10 @@ class Timing:
                 self.elT_02_7_performProbAnalysis_D += elT
             elif iMth == 8:
                 self.elT_02_8_calcProbTable += elT
+            elif iMth == 9:
+                self.elT_02_9_getD2CondProbSnip += elT
+            elif iMth == 10:
+                self.elT_02_10_saveD2CondProbSnipAsDfr += elT
             self.elT_Sum += elT
             self.updateLElTimes()
 
@@ -322,6 +331,10 @@ class Timing:
                str(round(self.elT_02_7_performProbAnalysis_D, self.rdDig)) +
                GC.S_NEWL + 'Method 8 | "calcProbTable":\t' +
                str(round(self.elT_02_8_calcProbTable, self.rdDig)) +
+               GC.S_NEWL + 'Method 9 | "getD2CondProbSnip":\t' +
+               str(round(self.elT_02_9_getD2CondProbSnip, self.rdDig)) +
+               GC.S_NEWL + 'Method 10 | "saveD2CondProbSnipAsDfr":\t' +
+               str(round(self.elT_02_10_saveD2CondProbSnipAsDfr, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 
