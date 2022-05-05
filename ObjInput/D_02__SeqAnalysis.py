@@ -15,9 +15,12 @@ calcSnipS = True
 calcSnipX = True
 saveAsDfrS = True
 saveAsDfrX = True
+
+calcTotalProb = True
+calcCondProb = True
+
 calcWtProb = False
 calcRelProb = False
-calcCondProb = True
 
 convSnipXToProbTbl = True
 
@@ -43,6 +46,7 @@ sFSnipDictX = GC.S_US02.join(['SnipDictX_FullSeq'] + sFE)
 sFSnipDfrS = GC.S_US02.join(['SnipDfrS_FullSeq'] + sFE)
 sFSnipDfrX = GC.S_US02.join(['SnipDfrX_FullSeq'] + sFE)
 sFProbTblFS = GC.S_US02.join(['ProbTable_FullSeq'] + sFE)
+sFProbTblTP = GC.S_US02.join(['ProbTable_TotalProb'] + sFE)
 sFProbTblCP = GC.S_US02.join(['ProbTable_CondProb'] + sFE)
 sFResWtProb = GC.S_US02.join(['WtProb_FullSeq'] + sFE)
 sFResRelProb = GC.S_US02.join(['RelProb_FullSeq'] + sFE)
@@ -65,6 +69,8 @@ sFullSeq = 'seqTarget'
 sSnipPyl = 'snipPyl'
 sSnipTtl = 'snipTtl'
 sSnipProb = 'snipProb'
+sTtlProb = GC.S_TOTAL_PROB
+sCndProb = GC.S_COND_PROB
 sWtProb = 'wtProb'
 sRelProb = 'relProb'
 sInCombRes = 'inCombRes'
@@ -105,8 +111,8 @@ dWtsLenSeq = {1: 0.1,
 
 # === derived values and input processing =====================================
 lSKeyFRes = ['sFLInpSeq', 'sFResWtLh', 'sFResRelLh', 'sFSnipDictS',
-             'sFSnipDictX', 'sFSnipDfrS', 'sFSnipDfrX', 'sFResWtProb',
-             'sFResRelProb']
+             'sFSnipDictX', 'sFSnipDfrS', 'sFSnipDfrX', 'sFProbTblFS',
+             'sFProbTblTP', 'sFProbTblCP', 'sFResWtProb', 'sFResRelProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -119,9 +125,10 @@ dIO = {# --- general
        'calcSnipX': calcSnipX,
        'saveAsDfrS': saveAsDfrS,
        'saveAsDfrX': saveAsDfrX,
+       'calcTotalProb': calcTotalProb,
+       'calcCondProb': calcCondProb,
        'calcWtProb': calcWtProb,
        'calcRelProb': calcRelProb,
-       'calcCondProb': calcCondProb,
        'convSnipXToProbTbl': convSnipXToProbTbl,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
@@ -136,6 +143,7 @@ dIO = {# --- general
        'sFSnipDfrS': sFSnipDfrS + GC.S_DOT + GC.S_EXT_CSV,
        'sFSnipDfrX': sFSnipDfrX + GC.S_DOT + GC.S_EXT_CSV,
        'sFProbTblFS': sFProbTblFS + GC.S_DOT + GC.S_EXT_CSV,
+       'sFProbTblTP': sFProbTblTP + GC.S_DOT + GC.S_EXT_CSV,
        'sFProbTblCP': sFProbTblCP + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
@@ -152,6 +160,8 @@ dIO = {# --- general
        'sSnipPyl': sSnipPyl,
        'sSnipTtl': sSnipTtl,
        'sSnipProb': sSnipProb,
+       'sTtlProb': sTtlProb,
+       'sCndProb': sCndProb,
        'sWtProb': sWtProb,
        'sRelProb': sRelProb,
        'sWtLikelihood': sWtLikelihood,

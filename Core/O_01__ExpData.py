@@ -78,7 +78,7 @@ class ExpData(BaseClass):
         print(GC.S_DS80, GC.S_NEWL, 'Rows with "NaN" in column "', cC, '": ',
               nR0-nR1, ' of ', nR0, '\t\t(', round((nR0-nR1)/nR0*100., nDig),
               '%)', GC.S_NEWL, 'Rows with length of snippet not ',
-              self.dITp['lenSDef'], ': ', nR1-nR2, ' of ', nR0, '\t(',
+              self.dITp['lenNmerDef'], ': ', nR1-nR2, ' of ', nR0, '\t(',
               round((nR1-nR2)/nR0*100., nDig), '%)', GC.S_NEWL, GC.S_ARR_LR,
               ' Remaining rows: ', nR2, GC.S_NEWL, GC.S_DS80, sep='')
 
@@ -143,7 +143,7 @@ class ExpData(BaseClass):
         nR1 = cDfr.shape[0]
         # remove lines with the wrong length of the Nmer
         cDfr[sLenS] = [len(cDfr.at[k, cCol]) for k in range(cDfr.shape[0])]
-        self.dfrNmer = cDfr[cDfr[sLenS] == self.dITp['lenSDef']]
+        self.dfrNmer = cDfr[cDfr[sLenS] == self.dITp['lenNmerDef']]
         self.dfrNmer.reset_index(drop=True, inplace=True)
         self.dfrNmer = self.dfrNmer.drop(sLenS, axis=1)
         self.fillDfrResIGen(self.dfrNmer, lR=self.dITp['lRResIG'], iSt=3)

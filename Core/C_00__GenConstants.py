@@ -78,7 +78,10 @@ S_COMBINED_OUT = S_COMBINED + 'Output'
 S_INFO = 'Info'
 S_PYL = 'Pyl'
 S_TOTAL = 'Total'
+S_COND = 'Cond'
 S_PROB = 'Prob'
+S_TOTAL_PROB = S_TOTAL + S_PROB
+S_COND_PROB = S_COND + S_PROB
 S_N_MER = 'N' + S_MER
 S_EFF = 'Eff'
 S_EFF_F = S_EFF + S_FULL
@@ -158,8 +161,8 @@ S_TRAIN_DATA = S_TRAIN + S_DATA
 S_TEST_DATA = S_TEST + S_DATA
 
 # --- predefined numbers ------------------------------------------------------
-LEN_SNIPPET_DEF = 15
-I_CENT_N_MER = LEN_SNIPPET_DEF//2
+LEN_N_MER_DEF = 15
+I_CENT_N_MER = LEN_N_MER_DEF//2
 R01 = 1
 R02 = 2
 R03 = 3

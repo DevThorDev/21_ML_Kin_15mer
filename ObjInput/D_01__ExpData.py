@@ -50,7 +50,7 @@ pDirResProb = GC.P_DIR_RES_PROB
 pDirResProb_Test = GC.P_DIR_RES_PROB_TEST
 
 # --- numbers -----------------------------------------------------------------
-lenSnippetDef = GC.LEN_SNIPPET_DEF
+lenNmerDef = GC.LEN_N_MER_DEF
 iCentNmer = GC.I_CENT_N_MER
 rndDigProp = GC.R08
 
@@ -175,7 +175,7 @@ dIO = {# --- general
        'pDirResProb': pDirResProb,
        'pDirResProb_T': pDirResProb_Test,
        # --- numbers
-       'lenSDef': lenSnippetDef,
+       'lenNmerDef': lenNmerDef,
        'iCentNmer': iCentNmer,
        'rndDigProp': rndDigProp,
        # --- strings

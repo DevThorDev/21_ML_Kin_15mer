@@ -85,8 +85,8 @@ S_N_MER = 'Nmer'
 S_LEN_N_MER = 'lenNmer'
 
 # --- predefined numbers ------------------------------------------------------
-LEN_SNIPPET_DEF = 15
-I_CENT_N_MER = LEN_SNIPPET_DEF//2
+LEN_N_MER_DEF = 15
+I_CENT_N_MER = LEN_N_MER_DEF//2
 
 # --- file name extensions ----------------------------------------------------
 xtCSV = S_DOT + S_CSV
@@ -117,7 +117,7 @@ sFResCombS = 'Combined_S_KinasesPho15mer_202202'
 sFResPropNmer = 'InfoEff_Prop15mer_202202__1_3_5_7'
 
 # --- numbers -----------------------------------------------------------------
-lenSnippetDef = LEN_SNIPPET_DEF
+lenNmerDef = LEN_N_MER_DEF
 iCentNmer = I_CENT_N_MER
 iStartCS = 0
 iEndCS = 10
@@ -208,7 +208,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'lSOvStatsRep': L_S_OV_STATS_REP,
         'lSEff': lSEff,
         # --- numbers ---------------------------------------------------------
-        'lenSnippetDef': lenSnippetDef,
+        'lenNmerDef': lenNmerDef,
         'iCentNmer': iCentNmer,
         'iStartCS': iStartCS,
         'iEndCS': iEndCS,

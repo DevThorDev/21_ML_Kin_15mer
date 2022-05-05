@@ -29,6 +29,7 @@ S_EQ = '='
 S_STAR = '*'
 S_USC = '_'
 S_NEWL = '\n'
+S_S = 'S'
 
 S_CSV = 'csv'
 
@@ -50,19 +51,32 @@ S_PROC_I_N_MER = 'ProcINmer'
 S_COMB_S = 'Combined_S'
 S_UNIQUE_COL = 'UniqueCol'
 S_UNIQUE_CODE_SEQ = 'UniqueCodeSeq'
+S_PEP_P = 'PepPos'
+S_N_MER = 'Nmer'
+S_REL_FREQ_SNIP = 'RelFreqSnip'
 
 # --- file name extensions ----------------------------------------------------
 XT_CSV = S_DOT + S_CSV
 
 # --- numbers -----------------------------------------------------------------
+LEN_N_MER_DEF = 15
+I_CENT_N_MER = LEN_N_MER_DEF//2
+
+R08 = 8
 
 # ### INPUT ###################################################################
 # --- flow control ------------------------------------------------------------
 inpTbl = 'CombS'            # 'ProcI' / 'CombS'
 
+doAllUniqueCol = False
+doUniqueCodeSeqRetPepPos = False
+doUniqueCodeSeqRetNmer = False
+doRelFreqSnip = True
+
 # --- numbers -----------------------------------------------------------------
 
 # --- strings -----------------------------------------------------------------
+sSnipCalcRF = 'LSV'
 
 # --- lists -------------------------------------------------------------------
 
@@ -72,16 +86,25 @@ inpTbl = 'CombS'            # 'ProcI' / 'CombS'
 
 # === derived values and input processing =====================================
 pInp = P_PROC_I_N_MER
-sFBase, sFBaseUnqC = S_F_PROC_I_N_MER, S_F_PROC_I_N_MER + S_USC + S_UNIQUE_COL
-sFBaseUnqCS = S_F_PROC_I_N_MER + S_USC + S_UNIQUE_CODE_SEQ
+sFBase = S_F_PROC_I_N_MER
+sFBaseUnqC = S_USC.join([S_F_PROC_I_N_MER, S_UNIQUE_COL])
+sFBaseUnqCSPepP = S_USC.join([S_F_PROC_I_N_MER, S_UNIQUE_CODE_SEQ, S_PEP_P])
+sFBaseUnqCSNmer = S_USC.join([S_F_PROC_I_N_MER, S_UNIQUE_CODE_SEQ, S_N_MER])
+sFBaseRFSnip = S_USC.join([S_F_PROC_I_N_MER, S_REL_FREQ_SNIP])
 if inpTbl == 'CombS':
     pInp = P_COMB_RES
-    sFBase, sFBaseUnqC = S_F_RES_COMB_S, S_F_RES_COMB_S + S_USC + S_UNIQUE_COL
-    sFBaseUnqCS = S_F_RES_COMB_S + S_USC + S_UNIQUE_CODE_SEQ
+    sFBase = S_F_RES_COMB_S
+    sFBaseUnqC = S_USC.join([S_F_RES_COMB_S, S_UNIQUE_COL])
+    sFBaseUnqCSPepP = S_USC.join([S_F_RES_COMB_S, S_UNIQUE_CODE_SEQ, S_PEP_P])
+    sFBaseUnqCSNmer = S_USC.join([S_F_RES_COMB_S, S_UNIQUE_CODE_SEQ, S_N_MER])
+    sFBaseRFSnip = S_USC.join([S_F_RES_COMB_S, S_REL_FREQ_SNIP])
 
-pFInp = os.path.join(pInp, sFBase + XT_CSV)
+pFInpUnqC = os.path.join(pInp, sFBase + XT_CSV)
+pFInpRFSnip = os.path.join(P_TEMP_RES, sFBaseUnqCSNmer + XT_CSV)
 pFOutUnqC = os.path.join(P_TEMP_RES, sFBaseUnqC + XT_CSV)
-pFOutUnqCS = os.path.join(P_TEMP_RES, sFBaseUnqCS + XT_CSV)
+pFOutUnqCSPepP = os.path.join(P_TEMP_RES, sFBaseUnqCSPepP + XT_CSV)
+pFOutUnqCSNmer = os.path.join(P_TEMP_RES, sFBaseUnqCSNmer + XT_CSV)
+pFOutRFSnip = os.path.join(P_TEMP_RES, sFBaseRFSnip + XT_CSV)
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
@@ -95,15 +118,21 @@ dInp = {# --- flow control ----------------------------------------------------
         'sDot': S_DOT,
         'sSemicol': S_SEMICOL,
         'sCSV': S_CSV,
+        'sSnipCalcRF': sSnipCalcRF,
         # --- file name extensions --------------------------------------------
         'xtCSV': XT_CSV,
         # --- numbers ---------------------------------------------------------
+        'lenNmerDef': LEN_N_MER_DEF,
+        'iCentNmer': I_CENT_N_MER,
         # --- lists -----------------------------------------------------------
         # --- dictionaries ----------------------------------------------------
         # === derived values and input processing =============================
-        'pFInp': pFInp,
+        'pFInpUnqC': pFInpUnqC,
+        'pFInpRFSnip': pFInpRFSnip,
         'pFOutUnqC': pFOutUnqC,
-        'pFOutUnqCS': pFOutUnqCS}
+        'pFOutUnqCSNmer': pFOutUnqCSNmer,
+        'pFOutUnqCSPepP': pFOutUnqCSPepP,
+        'pFOutRFSnip': pFOutRFSnip}
 
 # ### FUNCTIONS ###############################################################
 # --- General file system related functions -----------------------------------
@@ -126,47 +155,71 @@ def saveAsCSV(pdDfr, pF, reprNA='', cSep=S_SEMICOL):
     if pdDfr is not None:
         pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA)
 
-def saveDfrUniqueColAsCSV(pdDfr, pF, colUnq=None, reprNA='', cSep=S_SEMICOL):
+def saveDfrUniqueColAsCSV(cDfr, pFOut, colUnq=None, reprNA='', cSep=S_SEMICOL):
     if colUnq is None:
-        saveAsCSV(pdDfr.convert_dtypes(), pF=pF, reprNA=reprNA, cSep=cSep)
+        saveAsCSV(cDfr.convert_dtypes(), pF=pFOut, reprNA=reprNA, cSep=cSep)
         print('Saved unmodified DataFrame.')
     elif colUnq == True:
         lSerUnique = []
-        for sC in pdDfr.columns:
-            lSerUnique.append(pd.Series(pdDfr[sC].unique(), name=sC))
-        pdDfrMod = concLSerAx1(lSer=lSerUnique).convert_dtypes()
-        saveAsCSV(pdDfrMod, pF=pF, reprNA=reprNA, cSep=cSep)
+        for sC in cDfr.columns:
+            lSerUnique.append(pd.Series(cDfr[sC].unique(), name=sC))
+        cDfrMod = concLSerAx1(lSer=lSerUnique).convert_dtypes()
+        saveAsCSV(cDfrMod, pF=pFOut, reprNA=reprNA, cSep=cSep)
         print('Saved DataFrame with all columns converted to unique values.')
     else:
         print('ERROR: Value "', colUnq, '" not implemented for keyword ',
               '"colUnq".', sep='')
 
-def saveDfrUniqueColSpecAsCSV(pdDfr, pF, colUnq=None, colIRet=None, reprNA='',
-                              cSep=S_SEMICOL):
-    if colUnq in pdDfr.columns:
-        if colIRet in pdDfr.columns:
-            lVUnq, lArr = list(pdDfr[colUnq].unique()), []
+def saveDfrUniqueColSpecAsCSV(cDfr, pFOut, colUnq=None, colIRet=None,
+                              reprNA='', cSep=S_SEMICOL):
+    if colUnq in cDfr.columns:
+        if colIRet in cDfr.columns:
+            lVUnq, lArr = list(cDfr[colUnq].unique()), []
             for cV in lVUnq:
-                cSer = pdDfr[pdDfr[colUnq] == cV].loc[:, colIRet]
+                cSer = cDfr[cDfr[colUnq] == cV].loc[:, colIRet]
                 lArr.append(cSer.unique())
             maxNEl = max([cArr.shape[0] for cArr in lArr])
             for k, cArr in enumerate(lArr):
                 lArr[k] = np.append(cArr, [np.nan]*(maxNEl - cArr.shape[0]))
             arrFin = np.stack(lArr, axis=1).T
             lC = [str(colIRet) + S_USC + str(i) for i in range(1, maxNEl + 1)]
-            pdDfrMod = pd.DataFrame(arrFin, index=lVUnq, columns=lC)
-            saveAsCSV(pdDfrMod.convert_dtypes(), pF=pF, reprNA=reprNA,
+            cDfrMod = pd.DataFrame(arrFin, index=lVUnq, columns=lC)
+            saveAsCSV(cDfrMod.convert_dtypes(), pF=pFOut, reprNA=reprNA,
                       cSep=cSep)
             print('Saved DataFrame with column "', colUnq,
                   '" converted to unique values and column "', colIRet,
                   '" retained.', sep='')
         else:
-            saveAsCSV(pdDfrMod[colUnq], pF=pF, reprNA=reprNA, cSep=cSep)
+            saveAsCSV(cDfrMod[colUnq], pF=pFOut, reprNA=reprNA, cSep=cSep)
             print('Saved Series consisting of column "', colUnq,
                   '" converted to unique values.', sep='')
     else:
         print('ERROR: "', colUnq, '" is not in DataFrame columns: ',
-              pdDfr.columns.to_list(), '!', sep='')
+              cDfr.columns.to_list(), '!', sep='')
+
+# --- Functions handling dictionaries -----------------------------------------
+def addToDictCt(cD, cK, cIncr=1):
+    if cK in cD:
+        cD[cK] += cIncr
+    else:
+        cD[cK] = cIncr
+
+def addToDictL(cD, cK, cE, lUniqEl=False):
+    if cK in cD:
+        if not lUniqEl or cE not in cD[cK]:
+            cD[cK].append(cE)
+    else:
+        cD[cK] = [cE]
+
+def iniDictRes(idxDfr):
+    return {'nFullSeq': len(idxDfr),
+            'nFullSeqWOcc': 0,
+            'nOccInFullSeq': 0,
+            'dNOccInFullSeq': {},
+            'nPyl': 0,
+            'dPyl': {},
+            'dProbPyl': {},
+            'probPylSnip': 0.}
 
 # --- Functions initialising numpy arrays -------------------------------------
 def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
@@ -217,14 +270,95 @@ def concLSerAx1(lSer, ignIdx=False, verifInt=False, srtDfr=False):
     return concLSer(lSer, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
                     srtDfr=srtDfr)
 
+# --- General-purpose functions -----------------------------------------------
+def getAAcPyl(dInp, sNmer):
+    if len(sNmer) == dInp['lenNmerDef']:
+        return sNmer[dInp['iCentNmer']]
+
+def getCentralPosOfSnip(dInp, sSnip=S_S):
+    assert (len(sSnip) <= dInp['lenNmerDef'] and len(sSnip)%2 == 1)
+    return sSnip[len(sSnip)//2]
+
+def getCentralSnipOfNmer(dInp, sNmer, sSnip=S_S):
+    assert len(sNmer) == dInp['lenNmerDef']
+    assert (len(sSnip) <= dInp['lenNmerDef'] and len(sSnip)%2 == 1)
+    iS = dInp['iCentNmer'] - len(sSnip)//2
+    iE = dInp['iCentNmer'] + len(sSnip)//2 + 1
+    return sNmer[iS:iE]
+
+def checkCentralSnipOfNmer(dInp, sNmer, sSnip=S_S):
+    return getCentralSnipOfNmer(dInp, sNmer=sNmer, sSnip=sSnip) == sSnip
+
+# --- Function calculating relative frequency of single snippet ---------------
+def calcProbPylData(dInp, cDfr, pFOut, sSnip=S_S):
+    assert (len(sSnip) <= dInp['lenNmerDef'] and len(sSnip)%2 == 1)
+    # chCentSnip = getCentralPosOfSnip(dInp, sSnip=sSnip)
+    dRes = iniDictRes(cDfr.index)
+    # calculate the number of occurrences of the snippet in the full sequences
+    for sFS in cDfr.index:
+        nOccCS = sFS.count(sSnip)
+        dRes['nOccInFullSeq'] += nOccCS
+        addToDictCt(dRes['dNOccInFullSeq'], nOccCS)
+        if nOccCS > 0:
+            dRes['nFullSeqWOcc'] += 1
+        for sC in cDfr.columns:
+            sCNmer = cDfr.at[sFS, sC]
+            if type(sCNmer) == str:
+                if checkCentralSnipOfNmer(dInp, sNmer=sCNmer, sSnip=sSnip):
+                    dRes['nPyl'] += 1
+                    addToDictL(dRes['dPyl'], cK=sFS, cE=sCNmer, lUniqEl=True)
+        if sFS in dRes['dPyl']:
+            nPyl, nTtl, cPrb = len(dRes['dPyl'][sFS]), nOccCS, 0.
+            if nTtl > 0:
+                cPrb = nPyl/nTtl
+            dRes['dProbPyl'][sFS] = (nPyl, nTtl, cPrb)
+            dRes['probPylSnip'] += cPrb
+    if (dRes['probPylSnip'] > 0 and dRes['nFullSeqWOcc'] > 0):
+        dRes['probPylSnip'] /= dRes['nFullSeqWOcc']
+    return dRes
+
+# --- Function printing the results -------------------------------------------
+def printRes(dRes, sSnip=S_S):
+    print('Dictionary mapping the number of occurrences in a sequence to the',
+          'number of sequences with matching number of occurrences:')
+    for nOcc in sorted(dRes['dNOccInFullSeq'], reverse=True):
+        print(nOcc, ': ', dRes['dNOccInFullSeq'][nOcc], sep='')
+    print('Dictionary mapping the full sequences to the lists of Nmers ',
+          'containing the snippet "', sSnip, '" in their centre:', sep='')
+    for sFS in sorted(dRes['dPyl']):
+        print(sFS[:20], '...: ', dRes['dPyl'][sFS], sep='')
+    print('Dictionary mapping the full sequences to the tuple\n',
+          '(num. phosphorylations, num. total, est. probability in Nmer) ',
+          'for snippet "', sSnip, '":', sep='')
+    for sFS in sorted(dRes['dProbPyl']):
+        print(sFS[:20], '...: ', dRes['dProbPyl'][sFS], sep='')
+    print('Total number of full sequences:', dRes['nFullSeq'])
+    print('Number of full sequences with at least one occurrence of "', sSnip,
+          '": ', dRes['nFullSeqWOcc'], sep='')
+    print('Total number of occurrences of "', sSnip, '" in all full ',
+          'sequences: ', dRes['nOccInFullSeq'], sep='')
+    print('Total number of phosphorylations of snippet "', sSnip,
+          '": ', dRes['nPyl'], sep='')
+    print('Final probability of snippet "', sSnip, '" being phosphorylated: ',
+          round(dRes['probPylSnip'], R08), sep='')
+
 # ### MAIN ####################################################################
 print(S_EQ80, S_NEWL, S_DS30, ' DataFrameHandling.py ', S_DS28, S_NEWL, sep='')
-dfrInp = readCSV(pF=dInp['pFInp'], iCol=0)
-saveDfrUniqueColAsCSV(dfrInp, pF=dInp['pFOutUnqC'], colUnq=True)
-# saveDfrUniqueColSpecAsCSV(dfrInp, pF=dInp['pFOutUnqCS'], colUnq=S_C_CODE_SEQ,
-#                           colIRet=S_C_PEP_POS)
-saveDfrUniqueColSpecAsCSV(dfrInp, pF=dInp['pFOutUnqCS'], colUnq=S_C_CODE_SEQ,
-                          colIRet=S_C_N_MER)
+if (doAllUniqueCol or doUniqueCodeSeqRetPepPos or doUniqueCodeSeqRetNmer):
+    dfrInp = readCSV(pF=dInp['pFInpUnqC'], iCol=0)
+if doAllUniqueCol:
+    saveDfrUniqueColAsCSV(dfrInp, pFOut=dInp['pFOutUnqC'], colUnq=True)
+if doUniqueCodeSeqRetPepPos:
+    saveDfrUniqueColSpecAsCSV(dfrInp, pFOut=dInp['pFOutUnqCSPepP'],
+                              colUnq=S_C_CODE_SEQ, colIRet=S_C_PEP_POS)
+if doUniqueCodeSeqRetNmer:
+    saveDfrUniqueColSpecAsCSV(dfrInp, pFOut=dInp['pFOutUnqCSNmer'],
+                              colUnq=S_C_CODE_SEQ, colIRet=S_C_N_MER)
+if doRelFreqSnip:
+    dfrInp = readCSV(pF=dInp['pFInpRFSnip'], iCol=0)
+    dResult = calcProbPylData(dInp, dfrInp, pFOut=dInp['pFOutRFSnip'],
+                              sSnip=dInp['sSnipCalcRF'])
+    printRes(dResult, sSnip=dInp['sSnipCalcRF'])
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
 ###############################################################################
