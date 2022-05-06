@@ -162,6 +162,7 @@ class NmerSeq(Seq):
             iPCt = dITp['iCentNmer']
         self.iPCent = iPCt
         self.sPCent = sSq[dITp['iCentNmer']]
+        self.lIPyl = [dITp['iCentNmer']]
         self.createProfileDict(dITp)
 
     # --- print methods -------------------------------------------------------
@@ -186,40 +187,28 @@ class NmerSeq(Seq):
                     if lenSeq <= maxLenSeq}
         return dPrf
 
-    # --- method for storing the total probabilities of snippets --------------
-    def getTotalProbSnip(self, dITp, lFullSeq):
-        if not GF.Xist(lFullSeq):
-            print('ERROR: List of full sequences is', lFullSeq)
+    # --- sub-method for storing the probabilities of snippets ----------------
+    def getProbSnip(self, dITp, lInpSeq, maxLen=None):
+        if GF.Xist(lInpSeq):
+            dP = {}
+            dProf = self.getProfileDict(maxLenSeq=maxLen)
+            for sSnip in dProf.values():
+                GF.fillDProbSnip(dProb=dP, lSeq=lInpSeq, sSnip=sSnip)
+            return dP
+        else:
+            print('ERROR: List of input sequence strings is',
+                  [cSeq.sSeq for cSeq in lInpSeq])
             assert False
-        dTotalP = {}
-        dProf = self.getProfileDict(maxLenSeq=max(dITp['lLenNmer']))
-        for sSnip in dProf.values():
-            lV, n = [0, 0, 0.], 0
-            for cSeqF in lFullSeq:
-                lIPos = GF.getLCentPosSSub(sFull=cSeqF.sSeq, sSub=sSnip)
-                n += GF.fillLValSnip(lV, lIdxPos=lIPos, lIdxPyl=cSeqF.lIPyl)
-            if n > 0:
-                dTotalP[sSnip] = (lV[:-1] + [lV[-1]/n])
-            else:
-                dTotalP[sSnip] = lV
-        return dTotalP
+    
+    # --- method for storing the total probabilities of snippets --------------
+    def getTotalProbSnip(self, dITp, lInpSeq):
+        return self.getProbSnip(dITp, lInpSeq, maxLen=max(dITp['lLenNmer']))
 
     # --- method for storing the conditional probabilities of snippets --------
-    def getCondProbSnip(self, dITp, lFullSeq):
-        if not GF.Xist(lFullSeq):
-            print('ERROR: List of full sequences is', lFullSeq)
-            assert False
-        dCondP = {}
-        dProf = self.getProfileDict(maxLenSeq=max(dITp['lLenNmer']))
-        for sSnip in dProf.values():
-            lV, n = [0, 0, 0.], 0
-            for cSeqF in lFullSeq:
-                lIPos = GF.getLCentPosSSub(sFull=cSeqF.sSeq, sSub=sSnip)
-                n += GF.fillLValSnip(lV, lIdxPos=lIPos, lIdxPyl=cSeqF.lIPyl)
-            if n > 0:
-                dCondP[sSnip] = (lV[:-1] + [lV[-1]/n])
-            else:
-                dCondP[sSnip] = lV
+    def getCondProbSnip(self, dITp, lInpSeq, lFullSeq):
+        maxLenNmer = min(max(dITp['lLenNmer']), len(self.sSeq) - 1)
+        dCondP = self.getProbSnip(dITp, lInpSeq, maxLen=maxLenNmer)
+        GF.fillDProbSnip(dProb=dCondP, lSeq=lFullSeq, sSnip=self.sSeq)
         return dCondP
 
 # -----------------------------------------------------------------------------

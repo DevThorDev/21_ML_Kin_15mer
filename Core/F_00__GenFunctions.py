@@ -374,6 +374,16 @@ def dictToDfr(cD, idxDfr=None, dropNA=False, dropHow='any', srtBy=None,
                               ignore_index=True)
     return pdDfr
 
+def fillDProbSnip(dProb, lSeq, sSnip):
+    lV, n = [0, 0, 0.], 0
+    for cSeq in lSeq:
+        lIPos = getLCentPosSSub(sFull=cSeq.sSeq, sSub=sSnip)
+        n += fillLValSnip(lV, lIdxPos=lIPos, lIdxPyl=cSeq.lIPyl)
+    if n > 0:
+        dProb[sSnip] = (lV[:-1] + [lV[-1]/n])
+    else:
+        dProb[sSnip] = lV
+
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):
     return [cB for cB in cIt] == [True]*len(cIt)

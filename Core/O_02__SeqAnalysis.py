@@ -295,7 +295,7 @@ class SeqAnalysis(BaseClass):
     def getD2TotalProbSnip(self, stT=None):
         nSeq, sNS = len(self.lNmerSeq), 'Nmer sequences [getD2TotalProbSnip]'
         for i, cNmerS in enumerate(self.lNmerSeq):
-            dSub = cNmerS.getTotalProbSnip(self.dITp, lFullSeq=self.lFullSeq)
+            dSub = cNmerS.getTotalProbSnip(self.dITp, lInpSeq=self.lFullSeq)
             self.d2TotalProbSnip[cNmerS.sSeq] = dSub
             GF.showProgress(N=nSeq, n=i, modeDisp=self.dITp['mDsp'],
                             varText=sNS, startTime=stT)
@@ -303,7 +303,8 @@ class SeqAnalysis(BaseClass):
     def getD2CondProbSnip(self, stT=None):
         nSeq, sNS = len(self.lNmerSeq), 'Nmer sequences [getD2CondProbSnip]'
         for i, cNmerS in enumerate(self.lNmerSeq):
-            dSub = cNmerS.getCondProbSnip(self.dITp, lFullSeq=self.lFullSeq)
+            dSub = cNmerS.getCondProbSnip(self.dITp, lInpSeq=self.lNmerSeq,
+                                          lFullSeq=self.lFullSeq)
             self.d2CondProbSnip[cNmerS.sSeq] = dSub
             GF.showProgress(N=nSeq, n=i, modeDisp=self.dITp['mDsp'],
                             varText=sNS, startTime=stT)

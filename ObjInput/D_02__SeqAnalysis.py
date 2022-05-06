@@ -16,19 +16,19 @@ calcSnipX = True
 saveAsDfrS = True
 saveAsDfrX = True
 
-calcTotalProb = True
-calcCondProb = True
+calcTotalProb = False
+calcCondProb = False
 
-calcWtProb = False
-calcRelProb = False
+calcWtProb = True
+calcRelProb = True
 
 convSnipXToProbTbl = True
 
-useNmerSeqFrom = GC.S_COMB_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
+useNmerSeqFrom = GC.S_I_EFF_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
 
 # --- names and paths of files and dirs ---------------------------------------
-# sFSeqCheck = GC.S_F_PROC_INP_N_MER
-sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
+sFSeqCheck = GC.S_F_PROC_INP_N_MER
+# sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
 # sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
 
 sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
@@ -36,7 +36,8 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
-sFE = sFIEffInp.split(GC.S_US02)[1:]
+# sFE = sFIEffInp.split(GC.S_US02)[1:]
+sFE = [GC.S_US02.join([sFSeqCheck.split(GC.S_USC)[0], '2022_05_06'])]
 sFLInpSeq = GC.S_US02.join(['ListNmerInputSeq'] + sFE)
 
 sFResWtLh = GC.S_US02.join(['WtLikelihood_FullSeq'] + sFE)

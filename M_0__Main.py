@@ -42,7 +42,7 @@ cSeqAnalysis.performLhAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 
 cSeqAnalysis.performTCProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 
-# cSeqAnalysis.performProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
+cSeqAnalysis.performProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 # cSeqAnalysis.calcProbTable(cTim=cTiming, stT=startTime)
 
 GF.showElapsedTime(startTime)

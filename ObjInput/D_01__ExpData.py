@@ -20,7 +20,8 @@ genInfoEff = False
 genInfoGen = False
 
 # --- lists (1) ---------------------------------------------------------------
-lLenNmer = [1, 3, 5, 7]         # empty list: all lengths considered
+lLenNmer = None             # None: all lengths considered
+# lLenNmer = [1, 3, 5, 7]     # None: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
 sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
@@ -120,6 +121,8 @@ dMer = GC.D_MER
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
+if lLenNmer is None:
+    lLenNmer = list(range(1, lenNmerDef + 1, 2))
 lSCXt = ['', GC.S_PYL, GC.S_TOTAL, GC.S_PROB]
 lSCMer = [str(n) + GC.S_MER for n in lLenNmer]
 lSCMerPyl = [s + GC.S_USC + GC.S_PYL for s in lSCMer]

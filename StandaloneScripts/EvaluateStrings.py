@@ -94,7 +94,8 @@ sMerTotal = S_MER + S_USC + S_TOTAL
 sMerProb = S_MER + S_USC + S_PROB
 
 # --- lists -------------------------------------------------------------------
-lLenNmer = [1, 3, 5, 7]
+# lLenNmer = None         # None: all lengths considered
+lLenNmer = [1, 3, 5, 7] # None: all lengths considered
 
 # list of Nmer sequences to test or None (--> test all)
 # lNmerSeq2Test = ['AAAALKGSDHRRTTE', 'SDNSGTESSPRTNGG', 'DNSGTESSPRTNGGS']
@@ -111,6 +112,8 @@ assert (len(lSCProbTbl) >= 3 and len(lISrtProbTbl) >= 3 and
         len(lAscProbTbl) >= 3)
 
 # === derived values and input processing =====================================
+if lLenNmer is None:
+    lLenNmer = list(range(1, LEN_N_MER_DEF + 1, 2))
 lSCLenMer = [str(n) + sMer for n in lLenNmer]
 lSCLenMerPyl = [str(n) + sMerPyl for n in lLenNmer]
 lSCLenMerTotal = [str(n) + sMerTotal for n in lLenNmer]
