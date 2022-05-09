@@ -79,6 +79,7 @@ sLenSnip = GC.S_LEN_SNIP
 sExpName = GC.S_EXP_NAME
 sCodeTrunc = GC.S_CODE_TRUNC
 sAnyEff = GC.S_ANY_EFF
+sFullSeq = GC.S_FULL_SEQ
 sNmer = GC.S_N_MER
 sLenNmer = GC.S_LEN_N_MER
 sNOcc = GC.S_NUM_OCC
@@ -123,13 +124,14 @@ dMer = GC.D_MER
 # === derived values and input processing =====================================
 if lLenNmer is None:
     lLenNmer = list(range(1, lenNmerDef + 1, 2))
-lSCXt = ['', GC.S_PYL, GC.S_TOTAL, GC.S_PROB]
+lSCXt = ['', GC.S_PYL, GC.S_TOTAL, GC.S_REL_FREQ, GC.S_PROB]
 lSCMer = [str(n) + GC.S_MER for n in lLenNmer]
-lSCMerPyl = [s + GC.S_USC + GC.S_PYL for s in lSCMer]
-lSCMerTotal = [s + GC.S_USC + GC.S_TOTAL for s in lSCMer]
-lSCMerProb = [s + GC.S_USC + GC.S_PROB for s in lSCMer]
-dSCMerAll = {n: [sCSq, sCPy, sCTt, sCPr] for (n, sCSq, sCPy, sCTt, sCPr) in
-             zip(lLenNmer, lSCMer, lSCMerPyl, lSCMerTotal, lSCMerProb)}
+lSCMerPy = [s + GC.S_USC + lSCXt[1] for s in lSCMer]
+lSCMerTt = [s + GC.S_USC + lSCXt[2] for s in lSCMer]
+lSCMerRF = [s + GC.S_USC + lSCXt[3] for s in lSCMer]
+lSCMerPr = [s + GC.S_USC + lSCXt[4] for s in lSCMer]
+dSCMerAll = {n: [sCS, sCY, sCT, sCR, sCP] for (n, sCS, sCY, sCT, sCR, sCP) in
+             zip(lLenNmer, lSCMer, lSCMerPy, lSCMerTt, lSCMerRF, lSCMerPr)}
 lSCMerAll = GF.flattenIt(dSCMerAll.values())
 iStXS = lRowsResIGen.index(sRowCombXS)
 iStS = lRowsResIGen.index(sRowCombS)
@@ -151,9 +153,10 @@ dIO = {# --- general
        'lSLenNmer': [str(n) for n in lLenNmer],
        'lSCXt': lSCXt,
        'lSCMer': lSCMer,
-       'lSCMerPyl': lSCMerPyl,
-       'lSCMerTotal': lSCMerTotal,
-       'lSCMerProb': lSCMerProb,
+       'lSCMerPy': lSCMerPy,
+       'lSCMerTt': lSCMerTt,
+       'lSCMerRF': lSCMerRF,
+       'lSCMerPr': lSCMerPr,
        'lSCMerAll': lSCMerAll,
        # --- names and paths of files and dirs
        'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
@@ -205,6 +208,7 @@ dIO = {# --- general
        'sExpName': sExpName,
        'sCodeTrunc': sCodeTrunc,
        'sAnyEff': sAnyEff,
+       'sFullSeq': sFullSeq,
        'sNmer': sNmer,
        'sLenNmer': sLenNmer,
        'sNOcc': sNOcc,

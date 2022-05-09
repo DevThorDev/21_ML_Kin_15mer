@@ -86,9 +86,6 @@ def getLSFullSeq(dITp, dfrInpSeq, iS=None, iE=None):
 def getLSNmer(dITp, dfrInpSeq, lSFull=[], lSNmer=[]):
     if lSNmer is None and dITp['sCNmer'] in dfrInpSeq.columns:
         if dITp['sCCodeSeq'] in dfrInpSeq.columns:
-            # if dITp['reduceFullToNmerSeq']:
-            #     dfrCSeq = dfrInpSeq
-            # else:
             # reduce to Nmer sequences with corresponding full sequences
             dfrCSeq = dfrInpSeq[dfrInpSeq[dITp['sCCodeSeq']].isin(lSFull)]
             lSNmer = list(dfrCSeq[dITp['sCNmer']].unique())
@@ -98,16 +95,15 @@ def getLSNmer(dITp, dfrInpSeq, lSFull=[], lSNmer=[]):
 
 def modLSF(dITp, lSKeyF, sFE):
     for sKeyF in lSKeyF:
-        dITp[sKeyF] = GF.modSF(dITp[sKeyF], sEnd=sFE, sJoin=dITp['sUS02'])
+        if not GF.getSFEnd(sF=dITp[sKeyF], nCharEnd=len(sFE)) == sFE:
+            dITp[sKeyF] = GF.modSF(dITp[sKeyF], sEnd=sFE, sJoin=dITp['sUS02'])
 
 def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
     dLh, wtLh, lSCWtLh = {}, 0., dITp['lSCDfrLhV']
     assert len(lSCWtLh) >= 3
     for lenSnip, sSnip in dSqProfile.items():
         if lenSnip <= mxLSnip:
-            cLh = 0.
-            if sSnip in serLh.index:
-                cLh = serLh.at[sSnip]
+            cLh = (serLh.at[sSnip] if sSnip in serLh.index else 0.)
             dLh[sSnip] = cLh
             if lenSnip in dITp['dWtsLenSeq']:
                 wtLh += cLh*dITp['dWtsLenSeq'][lenSnip]

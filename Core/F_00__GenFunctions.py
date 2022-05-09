@@ -135,6 +135,11 @@ def getSF(sMid, iStart=None, iEnd=None, sPre='', sPost='', sSpl=GC.S_USC):
         lS = [getPartStr(sMid, iStart=iStart, iEnd=iEnd, sSpl=sSpl)]
     return joinS(lS)
 
+def getSFEnd(sF, nCharEnd):
+    if GC.S_DOT in sF:
+        sF = joinS(sF.split(GC.S_DOT)[:-1], sJoin=GC.S_DOT)[-nCharEnd:]
+    return sF[-nCharEnd:]
+
 def addSCentNmerToDict(dNum, dENmer, iCNmer):
     for k in range(iCNmer + 1):
         for sEff, lSNmer in dENmer.items():
@@ -165,13 +170,16 @@ def isInSeqSet(x, cSqSet, maxDlt=GC.MAX_DELTA):
             return True
     return False
 
+def getFract(cEnum=0, cDenom=1, defFract=0.):
+    return (defFract if cDenom == 0 else cEnum/cDenom)
+
 def calcPylProb(cSS, dCSS):
     nFSeq, nPyl, nTtl, cPrb = len(dCSS), 0, 0, 0.
     for tV in dCSS.values():
         nPyl += tV[0]
         nTtl += tV[1]
-        cPrb += tV[2]/nFSeq
-    return [cSS, nPyl, nTtl, cPrb]
+        cPrb += tV[3]/nFSeq
+    return [cSS, nPyl, nTtl, getFract(nPyl, nTtl), cPrb]
 
 # --- Functions handling iterators (lists/tuples or dictionaries) -------------
 def restrIt(cIt, lRestrLen=[], useLenS=False):
@@ -213,7 +221,7 @@ def fillLValSnip(lValSnip, lIdxPos=[], lIdxPyl=[]):
         nPyl, nOcc = sum(lB), len(lB)
         lValSnip[0] += nPyl
         lValSnip[1] += nOcc
-        lValSnip[2] += nPyl/nOcc
+        lValSnip[3] += nPyl/nOcc
         return 1
     return 0
 
@@ -375,12 +383,12 @@ def dictToDfr(cD, idxDfr=None, dropNA=False, dropHow='any', srtBy=None,
     return pdDfr
 
 def fillDProbSnip(dProb, lSeq, sSnip):
-    lV, n = [0, 0, 0.], 0
+    lV, n = [0, 0, 0., 0.], 0
     for cSeq in lSeq:
         lIPos = getLCentPosSSub(sFull=cSeq.sSeq, sSub=sSnip)
         n += fillLValSnip(lV, lIdxPos=lIPos, lIdxPyl=cSeq.lIPyl)
     if n > 0:
-        dProb[sSnip] = (lV[:-1] + [lV[-1]/n])
+        dProb[sSnip] = [lV[0], lV[1], lV[0]/lV[1], lV[-1]/n]
     else:
         dProb[sSnip] = lV
 

@@ -11,34 +11,37 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 # --- flow control ------------------------------------------------------------
 calcWtLh = False
 calcRelLh = False
+
 calcSnipS = True
 calcSnipX = True
-saveAsDfrS = True
-saveAsDfrX = True
 
-calcTotalProb = False
-calcCondProb = False
+saveAsDfrS = True
+saveAsDfrX = False
+
+calcTotalProb = True
+calcCondProb = True
 
 calcWtProb = True
 calcRelProb = True
 
 convSnipXToProbTbl = True
 
-useNmerSeqFrom = GC.S_I_EFF_INP    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
+useNmerSeqFrom = GC.S_SEQ_CHECK    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
 
 # --- names and paths of files and dirs ---------------------------------------
-sFSeqCheck = GC.S_F_PROC_INP_N_MER
-# sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
+# sFSeqCheck = GC.S_F_PROC_INP_N_MER
+sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
 # sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
 
-sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7'
+sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7_9_11_13_15'
 sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
 # sFE = sFIEffInp.split(GC.S_US02)[1:]
 sFE = [GC.S_US02.join([sFSeqCheck.split(GC.S_USC)[0], '2022_05_06'])]
-sFLInpSeq = GC.S_US02.join(['ListNmerInputSeq'] + sFE)
+sFLNmerSeq = GC.S_US02.join(['ListNmerInputSeq'] + sFE)
+sFLFullSeq = GC.S_US02.join(['ListFullInputSeq'] + sFE)
 
 sFResWtLh = GC.S_US02.join(['WtLikelihood_FullSeq'] + sFE)
 sFResRelLh = GC.S_US02.join(['RelLikelihood_FullSeq'] + sFE)
@@ -66,9 +69,10 @@ sSnippet = GC.S_SNIPPET
 sLenSnip = GC.S_LEN_SNIP
 sWtLikelihood = 'wtLikelihood'
 sRelLikelihood = 'relLikelihood'
-sFullSeq = 'seqTarget'
+sTargSeq = 'seqTarget'
 sSnipPyl = 'snipPyl'
 sSnipTtl = 'snipTtl'
+sSnipRelF = 'snipRelF'
 sSnipProb = 'snipProb'
 sTtlProb = GC.S_TOTAL_PROB
 sCndProb = GC.S_COND_PROB
@@ -90,8 +94,8 @@ lSCDfrLhD = [sCNmer, sEffCode, sSnippet, sLenSnip, sRelLikelihood]
 lSCDfrProbS = [sSnippet, sLenSnip, sSnipProb]
 lSrtByDfrProbS = [sLenSnip, sSnipProb, sSnippet]
 lSrtAscDfrProbS = [True, False, True]
-lSCDfrProbX = [sSnippet, sSnipPyl, sSnipTtl, sSnipProb]
-lSCDfrWFullSProbX = [sSnippet, sFullSeq, sSnipPyl, sSnipTtl, sSnipProb]
+lSCDfrProbX = [sSnippet, sSnipPyl, sSnipTtl, sSnipRelF, sSnipProb]
+lSCDfrWFSProbX = [sSnippet, sTargSeq, sSnipPyl, sSnipTtl, sSnipRelF, sSnipProb]
 lSrtByDfrProbX = [sSnippet, sSnipProb, sSnipPyl]
 lSrtAscDfrProbX = [True, False, True]
 
@@ -111,9 +115,10 @@ dWtsLenSeq = {1: 0.1,
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-lSKeyFRes = ['sFLInpSeq', 'sFResWtLh', 'sFResRelLh', 'sFSnipDictS',
-             'sFSnipDictX', 'sFSnipDfrS', 'sFSnipDfrX', 'sFProbTblFS',
-             'sFProbTblTP', 'sFProbTblCP', 'sFResWtProb', 'sFResRelProb']
+lSKeyFRes = ['sFLNmerSeq', 'sFLFullSeq', 'sFResWtLh', 'sFResRelLh',
+             'sFSnipDictS', 'sFSnipDictX', 'sFSnipDfrS', 'sFSnipDfrX',
+             'sFProbTblFS', 'sFProbTblTP', 'sFProbTblCP', 'sFResWtProb',
+             'sFResRelProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -136,7 +141,8 @@ dIO = {# --- general
        'sFSeqCheck': sFSeqCheck + GC.S_DOT + GC.S_EXT_CSV,
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
-       'sFLInpSeq': sFLInpSeq + GC.S_DOT + GC.S_EXT_CSV,
+       'sFLNmerSeq': sFLNmerSeq + GC.S_DOT + GC.S_EXT_CSV,
+       'sFLFullSeq': sFLFullSeq + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
        'sFSnipDictS': sFSnipDictS + GC.S_DOT + GC.S_EXT_BIN,
@@ -157,9 +163,10 @@ dIO = {# --- general
        'sEffCode': sEffCode,
        'sSnippet': sSnippet,
        'sLenSnip': sLenSnip,
-       'sFullSeq': sFullSeq,
+       'sTargSeq': sTargSeq,
        'sSnipPyl': sSnipPyl,
        'sSnipTtl': sSnipTtl,
+       'sSnipRelF': sSnipRelF,
        'sSnipProb': sSnipProb,
        'sTtlProb': sTtlProb,
        'sCndProb': sCndProb,
@@ -182,7 +189,7 @@ dIO = {# --- general
        'lSrtByDfrProbS': lSrtByDfrProbS,
        'lSrtAscDfrProbS': lSrtAscDfrProbS,
        'lSCDfrProbX': lSCDfrProbX,
-       'lSCDfrWFullSProbX': lSCDfrWFullSProbX,
+       'lSCDfrWFSProbX': lSCDfrWFSProbX,
        'lSrtByDfrProbX': lSrtByDfrProbX,
        'lSrtAscDfrProbX': lSrtAscDfrProbX,
        'lSCDfrProbV': lSCDfrProbV,

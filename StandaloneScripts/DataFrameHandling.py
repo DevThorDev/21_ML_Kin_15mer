@@ -76,7 +76,7 @@ doRelFreqSnip = True
 # --- numbers -----------------------------------------------------------------
 
 # --- strings -----------------------------------------------------------------
-sSnipCalcRF = 'ASS'
+sSnipCalcRF = 'LSV'
 
 # --- lists -------------------------------------------------------------------
 
@@ -339,6 +339,9 @@ def printRes(dRes, sSnip=S_S):
           'sequences: ', dRes['nOccInFullSeq'], sep='')
     print('Total number of phosphorylations of snippet "', sSnip,
           '": ', dRes['nPyl'], sep='')
+    relFreqSnip = round(dRes['nPyl']/dRes['nOccInFullSeq'], R08)
+    print('Number of phosphorylations divided by number of occurrences of ',
+          'snippet "', sSnip, '": ', relFreqSnip, sep='')
     print('Final probability of snippet "', sSnip, '" being phosphorylated: ',
           round(dRes['probPylSnip'], R08), sep='')
 

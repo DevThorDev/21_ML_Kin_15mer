@@ -23,9 +23,9 @@ sCombinedOut = GC.S_COMBINED_OUT
 sCDfrComb = GC.S_C_DFR_COMB
 sBGenInfoNmer = GC.S_B_GEN_INFO_N_MER
 sBGenInfoEff = GC.S_B_GEN_INFO_EFF
-sNmer = GC.S_N_MER
 sEff = GC.S_EFF
 sEffF = GC.S_EFF_F
+sNmer = GC.S_N_MER
 sImer = GC.S_I_MER
 sImerTrain = GC.S_I_MER_TRAIN
 sImerTest = GC.S_I_MER_TEST
@@ -55,9 +55,9 @@ dIO = {# --- general
        'sCDfrComb': sCDfrComb,
        'sBGenInfoNmer': sBGenInfoNmer,
        'sBGenInfoEff': sBGenInfoEff,
-       'sNmer': sNmer,
        'sEff': sEff,
        'sEffF': sEffF,
+       'sNmer': sNmer,
        'sImer': sImer,
        'sImerTrain': sImerTrain,
        'sImerTest': sImerTest,
