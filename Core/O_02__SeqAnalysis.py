@@ -45,7 +45,7 @@ class SeqAnalysis(BaseClass):
 
     def printLNmerSeq(self, prntFullI=False):
         self.printLInpSeq(sLSeqPrnt='Nmer', prntFullI=prntFullI)
-    
+
     def printDictLenSeq(self):
         print(GC.S_DS80, '\nLength-sequence dictionary:\n', GC.S_DS80, sep='')
         for cLen, lSeq in self.dLenSeq.items():
@@ -384,6 +384,26 @@ class SeqAnalysis(BaseClass):
                 cTim.updateTimes(iMth=11, stTMth=cStT, endTMth=time.time())
 
     # --- methods performing the Nmer-sequence single pos. prob. analysis -----
+    def processLFullSeq(self, iS=None, iE=None, unqS=True, stT=None):
+        [iS, iE], iCNmer = self.dITp['lIStartEnd'], self.dITp['iCentNmer']
+        self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
+        if not GF.Xist(self.lSFull):
+            assert self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns
+            t = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE, unqS=unqS)
+            self.lSFull, iS, iE = t
+        SF.modLSF(self.dITp, lSKeyF=[self.dITp['sFResSglPosProb']],
+                  sFE=GF.joinS([self.getSFResEnd(), iS, iE]))
+        self.d2Full2Nmer, sAllRmg = {sFull: {} for sFull in self.lSFull}, ''
+        for sFull in self.lSFull:
+            lI, sMod = sorted(self.getLIPosPyl(sFullSeq=sFull)), sFull
+            for k, cI in enumerate(lI):
+                iL, iR = max(0, cI - iCNmer), min(len(sFull), cI + iCNmer + 1)
+                sNmer = sFull[iL:iR]
+                GF.addToDictCt(self.d2Full2Nmer[sFull], cK=sNmer)
+                sMod = sMod[:iL] + GC.S_0*(iR - iL) + sMod[iR:]
+            sAllRmg += ''.join([chAAc for chAAc in sMod if chAAc != GC.S_0])
+        return sAllRmg
+
     def getD2Full2Nmer(self, iS=None, iE=None, unqS=True, stT=None):
         [iS, iE] = self.dITp['lIStartEnd']
         self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
@@ -399,7 +419,7 @@ class SeqAnalysis(BaseClass):
         for sFull in self.d2Full2Nmer:
             for sNmer in self.lSNmer:
                 pass
-    
+
     def getDRelFreqSglPos(self):
         iCt, lenNmer = self.dITp['iCentNmer'], self.dITp['lenNmerDef']
         self.nNmer, self.nFull = len(self.lNmerSeq), len(self.lFullSeq)
@@ -417,7 +437,7 @@ class SeqAnalysis(BaseClass):
                 GF.addToDictCt(self.dNOccSglPos[None], cK=chAAc)
                 GF.addToDictCt(self.dRelFreqSglPos[None], cK=chAAc,
                                nInc=1/self.nAAcFull)
-    
+
     def getProbSglPos(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if self.dITp['calcSglPosProb']:
             cStT = time.time()

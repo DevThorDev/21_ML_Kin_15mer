@@ -2,9 +2,7 @@
 ###############################################################################
 # --- F_01__SpcFunctions.py ---------------------------------------------------
 ###############################################################################
-# import numpy as np
 import pandas as pd
-# import scipy.stats as stats
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
