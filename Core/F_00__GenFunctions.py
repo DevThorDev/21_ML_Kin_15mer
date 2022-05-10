@@ -96,7 +96,8 @@ def Xist(cDat):
 
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, sJoin=GC.S_USC):
-    return sJoin.join([str(s) for s in itS if len(str(s)) > 0]).strip()
+    lSJoin = [str(s) for s in itS if s is not None and len(str(s)) > 0]
+    return sJoin.join(lSJoin).strip()
 
 def getPartStr(s, iStart=None, iEnd=None, sSpl=GC.S_USC):
     if iStart is None:
@@ -252,6 +253,12 @@ def extractFromDictL(cD, lKeys):
             else:
                 lRet.append(GC.S_WAVE)
     return lRet
+
+def addToDictCt(cD, cK, nInc=1):
+    if cK in cD:
+        cD[cK] += nInc
+    else:
+        cD[cK] = nInc
 
 def addToDictMnV(cD, cK, cEl, nEl):
     assert nEl > 0

@@ -12,34 +12,39 @@ sNmSpec = 'Input data for the SeqAnalysis class in O_02__SeqAnalysis'
 calcWtLh = False
 calcRelLh = False
 
-calcSnipS = True
-calcSnipX = True
+calcSnipS = False
+calcSnipX = False
 
 saveAsDfrS = True
 saveAsDfrX = False
 
-calcTotalProb = True
-calcCondProb = True
-
-calcWtProb = True
-calcRelProb = True
+calcWtProb = False
+calcRelProb = False
 
 convSnipXToProbTbl = True
 
-useNmerSeqFrom = GC.S_SEQ_CHECK    # S_SEQ_CHECK / S_I_EFF_INP / S_COMB_INP
+calcTotalProb = False
+calcCondProb = False
+
+calcSglPosProb = True
+
+useNmerSeqFrom = GC.S_COMB_INP    # S_I_EFF_INP / S_PROC_INP / S_COMB_INP
 
 # --- names and paths of files and dirs ---------------------------------------
-# sFSeqCheck = GC.S_F_PROC_INP_N_MER
-sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
-# sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
+sFE = '2022_05_06'
+
+sFSeqCheck = GC.S_F_PROC_INP_N_MER
+if useNmerSeqFrom == GC.S_COMB_INP:
+    sFSeqCheck = 'Combined_S_KinasesPho15mer_202202'
+    # sFSeqCheck = 'Combined_S_KinasesPho15mer_202202__Train'
 
 sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7_9_11_13_15'
+sFProcInp = GC.S_F_PROC_INP_N_MER
 sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
-# sFE = sFIEffInp.split(GC.S_US02)[1:]
-sFE = [GC.S_US02.join([sFSeqCheck.split(GC.S_USC)[0], '2022_05_06'])]
+sFE = [GC.S_US02.join([sFSeqCheck.split(GC.S_USC)[0], sFE])]
 sFLNmerSeq = GC.S_US02.join(['ListNmerInputSeq'] + sFE)
 sFLFullSeq = GC.S_US02.join(['ListFullInputSeq'] + sFE)
 
@@ -54,13 +59,13 @@ sFProbTblTP = GC.S_US02.join(['ProbTable_TotalProb'] + sFE)
 sFProbTblCP = GC.S_US02.join(['ProbTable_CondProb'] + sFE)
 sFResWtProb = GC.S_US02.join(['WtProb_FullSeq'] + sFE)
 sFResRelProb = GC.S_US02.join(['RelProb_FullSeq'] + sFE)
-
+sFResSglPosProb = GC.S_US02.join(['SglPosProb_NmerSeq'] + sFE)
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None            # number or None
 iEndLInpNmerSeq = None              # number or None
 
-mDsp = 100
+mDsp = 200
 
 # --- strings -----------------------------------------------------------------
 sCNmer = GC.S_C_N_MER
@@ -81,6 +86,7 @@ sRelProb = 'relProb'
 sInCombRes = 'inCombRes'
 sSeqCheck = GC.S_SEQ_CHECK
 sIEffInp = GC.S_I_EFF_INP
+sProcInp = GC.S_PROC_INP
 sCombInp = GC.S_COMB_INP
 sAllSeqNmer = GC.S_ALL_SEQ_N_MER
 sTrainData = GC.S_TRAIN_DATA
@@ -118,7 +124,7 @@ dWtsLenSeq = {1: 0.1,
 lSKeyFRes = ['sFLNmerSeq', 'sFLFullSeq', 'sFResWtLh', 'sFResRelLh',
              'sFSnipDictS', 'sFSnipDictX', 'sFSnipDfrS', 'sFSnipDfrX',
              'sFProbTblFS', 'sFProbTblTP', 'sFProbTblCP', 'sFResWtProb',
-             'sFResRelProb']
+             'sFResRelProb', 'sFResSglPosProb']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -131,15 +137,17 @@ dIO = {# --- general
        'calcSnipX': calcSnipX,
        'saveAsDfrS': saveAsDfrS,
        'saveAsDfrX': saveAsDfrX,
-       'calcTotalProb': calcTotalProb,
-       'calcCondProb': calcCondProb,
        'calcWtProb': calcWtProb,
        'calcRelProb': calcRelProb,
        'convSnipXToProbTbl': convSnipXToProbTbl,
+       'calcTotalProb': calcTotalProb,
+       'calcCondProb': calcCondProb,
+       'calcSglPosProb': calcSglPosProb,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
        'sFSeqCheck': sFSeqCheck + GC.S_DOT + GC.S_EXT_CSV,
        'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
+       'sFProcInp': sFProcInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
        'sFLNmerSeq': sFLNmerSeq + GC.S_DOT + GC.S_EXT_CSV,
        'sFLFullSeq': sFLFullSeq + GC.S_DOT + GC.S_EXT_CSV,
@@ -154,6 +162,7 @@ dIO = {# --- general
        'sFProbTblCP': sFProbTblCP + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
+       'sFResSglPosProb': sFResSglPosProb + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers
        'iStartLInpNmerSeq': iStartLInpNmerSeq,
        'iEndLInpNmerSeq': iEndLInpNmerSeq,
@@ -177,6 +186,7 @@ dIO = {# --- general
        'sInCombRes': sInCombRes,
        'sSeqCheck': sSeqCheck,
        'sIEffInp': sIEffInp,
+       'sProcInp': sProcInp,
        'sCombInp': sCombInp,
        'sAllSeqNmer': sAllSeqNmer,
        'sTrainData': sTrainData,

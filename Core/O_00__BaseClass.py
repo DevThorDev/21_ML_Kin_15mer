@@ -127,6 +127,8 @@ class BaseClass:
                 saveAnyway=True):
         if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
             print('Saving DataFrame as *.csv file to path ' + pF)
+            if idxLbl is not None:
+                saveIdx = True
             GF.checkDupSaveCSV(cDfr, pF, cSep=self.dITp['cSep'],
                                saveIdx=saveIdx, iLbl=idxLbl, dropDup=dropDup)
 
@@ -239,7 +241,7 @@ class FullSeq(Seq):
 
     # --- method for creating the Nmer dictionary ----------------------------
     def createNmerDict(self, dITp):
-        self.dNmer, iCNmer = {},  dITp['iCentNmer']
+        self.dNmer, iCNmer = {}, dITp['iCentNmer']
         for iPyl in self.lIPyl:
             sNmerSeq = self.sSeq[(iPyl - iCNmer):(iPyl + iCNmer + 1)]
             self.dNmer[iPyl] = NmerSeq(dITp, sSq=sNmerSeq, iPCt=iPyl)
@@ -255,6 +257,23 @@ class FullSeq(Seq):
                 cPrb = round(nPyl/nOcc, GC.R08)
                 dIPosSeq[sSeq2F] = (lIPos, lB, nPyl, nOcc, cPrb)
         return dIPosSeq
+
+    def getDictNmerSeqRmdr(self, dITp, lSSeq2F):
+        dNmerRmdr, sRmdr, iCNmer = {}, '', dITp['iCentNmer']
+        for sSeq2F in lSSeq2F:
+            lIPos = GF.getLCentPosSSub(self.sSeq, sSub=sSeq2F)
+            GF.addToDictCt(dNmerRmdr, cK=sSeq2F)
+            if len(lIPos) > 0:
+                for i in lIPos:
+                    if i == lIPos[0]:
+                        sRmdr += self.sSeq[:(i - iCNmer)]
+                    elif i > lIPos[0] and i < lIPos[-1]:
+                        sRmdr += self.sSeq[i:(i + 1)]
+                    elif i == lIPos[-1]:
+                        sRmdr += self.sSeq[(i + iCNmer + 1):]
+            else:
+                sRmdr = self.sSeq
+            GF.addToDictCt(dNmerRmdr, cK=sRmdr)
 
 # -----------------------------------------------------------------------------
 class Timing:
@@ -273,13 +292,15 @@ class Timing:
         self.elT_02_9_getD2TotalProbSnip = 0.
         self.elT_02_10_getD2CondProbSnip = 0.
         self.elT_02_11_saveD2TCProbSnipAsDfr = 0.
+        self.elT_02_12_getProbSglPos = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
         self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
                       'performProbAnalysis_A', 'performProbAnalysis_B',
                       'performProbAnalysis_C', 'performProbAnalysis_D',
                       'calcProbTable', 'getD2TotalProbSnip',
-                      'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr']
+                      'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
+                      'getProbSglPos']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -293,7 +314,8 @@ class Timing:
                      self.elT_02_8_calcProbTable,
                      self.elT_02_9_getD2TotalProbSnip,
                      self.elT_02_10_getD2CondProbSnip,
-                     self.elT_02_11_saveD2TCProbSnipAsDfr]
+                     self.elT_02_11_saveD2TCProbSnipAsDfr,
+                     self.elT_02_12_getProbSglPos]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
         if stTMth is not None and endTMth is not None:
@@ -320,6 +342,8 @@ class Timing:
                 self.elT_02_10_getD2CondProbSnip += elT
             elif iMth == 11:
                 self.elT_02_11_saveD2TCProbSnipAsDfr += elT
+            elif iMth == 12:
+                self.elT_02_12_getProbSglPos += elT
             self.elT_Sum += elT
             self.updateLElTimes()
 
@@ -348,6 +372,8 @@ class Timing:
                str(round(self.elT_02_10_getD2CondProbSnip, self.rdDig)) +
                GC.S_NEWL + 'Method 11 | "saveD2TCProbSnipAsDfr":\t' +
                str(round(self.elT_02_11_saveD2TCProbSnipAsDfr, self.rdDig)) +
+               GC.S_NEWL + 'Method 12 | "getProbSglPos":\t' +
+               str(round(self.elT_02_12_getProbSglPos, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 

@@ -79,18 +79,23 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
     return pd.DataFrame(d4Dfr).convert_dtypes()
 
 # --- Functions (O_02__SeqAnalysis) -------------------------------------------
-def getLSFullSeq(dITp, dfrInpSeq, iS=None, iE=None):
-    lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']].unique())
+def getLSFullSeq(dITp, dfrInpSeq, iS=None, iE=None, unqS=True):
+    if unqS:
+        lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']].unique())
+    else:
+        lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']])
     return GF.getItStartToEnd(lSFullSeq, iS, iE)
 
-def getLSNmer(dITp, dfrInpSeq, lSFull=[], lSNmer=[]):
+def getLSNmer(dITp, dfrInpSeq, lSFull=[], lSNmer=[], red2WF=True, unqS=True):
     if lSNmer is None and dITp['sCNmer'] in dfrInpSeq.columns:
-        if dITp['sCCodeSeq'] in dfrInpSeq.columns:
+        dfrCSeq = dfrInpSeq
+        if (dITp['sCCodeSeq'] in dfrInpSeq.columns and red2WF):
             # reduce to Nmer sequences with corresponding full sequences
             dfrCSeq = dfrInpSeq[dfrInpSeq[dITp['sCCodeSeq']].isin(lSFull)]
+        if unqS:
             lSNmer = list(dfrCSeq[dITp['sCNmer']].unique())
         else:
-            lSNmer = list(dfrInpSeq[dITp['sCNmer']].unique())
+            lSNmer = list(dfrCSeq[dITp['sCNmer']])
     return lSNmer
 
 def modLSF(dITp, lSKeyF, sFE):
