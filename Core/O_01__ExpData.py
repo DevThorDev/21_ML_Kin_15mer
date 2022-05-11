@@ -166,7 +166,7 @@ class ExpData(BaseClass):
         self.dTpDfr[self.dITp['sBase']][self.dITp['sCDfrComb']] = self.dfrComb
         sBase, sComb = self.dITp['sBase'], self.dITp['sCombined']
         self.saveDfr(self.dfrComb, pF=self.dPF[sBase][sComb][sMd],
-                     dropDup=True, saveAnyway=True)
+                     dropDup=True)
         self.fillDfrResIGen(self.dfrComb, lR=self.dITp['lRResIG'], iSt=iSt)
 
     def combineXS(self, iSt=0):
@@ -241,15 +241,15 @@ class ExpData(BaseClass):
                                  ascending=self.dITp['lSortDirAscDfrNmer'],
                                  inplace=True, ignore_index=True)
             self.saveDfr(dfrINmer, pF=self.dPF[tpDfr][self.dITp['sImer']],
-                         saveIdx=True, saveAnyway=True)
+                         saveIdx=True)
             GF.showElapsedTime(stT)
         if self.dTpDfr[tpDfr][self.dITp['sBGenInfoEff']]:
             dfrIEff = SF.dDNumToDfrIEff(self.dITp, dNmer)
             self.saveDfr(dfrIEff, pF=self.dPF[tpDfr][self.dITp['sIEff']],
-                         saveIdx=False, saveAnyway=True)
+                         saveIdx=False)
             dfrIEffF = SF.dDNumToDfrIEff(self.dITp, dNmer, wAnyEff=True)
             self.saveDfr(dfrIEffF, pF=self.dPF[tpDfr][self.dITp['sIEffF']],
-                         saveIdx=False, saveAnyway=True)
+                         saveIdx=False)
             GF.showElapsedTime(stT)
 
     def getInfoKinNmer(self, stT, tpDfr, sMd=GC.S_X_SHORT):

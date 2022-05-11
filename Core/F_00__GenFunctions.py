@@ -209,6 +209,7 @@ def restrLenS(cIt, lRestrLen=[]):
     return restrIt(cIt=cIt, lRestrLen=lRestrLen, useLenS=True)
 
 # --- Functions handling lists ------------------------------------------------
+
 def fillCondList(elCond, lToFill=[], lLoop=[], lUniqEl=True):
     for elCheckContain in lLoop:
         if elCond in elCheckContain:
@@ -225,6 +226,22 @@ def fillLValSnip(lValSnip, lIdxPos=[], lIdxPyl=[]):
         lValSnip[3] += nPyl/nOcc
         return 1
     return 0
+
+def fillListUnique(cL, cIt):
+    for cEl in cIt:
+        if cEl not in cL:
+            cL.append(cEl)
+
+def getListUniqueWD2(d2, srtDir=None):
+    lUnq = []
+    for cDSub in d2.values():
+        fillListUnique(cL=lUnq, cIt=cDSub)
+    if srtDir is not None:
+        if srtDir == 'asc':
+            return sorted(lUnq, reverse=False)
+        elif srtDir == 'desc':
+            return sorted(lUnq, reverse=True)
+    return lUnq
 
 # --- Functions handling dictionaries -----------------------------------------
 def addIfAbsent(lD, cK, cV=None):

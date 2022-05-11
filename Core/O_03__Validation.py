@@ -105,9 +105,9 @@ class Validation(ExpData):
     def saveTrainTestData(self):
         if self.dITp['saveCombTrain']:
             pFOut = self.dPF[self.dITp['sTrain']][self.dITp['sCombinedOut']]
-            self.saveDfr(self.dfrTrain, pF=pFOut, saveAnyway=True)
+            self.saveDfr(self.dfrTrain, pF=pFOut)
         if self.dITp['saveCombTest']:
             pFOut = self.dPF[self.dITp['sTest']][self.dITp['sCombinedOut']]
-            self.saveDfr(self.dfrTest, pF=pFOut, saveAnyway=True)
+            self.saveDfr(self.dfrTest, pF=pFOut)
 
 ###############################################################################

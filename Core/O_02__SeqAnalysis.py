@@ -69,10 +69,10 @@ class SeqAnalysis(BaseClass):
             print(GC.S_DS04, chAAc, GC.S_COL, round(cV, GC.R08))
         print(GC.S_PL04, GC.S_QMK, GC.S_COL, round(sum(dSub.values()), GC.R08))
 
-    def printDSglPos(self, sDPrnt='RelFreq', lIPPrnt=None):
-        cD = self.dNOccSglPos
+    def printD2SglPos(self, sDPrnt='RelFreq', lIPPrnt=None):
+        cD = self.d2NOccSglPos
         if sDPrnt == 'RelFreq':
-            cD = self.dRelFreqSglPos
+            cD = self.d2RFreqSglPos
         print(GC.S_EQ20, 'Dictionary of', sDPrnt, 'of single positions:')
         if lIPPrnt is None:
             for iP, dSub in cD.items():
@@ -82,11 +82,11 @@ class SeqAnalysis(BaseClass):
                 if iP in cD:
                     self.printDSglPosSub(cD[iP], iP=iP)
 
-    def printDNOccSglPos(self, lIPPrnt=None):
-        self.printDSglPos(sDPrnt='NOcc', lIPPrnt=lIPPrnt)
+    def printD2NOccSglPos(self, lIPPrnt=None):
+        self.printD2SglPos(sDPrnt='NOcc', lIPPrnt=lIPPrnt)
 
-    def printDRelFreqSglPos(self, lIPPrnt=None):
-        self.printDSglPos(sDPrnt='RelFreq', lIPPrnt=lIPPrnt)
+    def printD2RFreqSglPos(self, lIPPrnt=None):
+        self.printD2SglPos(sDPrnt='RelFreq', lIPPrnt=lIPPrnt)
 
     # --- methods for filling the result paths dictionary ---------------------
     def getPDirRes(self, pDirR=None):
@@ -118,6 +118,10 @@ class SeqAnalysis(BaseClass):
         self.dPF['ProbTblFS'] = GF.joinToPath(pP, self.dITp['sFProbTblFS'])
         self.dPF['ProbTblTP'] = GF.joinToPath(pP, self.dITp['sFProbTblTP'])
         self.dPF['ProbTblCP'] = GF.joinToPath(pP, self.dITp['sFProbTblCP'])
+        self.dPF['ResWtProb'] = GF.joinToPath(pP, self.dITp['sFResWtProb'])
+        self.dPF['ResRelProb'] = GF.joinToPath(pP, self.dITp['sFResRelProb'])
+        self.dPF['ResNOccSP'] = GF.joinToPath(pP, self.dITp['sFResNOccSP'])
+        self.dPF['ResRFreqSP'] = GF.joinToPath(pP, self.dITp['sFResRFreqSP'])
 
     def updateDPFVal(self):
         pP = self.pDirResProb
@@ -342,7 +346,7 @@ class SeqAnalysis(BaseClass):
         self.dfrProbTbl = GF.concLSerAx1(lSerD)
         self.dfrProbTbl.index = lSSeq
         self.saveDfr(self.dfrProbTbl, pF=self.dPF['ProbTblFS'],
-                     idxLbl=self.dITp['sCNmer'], saveAnyway=True)
+                     idxLbl=self.dITp['sCNmer'])
         cTim.updateTimes(iMth=8, stTMth=cStT, endTMth=time.time())
 
     # --- methods checking the Nmer-sequence snippet probability analysis -----
@@ -384,78 +388,69 @@ class SeqAnalysis(BaseClass):
                 cTim.updateTimes(iMth=11, stTMth=cStT, endTMth=time.time())
 
     # --- methods performing the Nmer-sequence single pos. prob. analysis -----
-    def processLFullSeq(self, iS=None, iE=None, unqS=True, stT=None):
-        [iS, iE], iCNmer = self.dITp['lIStartEnd'], self.dITp['iCentNmer']
+    def getInfoLSFull(self, unqS=True):
+        [iS, iE] = self.dITp['lIStartEnd']
         self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
         if not GF.Xist(self.lSFull):
             assert self.dITp['sCCodeSeq'] in self.dfrInpSeq.columns
             t = SF.getLSFullSeq(self.dITp, self.dfrInpSeq, iS, iE, unqS=unqS)
             self.lSFull, iS, iE = t
-        SF.modLSF(self.dITp, lSKeyF=[self.dITp['sFResSglPosProb']],
+        SF.modLSF(self.dITp, lSKeyF=['sFResNOccSP', 'sFResRFreqSP'],
                   sFE=GF.joinS([self.getSFResEnd(), iS, iE]))
-        self.d2Full2Nmer, sAllRmg = {sFull: {} for sFull in self.lSFull}, ''
+
+    def getD2Full2NmerSRem(self, iCt=0):
+        d2Full2Nmer, sSeqRem = {sFull: {} for sFull in self.lSFull}, ''
         for sFull in self.lSFull:
             lI, sMod = sorted(self.getLIPosPyl(sFullSeq=sFull)), sFull
             for k, cI in enumerate(lI):
-                iL, iR = max(0, cI - iCNmer), min(len(sFull), cI + iCNmer + 1)
+                iL, iR = max(0, cI - iCt), min(len(sFull), cI + iCt + 1)
                 sNmer = sFull[iL:iR]
-                GF.addToDictCt(self.d2Full2Nmer[sFull], cK=sNmer)
+                GF.addToDictCt(d2Full2Nmer[sFull], cK=sNmer)
                 sMod = sMod[:iL] + GC.S_0*(iR - iL) + sMod[iR:]
-            sAllRmg += ''.join([chAAc for chAAc in sMod if chAAc != GC.S_0])
-        return sAllRmg
+            sSeqRem += ''.join([chAAc for chAAc in sMod if chAAc != GC.S_0])
+        self.nNmer = sum([sum(dSub.values()) for dSub in d2Full2Nmer.values()])
+        return d2Full2Nmer, sSeqRem
 
-    def getD2Full2Nmer(self, iS=None, iE=None, unqS=True, stT=None):
-        [iS, iE] = self.dITp['lIStartEnd']
-        self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
-        iS, iE = self.getLFullSeq(iS, iE, unqS=unqS, stT=stT)
-        SF.modLSF(self.dITp, lSKeyF=[self.dITp['sFResSglPosProb']],
-                  sFE=GF.joinS([self.getSFResEnd(), iS, iE]))
-        if not GF.Xist(self.lSNmer):
-            self.lSNmer = SF.getLSNmer(self.dITp, self.dfrInpSeq, self.lSFull,
-                                       lSNmer=None, red2WF=True, unqS=True)
-        for cSeqF in self.lFullSeq:
-            dIPosSeq = cSeqF.getDictPosSeq(lSSeq2F=self.lSNmer)
-        self.d2Full2Nmer = {sFull: {} for sFull in self.lSFull}
-        for sFull in self.d2Full2Nmer:
-            for sNmer in self.lSNmer:
-                pass
+    def fillD2ResSglPos(self, d2Full2Nmer, sR='', iCt=0):
+        # fill Nmer position dictionaries
+        if self.nNmer > 0:
+            for dNmer in d2Full2Nmer.values():
+                for sNmer, n in dNmer.items():
+                    for iP in self.d2NOccSglPos:
+                        chAAc = sNmer[iP + iCt]
+                        GF.addToDictCt(self.d2NOccSglPos[iP], cK=chAAc, nInc=n)
+                        GF.addToDictCt(self.d2RFreqSglPos[iP], cK=chAAc,
+                                       nInc=n/self.nNmer)
+        # fill outside-Nmer amino acid dictionaries
+        self.d2NOccSglPos[None], self.d2RFreqSglPos[None] = {}, {}
+        for chAAc in sR:
+            GF.addToDictCt(self.d2NOccSglPos[None], cK=chAAc)
+            GF.addToDictCt(self.d2RFreqSglPos[None], cK=chAAc, nInc=1/len(sR))
 
-    def getDRelFreqSglPos(self):
+    def processLFullSeq(self, unqS=True, stT=None):
         iCt, lenNmer = self.dITp['iCentNmer'], self.dITp['lenNmerDef']
-        self.nNmer, self.nFull = len(self.lNmerSeq), len(self.lFullSeq)
-        self.dNOccSglPos = {iP: {} for iP in list(range(-iCt, lenNmer - iCt))}
-        self.dRelFreqSglPos = {iP: {} for iP in self.dNOccSglPos}
-        for sNmer in self.lSNmer:
-            for iP in self.dNOccSglPos:
-                GF.addToDictCt(self.dNOccSglPos[iP], cK=sNmer[iP + iCt])
-                GF.addToDictCt(self.dRelFreqSglPos[iP], cK=sNmer[iP + iCt],
-                               nInc=(0. if self.nNmer == 0 else 1/self.nNmer))
-        self.dNOccSglPos[None], self.dRelFreqSglPos[None] = {}, {}
-        self.nAAcFull = sum([len(sFull) for sFull in self.lSFull])
-        for sFull in self.lSFull:
-            for chAAc in sFull:
-                GF.addToDictCt(self.dNOccSglPos[None], cK=chAAc)
-                GF.addToDictCt(self.dRelFreqSglPos[None], cK=chAAc,
-                               nInc=1/self.nAAcFull)
+        self.getInfoLSFull(unqS=unqS)
+        d2Full2Nmer, sR = self.getD2Full2NmerSRem(iCt=iCt)
+        self.d2NOccSglPos = {iP: {} for iP in list(range(-iCt, lenNmer - iCt))}
+        self.d2RFreqSglPos = {iP: {} for iP in self.d2NOccSglPos}
+        self.fillD2ResSglPos(d2Full2Nmer, sR=sR, iCt=iCt)
 
     def getProbSglPos(self, cTim, lEff=[None], lSSeq=None, stT=None):
-        if self.dITp['calcSglPosProb']:
+        if self.dITp['calcSglPos']:
             cStT = time.time()
-            self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, uniqueS=True, stT=stT)
-            self.getDRelFreqSglPos()
-            self.printLNmerSeq()
-            self.printDNOccSglPos(lIPPrnt=[-7, -1, 0, 7, None])
-            self.printDRelFreqSglPos(lIPPrnt=[-7, -1, 0, 7, None])
+            self.processLFullSeq(unqS=True, stT=stT)
+            self.saveDfrResNOccSglPos()
+            self.saveDfrResRFreqSglPos()
             cTim.updateTimes(iMth=12, stTMth=cStT, endTMth=time.time())
 
     # --- methods for saving and loading data ---------------------------------
     def saveDfrRelLikelihood(self, dLV, d3, lSCD3):
         if self.dITp['calcWtLh']:
             dfrVal = GF.dLV3CToDfr(dLV)
-            self.saveDfr(dfrVal, pF=self.dPF['ResWtLh'], saveAnyway=True)
+            self.saveDfr(dfrVal, pF=self.dPF['ResWtLh'])
         if self.dITp['calcRelLh']:
             dfrDict = GF.d3ValToDfr(d3, lSCD3)
-            self.saveDfr(dfrDict, pF=self.dPF['ResRelLh'], saveAnyway=True)
+            self.saveDfr(dfrDict, pF=self.dPF['ResRelLh'])
 
     def convDictToDfrS(self):
         dLV, lSCDfr = {}, self.dITp['lSCDfrProbS']
@@ -472,8 +467,7 @@ class SeqAnalysis(BaseClass):
             GF.pickleSaveDict(cD=self.dSnipS, pF=self.dPF['SnipDictS'])
             if self.dITp['saveAsDfrS']:
                 self.dfrSnipS = self.convDictToDfrS()
-                self.saveDfr(self.dfrSnipS, pF=self.dPF['SnipDfrS'],
-                             saveAnyway=True)
+                self.saveDfr(self.dfrSnipS, pF=self.dPF['SnipDfrS'])
 
     def convDictToDfrX(self):
         dLV, lSCDfr = {}, self.dITp['lSCDfrWFSProbX']
@@ -494,7 +488,7 @@ class SeqAnalysis(BaseClass):
                 lIdx = self.dfrSnipX[self.dITp['sSnippet']].to_list()
                 self.dfrSnipX.index = lIdx
                 self.saveDfr(self.dfrSnipX, pF=self.dPF['SnipDfrX'],
-                             saveIdx=True, idxLbl=False, saveAnyway=True)
+                             saveIdx=True, idxLbl=False)
 
     def loadDfrSnipX(self, reLoad=False):
         pFDfr = self.dPF['SnipDfrX']
@@ -512,20 +506,41 @@ class SeqAnalysis(BaseClass):
             return self.dfrSnipX.to_dict(orient='dict')
 
     def saveD2TCProbSnipAsDfr(self, typeProb=GC.S_TOTAL_PROB):
-        cD, pFC = self.d2TotalProbSnip, self.dPF['ProbTblTP']
+        cD2, pFC = self.d2TotalProbSnip, self.dPF['ProbTblTP']
         if typeProb == self.dITp['sCndProb']:
-            cD, pFC = self.d2CondProbSnip, self.dPF['ProbTblCP']
-        if GF.Xist(cD):
+            cD2, pFC = self.d2CondProbSnip, self.dPF['ProbTblCP']
+        if GF.Xist(cD2):
             dLV, lSCDfr = {}, self.dITp['lSCMerAll']
-            for cDSub in cD.values():
+            for cDSub in cD2.values():
                 lElRow = []
                 for sSnip, lV in cDSub.items():
                     lElRow += ([sSnip] + lV)
                 assert len(lElRow) == len(lSCDfr)
                 for sC, cV in zip(lSCDfr, lElRow):
                     GF.addToDictL(dLV, cK=sC, cE=cV)
-            dfrVal = GF.dictToDfr(dLV, idxDfr=list(cD))
-            self.saveDfr(dfrVal, pF=pFC, idxLbl=self.dITp['sCNmer'],
-                         saveAnyway=True)
+            dfrVal = GF.dictToDfr(dLV, idxDfr=list(cD2))
+            self.saveDfr(dfrVal, pF=pFC, idxLbl=self.dITp['sCNmer'])
+
+    def saveDfrResSglPos(self, sDSave='RelFreq'):
+        cD2, pFC = self.d2NOccSglPos, self.dPF['ResNOccSP']
+        if sDSave == 'RelFreq':
+            cD2, pFC = self.d2RFreqSglPos, self.dPF['ResRFreqSP']
+        assert list(cD2).count(None) == 1
+        lIP = sorted([iP for iP in cD2 if iP is not None]) + [None]
+        dSCol = {str(iP): iP for iP in lIP if iP is not None}
+        dSCol[self.dITp['sNotInNmer']] = None
+        lSRow = GF.getListUniqueWD2(d2=cD2, srtDir='asc')
+        dfrRes = GF.iniPdDfr(lSNmC=list(dSCol), lSNmR=lSRow)
+        for chAAc in dfrRes.index:
+            for sIP in dfrRes.columns:
+                if chAAc in cD2[dSCol[sIP]]:
+                    dfrRes.at[chAAc, sIP] = cD2[dSCol[sIP]][chAAc]
+        self.saveDfr(dfrRes, pF=pFC, idxLbl=self.dITp['sAminoAcid'])
+
+    def saveDfrResNOccSglPos(self):
+        self.saveDfrResSglPos(sDSave='NOcc')
+
+    def saveDfrResRFreqSglPos(self):
+        self.saveDfrResSglPos(sDSave='RelFreq')
 
 ###############################################################################

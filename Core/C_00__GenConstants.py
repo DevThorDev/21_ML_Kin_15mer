@@ -161,6 +161,7 @@ S_CODE_TRUNC = 'code_trunc'
 S_ANY_EFF = 'Any' + S_EFF_CODE
 S_NUM_OCC = 'nOcc'
 S_ALL_SEQ_N_MER = 'AllSeq15mer'
+S_AMINO_ACID = 'AminoAcid'
 S_SEQ_CHECK = S_SEQ + 'Check'
 S_I_EFF_INP = 'I' + S_EFF + S_INP
 S_PROC_INP = S_PROC + S_INP
