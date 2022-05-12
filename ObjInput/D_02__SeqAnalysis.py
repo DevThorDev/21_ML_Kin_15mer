@@ -31,7 +31,7 @@ calcSglPos = True
 useNmerSeqFrom = GC.S_COMB_INP    # S_I_EFF_INP / S_PROC_INP / S_COMB_INP
 
 # --- names and paths of files and dirs ---------------------------------------
-sFE = '2022_05_06'
+sFE = '2022_05_12'
 
 sFSeqCheck = GC.S_F_PROC_INP_N_MER
 if useNmerSeqFrom == GC.S_COMB_INP:
@@ -59,6 +59,8 @@ sFProbTblTP = GC.S_US02.join(['ProbTable_TotalProb'] + sFE)
 sFProbTblCP = GC.S_US02.join(['ProbTable_CondProb'] + sFE)
 sFResWtProb = GC.S_US02.join(['WtProb_FullSeq'] + sFE)
 sFResRelProb = GC.S_US02.join(['RelProb_FullSeq'] + sFE)
+sFDictNOccSP = GC.S_US02.join(['Dict_SglPosNOcc_NmerSeq'] + sFE)
+sFDictRFreqSP = GC.S_US02.join(['Dict_SglPosRFreq_NmerSeq'] + sFE)
 sFResNOccSP = GC.S_US02.join(['SglPosNOcc_NmerSeq'] + sFE)
 sFResRFreqSP = GC.S_US02.join(['SglPosRFreq_NmerSeq'] + sFE)
 
@@ -127,7 +129,8 @@ dWtsLenSeq = {1: 0.1,
 lSKeyFRes = ['sFLNmerSeq', 'sFLFullSeq', 'sFResWtLh', 'sFResRelLh',
              'sFSnipDictS', 'sFSnipDictX', 'sFSnipDfrS', 'sFSnipDfrX',
              'sFProbTblFS', 'sFProbTblTP', 'sFProbTblCP', 'sFResWtProb',
-             'sFResRelProb', 'sFResNOccSP', 'sFResRFreqSP']
+             'sFResRelProb', 'sFDictNOccSP', 'sFDictRFreqSP', 'sFResNOccSP',
+             'sFResRFreqSP']
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -165,6 +168,8 @@ dIO = {# --- general
        'sFProbTblCP': sFProbTblCP + GC.S_DOT + GC.S_EXT_CSV,
        'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
+       'sFDictNOccSP': sFDictNOccSP + GC.S_DOT + GC.S_EXT_BIN,
+       'sFDictRFreqSP': sFDictRFreqSP + GC.S_DOT + GC.S_EXT_BIN,
        'sFResNOccSP': sFResNOccSP + GC.S_DOT + GC.S_EXT_CSV,
        'sFResRFreqSP': sFResRFreqSP + GC.S_DOT + GC.S_EXT_CSV,
        # --- numbers

@@ -18,12 +18,17 @@ class SeqAnalysis(BaseClass):
         self.idO = 'O_02'
         self.descO = 'Analysis of Nmer-sequences'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
-        self.lSFull, self.lSNmer, self.lFullSeq, self.lNmerSeq = [], [], [], []
-        self.d2TotalProbSnip, self.d2CondProbSnip = {}, {}
+        self.iniObj()
         self.getPDir()
         self.fillDPFVal()
         self.loadInpDfrs()
         print('Initiated "SeqAnalysis" base object.')
+
+    def iniObj(self):
+        self.nNmer = 0
+        self.lSFull, self.lSNmer, self.lFullSeq, self.lNmerSeq = [], [], [], []
+        self.d2TotalProbSnip, self.d2CondProbSnip = {}, {}
+        self.d2NOccSglPos, self.d2RFreqSglPos = {}, {}
 
     # --- print methods -------------------------------------------------------
     def printLInpSeq(self, sLSeqPrnt='Nmer', prntFullI=False, maxNPrnt=10):
@@ -120,6 +125,8 @@ class SeqAnalysis(BaseClass):
         self.dPF['ProbTblCP'] = GF.joinToPath(pP, self.dITp['sFProbTblCP'])
         self.dPF['ResWtProb'] = GF.joinToPath(pP, self.dITp['sFResWtProb'])
         self.dPF['ResRelProb'] = GF.joinToPath(pP, self.dITp['sFResRelProb'])
+        self.dPF['DictNOccSP'] = GF.joinToPath(pP, self.dITp['sFDictNOccSP'])
+        self.dPF['DictRFreqSP'] = GF.joinToPath(pP, self.dITp['sFDictRFreqSP'])
         self.dPF['ResNOccSP'] = GF.joinToPath(pP, self.dITp['sFResNOccSP'])
         self.dPF['ResRFreqSP'] = GF.joinToPath(pP, self.dITp['sFResRFreqSP'])
 
@@ -434,11 +441,19 @@ class SeqAnalysis(BaseClass):
         self.d2NOccSglPos = {iP: {} for iP in list(range(-iCt, lenNmer - iCt))}
         self.d2RFreqSglPos = {iP: {} for iP in self.d2NOccSglPos}
         self.fillD2ResSglPos(d2Full2Nmer, sR=sR, iCt=iCt)
+        GF.pickleSaveDict(cD=self.d2NOccSglPos, pF=self.dPF['DictNOccSP'])
+        GF.pickleSaveDict(cD=self.d2RFreqSglPos, pF=self.dPF['DictRFreqSP'])
 
     def getProbSglPos(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if self.dITp['calcSglPos']:
             cStT = time.time()
-            self.processLFullSeq(unqS=True, stT=stT)
+            if not os.path.isfile(self.dPF['DictRFreqSP']):
+                self.processLFullSeq(unqS=True, stT=stT)
+            else:
+                self.d2RFreqSglPos = GF.pickleLoadDict(self.dPF['DictRFreqSP'])
+            if (not GF.Xist(self.d2NOccSglPos) and
+                os.path.isfile(self.dPF['DictNOccSP'])):
+                self.d2NOccSglPos = GF.pickleLoadDict(self.dPF['DictNOccSP'])
             self.saveDfrResNOccSglPos()
             self.saveDfrResRFreqSglPos()
             cTim.updateTimes(iMth=12, stTMth=cStT, endTMth=time.time())

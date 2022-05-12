@@ -76,6 +76,7 @@ def pickleLoadDict(pF=('Dict' + GC.S_DOT + GC.S_EXT_BIN), reLoad=False):
     if os.path.isfile(pF) and (cD is None or len(cD) == 0 or reLoad):
         with open(pF, 'rb') as fDict:
             cD = pickle.load(fDict)
+        print('Loaded dictionary from', pF)
     if cD is None:
         print('ERROR: Loading dictionary from', pF, 'failed.')
     return cD
