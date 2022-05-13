@@ -123,7 +123,7 @@ for dEmitPr in emitPr.values():
 pFInpViterbi = os.path.join(P_TEMP, S_F_INP_VITERBI + XT_CSV)
 pFOutViterbi = os.path.join(P_TEMP, S_F_OUT_VITERBI + XT_CSV)
 
-lIDays = list(range(len(lObs)))
+lIPos = list(range(len(lObs)))
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
@@ -155,7 +155,7 @@ dInp = {# --- flow control ----------------------------------------------------
         # === derived values and input processing =============================
         'pFInpViterbi': pFInpViterbi,
         'pFOutViterbi': pFOutViterbi,
-        'lIDays': lIDays}
+        'lIPos': lIPos}
 
 # ### FUNCTIONS ###############################################################
 # --- General file system related functions -----------------------------------
@@ -220,36 +220,36 @@ def getTransProb(dI, V, t, cSt, prevSt):
     return V[t - 1][prevSt][S_PROB]*dI['transPr'][prevSt][cSt]
 
 def fillV(dI, V):
-    for t in dI['lIDays'][1:]:
-        cObs = dI['lObs'][t]
+    for i in dI['lIPos'][1:]:
+        cObs = dI['lObs'][i]
         for st in dI['lStates']:
-            maxTransProb = getTransProb(dI, V, t, cSt=st, prevSt=dI['st0'])
+            maxTransProb = getTransProb(dI, V, i, cSt=st, prevSt=dI['st0'])
             prevStSel = dI['st0']
             for prevSt in dI['lStates'][1:]:
-                transProb = getTransProb(dI, V, t, cSt=st, prevSt=prevSt)
+                transProb = getTransProb(dI, V, i, cSt=st, prevSt=prevSt)
                 if transProb > maxTransProb:
                     maxTransProb = transProb
                     prevStSel = prevSt
             maxProb = maxTransProb*dI['emitPr'][st][cObs]
             dData = {S_PROB: maxProb, S_PREV: prevStSel}
-            addToDictD(V, cKMain=t, cKSub=st, cVSub=dData)
+            addToDictD(V, cKMain=i, cKSub=st, cVSub=dData)
 
 def getMostProbStWBacktrack(dI, V):
-    optStPath, maxProb, bestSt, tLast = [], 0., None, dI['lIDays'][-1]
-    for st, dData in V[tLast].items():
+    optStPath, maxProb, bestSt, iLast = [], 0., None, dI['lIPos'][-1]
+    for st, dData in V[iLast].items():
         if dData[S_PROB] > maxProb:
             maxProb = dData[S_PROB]
             bestSt = st
     optStPath.append(bestSt)
-    previousSt = bestSt
     return {'optStPath': optStPath,
             'maxProb': maxProb,
-            'previousSt': previousSt}
+            'previousSt': bestSt}
 
 def followBacktrackTo1stObs(dI, dR, V):
     for t in range(len(V) - 2, -1, -1):
-        dR['optStPath'].insert(0, V[t + 1][dR['previousSt']][S_PREV])
-        dR['previousSt'] = V[t + 1][dR['previousSt']][S_PREV]
+        previousSt = V[t + 1][dR['previousSt']][S_PREV]
+        dR['optStPath'].insert(0, previousSt)
+        dR['previousSt'] = previousSt
 
 def ViterbiCore(dI):
     V = iniV(dI)
@@ -270,6 +270,8 @@ def printRes(dI, dR, V):
             print(S_DS08, 'Prob.', round(dProbPrev[S_PROB], dI['R08']),
                   S_VLINE, 'Previous state selected:', dProbPrev[S_PREV])
     print('Optimal state path:', dR['optStPath'])
+    # print('Maximal probability:', np.exp(dR['maxProb']))
+    # print('ln(maximal probability):', dR['maxProb'])
     print('Maximal probability:', dR['maxProb'])
     print('ln(maximal probability):', np.log(dR['maxProb']))
     # print('Previous state:', dR['previousSt'])

@@ -40,60 +40,24 @@ S_EQ80 = S_EQ*80
 
 COND_A = 'A'
 COND_C = 'C'
-COND_D = 'D'
-COND_E = 'E'
-COND_F = 'F'
 COND_G = 'G'
-COND_H = 'H'
-COND_I = 'I'
-COND_K = 'K'
-COND_L = 'L'
-COND_M = 'M'
-COND_N = 'N'
-COND_P = 'P'
-COND_Q = 'Q'
-COND_R = 'R'
-COND_S = 'S'
 COND_T = 'T'
-COND_V = 'V'
-COND_W = 'W'
-COND_Y = 'Y'
+COND_X = 'X'
 
+STATE_E = 'E'
+STATE_5 = '5'
+STATE_I = 'I'
 STATE_X = 'X'
-STATE_M3 = '-3'
-STATE_M2 = '-2'
-STATE_M1 = '-1'
-STATE_0 = '0'
-STATE_P1 = '+1'
-STATE_P2 = '+2'
-STATE_P3 = '+3'
 
-S_PROB = 'Prob'
+S_PROB = 'prob'
 S_PREV = 'prev'
 S_NONE = 'None'
 
 # --- strings for simplification ----------------------------------------------
 A = COND_A
 C = COND_C
-D = COND_D
-E = COND_E
-F = COND_F
 G = COND_G
-H = COND_H
-I = COND_I
-K = COND_K
-L = COND_L
-M = COND_M
-N = COND_N
-P = COND_P
-Q = COND_Q
-R = COND_R
-S = COND_S
 T = COND_T
-V = COND_V
-W = COND_W
-Y = COND_Y
-L_COND = [A, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, V, W, Y]
 
 # --- file name extensions ----------------------------------------------------
 XT_CSV = S_DOT + S_CSV
@@ -102,11 +66,10 @@ XT_CSV = S_DOT + S_CSV
 R08 = 8
 
 # --- sets --------------------------------------------------------------------
-setCond = {A, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, V, W, Y}
+setCond = {A, C, G, T, COND_X}
 
 # --- lists -------------------------------------------------------------------
-lStates = [STATE_X, STATE_M3, STATE_M2, STATE_M1,
-           STATE_0, STATE_P1, STATE_P2, STATE_P3]
+lStates = [STATE_E, STATE_5, STATE_I, STATE_X]
 
 # ### INPUT ###################################################################
 # --- flow control ------------------------------------------------------------
@@ -117,297 +80,38 @@ doViterbi = True
 # --- strings -----------------------------------------------------------------
 
 # --- lists -------------------------------------------------------------------
-lO01 = list('MSGSRRKATPASRTRVGNYEMGRTLGEGSFAKVKYAKNTVTGDQAAIKILDREKVFRHKMVEQ' +
-            'LKREISTMKLIKHPNVVEIIEVMASKTKIYIVLELVNGGELFDKIAQQGRLKEDEARRYFQQL' +
-            'INAVDYCHSRGVYHRDLKPENLILDANGVLKVSDFGLSAFSRQVREDGLLHTACGTPNYVAPE' +
-            'VLSDKGYDGAAADVWSCGVILFVLMAGYLPFDEPNLMTLYKRICKAEFSCPPWFSQGAKRVIK' +
-            'RILEPNPITRISIAELLEDEWFKKGYKPPSFDQDDEDITIDDVDAAFSNSKECLVTEKKEKPV' +
-            'SMNAFELISSSSEFSLENLFEKQAQLVKKETRFTSQRSASEIMSKMEETAKPLGFNVRKDNYK' +
-            'IKMKGDKSGRKGQLSVATEVFEVAPSLHVVELRKTGGDTLEFHKFYKNFSSGLKDVVWNTDAA' +
-            'AEEQKQ')
-lO02 = list('MTSLLKSSPGRRRGGDVESGKSEHADSDSDTFYIPSKNASIERLQQWRKAALVLNASRRFRYT' +
-            'LDLKKEQETREMRQKIRSHAHALLAANRFMDMGRESGVEKTTGPATPAGDFGITPEQLVIMSK' +
-            'DHNSGALEQYGGTQGLANLLKTNPEKGISGDDDDLLKRKTIYGSNTYPRKKGKGFLRFLWDAC' +
-            'HDLTLIILMVAAVASLALGIKTEGIKEGWYDGGSIAFAVILVIVVTAVSDYKQSLQFQNLNDE' +
-            'KRNIHLEVLRGGRRVEISIYDIVVGDVIPLNIGNQVPADGVLISGHSLALDESSMTGESKIVN' +
-            'KDANKDPFLMSGCKVADGNGSMLVTGVGVNTEWGLLMASISEDNGEETPLQVRLNGVATFIGS' +
-            'IGLAVAAAVLVILLTRYFTGHTKDNNGGPQFVKGKTKVGHVIDDVVKVLTVAVTIVVVAVPEG' +
-            'LPLAVTLTLAYSMRKMMADKALVRRLSACETMGSATTICSDKTGTLTLNQMTVVESYAGGKKT' +
-            'DTEQLPATITSLVVEGISQNTTGSIFVPEGGGDLEYSGSPTEKAILGWGVKLGMNFETARSQS' +
-            'SILHAFPFNSEKKRGGVAVKTADGEVHVHWKGASEIVLASCRSYIDEDGNVAPMTDDKASFFK' +
-            'NGINDMAGRTLRCVALAFRTYEAEKVPTGEELSKWVLPEDDLILLAIVGIKDPCRPGVKDSVV' +
-            'LCQNAGVKVRMVTGDNVQTARAIALECGILSSDADLSEPTLIEGKSFREMTDAERDKISDKIS' +
-            'VMGRSSPNDKLLLVQSLRRQGHVVAVTGDGTNDAPALHEADIGLAMGIAGTEVAKESSDIIIL' +
-            'DDNFASVVKVVRWGRSVYANIQKFIQFQLTVNVAALVINVVAAISSGDVPLTAVQLLWVNLIM' +
-            'DTLGALALATEPPTDHLMGRPPVGRKEPLITNIMWRNLLIQAIYQVSVLLTLNFRGISILGLE' +
-            'HEVHEHATRVKNTIIFNAFVLCQAFNEFNARKPDEKNIFKGVIKNRLFMGIIVITLVLQVIIV' +
-            'EFLGKFASTTKLNWKQWLICVGIGVISWPLALVGKFIPVPAAPISNKLKVLKFWGKKKNSSGE' +
-            'GSL')
-lO03 = list('MAEEQKTSKVDVESPAVLAPAKEPTPAPVEVADEKIHNPPPVESKALAVVEKPIEEHTPKKAS' +
-            'SGSADRDVILADLEKEKKTSFIKAWEESEKSKAENRAQKKISDVHAWENSKKAAVEAQLRKIE' +
-            'EKLEKKKAQYGEKMKNKVAAIHKLAEEKRAMVEAKKGEELLKAEEMGAKYRATGVVPKATCGCF')
+lO01 = [C, T, T, C, A, T, G, T, G, A, A, A, G, C, A, G, A, C, G, T, A, A, G, T,
+        C, A, COND_X]
 
 # --- dictionaries ------------------------------------------------------------
-dObs = {1: lO01, 2: lO02, 3: lO03}
+dObs = {1: lO01}
 
-startPr = {STATE_X: 0.99,
-           STATE_M3: 0.01,
-           STATE_M2: 0.,
-           STATE_M1: 0.,
-           STATE_0: 0.,
-           STATE_P1: 0.,
-           STATE_P2: 0.,
-           STATE_P3: 0.}
+startPr = {STATE_E: 1.,
+           STATE_5: 0.,
+           STATE_I: 0.,
+           STATE_X: 0.}
 
-transPr = {STATE_X: {STATE_X: 0.9,
-                     STATE_M3: 0.1,
-                     STATE_M2: 0.,
-                     STATE_M1: 0.,
-                     STATE_0: 0.,
-                     STATE_P1: 0.,
-                     STATE_P2: 0.,
-                     STATE_P3: 0.},
-           STATE_M3: {STATE_X: 0.,
-                      STATE_M3: 0.,
-                      STATE_M2: 1.,
-                      STATE_M1: 0.,
-                      STATE_0: 0.,
-                      STATE_P1: 0.,
-                      STATE_P2: 0.,
-                      STATE_P3: 0.},
-           STATE_M2: {STATE_X: 0.,
-                      STATE_M3: 0.,
-                      STATE_M2: 0.,
-                      STATE_M1: 1.,
-                      STATE_0: 0.,
-                      STATE_P1: 0.,
-                      STATE_P2: 0.,
-                      STATE_P3: 0.},
-           STATE_M1: {STATE_X: 0.,
-                      STATE_M3: 0.,
-                      STATE_M2: 0.,
-                      STATE_M1: 0.,
-                      STATE_0: 1.,
-                      STATE_P1: 0.,
-                      STATE_P2: 0.,
-                      STATE_P3: 0.},
-           STATE_0: {STATE_X: 0.,
-                     STATE_M3: 0.,
-                     STATE_M2: 0.,
-                     STATE_M1: 0.,
-                     STATE_0: 0.,
-                     STATE_P1: 1.,
-                     STATE_P2: 0.,
-                     STATE_P3: 0.},
-           STATE_P1: {STATE_X: 0.,
-                      STATE_M3: 0.,
-                      STATE_M2: 0.,
-                      STATE_M1: 0.,
-                      STATE_0: 0.,
-                      STATE_P1: 0.,
-                      STATE_P2: 1.,
-                      STATE_P3: 0.},
-           STATE_P2: {STATE_X: 0.,
-                      STATE_M3: 0.,
-                      STATE_M2: 0.,
-                      STATE_M1: 0.,
-                      STATE_0: 0.,
-                      STATE_P1: 0.,
-                      STATE_P2: 0.,
-                      STATE_P3: 1.},
-           STATE_P3: {STATE_X: 1.,
-                      STATE_M3: 0.,
-                      STATE_M2: 0.,
-                      STATE_M1: 0.,
-                      STATE_0: 0.,
-                      STATE_P1: 0.,
-                      STATE_P2: 0.,
-                      STATE_P3: 0.}}
+transPr = {STATE_E: {STATE_E: 0.9,
+                     STATE_5: 0.1,
+                     STATE_I: 0.,
+                     STATE_X: 0.},
+           STATE_5: {STATE_E: 0.,
+                     STATE_5: 0.,
+                     STATE_I: 1.,
+                     STATE_X: 0.},
+           STATE_I: {STATE_E: 0.,
+                     STATE_5: 0.,
+                     STATE_I: 0.9,
+                     STATE_X: 0.1},
+           STATE_X: {STATE_E: 0.,
+                     STATE_5: 0.,
+                     STATE_I: 0.,
+                     STATE_X: 1.}}
 
-lX = [
-0.0677,
-0.0148,
-0.0557,
-0.0691,
-0.0392,
-0.0691,
-0.0224,
-0.0505,
-0.0615,
-0.0935,
-0.0243,
-0.0460,
-0.0513,
-0.0378,
-0.0559,
-0.0877,
-0.0507,
-0.0647,
-0.0113,
-0.0268]
-
-lM3 = [
-0.0631,
-0.0041,
-0.0628,
-0.0624,
-0.0178,
-0.0802,
-0.0246,
-0.0262,
-0.0706,
-0.0499,
-0.0172,
-0.0325,
-0.0671,
-0.0303,
-0.1441,
-0.1277,
-0.0493,
-0.0440,
-0.0039,
-0.0219]
-
-lM2 = [
-0.0594,
-0.0055,
-0.0563,
-0.0614,
-0.0278,
-0.0764,
-0.0213,
-0.0334,
-0.0461,
-0.0577,
-0.0139,
-0.0391,
-0.0954,
-0.0309,
-0.0712,
-0.1599,
-0.0622,
-0.0608,
-0.0035,
-0.0178]
-
-lM1 = [
-0.0620,
-0.0072,
-0.0592,
-0.0673,
-0.0219,
-0.0958,
-0.0188,
-0.0301,
-0.0583,
-0.0708,
-0.0227,
-0.0409,
-0.0743,
-0.0276,
-0.0768,
-0.1322,
-0.0561,
-0.0567,
-0.0033,
-0.0178]
-
-l0 = [
-0.0002,
-0.,
-0.0004,
-0.0004,
-0.,
-0.0004,
-0.,
-0.,
-0.,
-0.,
-0.0002,
-0.,
-0.0010,
-0.,
-0.0002,
-0.7390,
-0.2178,
-0.,
-0.,
-0.0403]
-
-lP1 = [
-0.0489,
-0.0047,
-0.0659,
-0.0606,
-0.0409,
-0.0764,
-0.0145,
-0.0278,
-0.0285,
-0.0604,
-0.0176,
-0.0319,
-0.2100,
-0.0262,
-0.0430,
-0.1236,
-0.0467,
-0.0524,
-0.0027,
-0.0172]
-
-lP2 = [
-0.0631,
-0.0072,
-0.0751,
-0.0786,
-0.0162,
-0.0780,
-0.0182,
-0.0311,
-0.0633,
-0.0483,
-0.0106,
-0.0411,
-0.0888,
-0.0231,
-0.0766,
-0.1517,
-0.0549,
-0.0561,
-0.0049,
-0.0131]
-
-lP3 = [
-0.0704,
-0.0068,
-0.0641,
-0.0845,
-0.0289,
-0.0847,
-0.0225,
-0.0240,
-0.0577,
-0.0497,
-0.0194,
-0.0387,
-0.0821,
-0.0264,
-0.0737,
-0.1308,
-0.0514,
-0.0557,
-0.0043,
-0.0242]
-
-emitPr = {STATE_X: {cC: cP for cC, cP in zip(L_COND, lX)},
-          STATE_M3: {cC: cP for cC, cP in zip(L_COND, lM3)},
-          STATE_M2: {cC: cP for cC, cP in zip(L_COND, lM2)},
-          STATE_M1: {cC: cP for cC, cP in zip(L_COND, lM1)},
-          STATE_0: {cC: cP for cC, cP in zip(L_COND, l0)},
-          STATE_P1: {cC: cP for cC, cP in zip(L_COND, lP1)},
-          STATE_P2: {cC: cP for cC, cP in zip(L_COND, lP2)},
-          STATE_P3: {cC: cP for cC, cP in zip(L_COND, lP3)}}
+emitPr = {STATE_E: {A: 0.25, C: 0.25, G: 0.25, T: 0.25, COND_X: 0.},
+          STATE_5: {A: 0.05, C: 0., G: 0.95, T: 0., COND_X: 0.},
+          STATE_I: {A: 0.4, C: 0.1, G: 0.1, T: 0.4, COND_X: 0.},
+          STATE_X: {A: 0., C: 0., G: 0., T: 0., COND_X: 1.}}
 
 # === assertions ==============================================================
 for lObs in dObs.values():
