@@ -24,8 +24,8 @@ lLenNmer = None             # None: all lengths considered
 # lLenNmer = [1, 3, 5, 7]     # None: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
-sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.S_DOT + GC.S_EXT_CSV
-sFRawInpNmer = GC.S_F_RAW_INP_N_MER + GC.S_DOT + GC.S_EXT_CSV
+sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.XT_CSV
+sFRawInpNmer = GC.S_F_RAW_INP_N_MER + GC.XT_CSV
 
 sFProcInpKin = GC.S_F_PROC_INP_KIN
 sFProcInpNmer = GC.S_F_PROC_INP_N_MER
@@ -49,6 +49,7 @@ pDirResInfo = GC.P_DIR_RES_INFO
 pDirResInfo_Test = GC.P_DIR_RES_INFO_TEST
 pDirResProb = GC.P_DIR_RES_PROB
 pDirResProb_Test = GC.P_DIR_RES_PROB_TEST
+pDirResViterbi = GC.P_DIR_RES_VITERBI
 
 # --- numbers -----------------------------------------------------------------
 lenNmerDef = GC.LEN_N_MER_DEF
@@ -159,15 +160,15 @@ dIO = {# --- general
        'lSCMerPr': lSCMerPr,
        'lSCMerAll': lSCMerAll,
        # --- names and paths of files and dirs
-       'sFProcInpKin': sFProcInpKin + GC.S_DOT + GC.S_EXT_CSV,
-       'sFProcInpNmer': sFProcInpNmer + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResCombXS': sFResCombXS + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResCombS': sFResCombS + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResCombM': sFResCombM + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResCombL': sFResCombL + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResIGen': sFResIGen + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResINmer': sFResINmer + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResIEff': sFResIEff + GC.S_DOT + GC.S_EXT_CSV,
+       'sFProcInpKin': sFProcInpKin + GC.XT_CSV,
+       'sFProcInpNmer': sFProcInpNmer + GC.XT_CSV,
+       'sFResCombXS': sFResCombXS + GC.XT_CSV,
+       'sFResCombS': sFResCombS + GC.XT_CSV,
+       'sFResCombM': sFResCombM + GC.XT_CSV,
+       'sFResCombL': sFResCombL + GC.XT_CSV,
+       'sFResIGen': sFResIGen + GC.XT_CSV,
+       'sFResINmer': sFResINmer + GC.XT_CSV,
+       'sFResIEff': sFResIEff + GC.XT_CSV,
        'pFRawInpKin': GF.joinToPath(pDirRawInp, sFRawInpKin),
        'pFRawInpKin_T': GF.joinToPath(pDirRawInp_Test, sFRawInpKin),
        'pFRawInpNmer': GF.joinToPath(pDirRawInp, sFRawInpNmer),
@@ -180,6 +181,7 @@ dIO = {# --- general
        'pDirResInfo_T': pDirResInfo_Test,
        'pDirResProb': pDirResProb,
        'pDirResProb_T': pDirResProb_Test,
+       'pDirResViterbi': pDirResViterbi,
        # --- numbers
        'lenNmerDef': lenNmerDef,
        'iCentNmer': iCentNmer,

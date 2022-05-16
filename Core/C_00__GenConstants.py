@@ -124,6 +124,7 @@ DIR_RES_INFO = '33_Res' + S_INFO
 DIR_RES_INFO_TEST = '34_Res' + S_INFO + S_USC + S_TEST
 DIR_RES_PROB = '35_Res' + S_PROB
 DIR_RES_PROB_TEST = '36_Res' + S_PROB + S_USC + S_TEST
+DIR_RES_VITERBI = '37_ResViterbi'
 
 P_DIR_INP = os.path.join('..', '..', DIR_INP)
 P_DIR_RAW_INP = os.path.join(P_DIR_INP, DIR_RAW_INP)
@@ -136,12 +137,20 @@ P_DIR_RES_INFO = os.path.join(P_DIR_INP, DIR_RES_INFO)
 P_DIR_RES_INFO_TEST = os.path.join(P_DIR_INP, DIR_RES_INFO_TEST)
 P_DIR_RES_PROB = os.path.join(P_DIR_INP, DIR_RES_PROB)
 P_DIR_RES_PROB_TEST = os.path.join(P_DIR_INP, DIR_RES_PROB_TEST)
+P_DIR_RES_VITERBI = os.path.join(P_DIR_INP, DIR_RES_VITERBI)
 
 S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'
 S_EXT_PDF = 'pdf'
 S_EXT_PTH = 'pth'
 S_EXT_BIN = 'bin'
+
+# --- file name extensions ----------------------------------------------------
+XT_PY = S_DOT + S_EXT_PY
+XT_CSV = S_DOT + S_EXT_CSV
+XT_PDF = S_DOT + S_EXT_PDF
+XT_PTH = S_DOT + S_EXT_PTH
+XT_BIN = S_DOT + S_EXT_BIN
 
 # --- predefined strings (2) --------------------------------------------------
 S_MODE = 'Mode'
@@ -150,6 +159,7 @@ S_DATA = 'Data'
 S_SEQ = 'Seq'
 S_INP = 'Inp'
 S_FULL_SEQ = S_FULL + S_SEQ
+S_N_MER_SEQ = S_N_MER + S_SEQ
 S_LEN_N_MER = 'len' + S_N_MER
 S_EFF_CODE = 'Effector'
 S_C_N_MER = 'c15mer'
@@ -168,6 +178,9 @@ S_PROC_INP = S_PROC + S_INP
 S_COMB_INP = S_COMB + S_INP
 S_TRAIN_DATA = S_TRAIN + S_DATA
 S_TEST_DATA = S_TEST + S_DATA
+S_PREV = 'prev'
+S_SGL_POS_OCC = 'SglPosNOcc'
+S_SGL_POS_FRQ = 'SglPosRFreq'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15

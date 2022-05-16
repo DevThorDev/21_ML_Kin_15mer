@@ -31,6 +31,11 @@ class SeqAnalysis(BaseClass):
         self.d2NOccSglPos, self.d2RFreqSglPos = {}, {}
 
     # --- print methods -------------------------------------------------------
+    def printDictPaths(self):
+        print(GC.S_EQ20, 'Dictionary of file paths:')
+        for sK, sP in self.dPF.items():
+            print(sK, ':\t', sP, sep='')
+
     def printLInpSeq(self, sLSeqPrnt='Nmer', prntFullI=False, maxNPrnt=10):
         lSeq = self.lFullSeq
         if sLSeqPrnt == 'Nmer':
@@ -154,8 +159,10 @@ class SeqAnalysis(BaseClass):
     # --- methods for loading data --------------------------------------------
     def loadInpDfrs(self):
         self.lCombSeq, self.dLenSeq = [], {}
-        self.dfrIEff = self.loadData(pF=self.dPF['IEffInp'], iC=0)
-        self.dfrComb = self.loadData(pF=self.dPF['CombInp'], iC=0)
+        if self.dITp['useNmerSeqFrom'] == self.dITp['sIEffInp']:
+            self.dfrIEff = self.loadData(pF=self.dPF['IEffInp'], iC=0)
+        if self.dITp['calcWtLh'] or self.dITp['calcRelLh']:
+            self.dfrComb = self.loadData(pF=self.dPF['CombInp'], iC=0)
         if GF.Xist(self.dfrComb) and self.dITp['sCNmer'] in self.dfrComb:
             self.lCombSeq = list(self.dfrComb[self.dITp['sCNmer']].unique())
 

@@ -64,14 +64,14 @@ def checkDupSaveCSV(pdDfr, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True,
         pdDfr.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx,
                      index_label=iLbl)
 
-def pickleSaveDict(cD, pF=('Dict' + GC.S_DOT + GC.S_EXT_BIN)):
+def pickleSaveDict(cD, pF=('Dict' + GC.XT_BIN)):
     try:
         with open(pF, 'wb') as fDict:
             pickle.dump(cD, fDict)
     except:
         print('ERROR: Dumping dictionary to', pF, 'failed.')
 
-def pickleLoadDict(pF=('Dict' + GC.S_DOT + GC.S_EXT_BIN), reLoad=False):
+def pickleLoadDict(pF=('Dict' + GC.XT_BIN), reLoad=False):
     cD = None
     if os.path.isfile(pF) and (cD is None or len(cD) == 0 or reLoad):
         with open(pF, 'rb') as fDict:
@@ -654,6 +654,64 @@ def drawFromNorm(cMn=0., cSD=1., tPar=None, arrShape=None):
     else:
         cSD = max(cSD, 0)
     return RNG().normal(loc=cMn, scale=cSD, size=arrShape)
+
+# --- Helper functions for the Viterbi algorithm handling ">", exp and ln -----
+def X_exp(x=None):
+    if x is None:
+        return 0.
+    else:
+        return np.exp(x)
+
+def X_ln(x=None):
+    if x is None or x < 0:
+        print('ERROR: Value to calculate natural logarithm from is', x, '...')
+        # assert False
+        return None
+    elif x == 0:
+        return None
+    else:
+        return np.log(x)
+
+def X_sum(x=None, y=None):
+    if x is None or y is None:
+        return None
+    else:
+        return x + y
+
+def X_lnSum(x=None, y=None):
+    if x is None and y is None:
+        return None
+    elif x is None and y is not None:
+        return X_ln(y)
+    elif x is not None and y is None:
+        return X_ln(x)
+    else:
+        if x > 0 and y > 0:
+            if X_ln(x) > X_ln(y):
+                return X_ln(x) + X_ln(1 + np.exp(X_ln(y) - X_ln(x)))
+            else:
+                return X_ln(y) + X_ln(1 + np.exp(X_ln(x) - X_ln(y)))
+        else:
+            return None
+
+def X_lnProd(x=None, y=None):
+    if x is None or y is None or X_ln(x) is None or X_ln(y) is None:
+        return None
+    else:
+        return X_ln(x) + X_ln(y)
+
+def X_greater(x=None, y=None):
+    if x is None and y is None:
+        return False
+    elif x is None and y is not None:
+        return False
+    elif x is not None and y is None:
+        return True
+    else:
+        if x > y:
+            return True
+        else:
+            return False
 
 # --- General printing functions ----------------------------------------------
 def printMode(isTestMode=False):

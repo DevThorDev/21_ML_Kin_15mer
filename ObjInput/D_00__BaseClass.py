@@ -37,6 +37,15 @@ sIEffFTrain = GC.S_I_EFF_F_TRAIN
 sIEffFTest = GC.S_I_EFF_F_TEST
 sIGen = GC.S_I_GEN
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
+sNmerSeq = GC.S_N_MER_SEQ
+sFullSeq = GC.S_FULL_SEQ
+
+# --- file name extensions ----------------------------------------------------
+xtPY = GC.XT_PY
+xtCSV = GC.XT_CSV
+xtPDF = GC.XT_PDF
+xtPTH = GC.XT_PTH
+xtBIN = GC.XT_BIN
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -71,6 +80,14 @@ dIO = {# --- general
        'sCapXS': sCapXS,
        'sCapS': sCapS,
        'sCapM': sCapM,
-       'sCapL': sCapL}
+       'sCapL': sCapL,
+       'sNmerSeq': sNmerSeq,
+       'sFullSeq': sFullSeq,
+       # --- file name extensions
+       'xtPY': xtPY,
+       'xtCSV': xtCSV,
+       'xtPDF': xtPDF,
+       'xtPTH': xtPTH,
+       'xtBIN': xtBIN}
 
 ###############################################################################

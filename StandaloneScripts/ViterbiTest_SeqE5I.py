@@ -18,6 +18,7 @@ S_F_OUT_VITERBI = ''
 S_SPACE = ' '
 S_DOT = '.'
 S_SEMICOL = ';'
+S_COLON = ':'
 S_DASH = '-'
 S_PLUS = '+'
 S_EQ = '='
@@ -50,6 +51,7 @@ STATE_X = 'X'
 
 S_PROB = 'prob'
 S_PREV = 'prev'
+S_NONE = 'None'
 
 # --- strings for simplification ----------------------------------------------
 A = COND_A
@@ -62,6 +64,7 @@ XT_CSV = S_DOT + S_CSV
 
 # --- numbers -----------------------------------------------------------------
 R08 = 8
+DELTA = 1.0E-14
 
 # --- sets --------------------------------------------------------------------
 setCond = {A, C, G, T, COND_X}
@@ -78,10 +81,12 @@ doViterbi = True
 # --- strings -----------------------------------------------------------------
 
 # --- lists -------------------------------------------------------------------
-lObs = [C, T, T, C, A, T, G, T, G, A, A, A, G, C, A, G, A, C, G, T, A, A, G, T,
+lO01 = [C, T, T, C, A, T, G, T, G, A, A, A, G, C, A, G, A, C, G, T, A, A, G, T,
         C, A, COND_X]
 
 # --- dictionaries ------------------------------------------------------------
+dObs = {1: lO01}
+
 startPr = {STATE_E: 1.,
            STATE_5: 0.,
            STATE_I: 0.,
@@ -110,20 +115,22 @@ emitPr = {STATE_E: {A: 0.25, C: 0.25, G: 0.25, T: 0.25, COND_X: 0.},
           STATE_X: {A: 0., C: 0., G: 0., T: 0., COND_X: 1.}}
 
 # === assertions ==============================================================
-for cObs in lObs:
-    assert cObs in setCond
+for lObs in dObs.values():
+    for cObs in lObs:
+        assert cObs in setCond
 
 assert sum(startPr.values()) == 1
 for dTransPr in transPr.values():
     assert sum(dTransPr.values()) == 1
 for dEmitPr in emitPr.values():
-    assert sum(dEmitPr.values()) == 1
+    assert (sum(dEmitPr.values()) > 1. - DELTA and
+            sum(dEmitPr.values()) < 1. + DELTA)
 
 # === derived values and input processing =====================================
 pFInpViterbi = os.path.join(P_TEMP, S_F_INP_VITERBI + XT_CSV)
 pFOutViterbi = os.path.join(P_TEMP, S_F_OUT_VITERBI + XT_CSV)
 
-lIPos = list(range(len(lObs)))
+dIPos = {k: list(range(len(lObs))) for k, lObs in dObs.items()}
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
@@ -136,6 +143,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'xtCSV': XT_CSV,
         # --- numbers
         'R08': R08,
+        'DELTA': DELTA,
         # --- sets
         'setCond': setCond,
         # --- lists
@@ -147,15 +155,15 @@ dInp = {# --- flow control ----------------------------------------------------
         'st0': lStates[0],
         # --- numbers ---------------------------------------------------------
         # --- lists -----------------------------------------------------------
-        'lObs': lObs,
         # --- dictionaries ----------------------------------------------------
+        'dObs': dObs,
         'startPr': startPr,
         'transPr': transPr,
         'emitPr': emitPr,
         # === derived values and input processing =============================
         'pFInpViterbi': pFInpViterbi,
         'pFOutViterbi': pFOutViterbi,
-        'lIPos': lIPos}
+        'dIPos': dIPos}
 
 # ### FUNCTIONS ###############################################################
 # --- General file system related functions -----------------------------------
@@ -205,39 +213,51 @@ def addToDictD(cD, cKMain, cKSub, cVSub=[], allowRpl=False):
     else:
         cD[cKMain] = {cKSub: cVSub}
 
+# --- Helper function for the Viterbi algorithm handling ">" ------------------
+def X_greater(x=None, y=None):
+    if x is None and y is None:
+        return False
+    elif x is None and y is not None:
+        return False
+    elif x is not None and y is None:
+        return True
+    else:
+        if x > y:
+            return True
+        else:
+            return False
+
 # --- Viterbi algorithm related functions -------------------------------------
-def iniV(dI):
-    assert len(dI['lObs']) > 0 and len(dI['lStates']) > 0
-    V, t = {}, 0
-    cObs = dI['lObs'][t]
+def iniV(dI, lObs=[]):
+    assert len(lObs) > 0 and len(dI['lStates']) > 0
+    V, i = {}, 0
     for st in dI['lStates']:
-        dData = {S_PROB: dI['startPr'][st]*dI['emitPr'][st][cObs],
+        dData = {S_PROB: dI['startPr'][st]*dI['emitPr'][st][lObs[i]],
                  S_PREV: None}
-        addToDictD(V, cKMain=t, cKSub=st, cVSub=dData)
+        addToDictD(V, cKMain=i, cKSub=st, cVSub=dData)
     return V
 
-def getTransProb(dI, V, t, cSt, prevSt):
-    return V[t - 1][prevSt][S_PROB]*dI['transPr'][prevSt][cSt]
+def getTransProb(dI, V, i, cSt, prevSt):
+    return V[i - 1][prevSt][S_PROB]*dI['transPr'][prevSt][cSt]
 
-def fillV(dI, V):
-    for i in dI['lIPos'][1:]:
-        cObs = dI['lObs'][i]
+def fillV(dI, V, iLObs=0, lObs=[]):
+    for i in dI['dIPos'][iLObs][1:]:
         for st in dI['lStates']:
             maxTransProb = getTransProb(dI, V, i, cSt=st, prevSt=dI['st0'])
             prevStSel = dI['st0']
             for prevSt in dI['lStates'][1:]:
                 transProb = getTransProb(dI, V, i, cSt=st, prevSt=prevSt)
-                if transProb > maxTransProb:
+                if X_greater(transProb, maxTransProb):
                     maxTransProb = transProb
                     prevStSel = prevSt
-            maxProb = maxTransProb*dI['emitPr'][st][cObs]
+            maxProb = maxTransProb*dI['emitPr'][st][lObs[i]]
             dData = {S_PROB: maxProb, S_PREV: prevStSel}
             addToDictD(V, cKMain=i, cKSub=st, cVSub=dData)
 
-def getMostProbStWBacktrack(dI, V):
-    optStPath, maxProb, bestSt, iLast = [], 0., None, dI['lIPos'][-1]
+def getMostProbStWBacktrack(dI, V, iLObs=0):
+    optStPath, maxProb, bestSt, iLast = [], None, None, dI['dIPos'][iLObs][-1]
     for st, dData in V[iLast].items():
-        if dData[S_PROB] > maxProb:
+        if X_greater(dData[S_PROB], maxProb):
             maxProb = dData[S_PROB]
             bestSt = st
     optStPath.append(bestSt)
@@ -246,42 +266,44 @@ def getMostProbStWBacktrack(dI, V):
             'previousSt': bestSt}
 
 def followBacktrackTo1stObs(dI, dR, V):
-    for t in range(len(V) - 2, -1, -1):
-        previousSt = V[t + 1][dR['previousSt']][S_PREV]
+    for i in range(len(V) - 2, -1, -1):
+        previousSt = V[i + 1][dR['previousSt']][S_PREV]
         dR['optStPath'].insert(0, previousSt)
         dR['previousSt'] = previousSt
 
-def ViterbiCore(dI):
-    V = iniV(dI)
+def ViterbiCore(dI, iLObs=0, lObs=[]):
+    V = iniV(dI, lObs=lObs)
     # run ViterbiCore for t > 0
-    fillV(dI, V)
+    fillV(dI, V, iLObs=iLObs, lObs=lObs)
     # Get most probable state and its backtrack
-    dR = getMostProbStWBacktrack(dI, V)
+    dR = getMostProbStWBacktrack(dI, V, iLObs=iLObs)
     # Follow the backtrack till the first observation
     followBacktrackTo1stObs(dI, dR, V)
     return dR, V
 
 # --- Function printing the results -------------------------------------------
 def printRes(dI, dR, V):
-    for t, dSt in V.items():
-        print(S_ST08, 'Time', t)
+    for i, dSt in V.items():
+        print(S_ST08, 'Position (observation) index', i)
         for st, dProbPrev in dSt.items():
             print(S_EQ08, 'State', st)
-            print(S_DS08, 'Prob.', round(dProbPrev[S_PROB], dI['R08']),
+            cProb = S_NONE
+            if dProbPrev[S_PROB] is not None:
+                cProb = round(dProbPrev[S_PROB], dI['R08'])
+            print(S_DS08, 'Prob.', cProb,
                   S_VLINE, 'Previous state selected:', dProbPrev[S_PREV])
     print('Optimal state path:', dR['optStPath'])
-    # print('Maximal probability:', np.exp(dR['maxProb']))
-    # print('ln(maximal probability):', dR['maxProb'])
     print('Maximal probability:', dR['maxProb'])
-    print('ln(maximal probability):', np.log(dR['maxProb']))
-    # print('Previous state:', dR['previousSt'])
+    print('Maximal ln(probability):', np.log(dR['maxProb']))
 
 # ### MAIN ####################################################################
 print(S_EQ80, S_NEWL, S_DS30, ' ViterbiTest.py ', S_DS34, S_NEWL, sep='')
 if doViterbi:
     # dfrInp = readCSV(pF=dInp['pFInpViterbi'], iCol=0)
-    dRes, V = ViterbiCore(dI=dInp)
-    printRes(dI=dInp, dR=dRes, V=V)
+    for iLObs, lObs in dObs.items():
+        print(S_DS80, S_NEWL, S_EQ08, ' Observations ', iLObs, S_COLON, sep='')
+        dRes, V = ViterbiCore(dI=dInp, iLObs=iLObs, lObs=lObs)
+        printRes(dI=dInp, dR=dRes, V=V)
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
 ###############################################################################

@@ -64,6 +64,7 @@ XT_CSV = S_DOT + S_CSV
 
 # --- numbers -----------------------------------------------------------------
 R08 = 8
+DELTA = 1.0E-14
 
 # --- sets --------------------------------------------------------------------
 setCond = {A, C, G, T, COND_X}
@@ -122,8 +123,8 @@ assert sum(startPr.values()) == 1
 for dTransPr in transPr.values():
     assert sum(dTransPr.values()) == 1
 for dEmitPr in emitPr.values():
-    # assert sum(dEmitPr.values()) == 1
-    assert sum(dEmitPr.values()) > 0.95 and sum(dEmitPr.values()) < 1.05
+    assert (sum(dEmitPr.values()) > 1. - DELTA and
+            sum(dEmitPr.values()) < 1. + DELTA)
 
 # === derived values and input processing =====================================
 pFInpViterbi = os.path.join(P_TEMP, S_F_INP_VITERBI + XT_CSV)
@@ -142,6 +143,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'xtCSV': XT_CSV,
         # --- numbers
         'R08': R08,
+        'DELTA': DELTA,
         # --- sets
         'setCond': setCond,
         # --- lists
@@ -211,7 +213,7 @@ def addToDictD(cD, cKMain, cKSub, cVSub=[], allowRpl=False):
     else:
         cD[cKMain] = {cKSub: cVSub}
 
-# --- Helper functions for the Viterbi algorithm handling exp and ln ----------
+# --- Helper functions for the Viterbi algorithm handling ">", exp and ln -----
 def X_exp(x=None):
     if x is None:
         return 0.
@@ -326,8 +328,8 @@ def ViterbiCore(dI, iLObs=0, lObs=[]):
 
 # --- Function printing the results -------------------------------------------
 def printRes(dI, dR, V):
-    for t, dSt in V.items():
-        print(S_ST08, 'Time', t)
+    for i, dSt in V.items():
+        print(S_ST08, 'Position (observation) index', i)
         for st, dProbPrev in dSt.items():
             print(S_EQ08, 'State', st)
             lnProb = S_NONE
@@ -338,14 +340,13 @@ def printRes(dI, dR, V):
     print('Optimal state path:', dR['optStPath'])
     print('Maximal probability:', np.exp(dR['maxProb']))
     print('Maximal ln(probability):', dR['maxProb'])
-    # print('Previous state:', dR['previousSt'])
 
 # ### MAIN ####################################################################
 print(S_EQ80, S_NEWL, S_DS30, ' ViterbiTest.py ', S_DS34, S_NEWL, sep='')
 if doViterbi:
     # dfrInp = readCSV(pF=dInp['pFInpViterbi'], iCol=0)
     for iLObs, lObs in dObs.items():
-        print(S_DS80, S_NEWL, S_EQ08, ' Observation ', iLObs, S_COLON, sep='')
+        print(S_DS80, S_NEWL, S_EQ08, ' Observations ', iLObs, S_COLON, sep='')
         dRes, V = ViterbiCore(dI=dInp, iLObs=iLObs, lObs=lObs)
         printRes(dI=dInp, dR=dRes, V=V)
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')

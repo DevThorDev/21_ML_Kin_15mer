@@ -26,7 +26,7 @@ convSnipXToProbTbl = True
 calcTotalProb = False
 calcCondProb = False
 
-calcSglPos = True
+calcSglPos = False
 
 useNmerSeqFrom = GC.S_COMB_INP    # S_I_EFF_INP / S_PROC_INP / S_COMB_INP
 
@@ -44,25 +44,29 @@ sFCombInp = 'Combined_XS_KinasesPho15mer_202202'
 # sFIEffInp = 'InfoEff_Prop15mer_202202__Full__1_3_5_7__Train'
 # sFCombInp = 'Combined_S_KinasesPho15mer_202202__Train'
 
-sFE = [GC.S_US02.join([sFSeqCheck.split(GC.S_USC)[0], sFE])]
-sFLNmerSeq = GC.S_US02.join(['ListNmerInputSeq'] + sFE)
-sFLFullSeq = GC.S_US02.join(['ListFullInputSeq'] + sFE)
+sFE = GC.S_US02.join([sFSeqCheck.split(GC.S_USC)[0], sFE])
+sFLNmerSeq = GC.S_US02.join(['ListNmerInputSeq'] + [sFE])
+sFLFullSeq = GC.S_US02.join(['ListFullInputSeq'] + [sFE])
 
-sFResWtLh = GC.S_US02.join(['WtLikelihood_FullSeq'] + sFE)
-sFResRelLh = GC.S_US02.join(['RelLikelihood_FullSeq'] + sFE)
-sFSnipDictS = GC.S_US02.join(['SnipDictS_FullSeq'] + sFE)
-sFSnipDictX = GC.S_US02.join(['SnipDictX_FullSeq'] + sFE)
-sFSnipDfrS = GC.S_US02.join(['SnipDfrS_FullSeq'] + sFE)
-sFSnipDfrX = GC.S_US02.join(['SnipDfrX_FullSeq'] + sFE)
-sFProbTblFS = GC.S_US02.join(['ProbTable_FullSeq'] + sFE)
-sFProbTblTP = GC.S_US02.join(['ProbTable_TotalProb'] + sFE)
-sFProbTblCP = GC.S_US02.join(['ProbTable_CondProb'] + sFE)
-sFResWtProb = GC.S_US02.join(['WtProb_FullSeq'] + sFE)
-sFResRelProb = GC.S_US02.join(['RelProb_FullSeq'] + sFE)
-sFDictNOccSP = GC.S_US02.join(['Dict_SglPosNOcc_NmerSeq'] + sFE)
-sFDictRFreqSP = GC.S_US02.join(['Dict_SglPosRFreq_NmerSeq'] + sFE)
-sFResNOccSP = GC.S_US02.join(['SglPosNOcc_NmerSeq'] + sFE)
-sFResRFreqSP = GC.S_US02.join(['SglPosRFreq_NmerSeq'] + sFE)
+sFResWtLh = GC.S_US02.join(['WtLikelihood_' + GC.S_FULL_SEQ] + [sFE])
+sFResRelLh = GC.S_US02.join(['RelLikelihood_' + GC.S_FULL_SEQ] + [sFE])
+sFSnipDictS = GC.S_US02.join(['SnipDictS_' + GC.S_FULL_SEQ] + [sFE])
+sFSnipDictX = GC.S_US02.join(['SnipDictX_' + GC.S_FULL_SEQ] + [sFE])
+sFSnipDfrS = GC.S_US02.join(['SnipDfrS_' + GC.S_FULL_SEQ] + [sFE])
+sFSnipDfrX = GC.S_US02.join(['SnipDfrX_' + GC.S_FULL_SEQ] + [sFE])
+sFProbTblFS = GC.S_US02.join(['ProbTable_' + GC.S_FULL_SEQ] + [sFE])
+sFProbTblTP = GC.S_US02.join(['ProbTable_' + GC.S_TOTAL_PROB] + [sFE])
+sFProbTblCP = GC.S_US02.join(['ProbTable_' + GC.S_COND_PROB] + [sFE])
+sFResWtProb = GC.S_US02.join(['WtProb_' + GC.S_FULL_SEQ] + [sFE])
+sFResRelProb = GC.S_US02.join(['RelProb_' + GC.S_FULL_SEQ] + [sFE])
+sFDictNOccSP = GC.S_US02.join(['Dict_' + GC.S_SGL_POS_OCC + GC.S_USC +
+                               GC.S_N_MER_SEQ] + [sFE])
+sFDictRFreqSP = GC.S_US02.join(['Dict_' + GC.S_SGL_POS_FRQ + GC.S_USC +
+                                GC.S_N_MER_SEQ] + [sFE])
+sFResNOccSP = GC.S_US02.join([GC.S_SGL_POS_OCC + GC.S_USC + GC.S_N_MER_SEQ] +
+                             [sFE])
+sFResRFreqSP = GC.S_US02.join([GC.S_SGL_POS_FRQ + GC.S_USC + GC.S_N_MER_SEQ] +
+                              [sFE])
 
 # --- numbers -----------------------------------------------------------------
 iStartLInpNmerSeq = None            # number or None
@@ -151,27 +155,28 @@ dIO = {# --- general
        'calcSglPos': calcSglPos,
        'useNmerSeqFrom': useNmerSeqFrom,
        # --- names and paths of files and dirs
-       'sFSeqCheck': sFSeqCheck + GC.S_DOT + GC.S_EXT_CSV,
-       'sFIEffInp': sFIEffInp + GC.S_DOT + GC.S_EXT_CSV,
-       'sFProcInp': sFProcInp + GC.S_DOT + GC.S_EXT_CSV,
-       'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
-       'sFLNmerSeq': sFLNmerSeq + GC.S_DOT + GC.S_EXT_CSV,
-       'sFLFullSeq': sFLFullSeq + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
-       'sFSnipDictS': sFSnipDictS + GC.S_DOT + GC.S_EXT_BIN,
-       'sFSnipDictX': sFSnipDictX + GC.S_DOT + GC.S_EXT_BIN,
-       'sFSnipDfrS': sFSnipDfrS + GC.S_DOT + GC.S_EXT_CSV,
-       'sFSnipDfrX': sFSnipDfrX + GC.S_DOT + GC.S_EXT_CSV,
-       'sFProbTblFS': sFProbTblFS + GC.S_DOT + GC.S_EXT_CSV,
-       'sFProbTblTP': sFProbTblTP + GC.S_DOT + GC.S_EXT_CSV,
-       'sFProbTblCP': sFProbTblCP + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResWtProb': sFResWtProb + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResRelProb': sFResRelProb + GC.S_DOT + GC.S_EXT_CSV,
-       'sFDictNOccSP': sFDictNOccSP + GC.S_DOT + GC.S_EXT_BIN,
-       'sFDictRFreqSP': sFDictRFreqSP + GC.S_DOT + GC.S_EXT_BIN,
-       'sFResNOccSP': sFResNOccSP + GC.S_DOT + GC.S_EXT_CSV,
-       'sFResRFreqSP': sFResRFreqSP + GC.S_DOT + GC.S_EXT_CSV,
+       'sFESeqA': sFE,
+       'sFSeqCheck': sFSeqCheck + GC.XT_CSV,
+       'sFIEffInp': sFIEffInp + GC.XT_CSV,
+       'sFProcInp': sFProcInp + GC.XT_CSV,
+       'sFCombInp': sFCombInp + GC.XT_CSV,
+       'sFLNmerSeq': sFLNmerSeq + GC.XT_CSV,
+       'sFLFullSeq': sFLFullSeq + GC.XT_CSV,
+       'sFResWtLh': sFResWtLh + GC.XT_CSV,
+       'sFResRelLh': sFResRelLh + GC.XT_CSV,
+       'sFSnipDictS': sFSnipDictS + GC.XT_BIN,
+       'sFSnipDictX': sFSnipDictX + GC.XT_BIN,
+       'sFSnipDfrS': sFSnipDfrS + GC.XT_CSV,
+       'sFSnipDfrX': sFSnipDfrX + GC.XT_CSV,
+       'sFProbTblFS': sFProbTblFS + GC.XT_CSV,
+       'sFProbTblTP': sFProbTblTP + GC.XT_CSV,
+       'sFProbTblCP': sFProbTblCP + GC.XT_CSV,
+       'sFResWtProb': sFResWtProb + GC.XT_CSV,
+       'sFResRelProb': sFResRelProb + GC.XT_CSV,
+       'sFDictNOccSP': sFDictNOccSP + GC.XT_BIN,
+       'sFDictRFreqSP': sFDictRFreqSP + GC.XT_BIN,
+       'sFResNOccSP': sFResNOccSP + GC.XT_CSV,
+       'sFResRFreqSP': sFResRFreqSP + GC.XT_CSV,
        # --- numbers
        'iStartLInpNmerSeq': iStartLInpNmerSeq,
        'iEndLInpNmerSeq': iEndLInpNmerSeq,

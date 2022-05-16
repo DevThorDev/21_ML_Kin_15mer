@@ -54,17 +54,17 @@ dIO = {# --- general
        'genInfoEffTrain': genInfoEffTrain,
        'genInfoEffTest': genInfoEffTest,
        # --- names and paths of files and dirs
-       'sFCombInp': sFCombInp + GC.S_DOT + GC.S_EXT_CSV,
-       # 'sFResWtLh': sFResWtLh + GC.S_DOT + GC.S_EXT_CSV,
-       # 'sFResRelLh': sFResRelLh + GC.S_DOT + GC.S_EXT_CSV,
+       'sFCombInp': sFCombInp + GC.XT_CSV,
+       # 'sFResWtLh': sFResWtLh + GC.XT_CSV,
+       # 'sFResRelLh': sFResRelLh + GC.XT_CSV,
        # --- numbers
        'share4Test': share4Test,
        # --- strings
        # --- lists
        # --- dictionaries
        # === derived values and input processing
-       'sFCombTrain': sFCombTrain + GC.S_DOT + GC.S_EXT_CSV,
-       'sFCombTest': sFCombTest + GC.S_DOT + GC.S_EXT_CSV,
+       'sFCombTrain': sFCombTrain + GC.XT_CSV,
+       'sFCombTest': sFCombTest + GC.XT_CSV,
        'share4Train': share4Train,
        }
 

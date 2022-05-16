@@ -12,6 +12,7 @@ from Core.O_00__BaseClass import Timing
 from Core.O_01__ExpData import ExpData
 from Core.O_02__SeqAnalysis import SeqAnalysis
 from Core.O_03__Validation import Validation
+from Core.O_05__ViterbiLog import ViterbiLog
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -52,6 +53,12 @@ GF.showElapsedTime(startTime)
 cValidation = Validation(inpDatG)
 cValidation.createResultsTrain(stT=startTime)
 # cValidation.printTestObj(printDfrComb=True)
+
+cViterbiAlg = ViterbiLog(inpDatG)
+cViterbiAlg.printDictPaths()
+cViterbiAlg.printDfrEmitProb()
+cViterbiAlg.printDfrTransProb()
+cViterbiAlg.runViterbiAlgorithm()
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

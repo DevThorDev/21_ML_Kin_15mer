@@ -72,6 +72,9 @@ class BaseClass:
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
         self.dfrIEff, self.dfrInpSeq, self.dfrInpNmer = None, None, None
         self.dfrComb, self.dfrTrain, self.dfrTest = None, None, None
+        self.dfrEmitProb, self.dfrTransProb = None, None
+        self.serStatePath = None
+        self.dfrProbDetail, self.dfrProbFinal = None, None
 
     # --- methods for filling the DataFrame type dictionary -------------------
     def fillDTpDfrBase(self):
@@ -105,8 +108,9 @@ class BaseClass:
             self.pDirResComb = self.dITp['pDirResComb']
             self.pDirResInfo = self.dITp['pDirResInfo']
             self.pDirResProb = self.dITp['pDirResProb']
+        self.pDirResViterbi = self.dITp['pDirResViterbi']
 
-    def loadData(self, pF, iC=None, dDTp=None, cSep=None):
+    def loadData(self, pF, iC=None, dDTp=None, NAfillV=None, cSep=None):
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
         if cSep is None:
             cSep = self.dITp['cSep']
@@ -114,6 +118,8 @@ class BaseClass:
             cDfr = GF.readCSV(pF, iCol=iC, dDTp=dDTp, cSep=cSep)
             sPrt = 'Loading data from path ' + pF
         print(sPrt)
+        if NAfillV is not None:
+            return cDfr.fillna(NAfillV)
         return cDfr
 
     def loadSerOrList(self, pF, iC=None, toList=False, dDTp=None, cSep=None):
@@ -201,7 +207,7 @@ class NmerSeq(Seq):
             print('ERROR: List of input sequence strings is',
                   [cSeq.sSeq for cSeq in lInpSeq])
             assert False
-    
+
     # --- method for storing the total probabilities of snippets --------------
     def getTotalProbSnip(self, dITp, lInpSeq):
         return self.getProbSnip(dITp, lInpSeq, maxLen=max(dITp['lLenNmer']))
@@ -379,12 +385,13 @@ class Timing:
 
     def printRelTimes(self):
         assert len(self.lSMth) == len(self.lElT)
-        print(GC.S_WV80)
-        for k, (sMth, cElT) in enumerate(zip(self.lSMth, self.lElT)):
-            sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'
-            sWS = GC.S_SPACE*(6 - len(sX))
-            print(GC.S_SP04 + sWS + sX + '\t(share of time in Method ' +
-                  str(k + 1) + ' | "' + sMth + '")')
-        print(GC.S_WV80)
+        if self.elT_Sum > 0:
+            print(GC.S_WV80)
+            for k, (sMth, cElT) in enumerate(zip(self.lSMth, self.lElT)):
+                sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'
+                sWS = GC.S_SPACE*(6 - len(sX))
+                print(GC.S_SP04 + sWS + sX + '\t(share of time in Method ' +
+                      str(k + 1) + ' | "' + sMth + '")')
+            print(GC.S_WV80)
 
 ###############################################################################
