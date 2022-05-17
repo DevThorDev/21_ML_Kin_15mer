@@ -29,7 +29,8 @@ S_SLASH = '/'
 S_QMK = '?'
 S_NEWL = '\n'
 S_0 = '0'
-S_CAP_XS, S_CAP_S, S_CAP_M, S_CAP_L = 'XS', 'S', 'M', 'L'
+S_CAP_X = 'X'
+S_CAP_XS, S_CAP_S, S_CAP_M, S_CAP_L = S_CAP_X + 'S', 'S', 'M', 'L'
 
 S_US02 = S_USC*2
 S_DT03 = S_DOT*3
@@ -86,6 +87,7 @@ S_COND = 'Cond'
 S_PROB = 'Prob'
 S_TOTAL_PROB = S_TOTAL + S_PROB
 S_COND_PROB = S_COND + S_PROB
+S_LN_PROB = 'ln(' + S_PROB + ')'
 S_N_MER = 'N' + S_MER
 S_EFF = 'Eff'
 S_EFF_F = S_EFF + S_FULL
@@ -179,6 +181,8 @@ S_COMB_INP = S_COMB + S_INP
 S_TRAIN_DATA = S_TRAIN + S_DATA
 S_TEST_DATA = S_TEST + S_DATA
 S_PREV = 'prev'
+S_STATE = 'State'
+S_START_PROB = 'Start' + S_PROB
 S_SGL_POS_OCC = 'SglPosNOcc'
 S_SGL_POS_FRQ = 'SglPosRFreq'
 

@@ -72,9 +72,9 @@ class BaseClass:
         self.lDfrInp = [self.dfrKin, self.dfrNmer]
         self.dfrIEff, self.dfrInpSeq, self.dfrInpNmer = None, None, None
         self.dfrComb, self.dfrTrain, self.dfrTest = None, None, None
-        self.dfrEmitProb, self.dfrTransProb = None, None
-        self.serStatePath = None
-        self.dfrProbDetail, self.dfrProbFinal = None, None
+        self.dfrEmitProb = None
+        self.dfrStartProb, self.dfrTransProb = None, None
+        # self.dfrProbDetail, self.dfrProbFinal = None, None
 
     # --- methods for filling the DataFrame type dictionary -------------------
     def fillDTpDfrBase(self):

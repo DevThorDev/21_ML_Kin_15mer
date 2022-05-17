@@ -59,7 +59,7 @@ rndDigProp = GC.R08
 # --- strings -----------------------------------------------------------------
 sUSC = GC.S_USC
 sUS02 = GC.S_US02
-s0 = GC.S_0
+s0, sX = GC.S_0, GC.S_CAP_X
 sNULL = 'NULL'
 sSeq = 'Seq'
 sMer = GC.S_MER
@@ -190,6 +190,7 @@ dIO = {# --- general
        'sUSC': sUSC,
        'sUS02': sUS02,
        's0': s0,
+       'sX': sX,
        'sNULL': sNULL,
        'sSeq': sSeq,
        'sMer': sMer,

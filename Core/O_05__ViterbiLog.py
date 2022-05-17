@@ -22,6 +22,25 @@ class ViterbiLog(SeqAnalysis):
         self.loadInpData()
         print('Initiated "ViterbiLog" base object.')
 
+    # --- methods for loading input data --------------------------------------
+    def loadInpData(self):
+        sStPr, pFE = self.dITp['sStartProb'], self.dPF['EmitProb']
+        pFS, pFT = self.dPF['StartProb'], self.dPF['TransProb']
+        self.dfrFSeqInp = self.loadData(pF=self.dPF['FullSeq'], iC=0)
+        self.dfrEmitProb = self.loadData(pF=pFE, iC=0, NAfillV=0.).T
+        self.dfrStartProb = self.loadData(pF=pFS, iC=0, NAfillV=0.)
+        self.dfrTransProb = self.loadData(pF=pFT, iC=0, NAfillV=0.)
+        self.dEmitProb = self.dfrEmitProb.T.to_dict(orient='dict')
+        self.dStartProb = self.dfrStartProb.to_dict(orient='dict')[sStPr]
+        self.dTransProb = self.dfrTransProb.T.to_dict(orient='dict')
+        self.dFSeq, self.dStatePath, self.dPosPyl = {}, {}, {}
+        self.d2ProbDetail, self.dProbFinal, self.dRV = {}, {}, {}
+        self.lStates = list(self.dStartProb)
+        if self.dITp['sCCodeSeq'] in self.dfrFSeqInp.columns:
+            arrFSeqUnq = self.dfrFSeqInp[self.dITp['sCCodeSeq']].unique()
+            for k, sFSeq in enumerate(arrFSeqUnq):
+                self.dFSeq[k] = list(sFSeq)
+
     # --- print methods -------------------------------------------------------
     def printDfrEmitProb(self):
         print(GC.S_EQ20, 'DataFrame of emission probabilities:')
@@ -29,6 +48,14 @@ class ViterbiLog(SeqAnalysis):
         print('Index:', self.dfrEmitProb.index.to_list())
         print('Columns:', self.dfrEmitProb.columns.to_list())
         print('Dict:\n', self.dEmitProb, sep='')
+        print(GC.S_DS80)
+
+    def printDfrStartProb(self):
+        print(GC.S_EQ20, 'DataFrame of start probabilities:')
+        print(self.dfrStartProb)
+        print('Index:', self.dfrStartProb.index.to_list())
+        print('Columns:', self.dfrStartProb.columns.to_list())
+        print('Dict:\n', self.dStartProb, sep='')
         print(GC.S_DS80)
 
     def printDfrTransProb(self):
@@ -40,8 +67,8 @@ class ViterbiLog(SeqAnalysis):
         print(GC.S_DS80)
 
     # --- method printing the results of the Viterbi algorithm ----------------
-    def printViterbiRes(self, dR, V):
-        for i, dSt in V.items():
+    def printViterbiDetailedRes(self):
+        for i, dSt in self.V.items():
             print(GC.S_ST04, 'Position (observation) index', i)
             for st, dPP in dSt.items():
                 print(GC.S_DS04, 'State', st)
@@ -51,102 +78,123 @@ class ViterbiLog(SeqAnalysis):
                 print(GC.S_SP04, 'ln(prob).:', lnProb,
                       GC.S_VBAR, 'Previous state selected:',
                       dPP[self.dITp['sPrev']])
-        print('Optimal state path:', dR['optStPath'])
-        print('Maximal probability:', GF.X_exp(dR['maxProb']))
-        print('Maximal ln(probability):', dR['maxProb'])
+        for sFSeq in self.dFSeq.values():
+            print('Optimal state path:', self.dRV[sFSeq]['optStPath'])
+            print('Maximal probability:', GF.X_exp(self.dRV[sFSeq]['maxProb']))
+            print('Maximal ln(probability):', self.dRV[sFSeq]['maxProb'])
 
     # --- methods for filling the result paths dictionary ---------------------
     def addValsToDPF(self):
-        pPI, pPr, pVi = self.pDirProcInp, self.pDirResProb, self.pDirResViterbi
-        sFE, sXtCSV = self.dITp['sFESeqA'], self.dITp['xtCSV']
+        pPI, pVi = self.pDirProcInp, self.pDirResViterbi
+        sFE, sXt = self.dITp['sFESeqA'], self.dITp['xtCSV']
         self.dPF['EmitProb'] = self.dPF['ResRFreqSP']
-        self.dITp['sFInpTransProb'] += sXtCSV
-        self.dPF['TransProb'] = GF.joinToPath(pPI, self.dITp['sFInpTransProb'])
+        p = pPI
+        if self.dITp['useFullSeqFrom'] == GC.S_COMB_INP:
+            p = self.pDirResComb
+        self.dPF['FullSeq'] = GF.joinToPath(p, self.dITp['sFInpFullSeq'] + sXt)
+        for sF, sK in zip(['sFInpStartProb', 'sFInpTransProb'],
+                          ['StartProb', 'TransProb']):
+            self.dPF[sK] = GF.joinToPath(pPI, self.dITp[sF] + sXt)
         sFE = self.dITp['sUS02'].join([self.dITp['sNmerSeq'], sFE])
-        lSF = ['sFOptStatePath', 'sFProbDetail', 'sFProbFinal']
-        lSK = ['StatePath', 'ProbDetail', 'ProbFinal']
+        lSF = ['sFOptStatePath', 'sFPosPyl', 'sFProbDetail', 'sFProbFinal']
+        lSK = ['StatePath', 'PosPyl', 'ProbDetail', 'ProbFinal']
         for sF, sK in zip(lSF, lSK):
-            self.dITp[sF] += self.dITp['sUSC'].join([sF, sFE]) + sXtCSV
+            self.dITp[sF] = self.dITp['sUSC'].join([self.dITp[sF], sFE]) + sXt
             self.dPF[sK] = GF.joinToPath(pVi, self.dITp[sF])
 
     # --- Viterbi algorithm related functions -------------------------------------
     def iniV(self, lObs=[]):
-        assert len(lObs) > 0 and len(self.dITp['lStates']) > 0
-        V, i = {}, 0
-        for st in self.dITp['lStates']:
-            cProb = GF.X_lnProd(self.dITp['startPr'][st],
+        assert len(lObs) > 0 and len(self.lStates) > 0
+        self.V, i = {}, 0
+        for st in self.lStates:
+            cProb = GF.X_lnProd(self.dStartProb[st],
                                 self.dEmitProb[st][lObs[i]])
             dData = {self.dITp['sProb']: cProb,
                      self.dITp['sPrev']: None}
-            GF.addToDictD(V, cKMain=i, cKSub=st, cVSub=dData)
-        return V
+            GF.addToDictD(self.V, cKMain=i, cKSub=st, cVSub=dData)
 
-    def getTransProb(self, V, i, cSt, prevSt):
-        return GF.X_sum(V[i - 1][prevSt][self.dITp['sProb']],
+    def getTransProb(self, j, cSt, prevSt):
+        return GF.X_sum(self.V[j][prevSt][self.dITp['sProb']],
                         GF.X_ln(self.dTransProb[prevSt][cSt]))
 
-    def fillV(self, V, iLObs=0, lObs=[]):
-        st0 = self.dITp['st0']
-        for i in self.dITp['dIPos'][iLObs][1:]:
-            for st in self.dITp['lStates']:
-                maxTransProb = self.getTransProb(V, i, cSt=st, prevSt=st0)
+    def fillV(self, iFSeq=0, lObs=[]):
+        st0 = self.lStates[0]
+        for j, sAAc in enumerate(self.dFSeq[iFSeq][1:]):
+            for st in self.lStates:
+                maxTransProb = self.getTransProb(j, cSt=st, prevSt=st0)
                 prevStSel = st0
-                for prevSt in self.dITp['lStates'][1:]:
-                    transProb = self.getTransProb(V, i, cSt=st, prevSt=prevSt)
+                for prevSt in self.lStates[1:]:
+                    transProb = self.getTransProb(j, cSt=st, prevSt=prevSt)
                     if GF.X_greater(transProb, maxTransProb):
                         maxTransProb = transProb
                         prevStSel = prevSt
                 maxProb = GF.X_sum(maxTransProb,
-                                   GF.X_ln(self.dEmitProb[st][lObs[i]]))
+                                   GF.X_ln(self.dEmitProb[st][sAAc]))
                 dData = {self.dITp['sProb']: maxProb,
                          self.dITp['sPrev']: prevStSel}
-                GF.addToDictD(V, cKMain=i, cKSub=st, cVSub=dData)
+                GF.addToDictD(self.V, cKMain=(j+1), cKSub=st, cVSub=dData)
 
-    def getMostProbStWBacktrack(self, V, iLObs=0):
-        optStPath, maxProb, bestSt = [], None, None
-        iLast = self.dITp['dIPos'][iLObs][-1]
-        for st, dData in V[iLast].items():
+    def getMostProbStWBacktrack(self, iFSeq=0, sFSeq=''):
+        pOptSt, maxProb, bestSt = [], None, None
+        # iLast = self.dITp['dIPos'][iFSeq][-1]
+        iLast = len(self.dFSeq[iFSeq]) - 1
+        for st, dData in self.V[iLast].items():
             if GF.X_greater(dData[self.dITp['sProb']], maxProb):
                 maxProb = dData[self.dITp['sProb']]
                 bestSt = st
-        optStPath.append(bestSt)
-        return {'optStPath': optStPath,
-                'maxProb': maxProb,
-                'previousSt': bestSt}
+        pOptSt.append(bestSt)
+        GF.addToDictD(self.dRV, cKMain=sFSeq, cKSub='optStPath', cVSub=pOptSt)
+        GF.addToDictD(self.dRV, cKMain=sFSeq, cKSub='maxProb', cVSub=maxProb)
+        GF.addToDictD(self.dRV, cKMain=sFSeq, cKSub='prevSt', cVSub=bestSt)
 
-    def followBacktrackTo1stObs(self, dR, V):
-        for i in range(len(V) - 2, -1, -1):
-            previousSt = V[i + 1][dR['previousSt']][self.dITp['sPrev']]
-            dR['optStPath'].insert(0, previousSt)
-            dR['previousSt'] = previousSt
+    def followBacktrackTo1stObs(self, sFSeq=''):
+        dRVSeq = self.dRV[sFSeq]
+        for i in range(len(self.V) - 2, -1, -1):
+            prevSt = self.V[i + 1][dRVSeq['prevSt']][self.dITp['sPrev']]
+            dRVSeq['optStPath'].insert(0, prevSt)
+            dRVSeq['prevSt'] = prevSt
 
-    def ViterbiCore(self, iLObs=0, lObs=[]):
-        V = self.iniV(lObs=lObs)
+    def ViterbiCore(self, iFSeq=0, lObs=[]):
+        self.iniV(lObs=lObs)
         # run ViterbiCore for t > 0
-        self.fillV(V, iLObs=iLObs, lObs=lObs)
+        self.fillV(iFSeq=iFSeq, lObs=lObs)
         # Get most probable state and its backtrack
-        dR = self.getMostProbStWBacktrack(V, iLObs=iLObs)
+        sFullSeq = ''.join(lObs)
+        self.getMostProbStWBacktrack(iFSeq=iFSeq, sFSeq=sFullSeq)
         # Follow the backtrack till the first observation
-        self.followBacktrackTo1stObs(dR, V)
-        return dR, V
+        self.followBacktrackTo1stObs(sFSeq=sFullSeq)
+        return sFullSeq
 
     def runViterbiAlgorithm(self):
         if self.dITp['doViterbi']:
             print(GC.S_EQ80, GC.S_NEWL, GC.S_DS30, ' Viterbi Algorithm ',
-                  GC.S_DS30, GC.S_NEWL, sep='')
-            for iLObs, lObs in self.dITp['dObs'].items():
-                print(GC.S_DS80, GC.S_NEWL, GC.S_EQ20, ' Observations ', iLObs,
-                      GC.S_COL, sep='')
-                dRes, V = self.ViterbiCore(iLObs=iLObs, lObs=lObs)
-                self.printViterbiRes(dR=dRes, V=V)
-            print(GC.S_DS80, GC.S_NEWL, GC.S_DS30, ' DONE ', GC.S_DS36, sep='')
+                  GC.S_DS31, GC.S_NEWL, sep='')
+            for iFSeq, lAAcObs in self.dFSeq.items():
+                sFSeq = self.ViterbiCore(iFSeq=iFSeq, lObs=lAAcObs)
+                # self.printViterbiDetailedRes()
+                lO = [(s if s != self.dITp['sNotInNmer'] else
+                       self.dITp['sX']) for s in self.dRV[sFSeq]['optStPath']]
+                lIPyl = [i for i in range(len(lO)) if lO[i] == self.dITp['s0']]
+                self.dStatePath[sFSeq], self.dPosPyl[sFSeq] = lO, sorted(lIPyl)
+                for st, dData in self.V[iFSeq].items():
+                    GF.addToDictD(self.d2ProbDetail, cKMain=sFSeq, cKSub=st,
+                                  cVSub=dData[self.dITp['sProb']])
+            self.saveViterbiResData()
 
-    # --- methods for loading and saving data ---------------------------------
-    def loadInpData(self):
-        pFE, pFT = self.dPF['EmitProb'], self.dPF['TransProb']
-        self.dfrEmitProb = self.loadData(pF=pFE, iC=0, NAfillV=0.).T
-        self.dfrTransProb = self.loadData(pF=pFT, iC=0, NAfillV=0.)
-        self.dEmitProb = self.dfrEmitProb.T.to_dict(orient='dict')
-        self.dTransProb = self.dfrTransProb.T.to_dict(orient='dict')
+    # --- methods for saving data ---------------------------------------------
+    def saveViterbiResData(self):
+        pFStP, pFPPy = self.dPF['StatePath'], self.dPF['PosPyl']
+        pFPrD, pFPrF = self.dPF['ProbDetail'], self.dPF['ProbFinal']
+        self.saveDfr(GF.iniDfrFromDictIt(self.dStatePath), pF=pFStP)
+        self.saveDfr(GF.iniDfrFromDictIt(self.dPosPyl), pF=pFPPy)
+        lC = [self.dITp['sFullSeq'], self.dITp['sState'], self.dITp['sLnProb']]
+        self.saveDfr(GF.iniDfrFromD2(self.d2ProbDetail, colDfr=lC), pF=pFPrD)
+        lVProb = [GF.X_exp(self.dRV[sFSeq]['maxProb']) for sFSeq in self.dRV]
+        lVLnProb = [self.dRV[sFSeq]['maxProb'] for sFSeq in self.dRV]
+        dProbFin = {self.dITp['sFullSeq']: list(self.dRV),
+                    self.dITp['sProb']: lVProb,
+                    self.dITp['sLnProb']: lVLnProb}
+        self.saveDfr(GF.iniDfrFromDictIt(dProbFin), pF=pFPrF)
+        
 
 ###############################################################################

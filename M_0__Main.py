@@ -57,6 +57,7 @@ cValidation.createResultsTrain(stT=startTime)
 cViterbiAlg = ViterbiLog(inpDatG)
 cViterbiAlg.printDictPaths()
 cViterbiAlg.printDfrEmitProb()
+cViterbiAlg.printDfrStartProb()
 cViterbiAlg.printDfrTransProb()
 cViterbiAlg.runViterbiAlgorithm()
 

@@ -514,6 +514,36 @@ def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
 def iniWShape(tmplDfr, fillV=np.nan):
     iniPdDfr(shape=tmplDfr.shape, fillV=fillV)
 
+def getIdxDfr(maxLen=0, idxDfr=None):
+    if idxDfr is not None and len(idxDfr) >= maxLen:
+        idxDfr = idxDfr[:maxLen]
+    else:
+        idxDfr = None
+    return idxDfr
+
+def iniDfrFromDictIt(cD, idxDfr=None):
+    maxLen = 0
+    for cK, cIt in cD.items():
+        if len(cIt) > maxLen:
+            maxLen = len(cIt)
+    for cK, cIt in cD.items():
+        cD[cK] = list(cIt) + [np.nan]*(maxLen - len(cIt))
+    idxDfr = getIdxDfr(maxLen=maxLen, idxDfr=idxDfr)
+    return pd.DataFrame(cD, index=idxDfr)
+
+def iniDfrFromD2(d2, idxDfr=None, colDfr=None):
+    nCol = 2 + 1                    # two dict levels plus sub-dict values
+    if colDfr is None or len(colDfr) < nCol:
+        colDfr = range(nCol)
+    lLenDSub = [len(cD) for cD in d2.values()]
+    dLV = {sC: None for sC in colDfr[:nCol]}
+    lVC0 = flattenIt([[cKMain]*lLenDSub[k] for k, cKMain in enumerate(d2)])
+    lVC1 = flattenIt([list(cD) for cD in d2.values()])
+    lVC2 = flattenIt([list(cD.values()) for cD in d2.values()])
+    for sC, lV in zip(dLV, [lVC0, lVC1, lVC2]):
+        dLV[sC] = lV
+    return iniDfrFromDictIt(dLV, idxDfr=idxDfr)
+
 def tryRoundX(x, RD=None):
     if RD is not None:
         try:
