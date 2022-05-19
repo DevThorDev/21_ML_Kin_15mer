@@ -327,6 +327,13 @@ def addToDictD(cD, cKMain, cKSub, cVSub=[], allowRpl=False):
     else:
         cD[cKMain] = {cKSub: cVSub}
 
+def addToD3(cD3, cKL1, cKL2, cKL3, cVL3=[], allowRpl=False):
+    if cKL1 in cD3:
+        addToDictD(cD=cD3[cKL1], cKMain=cKL2, cKSub=cKL3, cVSub=cVL3,
+                   allowRpl=allowRpl)
+    else:
+        cD3[cKL1] = {cKL2: {cKL3: cVL3}}
+
 def convDDNumToDDProp(dDNum, nDigRnd):
     dDSum, dDProp = {}, {}
     for cKM, cDSub in dDNum.items():
@@ -521,6 +528,12 @@ def getIdxDfr(maxLen=0, idxDfr=None):
         idxDfr = None
     return idxDfr
 
+def getColDfr(nLvl=1, colDfr=None):
+    nCol = nLvl + 1    # nLvl dict levels plus 1 level for the sub-dict values
+    if colDfr is None or len(colDfr) < nCol:
+        colDfr = range(nCol)
+    return nCol, colDfr
+
 def iniDfrFromDictIt(cD, idxDfr=None):
     maxLen = 0
     for cK, cIt in cD.items():
@@ -532,17 +545,28 @@ def iniDfrFromDictIt(cD, idxDfr=None):
     return pd.DataFrame(cD, index=idxDfr)
 
 def iniDfrFromD2(d2, idxDfr=None, colDfr=None):
-    nCol = 2 + 1                    # two dict levels plus sub-dict values
-    if colDfr is None or len(colDfr) < nCol:
-        colDfr = range(nCol)
-    lLenDSub = [len(cD) for cD in d2.values()]
+    nCol, colDfr = getColDfr(nLvl=2, colDfr=colDfr)
+    lLenL2 = [len(cD) for cD in d2.values()]
     dLV = {sC: None for sC in colDfr[:nCol]}
-    lVC0 = flattenIt([[cKMain]*lLenDSub[k] for k, cKMain in enumerate(d2)])
+    lVC0 = flattenIt([[cKMain]*lLenL2[k] for k, cKMain in enumerate(d2)])
     lVC1 = flattenIt([list(cD) for cD in d2.values()])
     lVC2 = flattenIt([list(cD.values()) for cD in d2.values()])
     for sC, lV in zip(dLV, [lVC0, lVC1, lVC2]):
         dLV[sC] = lV
     return iniDfrFromDictIt(dLV, idxDfr=idxDfr)
+
+def iniDfrFromD3(d3, idxDfr=None, colDfr=None):
+    nCol, colDfr = getColDfr(nLvl=3, colDfr=colDfr)
+    fullDfr = pd.DataFrame(columns=colDfr)
+    for cKL1, cDL1 in d3.items():
+        cDfr = iniDfrFromD2(cDL1, colDfr=colDfr[1:])
+        cSer = pd.Series([cKL1]*cDfr.shape[0], name=colDfr[0])
+        cDfr = pd.concat([cSer, cDfr], axis=1, verify_integrity=True)
+        fullDfr = pd.concat([fullDfr, cDfr], axis=0)
+    idxDfr = getIdxDfr(maxLen=fullDfr.shape[0], idxDfr=idxDfr)
+    if idxDfr is not None:
+        fullDfr.index = idxDfr
+    return fullDfr.reset_index(drop=True)
 
 def tryRoundX(x, RD=None):
     if RD is not None:

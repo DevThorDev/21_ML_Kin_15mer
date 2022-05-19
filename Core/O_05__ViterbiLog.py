@@ -34,7 +34,7 @@ class ViterbiLog(SeqAnalysis):
         self.dStartProb = self.dfrStartProb.to_dict(orient='dict')[sStPr]
         self.dTransProb = self.dfrTransProb.T.to_dict(orient='dict')
         self.dFSeq, self.dStatePath, self.dPosPyl = {}, {}, {}
-        self.d2ProbDetail, self.dProbFinal, self.dRV = {}, {}, {}
+        self.d3ProbDetail, self.dProbFinal, self.dRV = {}, {}, {}
         self.lStates = list(self.dStartProb)
         if self.dITp['sCCodeSeq'] in self.dfrFSeqInp.columns:
             arrFSeqUnq = self.dfrFSeqInp[self.dITp['sCCodeSeq']].unique()
@@ -176,9 +176,10 @@ class ViterbiLog(SeqAnalysis):
                        self.dITp['sX']) for s in self.dRV[sFSeq]['optStPath']]
                 lIPyl = [i for i in range(len(lO)) if lO[i] == self.dITp['s0']]
                 self.dStatePath[sFSeq], self.dPosPyl[sFSeq] = lO, sorted(lIPyl)
-                for st, dData in self.V[iFSeq].items():
-                    GF.addToDictD(self.d2ProbDetail, cKMain=sFSeq, cKSub=st,
-                                  cVSub=dData[self.dITp['sProb']])
+                for i, dSub in self.V.items():
+                    for st, dData in dSub.items():
+                        GF.addToD3(self.d3ProbDetail, cKL1=iFSeq, cKL2=i,
+                                   cKL3=st, cVL3=dData[self.dITp['sProb']])
             self.saveViterbiResData()
 
     # --- methods for saving data ---------------------------------------------
@@ -187,14 +188,14 @@ class ViterbiLog(SeqAnalysis):
         pFPrD, pFPrF = self.dPF['ProbDetail'], self.dPF['ProbFinal']
         self.saveDfr(GF.iniDfrFromDictIt(self.dStatePath), pF=pFStP)
         self.saveDfr(GF.iniDfrFromDictIt(self.dPosPyl), pF=pFPPy)
-        lC = [self.dITp['sFullSeq'], self.dITp['sState'], self.dITp['sLnProb']]
-        self.saveDfr(GF.iniDfrFromD2(self.d2ProbDetail, colDfr=lC), pF=pFPrD)
+        lC = [self.dITp['sFullSeq'], 'Index', self.dITp['sState'], self.dITp['sLnProb']]
+        self.saveDfr(GF.iniDfrFromD3(self.d3ProbDetail, colDfr=lC), pF=pFPrD)
         lVProb = [GF.X_exp(self.dRV[sFSeq]['maxProb']) for sFSeq in self.dRV]
         lVLnProb = [self.dRV[sFSeq]['maxProb'] for sFSeq in self.dRV]
         dProbFin = {self.dITp['sFullSeq']: list(self.dRV),
                     self.dITp['sProb']: lVProb,
                     self.dITp['sLnProb']: lVLnProb}
         self.saveDfr(GF.iniDfrFromDictIt(dProbFin), pF=pFPrF)
-        
+
 
 ###############################################################################
