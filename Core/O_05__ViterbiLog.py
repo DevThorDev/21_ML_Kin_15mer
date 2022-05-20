@@ -2,7 +2,7 @@
 ###############################################################################
 # --- O_05__ViterbiLog.py ----------------------------------------------------
 ###############################################################################
-# import os, time
+import time
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
@@ -165,11 +165,13 @@ class ViterbiLog(SeqAnalysis):
         self.followBacktrackTo1stObs(sFSeq=sFullSeq)
         return sFullSeq
 
-    def runViterbiAlgorithm(self):
+    def runViterbiAlgorithm(self, cTim, stT=None):
         if self.dITp['doViterbi']:
+            cStT = time.time()
             print(GC.S_EQ80, GC.S_NEWL, GC.S_DS30, ' Viterbi Algorithm ',
                   GC.S_DS31, GC.S_NEWL, sep='')
-            for iFSeq, lAAcObs in self.dFSeq.items():
+            nFSeq, sFS = len(self.dFSeq), 'full sequences [ViterbiAlgorithm]'
+            for k, (iFSeq, lAAcObs) in enumerate(self.dFSeq.items()):
                 sFSeq = self.ViterbiCore(iFSeq=iFSeq, lObs=lAAcObs)
                 # self.printViterbiDetailedRes()
                 lO = [(s if s != self.dITp['sNotInNmer'] else
@@ -180,7 +182,10 @@ class ViterbiLog(SeqAnalysis):
                     for st, dData in dSub.items():
                         GF.addToD3(self.d3ProbDetail, cKL1=iFSeq, cKL2=i,
                                    cKL3=st, cVL3=dData[self.dITp['sProb']])
+                GF.showProgress(N=nFSeq, n=k, modeDisp=self.dITp['mDsp'],
+                                varText=sFS, startTime=stT)
             self.saveViterbiResData()
+            cTim.updateTimes(iMth=13, stTMth=cStT, endTMth=time.time())
 
     # --- methods for saving data ---------------------------------------------
     def saveViterbiResData(self):

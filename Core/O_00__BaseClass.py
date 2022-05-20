@@ -299,6 +299,7 @@ class Timing:
         self.elT_02_10_getD2CondProbSnip = 0.
         self.elT_02_11_saveD2TCProbSnipAsDfr = 0.
         self.elT_02_12_getProbSglPos = 0.
+        self.elT_05_13_ViterbiAlgorithm = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
         self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
@@ -306,7 +307,7 @@ class Timing:
                       'performProbAnalysis_C', 'performProbAnalysis_D',
                       'calcProbTable', 'getD2TotalProbSnip',
                       'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
-                      'getProbSglPos']
+                      'getProbSglPos', 'ViterbiAlgorithm']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -321,7 +322,8 @@ class Timing:
                      self.elT_02_9_getD2TotalProbSnip,
                      self.elT_02_10_getD2CondProbSnip,
                      self.elT_02_11_saveD2TCProbSnipAsDfr,
-                     self.elT_02_12_getProbSglPos]
+                     self.elT_02_12_getProbSglPos,
+                     self.elT_05_13_ViterbiAlgorithm]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
         if stTMth is not None and endTMth is not None:
@@ -350,6 +352,8 @@ class Timing:
                 self.elT_02_11_saveD2TCProbSnipAsDfr += elT
             elif iMth == 12:
                 self.elT_02_12_getProbSglPos += elT
+            elif iMth == 13:
+                self.elT_05_13_ViterbiAlgorithm += elT
             self.elT_Sum += elT
             self.updateLElTimes()
 
@@ -380,6 +384,8 @@ class Timing:
                str(round(self.elT_02_11_saveD2TCProbSnipAsDfr, self.rdDig)) +
                GC.S_NEWL + 'Method 12 | "getProbSglPos":\t' +
                str(round(self.elT_02_12_getProbSglPos, self.rdDig)) +
+               GC.S_NEWL + 'Method 13 | "ViterbiAlgorithm":\t' +
+               str(round(self.elT_05_13_ViterbiAlgorithm, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 

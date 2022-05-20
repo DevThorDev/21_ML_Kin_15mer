@@ -425,16 +425,19 @@ class SeqAnalysis(BaseClass):
         self.nNmer = sum([sum(dSub.values()) for dSub in d2Full2Nmer.values()])
         return d2Full2Nmer, sSeqRem
 
-    def fillD2ResSglPos(self, d2Full2Nmer, sR='', iCt=0):
+    def fillD2ResSglPos(self, d2Full2Nmer, sR='', iCt=0, stT=None):
         # fill Nmer position dictionaries
         if self.nNmer > 0:
-            for dNmer in d2Full2Nmer.values():
+            nNmer, sNS = len(d2Full2Nmer), 'Nmer sequences [fillD2ResSglPos]'
+            for m, dNmer in enumerate(d2Full2Nmer.values()):
                 for sNmer, n in dNmer.items():
                     for iP in self.d2NOccSglPos:
                         chAAc = sNmer[iP + iCt]
                         GF.addToDictCt(self.d2NOccSglPos[iP], cK=chAAc, nInc=n)
                         GF.addToDictCt(self.d2RFreqSglPos[iP], cK=chAAc,
                                        nInc=n/self.nNmer)
+                GF.showProgress(N=nNmer, n=m, modeDisp=self.dITp['mDsp'],
+                                varText=sNS, startTime=stT)
         # fill outside-Nmer amino acid dictionaries
         self.d2NOccSglPos[None], self.d2RFreqSglPos[None] = {}, {}
         for chAAc in sR:
@@ -447,7 +450,7 @@ class SeqAnalysis(BaseClass):
         d2Full2Nmer, sR = self.getD2Full2NmerSRem(iCt=iCt)
         self.d2NOccSglPos = {iP: {} for iP in list(range(-iCt, lenNmer - iCt))}
         self.d2RFreqSglPos = {iP: {} for iP in self.d2NOccSglPos}
-        self.fillD2ResSglPos(d2Full2Nmer, sR=sR, iCt=iCt)
+        self.fillD2ResSglPos(d2Full2Nmer, sR=sR, iCt=iCt, stT=stT)
         GF.pickleSaveDict(cD=self.d2NOccSglPos, pF=self.dPF['DictNOccSP'])
         GF.pickleSaveDict(cD=self.d2RFreqSglPos, pF=self.dPF['DictRFreqSP'])
 

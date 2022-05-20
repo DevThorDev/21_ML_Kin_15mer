@@ -8,6 +8,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.datasets import load_iris
+from sklearn.datasets import make_classification
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -18,7 +21,9 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 P_TEMP = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer', '98_TEMP')
 
 S_F_INP_MLP_CLF = 'SglPosAAc_Red__Combined_S_KinasesPho15mer_202202'
+S_F_INP_RF_CLF = 'TestCategorical'
 S_F_OUT_MLP_CLF = S_F_INP_MLP_CLF + '_Results'
+S_F_OUT_RF_CLF = S_F_INP_RF_CLF + '_Results'
 
 # --- strings -----------------------------------------------------------------
 S_SPACE = ' '
@@ -66,8 +71,11 @@ R08 = 8
 
 # ### INPUT ###################################################################
 # --- flow control ------------------------------------------------------------
-doMLP_Clf = True
-usedData = 'SglPosAAc_Red'  # 'IrisData' / 'SglPosAAc_Red'
+doMLP_Clf = False
+doRF_Clf = True
+
+# 'IrisData' / 'SglPosAAc_Red' / 'TestCategorical' / 'MakeClassifier'
+usedData = 'TestCategorical'
 
 # --- boolean variables -------------------------------------------------------
 scaleX=False
@@ -75,14 +83,27 @@ scaleY=False
 
 # --- numbers -----------------------------------------------------------------
 rndState = None            # None (random) or integer (reproducible)
+
 propTestData = .2
 sizeHiddenLayers = (256, 128, 64, 32)
+
+nSamplesMC = 100
+nFeaturesMC = 4
+nInformativeMC = 2
+nRedundantMC = 0
+shuffleItMC = False
+maxDepthClfMC = 2
+
+llFeaturesMC = [[1.2, 1.3, 0.8, 0.75],
+                [-0.5, 0.7, 1.2, 0.9],
+                [2.1, -0.1, -0.3, 0.4]]
 
 # --- strings -----------------------------------------------------------------
 sActivation = 'relu'
 sPltSupTtl = 'Confusion Matrix for Iris Dataset'
 
-sHdrCY = 'EffType'     # KinaseFamily / 'EffType'
+sHdrCY_SglPosAAc_Red = 'EffType'     # 'KinaseFamily' / 'EffType'
+sHdrCY_TestCategorical = 'Class'     # 'Class'
 
 # --- lists -------------------------------------------------------------------
 lPltLbls = ['Setosa', 'Versicolor', 'Virginica']
@@ -93,11 +114,14 @@ lPltLbls = ['Setosa', 'Versicolor', 'Virginica']
 
 # === derived values and input processing =====================================
 pFInpMLP_Clf = os.path.join(P_TEMP, S_F_INP_MLP_CLF + XT_CSV)
+pFInpRF_Clf = os.path.join(P_TEMP, S_F_INP_RF_CLF + XT_CSV)
 pFOutMLP_Clf = os.path.join(P_TEMP, S_F_OUT_MLP_CLF + XT_CSV)
+pFOutRF_Clf = os.path.join(P_TEMP, S_F_OUT_RF_CLF + XT_CSV)
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
         'doMLP_Clf': doMLP_Clf,
+        'doRF_Clf': doRF_Clf,
         'usedData': usedData,
         # --- boolean variables -----------------------------------------------
         'scaleX': scaleX,
@@ -105,7 +129,9 @@ dInp = {# --- flow control ----------------------------------------------------
         # --- files, directories and paths ------------------------------------
         'pTemp': P_TEMP,
         'sFInpMLP_Clf': S_F_INP_MLP_CLF + XT_CSV,
+        'sFInpRF_Clf': S_F_INP_RF_CLF + XT_CSV,
         'sFOutMLP_Clf': S_F_OUT_MLP_CLF + XT_CSV,
+        'sFOutRF_Clf': S_F_OUT_RF_CLF + XT_CSV,
         # --- file name extensions --------------------------------------------
         'xtCSV': XT_CSV,
         # --- numbers
@@ -113,6 +139,13 @@ dInp = {# --- flow control ----------------------------------------------------
         'rndState': rndState,
         'propTest': propTestData,
         'sizeHL': sizeHiddenLayers,
+        'nSamples': nSamplesMC,
+        'nFeatures': nFeaturesMC,
+        'nInformative': nInformativeMC,
+        'nRedundant': nRedundantMC,
+        'shuffleIt': shuffleItMC,
+        'maxDepthClfMC': maxDepthClfMC,
+        'llFeaturesMC': llFeaturesMC,
         # --- sets
         # --- lists
         # --- strings
@@ -122,14 +155,17 @@ dInp = {# --- flow control ----------------------------------------------------
         'sSpecies': S_SPECIES,
         'sActivation': sActivation,
         'sPltSupTtl': sPltSupTtl,
-        'sHdrCY': sHdrCY,
+        'sHdrCY_SglPosAAc_Red': sHdrCY_SglPosAAc_Red,
+        'sHdrCY_TestCategorical': sHdrCY_TestCategorical,
         # --- numbers ---------------------------------------------------------
         # --- lists -----------------------------------------------------------
         'lPltLbls': lPltLbls,
         # --- dictionaries ----------------------------------------------------
         # === derived values and input processing =============================
         'pFInpMLP_Clf': pFInpMLP_Clf,
-        'pFOutMLP_Clf': pFOutMLP_Clf}
+        'pFInpRF_Clf': pFInpRF_Clf,
+        'pFOutMLP_Clf': pFOutMLP_Clf,
+        'pFOutRF_Clf': pFOutRF_Clf}
 
 # ### FUNCTIONS ###############################################################
 # --- General file system related functions -----------------------------------
@@ -160,12 +196,36 @@ def loadIrisData(dI):
     y = pd.Series(iris_data.target, name=dI['sSpecies'])
     return X, y
 
-def loadSKLearnTestData(dI, iCol=None):
-    dfrInp = readCSV(pF=dI['pFInpMLP_Clf'], iCol=iCol)
-    assert dI['sHdrCY'] in dfrInp.columns
-    dfrX = dfrInp[[s for s in dfrInp.columns if s != dI['sHdrCY']]]
-    serY = dfrInp[dI['sHdrCY']]
+def loadClfTestData(dI, iCol=None):
+    pF, sHdCY = dI['pFInpMLP_Clf'], dI['sHdrCY_SglPosAAc_Red']
+    if dI['usedData'] == 'SglPosAAc_Red':
+        pF, sHdCY = dI['pFInpMLP_Clf'], dI['sHdrCY_SglPosAAc_Red']
+    elif dI['usedData'] == 'TestCategorical':
+        pF, sHdCY = dI['pFInpRF_Clf'], dI['sHdrCY_TestCategorical']
+    dfrInp = readCSV(pF=pF, iCol=iCol)
+    print('Input DataFrame:', S_NEWL, dfrInp, sep='')
+    assert sHdCY in dfrInp.columns
+    dfrX = dfrInp[[s for s in dfrInp.columns if s != sHdCY]]
+    serY = dfrInp[sHdCY]
     return dfrX, serY
+
+def getDataFromMakeClassification(dI):
+    return make_classification(n_samples=dI['nSamples'],
+                               n_features=dI['nFeatures'],
+                               n_informative=dI['nInformative'],
+                               n_redundant=dI['nRedundant'],
+                               random_state=dI['rndState'],
+                               shuffle=dI['shuffleIt'])
+
+def getDataXy(dI):
+    X, y = None, None
+    if dI['usedData'] == 'IrisData':
+        X, y = loadIrisData(dI=dI)
+    elif dI['usedData'] in ['SglPosAAc_Red', 'TestCategorical']:
+        X, y = loadClfTestData(dI=dI, iCol=0)
+    elif dI['usedData'] == 'MakeClassifier':
+        X, y = getDataFromMakeClassification(dI=dI)
+    return X, y
 
 # --- Functions handling dictionaries -----------------------------------------
 def addToDictCt(cD, cK, cIncr=1):
@@ -229,7 +289,7 @@ class TrainTestData:
             sc_Y = StandardScaler()
             self.y_Train_Sc = sc_Y.fit_transform(self.y_Train)
             self.y_Test_Sc = sc_Y.transform(self.y_Test)
-    
+
 # -----------------------------------------------------------------------------
 class Pred_MLPClf:
     # --- initialisation of the class -----------------------------------------
@@ -268,6 +328,27 @@ class Pred_MLPClf:
         print('Confusion matrix:', S_NEWL, self.confusMatrix, sep='')
 
 # -----------------------------------------------------------------------------
+class Fitted_RFClf:
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, dInp, X, y):
+        self.idO = 'Pred_RF'
+        self.descO = 'Predictor based on the Random Forest classifier'
+        self.dI = dInp
+        self.X, self.y = X, y
+        self.RndForestClfFit()
+        print('Initiated "Pred_RFClf" base object.')
+
+    # --- methods for fitting and predicting with a Random Forest Classifier --
+    def RndForestClfFit(self):
+        self.Clf = RandomForestClassifier(max_depth=self.dI['maxDepthClfMC'],
+                                          random_state=self.dI['rndState'])
+        self.Clf.fit(self.X, self.y)
+
+    def RndForestClfPred(self):
+        self.lPred = self.Clf.predict(self.dI['llFeaturesMC'])
+        print('List of predictions:', S_NEWL, self.lPred, sep='')
+
+# -----------------------------------------------------------------------------
 class Plotter:
     # --- initialisation of the class -----------------------------------------
     def __init__(self, dInp):
@@ -287,24 +368,27 @@ class Plotter:
 # ### MAIN ####################################################################
 print(S_EQ80, S_NEWL, S_DS30, ' SKLearnTest_MLPClassifier.py ', S_DS20, S_NEWL,
       sep='')
-if doMLP_Clf:
-    X, y = None, None
-    if dInp['usedData'] == 'IrisData':
-        X, y = loadIrisData(dI=dInp)
-    elif dInp['usedData'] == 'SglPosAAc_Red':
-        X, y = loadSKLearnTestData(dI=dInp, iCol=0)
-        
-    print('X:', S_NEWL, X, S_NEWL, S_DS80, S_NEWL, 'y:', S_NEWL, y, sep='')
-    print('type(X):', type(X), '| type(y):', type(y))
-    print('shape of X:', X.shape, '| shape of y:', y.shape)
-    
+X, y = getDataXy(dI=dInp)
+print('X:', S_NEWL, X, S_NEWL, S_DS80, S_NEWL, 'y:', S_NEWL, y, sep='')
+print('type(X):', type(X), '| type(y):', type(y))
+print('shape of X:', X.shape, '| shape of y:', y.shape)
+try:
+    print('(min, max) of X:', X.min(), X.max())
+except:
+    print('No min. and max. of X, as values of X are not ordered.')
+
+if dInp['doMLP_Clf']:
     TrTeData = TrainTestData(dInp=dInp, X=X, y=y)
     cMLPPred = Pred_MLPClf(dInp=dInp, TTD=TrTeData)
     cMLPPred.printFitQuality()
-    
+
     Pltr = Plotter(dInp=dInp)
     Pltr.plotConfusionMatrix(prMLPC=cMLPPred)
-    
+
+if dInp['doRF_Clf']:
+    cFittedRFClf = Fitted_RFClf(dInp=dInp, X=X, y=y)
+    # cFittedRFClf.RndForestClfPred()
+
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
 ###############################################################################

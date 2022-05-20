@@ -59,7 +59,7 @@ cViterbiAlg.printDictPaths()
 cViterbiAlg.printDfrEmitProb()
 cViterbiAlg.printDfrStartProb()
 cViterbiAlg.printDfrTransProb()
-cViterbiAlg.runViterbiAlgorithm()
+cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])
