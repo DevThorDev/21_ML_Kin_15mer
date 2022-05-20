@@ -94,9 +94,8 @@ nRedundantMC = 0
 shuffleItMC = False
 maxDepthClfMC = 2
 
-llFeaturesMC = [[1.2, 1.3, 0.8, 0.75],
-                [-0.5, 0.7, 1.2, 0.9],
-                [2.1, -0.1, -0.3, 0.4]]
+llFeaturesMC = [['A', 'C', 'D', 'A', 'D', 'A'],
+                ['B', 'D', 'B', 'B', 'C', 'A']]
 
 # --- strings -----------------------------------------------------------------
 sActivation = 'relu'
@@ -335,17 +334,42 @@ class Fitted_RFClf:
         self.descO = 'Predictor based on the Random Forest classifier'
         self.dI = dInp
         self.X, self.y = X, y
+        self.Xtrans = None
+        self.encodeCatFeatures()
+        self.transCatToNumpy()
         self.RndForestClfFit()
         print('Initiated "Pred_RFClf" base object.')
+
+    # --- method for encoding the categorical features ------------------------
+    def encodeCatFeatures(self):
+        self.cEnc = OneHotEncoder()
+        self.cEnc.fit(self.X)
+        print('Categories:', S_NEWL, self.cEnc.categories_)
+        print('n_features_in:', S_NEWL, self.cEnc.n_features_in_)
+        print('feature_names_in:', S_NEWL, self.cEnc.feature_names_in_)
+        print('Feature names out:', S_NEWL, self.cEnc.get_feature_names_out(),
+              sep='')
+
+    # --- method for transforming categorical features to a numpy array -------
+    def transCatToNumpy(self, llCat=None):
+        if llCat is None:
+            llCat = self.X
+        self.Xtrans = self.cEnc.transform(llCat).toarray()
+        print('Transformed array:', S_NEWL, self.Xtrans, S_NEWL, 'Shape:',
+              self.Xtrans.shape, sep='')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def RndForestClfFit(self):
         self.Clf = RandomForestClassifier(max_depth=self.dI['maxDepthClfMC'],
                                           random_state=self.dI['rndState'])
-        self.Clf.fit(self.X, self.y)
+        if self.Xtrans is None:
+            self.Clf.fit(self.X, self.y)
+        else:
+            self.Clf.fit(self.Xtrans, self.y)
 
     def RndForestClfPred(self):
-        self.lPred = self.Clf.predict(self.dI['llFeaturesMC'])
+        ll = self.dI['llFeaturesMC']
+        self.lPred = self.Clf.predict(self.cEnc.transform(ll).toarray())
         print('List of predictions:', S_NEWL, self.lPred, sep='')
 
 # -----------------------------------------------------------------------------
@@ -387,7 +411,9 @@ if dInp['doMLP_Clf']:
 
 if dInp['doRF_Clf']:
     cFittedRFClf = Fitted_RFClf(dInp=dInp, X=X, y=y)
-    # cFittedRFClf.RndForestClfPred()
+    # cFittedRFClf.transCatToNumpy(llCat=[['A', 'C', 'D', 'A', 'D', 'A'],
+    #                                     ['B', 'D', 'B', 'B', 'C', 'A']])
+    cFittedRFClf.RndForestClfPred()
 
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
