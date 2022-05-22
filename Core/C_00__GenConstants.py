@@ -127,6 +127,7 @@ DIR_RES_INFO_TEST = '34_Res' + S_INFO + S_USC + S_TEST
 DIR_RES_PROB = '35_Res' + S_PROB
 DIR_RES_PROB_TEST = '36_Res' + S_PROB + S_USC + S_TEST
 DIR_RES_VITERBI = '37_ResViterbi'
+DIR_TEMP = '98_TEMP'
 
 P_DIR_INP = os.path.join('..', '..', DIR_INP)
 P_DIR_RAW_INP = os.path.join(P_DIR_INP, DIR_RAW_INP)
@@ -140,6 +141,7 @@ P_DIR_RES_INFO_TEST = os.path.join(P_DIR_INP, DIR_RES_INFO_TEST)
 P_DIR_RES_PROB = os.path.join(P_DIR_INP, DIR_RES_PROB)
 P_DIR_RES_PROB_TEST = os.path.join(P_DIR_INP, DIR_RES_PROB_TEST)
 P_DIR_RES_VITERBI = os.path.join(P_DIR_INP, DIR_RES_VITERBI)
+P_DIR_TEMP = os.path.join(P_DIR_INP, DIR_TEMP)
 
 S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'
@@ -185,6 +187,10 @@ S_STATE = 'State'
 S_START_PROB = 'Start' + S_PROB
 S_SGL_POS_OCC = 'SglPosNOcc'
 S_SGL_POS_FRQ = 'SglPosRFreq'
+S_LIST = 'List'
+S_UNIQUE = 'Unique'
+S_FULL_LIST = S_FULL + S_LIST
+S_UNQ_LIST = S_UNIQUE + S_LIST
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15

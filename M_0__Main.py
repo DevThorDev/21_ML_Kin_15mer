@@ -13,6 +13,7 @@ from Core.O_01__ExpData import ExpData
 from Core.O_02__SeqAnalysis import SeqAnalysis
 from Core.O_03__Validation import Validation
 from Core.O_05__ViterbiLog import ViterbiLog
+from Core.O_07__Classifier import Classifier
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -60,6 +61,10 @@ cViterbiAlg.printDfrEmitProb()
 cViterbiAlg.printDfrStartProb()
 cViterbiAlg.printDfrTransProb()
 cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
+
+cCls = Classifier(inpDatG)
+cCls.printX()
+cCls.printY()
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

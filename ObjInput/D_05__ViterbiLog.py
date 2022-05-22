@@ -9,7 +9,7 @@ sOType = 'Viterbi algoritm for sequences [log(prob.)] (D_05__ViterbiLog)'
 sNmSpec = 'Input data for the ViterbiLog class in O_05__ViterbiLog'
 
 # --- flow control ------------------------------------------------------------
-doViterbi = True
+doViterbi = False
 
 useFullSeqFrom = GC.S_COMB_INP    # S_PROC_INP / S_COMB_INP
 

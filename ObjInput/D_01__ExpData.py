@@ -50,6 +50,7 @@ pDirResInfo_Test = GC.P_DIR_RES_INFO_TEST
 pDirResProb = GC.P_DIR_RES_PROB
 pDirResProb_Test = GC.P_DIR_RES_PROB_TEST
 pDirResViterbi = GC.P_DIR_RES_VITERBI
+pDirTemp = GC.P_DIR_TEMP
 
 # --- numbers -----------------------------------------------------------------
 lenNmerDef = GC.LEN_N_MER_DEF
@@ -182,6 +183,7 @@ dIO = {# --- general
        'pDirResProb': pDirResProb,
        'pDirResProb_T': pDirResProb_Test,
        'pDirResViterbi': pDirResViterbi,
+       'pDirTemp': pDirTemp,
        # --- numbers
        'lenNmerDef': lenNmerDef,
        'iCentNmer': iCentNmer,

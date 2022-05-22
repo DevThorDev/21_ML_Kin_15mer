@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-# --- O_05__ViterbiLog.py ----------------------------------------------------
+# --- O_05__ViterbiLog.py -----------------------------------------------------
 ###############################################################################
 import time
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
-# import Core.F_01__SpcFunctions as SF
 
 from Core.O_02__SeqAnalysis import SeqAnalysis
 
