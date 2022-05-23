@@ -166,6 +166,7 @@ S_FULL_SEQ = S_FULL + S_SEQ
 S_N_MER_SEQ = S_N_MER + S_SEQ
 S_LEN_N_MER = 'len' + S_N_MER
 S_EFF_CODE = 'Effector'
+S_EFF_CL = S_EFF_CODE + 'Cl'
 S_C_N_MER = 'c15mer'
 S_POS_P_SITE = 'PosPSite'
 S_SNIPPET = 'Snippet'

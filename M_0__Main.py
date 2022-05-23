@@ -13,7 +13,7 @@ from Core.O_01__ExpData import ExpData
 from Core.O_02__SeqAnalysis import SeqAnalysis
 from Core.O_03__Validation import Validation
 from Core.O_05__ViterbiLog import ViterbiLog
-from Core.O_07__Classifier import Classifier
+from Core.O_07__Classifier import RndForestClf, NNMLPClf
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -50,21 +50,40 @@ cSeqAnalysis.performTCProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 
 cSeqAnalysis.getProbSglPos(cTim=cTiming, lEff=[None], stT=startTime)
 
-GF.showElapsedTime(startTime)
 cValidation = Validation(inpDatG)
 cValidation.createResultsTrain(stT=startTime)
 # cValidation.printTestObj(printDfrComb=True)
 
-cViterbiAlg = ViterbiLog(inpDatG)
-cViterbiAlg.printDictPaths()
-cViterbiAlg.printDfrEmitProb()
-cViterbiAlg.printDfrStartProb()
-cViterbiAlg.printDfrTransProb()
-cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
+# cViterbiAlg = ViterbiLog(inpDatG)
+# cViterbiAlg.printDictPaths()
+# cViterbiAlg.printDfrEmitProb()
+# cViterbiAlg.printDfrStartProb()
+# cViterbiAlg.printDfrTransProb()
+# cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
 
-cCls = Classifier(inpDatG)
-cCls.printX()
-cCls.printY()
+cStTime = GF.showElapsedTime(startTime)
+cRFClf = RndForestClf(inpDatG)
+# cRFClf.ClfPred(dat2Pre=[list('ACDADA'), list('BDBBCA'), list('CBDCCD'),
+#                         list('DDBADC'), list('CDCDAA'), list('AAACCC'),
+#                         list('CACCDB'), list('CACCDD'), list('DCBBDB'),
+#                         list('DCABDB')])
+print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
+cRFClf.ClfPred()
+cRFClf.printFitQuality()
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
+
+cStTime = GF.showElapsedTime(startTime)
+cMLPClf = NNMLPClf(inpDatG)
+# cMLPClf.ClfPred(dat2Pre=[list('ACDADA'), list('BDBBCA'), list('CBDCCD'),
+#                          list('DDBADC'), list('CDCDAA'), list('AAACCC'),
+#                          list('CACCDB'), list('CACCDD'), list('DCBBDB'),
+#                          list('DCABDB')])
+print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
+cMLPClf.ClfPred()
+cMLPClf.printFitQuality()
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

@@ -825,11 +825,13 @@ def printElapsedTimeSim(stT=None, cT=None, sPre='Time', nDig=GC.R04):
               round(elT/(3600*24), nDig), 'days.')
 
 def showElapsedTime(startTime=None):
+    cTime = time.time()
     if startTime is not None:
         print(GC.S_DS80)
-        printElapsedTimeSim(startTime, time.time(), 'Time')
-        print(GC.S_SP04 + 'Current time:', time.ctime(time.time()), GC.S_SP04)
+        printElapsedTimeSim(startTime, cTime, 'Time')
+        print(GC.S_SP04 + 'Current time:', time.ctime(cTime), GC.S_SP04)
         print(GC.S_DS80)
+    return cTime
 
 def showProgress(N, n=0, modeDisp=1, varText='', startTime=None, showT=False):
     if (n + 1)%modeDisp == 0:
