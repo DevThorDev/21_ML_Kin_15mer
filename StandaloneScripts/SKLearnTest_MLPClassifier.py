@@ -18,7 +18,8 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # ### CONSTANTS ###############################################################
 # --- files, directories and paths --------------------------------------------
-P_TEMP = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer', '98_TEMP')
+P_TEMP = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
+                      '98_TEMP_CSV')
 
 S_F_INP_MLP_CLF = 'SglPosAAc_Red__Combined_S_KinasesPho15mer_202202'
 S_F_INP_RF_CLF = 'TestCategorical'

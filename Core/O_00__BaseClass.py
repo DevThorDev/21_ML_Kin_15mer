@@ -302,6 +302,7 @@ class Timing:
         self.elT_05_13_ViterbiAlgorithm = 0.
         self.elT_07_14_RndForestClf = 0.
         self.elT_07_15_NNMLPClf = 0.
+        self.elT_07_16_PropCalculator = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
         self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
@@ -310,7 +311,7 @@ class Timing:
                       'calcProbTable', 'getD2TotalProbSnip',
                       'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
                       'getProbSglPos', 'ViterbiAlgorithm', 'RndForestClf',
-                      'NNMLPClf']
+                      'NNMLPClf', 'PropCalculator']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -328,7 +329,8 @@ class Timing:
                      self.elT_02_12_getProbSglPos,
                      self.elT_05_13_ViterbiAlgorithm,
                      self.elT_07_14_RndForestClf,
-                     self.elT_07_15_NNMLPClf]
+                     self.elT_07_15_NNMLPClf,
+                     self.elT_07_16_PropCalculator]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
         if stTMth is not None and endTMth is not None:
@@ -363,6 +365,8 @@ class Timing:
                 self.elT_07_14_RndForestClf += elT
             elif iMth == 15:
                 self.elT_07_15_NNMLPClf += elT
+            elif iMth == 16:
+                self.elT_07_16_PropCalculator += elT
             self.elT_Sum += elT
             self.updateLElTimes()
 
@@ -399,6 +403,8 @@ class Timing:
                str(round(self.elT_07_14_RndForestClf, self.rdDig)) +
                GC.S_NEWL + 'Method 15 | "NNMLPClf":\t' +
                str(round(self.elT_07_15_NNMLPClf, self.rdDig)) +
+               GC.S_NEWL + 'Method 16 | "PropCalculator":\t' +
+               str(round(self.elT_07_16_PropCalculator, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 

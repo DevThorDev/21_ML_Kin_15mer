@@ -14,7 +14,7 @@ P_PROC_I_N_MER = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
 P_COMB_RES = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
                           '31_ResCombined')
 P_TEMP_RES = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
-                          '98_TEMP')
+                          '98_TEMP_CSV')
 
 S_F_PROC_I_N_MER = 'Pho15mer_202202'
 S_F_RES_COMB_S = 'Combined_S_KinasesPho15mer_202202'

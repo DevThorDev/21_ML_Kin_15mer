@@ -9,7 +9,8 @@ import pandas as pd
 
 # ### CONSTANTS ###############################################################
 # --- files, directories and paths --------------------------------------------
-P_TEMP = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer', '98_TEMP')
+P_TEMP = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
+                      '98_TEMP_CSV')
 
 S_F_INP_VITERBI = ''
 S_F_OUT_VITERBI = ''

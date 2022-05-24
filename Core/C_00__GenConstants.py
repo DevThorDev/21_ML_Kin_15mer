@@ -127,7 +127,7 @@ DIR_RES_INFO_TEST = '34_Res' + S_INFO + S_USC + S_TEST
 DIR_RES_PROB = '35_Res' + S_PROB
 DIR_RES_PROB_TEST = '36_Res' + S_PROB + S_USC + S_TEST
 DIR_RES_VITERBI = '37_ResViterbi'
-DIR_TEMP = '98_TEMP'
+DIR_TEMP = '98_TEMP_CSV'
 
 P_DIR_INP = os.path.join('..', '..', DIR_INP)
 P_DIR_RAW_INP = os.path.join(P_DIR_INP, DIR_RAW_INP)
@@ -162,6 +162,7 @@ S_TYPE = 'Type'
 S_DATA = 'Data'
 S_SEQ = 'Seq'
 S_INP = 'Inp'
+S_OUT = 'Out'
 S_FULL_SEQ = S_FULL + S_SEQ
 S_N_MER_SEQ = S_N_MER + S_SEQ
 S_LEN_N_MER = 'len' + S_N_MER
@@ -192,6 +193,9 @@ S_LIST = 'List'
 S_UNIQUE = 'Unique'
 S_FULL_LIST = S_FULL + S_LIST
 S_UNQ_LIST = S_UNIQUE + S_LIST
+S_AAC = 'AAc'
+S_AAC_CHARGE = S_AAC + 'Charge'
+S_AAC_POLAR = S_AAC + 'Polar'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15

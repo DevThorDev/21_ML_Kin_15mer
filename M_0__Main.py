@@ -13,7 +13,7 @@ from Core.O_01__ExpData import ExpData
 from Core.O_02__SeqAnalysis import SeqAnalysis
 from Core.O_03__Validation import Validation
 from Core.O_05__ViterbiLog import ViterbiLog
-from Core.O_07__Classifier import RndForestClf, NNMLPClf
+from Core.O_07__Classifier import RndForestClf, NNMLPClf, PropCalculator
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -84,6 +84,12 @@ cMLPClf.ClfPred()
 cMLPClf.printFitQuality()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
+
+cStTime = GF.showElapsedTime(startTime)
+cPropCalc = PropCalculator(inpDatG)
+cPropCalc.calcPropAAc()
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
 
 # cPlotter = Plotter(inDG, calcDfrs=True)
 GF.printMode(inpDatG.dI['isTest'])

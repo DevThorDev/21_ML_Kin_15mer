@@ -12,7 +12,8 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
 doRndForestClf = True
-doNNMLPClf = False
+doNNMLPClf = True
+doPropCalc = True
 
 doTrainTestSplit = True
 
@@ -22,25 +23,36 @@ calcConfMatrix = False
 useFullSeqFrom = GC.S_COMB_INP      # S_PROC_INP / S_COMB_INP
 usedNmerSeq = GC.S_FULL_LIST        # S_FULL_LIST / S_UNQ_LIST
 
+usedAAcType = GC.S_AAC_POLAR        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
+
 # --- names and paths of files and dirs ---------------------------------------
-sFInp = 'TestCategorical'
+sFInpClf = 'TestCategorical'
+sFInpPrC = sFInpClf
 
 if useFullSeqFrom == GC.S_COMB_INP:
-    sFInp = 'Test_Combined_S_KinasesPho15mer_202202'
+    sFInpClf = 'Test_' + usedAAcType + '_Combined_S_KinasesPho15mer_202202'
+    sFInpPrC = sFInpClf
 
-pInp = GC.P_DIR_TEMP
+sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_OUT])
+
+pInpClf = GC.P_DIR_TEMP
+pInpPrC = pInpClf
+pOutPrC = pInpPrC
+
+# --- input for random forest classifier --------------------------------------
+nEstim = 100                    # [100]
+criterionQS = 'gini'            # {['gini'], 'entropy', 'log_loss'}
+maxDepth = None                 # {[None], 1, 2, 3,...}
+maxFtr = None                   # {['sqrt'], 'log2', None}, int or float
+
+# --- input for neural network MLP classifier ---------------------------------
+tHiddenLayers = (256, 128, 64, 32)
+sActivation = 'relu'
 
 # --- numbers -----------------------------------------------------------------
 rndState = None             # None (random) or integer (reproducible)
-maxLenNmer = 11              # odd number between 1 and 15
+maxLenNmer = 15              # odd number between 1 and 15
 propTestData = .2
-
-# --- numbers for random forest classifier ------------------------------------
-nEstim = 200
-maxDepthRFClf = 4
-
-# --- numbers for neural network MLP classifier -------------------------------
-tHiddenLayers = (256, 128, 64, 32)
 
 rndDigScore = GC.R04
 rndDigCorrect = GC.R04
@@ -51,14 +63,16 @@ sUnqList = GC.S_UNQ_LIST
 
 sCY = GC.S_EFF_CL
 
-sActivation = 'relu'
-
 # --- sets --------------------------------------------------------------------
-setFeat = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P',
-           'Q', 'R', 'S', 'T', 'V', 'W', 'Y'}
-setNmerLen = {1, 3, 5, 7, 9, 11, 13, 15}
+setFeat = set('ACDEFGHIKLMNPQRSTVWY')
+if usedAAcType == GC.S_AAC_CHARGE:
+    setFeat = set('NPST')
+elif usedAAcType == GC.S_AAC_POLAR:
+    setFeat = set('ABCNPQ')
+setNmerLen = set(range(1, 15 + 1, 2))
 
 # --- lists -------------------------------------------------------------------
+lFeatSrt = sorted(list(setFeat))
 
 # --- dictionaries ------------------------------------------------------------
 
@@ -88,33 +102,42 @@ dIO = {# --- general
        # --- flow control
        'doRndForestClf': doRndForestClf,
        'doNNMLPClf': doNNMLPClf,
+       'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
        'encodeCatFtr': encodeCatFtr,
        'calcConfMatrix': calcConfMatrix,
        'useFullSeqFrom': useFullSeqFrom,
        'usedNmerSeq': usedNmerSeq,
+       'usedAAcType': usedAAcType,
        # --- names and paths of files and dirs
-       'sFInp': sFInp,
-       'pInp': pInp,
+       'sFInpClf': sFInpClf,
+       'sFInpPrC': sFInpPrC,
+       'sFOutPrC': sFOutPrC,
+       'pInpClf': pInpClf,
+       'pInpPrC': pInpPrC,
+       'pOutPrC': pOutPrC,
+       # --- input for random forest classifier
+       'nEstim': nEstim,
+       'criterionQS': criterionQS,
+       'maxDepth': maxDepth,
+       'maxFtr': maxFtr,
+       # --- input for neural network MLP classifier
+       'tHiddenLayers': tHiddenLayers,
+       'sActivation': sActivation,
        # --- numbers
        'rndState': rndState,
        'maxLenNmer': maxLenNmer,
        'propTestData': propTestData,
-       # --- numbers for random forest classifier
-       'nEstim': nEstim,
-       'maxDepthRFClf': maxDepthRFClf,
-       # --- numbers for neural network MLP classifier
-       'tHiddenLayers': tHiddenLayers,
        'rndDigScore': rndDigScore,
        'rndDigCorrect': rndDigCorrect,
        # --- strings
        'sFullList': sFullList,
        'sUnqList': sUnqList,
        'sCY': sCY,
-       'sActivation': sActivation,
        # --- sets
        'setFeat': setFeat,
        # --- lists
+       'lFeatSrt': lFeatSrt,
        # --- dictionaries
        # === derived values and input processing
        'maxPosNmer': maxPosNmer,
