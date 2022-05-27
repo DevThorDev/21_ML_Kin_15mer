@@ -69,7 +69,6 @@ cRFClf = RndForestClf(inpDatG)
 #                         list('DCABDB')])
 print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
 cRFClf.ClfPred()
-cRFClf.printFitQuality()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
 
@@ -81,7 +80,6 @@ cMLPClf = NNMLPClf(inpDatG)
 #                          list('DCABDB')])
 print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
 cMLPClf.ClfPred()
-cMLPClf.printFitQuality()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
@@ -91,7 +89,10 @@ cPropCalc.calcPropAAc()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
 
-# cPlotter = Plotter(inDG, calcDfrs=True)
+for cClf in [cRFClf, cMLPClf]:
+    cClf.printFitQuality()
+    cClf.plotConfMatrix()
+
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)
 cTiming.printRelTimes()

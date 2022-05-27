@@ -196,6 +196,8 @@ S_UNQ_LIST = S_UNIQUE + S_LIST
 S_AAC = 'AAc'
 S_AAC_CHARGE = S_AAC + 'Charge'
 S_AAC_POLAR = S_AAC + 'Polar'
+S_MTH_RF = 'RandomForest'
+S_MTH_MLP = 'NeuralNetworkMLP'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15

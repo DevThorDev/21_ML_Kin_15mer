@@ -2,7 +2,7 @@
 ###############################################################################
 # --- O_07__Classifier.py ----------------------------------------------------
 ###############################################################################
-import time
+import matplotlib.pyplot as plt
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
@@ -34,7 +34,7 @@ class BaseClfPrC(SeqAnalysis):
         self.XTransTrain, self.XTransTest = None, None
         self.y, self.yPred = None, None
         self.yTrain, self.yTest = None, None
-        self.Clf = None
+        self.Clf, self.sMth = None, None
         self.scoreClf, self.confusMatrix = None, None
         self.dPropAAc = {}
 
@@ -43,11 +43,11 @@ class BaseClfPrC(SeqAnalysis):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
         sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
+        sFConfMat = self.dITp['sFConfMat'] + self.dITp['xtCSV']
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
+        self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
-        # sFInpClf = self.dITp['sUSC'].join([self.dITp['sFInpClf'],
-        #                                 self.dITp['usedNmerSeq']]) + sXt
 
     def loadInpData(self, dfrInp):
         self.serNmerSeq = dfrInp[self.dITp['sCNmer']]
@@ -145,12 +145,12 @@ class Classifier(BaseClfPrC):
                 print(self.yPred)
 
     def printFitQuality(self):
+        print(GC.S_DS04, ' Fit quality for the "', self.sMth, '" method ',
+              GC.S_DS04, sep='')
+        if self.scoreClf is not None:
+            print('Classification score for the test data:',
+                  round(self.scoreClf, self.dITp['rndDigScore']))
         if self.dITp['lvlOut'] > 0:
-            # print('True/Test y-values:', self.yTest.to_numpy())
-            # print('Predicted y-values:', self.yPred)
-            if self.scoreClf is not None:
-                print('Classification score for the test data:',
-                      round(self.scoreClf, self.dITp['rndDigScore']))
             if self.confusMatrix is not None:
                 print('Confusion matrix:', GC.S_NEWL, self.confusMatrix,
                       sep='')
@@ -226,17 +226,36 @@ class Classifier(BaseClfPrC):
             self.yPred = self.Clf.predict(dat2Pre)
             if self.dITp['lvlOut'] > 0:
                 self.printPredictions(X2Pre=dat2Pre)
+            self.calcConfMatrix()
+
+    # --- method for adapting a key of the result paths dictionary ------------
+    def adaptPathConfMatrix(self):
+        sFConfMat = self.dITp['sFConfMat'] + self.sMth + self.dITp['xtCSV']
+        self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
 
     # --- method for calculating the confusion matrix -------------------------
-    def calcConfusionMatrix(self):
-        pass
-        # if self.dITp['calcConfMatrix']:
-        #     self.confusMatrix = confusion_matrix(y_true=self.TTD.y_Test,
-        #                                           y_pred=self.y_Pred)
+    def calcConfMatrix(self):
+        if self.dITp['calcConfMatrix']:
+            self.confusMatrix = confusion_matrix(y_true=self.yTest,
+                                                 y_pred=self.yPred)
+            self.lClPlt = self.dITp['lAllClPlt'][1:]
+            dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=self.lClPlt,
+                                lSNmR=self.lClPlt)
+            if self.sMth is not None:
+                self.adaptPathConfMatrix()
+            self.saveDfr(dfrCM, pF=self.dPF['ConfMat'])
 
-    # --- methods for saving data ---------------------------------------------
-    def saveResData(self):
-        pass
+    # --- method for plotting the confusion matrix ----------------------------
+    def plotConfMatrix(self):
+        if self.confusMatrix is not None:
+            CM, lCl = self.confusMatrix, self.lClPlt
+            D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
+            D.plot()
+            supTtl = self.dITp['sSupTtlPlt']
+            if self.sMth is not None:
+                supTtl += ' (method: "' + self.sMth + '")'
+            D.figure_.suptitle(supTtl)
+            plt.show()
 
 # -----------------------------------------------------------------------------
 class RndForestClf(Classifier):
@@ -244,6 +263,7 @@ class RndForestClf(Classifier):
     def __init__(self, inpDat):
         super().__init__(inpDat)
         self.descO = 'Random Forest classifier'
+        self.sMth = self.dITp['sMthRF']
         if self.dITp['doRndForestClf']:
             self.getClf()
             self.ClfFit(self.Clf)
@@ -263,6 +283,7 @@ class NNMLPClf(Classifier):
     def __init__(self, inpDat):
         super().__init__(inpDat)
         self.descO = 'Neural Network MLP classifier'
+        self.sMth = self.dITp['sMthMLP']
         if self.dITp['doNNMLPClf']:
             self.getClf()
             self.ClfFit(self.Clf)
@@ -285,7 +306,8 @@ class PropCalculator(BaseClfPrC):
     def __init__(self, inpDat, iTp=7, lITpUpd=[1, 2]):
         super().__init__(inpDat)
         self.descO = 'Calculator: AAc proportions per kinase (class)'
-        self.loadInpDataPrC()
+        if self.dITp['doPropCalc']:
+            self.loadInpDataPrC()
         print('Initiated "PropCalculator" base object.')
 
     # --- methods for loading input data --------------------------------------
@@ -303,18 +325,19 @@ class PropCalculator(BaseClfPrC):
 
     # --- methods calculating the proportions of AAc at all Nmer positions ----
     def calcPropAAc(self):
-        self.lSCl = sorted(list(self.dfrInpPrC[self.dITp['sCY']].unique()))
-        for sCl in self.lSCl:
-            cDfrI = self.dfrInpPrC[self.dfrInpPrC[self.dITp['sCY']] == sCl]
-            cD2Out, nTtl = {}, cDfrI.shape[0]
-            for sPos in self.dITp['lSCX']:
-                serCPos = cDfrI[sPos]
-                for sAAc in self.dITp['lFeatSrt']:
-                    nCAAc = serCPos[serCPos == sAAc].count()
-                    GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
-                                  cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
-            self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
-            self.adaptPathOutDataPrC(sCl=sCl)
-            self.saveDfr(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
+        if self.dITp['doPropCalc']:
+            self.lSCl = sorted(list(self.dfrInpPrC[self.dITp['sCY']].unique()))
+            for sCl in self.lSCl:
+                cDfrI = self.dfrInpPrC[self.dfrInpPrC[self.dITp['sCY']] == sCl]
+                cD2Out, nTtl = {}, cDfrI.shape[0]
+                for sPos in self.dITp['lSCX']:
+                    serCPos = cDfrI[sPos]
+                    for sAAc in self.dITp['lFeatSrt']:
+                        nCAAc = serCPos[serCPos == sAAc].count()
+                        GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
+                                      cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
+                self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
+                self.adaptPathOutDataPrC(sCl=sCl)
+                self.saveDfr(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
 
 ###############################################################################

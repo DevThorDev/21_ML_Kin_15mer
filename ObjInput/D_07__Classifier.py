@@ -18,29 +18,32 @@ doPropCalc = True
 doTrainTestSplit = True
 
 encodeCatFtr = True
-calcConfMatrix = False
+calcConfMatrix = True
 
 useFullSeqFrom = GC.S_COMB_INP      # S_PROC_INP / S_COMB_INP
 usedNmerSeq = GC.S_FULL_LIST        # S_FULL_LIST / S_UNQ_LIST
 
-usedAAcType = GC.S_AAC_POLAR        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
+usedAAcType = GC.S_AAC        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
 # --- names and paths of files and dirs ---------------------------------------
 sFInpClf = 'TestCategorical'
 sFInpPrC = sFInpClf
 
 if useFullSeqFrom == GC.S_COMB_INP:
-    sFInpClf = 'Test_' + usedAAcType + '_Combined_S_KinasesPho15mer_202202'
+    # sFInpClf = 'Test_' + usedAAcType + '_Combined_S_KinasesPho15mer_202202'
+    sFInpClf = 'Test_AllCl' + usedAAcType + '_Combined_S_KinasesPho15mer_202202'
     sFInpPrC = sFInpClf
 
+sFConfMat = GC.S_US02.join([sFInpClf, 'ConfMat'])
 sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_OUT])
 
 pInpClf = GC.P_DIR_TEMP
 pInpPrC = pInpClf
+pConfMat = pInpClf
 pOutPrC = pInpPrC
 
 # --- input for random forest classifier --------------------------------------
-nEstim = 100                    # [100]
+nEstim = 200                    # [100]
 criterionQS = 'gini'            # {['gini'], 'entropy', 'log_loss'}
 maxDepth = None                 # {[None], 1, 2, 3,...}
 maxFtr = None                   # {['sqrt'], 'log2', None}, int or float
@@ -51,7 +54,7 @@ sActivation = 'relu'
 
 # --- numbers -----------------------------------------------------------------
 rndState = None             # None (random) or integer (reproducible)
-maxLenNmer = 15              # odd number between 1 and 15
+maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
 propTestData = .2
 
 rndDigScore = GC.R04
@@ -63,6 +66,11 @@ sUnqList = GC.S_UNQ_LIST
 
 sCY = GC.S_EFF_CL
 
+sMthRF = GC.S_MTH_RF
+sMthMLP = GC.S_MTH_MLP
+
+sSupTtlPlt = 'Confusion matrix'
+
 # --- sets --------------------------------------------------------------------
 setFeat = set('ACDEFGHIKLMNPQRSTVWY')
 if usedAAcType == GC.S_AAC_CHARGE:
@@ -73,11 +81,18 @@ setNmerLen = set(range(1, 15 + 1, 2))
 
 # --- lists -------------------------------------------------------------------
 lFeatSrt = sorted(list(setFeat))
+lAllClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
+             'C12---', 'C1-3--', 'C1--4-', 'C1---5', 'C-23--', 'C-2-4-',
+             'C-2--5', 'C--34-', 'C--3-5', 'C---45', 'C123--', 'C12-4-',
+             'C12--5', 'C1-34-', 'C1-3-5', 'C1--45', 'C-234-', 'C-23-5',
+             'C-2-45', 'C--345', 'C1234-', 'C123-5', 'C12-45', 'C1-345',
+             'C-2345', 'C12345']
 
 # --- dictionaries ------------------------------------------------------------
 
 # === assertions ==============================================================
-assert maxLenNmer in setNmerLen
+if maxLenNmer not in setNmerLen:
+    maxLenNmer = max(setNmerLen)
 # for lObs in dObs.values():
 #     for cObs in lObs:
 #         assert cObs in setFeat
@@ -112,9 +127,11 @@ dIO = {# --- general
        # --- names and paths of files and dirs
        'sFInpClf': sFInpClf,
        'sFInpPrC': sFInpPrC,
+       'sFConfMat': sFConfMat,
        'sFOutPrC': sFOutPrC,
        'pInpClf': pInpClf,
        'pInpPrC': pInpPrC,
+       'pConfMat': pConfMat,
        'pOutPrC': pOutPrC,
        # --- input for random forest classifier
        'nEstim': nEstim,
@@ -134,10 +151,14 @@ dIO = {# --- general
        'sFullList': sFullList,
        'sUnqList': sUnqList,
        'sCY': sCY,
+       'sMthRF': sMthRF,
+       'sMthMLP': sMthMLP,
+       'sSupTtlPlt': sSupTtlPlt,
        # --- sets
        'setFeat': setFeat,
        # --- lists
        'lFeatSrt': lFeatSrt,
+       'lAllClPlt': lAllClPlt,
        # --- dictionaries
        # === derived values and input processing
        'maxPosNmer': maxPosNmer,
