@@ -116,4 +116,20 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
         for sC, cV in zip(lSCWtLh[:3], [cSSq, cEff, wtLh]):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
+# --- Functions (O_07__Classifier) --------------------------------------------
+def getClassStr(dITp, lSCl=[]):
+    setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
+    # step 1: fill setSDigC
+    for sCl in lSCl:
+        for cChar in sCl:
+            if cChar in dITp['setSDig'] and cChar not in setSDigC:
+                setSDigC.add(cChar)
+    # step 2: assemble sClOut
+    for i in range(1, n):
+        if str(i) in setSDigC:
+            sClOut += str(i)
+        else:
+            sClOut += dITp['sDash']
+    return sClOut
+
 ###############################################################################

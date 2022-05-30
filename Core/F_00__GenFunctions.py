@@ -210,7 +210,6 @@ def restrLenS(cIt, lRestrLen=[]):
     return restrIt(cIt=cIt, lRestrLen=lRestrLen, useLenS=True)
 
 # --- Functions handling lists ------------------------------------------------
-
 def fillCondList(elCond, lToFill=[], lLoop=[], lUniqEl=True):
     for elCheckContain in lLoop:
         if elCond in elCheckContain:
@@ -232,6 +231,13 @@ def fillListUnique(cL, cIt):
     for cEl in cIt:
         if cEl not in cL:
             cL.append(cEl)
+
+def toListUnique(cL):
+    cLUnq = []
+    for cEl in cL:
+        if cEl not in cLUnq:
+            cLUnq.append(cEl)
+    return cLUnq
 
 def getListUniqueWD2(d2, srtDir=None):
     lUnq = []

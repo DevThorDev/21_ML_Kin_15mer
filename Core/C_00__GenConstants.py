@@ -29,6 +29,7 @@ S_SLASH = '/'
 S_QMK = '?'
 S_NEWL = '\n'
 S_0 = '0'
+S_CAP_C = 'C'
 S_CAP_X = 'X'
 S_CAP_XS, S_CAP_S, S_CAP_M, S_CAP_L = S_CAP_X + 'S', 'S', 'M', 'L'
 
@@ -120,6 +121,7 @@ DIR_RAW_INP = '01_RawData'
 DIR_RAW_INP_TEST = '02_RawData' + S_USC + S_TEST
 DIR_PROC_INP = '11_ProcInpData'
 DIR_PROC_INP_TEST = '12_ProcInpData' + S_USC + S_TEST
+DIR_INP_CLF = '21_InpDataClf'
 DIR_RES_COMB = '31_Res' + S_COMBINED
 DIR_RES_COMB_TEST = '32_Res' + S_COMBINED + S_USC + S_TEST
 DIR_RES_INFO = '33_Res' + S_INFO
@@ -127,6 +129,7 @@ DIR_RES_INFO_TEST = '34_Res' + S_INFO + S_USC + S_TEST
 DIR_RES_PROB = '35_Res' + S_PROB
 DIR_RES_PROB_TEST = '36_Res' + S_PROB + S_USC + S_TEST
 DIR_RES_VITERBI = '37_ResViterbi'
+DIR_RES_CLF = '39_ResClf'
 DIR_TEMP = '98_TEMP_CSV'
 
 P_DIR_INP = os.path.join('..', '..', DIR_INP)
@@ -134,6 +137,7 @@ P_DIR_RAW_INP = os.path.join(P_DIR_INP, DIR_RAW_INP)
 P_DIR_RAW_INP_TEST = os.path.join(P_DIR_INP, DIR_RAW_INP_TEST)
 P_DIR_PROC_INP = os.path.join(P_DIR_INP, DIR_PROC_INP)
 P_DIR_PROC_INP_TEST = os.path.join(P_DIR_INP, DIR_PROC_INP_TEST)
+P_DIR_INP_CLF = os.path.join(P_DIR_INP, DIR_INP_CLF)
 P_DIR_RES_COMB = os.path.join(P_DIR_INP, DIR_RES_COMB)
 P_DIR_RES_COMB_TEST = os.path.join(P_DIR_INP, DIR_RES_COMB_TEST)
 P_DIR_RES_INFO = os.path.join(P_DIR_INP, DIR_RES_INFO)
@@ -141,6 +145,7 @@ P_DIR_RES_INFO_TEST = os.path.join(P_DIR_INP, DIR_RES_INFO_TEST)
 P_DIR_RES_PROB = os.path.join(P_DIR_INP, DIR_RES_PROB)
 P_DIR_RES_PROB_TEST = os.path.join(P_DIR_INP, DIR_RES_PROB_TEST)
 P_DIR_RES_VITERBI = os.path.join(P_DIR_INP, DIR_RES_VITERBI)
+P_DIR_RES_CLF = os.path.join(P_DIR_INP, DIR_RES_CLF)
 P_DIR_TEMP = os.path.join(P_DIR_INP, DIR_TEMP)
 
 S_EXT_PY = 'py'
@@ -161,6 +166,7 @@ S_MODE = 'Mode'
 S_TYPE = 'Type'
 S_DATA = 'Data'
 S_SEQ = 'Seq'
+S_PROP = 'Prop'
 S_INP = 'Inp'
 S_OUT = 'Out'
 S_FULL_SEQ = S_FULL + S_SEQ
@@ -198,6 +204,7 @@ S_AAC_CHARGE = S_AAC + 'Charge'
 S_AAC_POLAR = S_AAC + 'Polar'
 S_MTH_RF = 'RandomForest'
 S_MTH_MLP = 'NeuralNetworkMLP'
+S_CONF_MAT = 'ConfMat'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15
@@ -211,8 +218,12 @@ R24 = 24
 MAX_DELTA = 1.0E-14
 MAX_LEN_L_DSP = 5
 
+# --- predefined sets ---------------------------------------------------------
+SET_S_DIG = {str(k) for k in range(10)}
+
 # --- predefined lists --------------------------------------------------------
 L_MER = [1, 3, 5, 7, 9, 11, 13, 15]
+L_S_DIG = []
 
 # --- predefined dictionaries -------------------------------------------------
 D_MER = {n: str(n) + S_MER for n in L_MER}

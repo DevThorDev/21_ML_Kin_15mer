@@ -58,9 +58,10 @@ iCentNmer = GC.I_CENT_N_MER
 rndDigProp = GC.R08
 
 # --- strings -----------------------------------------------------------------
+sDash = GC.S_DASH
 sUSC = GC.S_USC
 sUS02 = GC.S_US02
-s0, sX = GC.S_0, GC.S_CAP_X
+s0, sC, sX = GC.S_0, GC.S_CAP_C, GC.S_CAP_X
 sNULL = 'NULL'
 sSeq = 'Seq'
 sMer = GC.S_MER
@@ -103,6 +104,9 @@ sNaNCombL = 'nNaN_CombL'
 sNaNCombM = 'nNaN_CombM'
 sNaNCombS = 'nNaN_CombS'
 sNaNCombXS = 'nNaN_CombXS'
+
+# --- sets --------------------------------------------------------------------
+setSDig = GC.SET_S_DIG
 
 # --- lists (2) ---------------------------------------------------------------
 lSCKinF = [sEffCode, sTargCode]
@@ -189,9 +193,11 @@ dIO = {# --- general
        'iCentNmer': iCentNmer,
        'rndDigProp': rndDigProp,
        # --- strings
+       'sDash': sDash,
        'sUSC': sUSC,
        'sUS02': sUS02,
        's0': s0,
+       'sC': sC,
        'sX': sX,
        'sNULL': sNULL,
        'sSeq': sSeq,
@@ -217,6 +223,8 @@ dIO = {# --- general
        'sNmer': sNmer,
        'sLenNmer': sLenNmer,
        'sNOcc': sNOcc,
+       # --- sets
+       'setSDig': setSDig,
        # --- lists (2)
        'lSCKinF': lSCKinF,
        'lCXclDfrNmerXS': lCXclDfrNmerXS,

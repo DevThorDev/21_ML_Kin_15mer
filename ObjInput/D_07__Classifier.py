@@ -3,6 +3,7 @@
 # --- D_07__Classifier.py -----------------------------------------------------
 ###############################################################################
 import Core.C_00__GenConstants as GC
+import Core.F_00__GenFunctions as GF
 
 # --- general -----------------------------------------------------------------
 sOType = 'Classifiers for data classification (D_07__Classifier)'
@@ -20,30 +21,30 @@ doTrainTestSplit = True
 encodeCatFtr = True
 calcConfMatrix = True
 
-useFullSeqFrom = GC.S_COMB_INP      # S_PROC_INP / S_COMB_INP
+useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
 usedNmerSeq = GC.S_FULL_LIST        # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcType = GC.S_AAC        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
 # --- names and paths of files and dirs ---------------------------------------
-sFInpClf = 'TestCategorical'
-sFInpPrC = sFInpClf
+sFInpStart = 'NewClOrig70'                # '' / 'AllCl' / 'NewClOrig70'
+sFResCombS = 'Combined_S_KinasesPho15mer_202202'
 
-if useFullSeqFrom == GC.S_COMB_INP:
-    # sFInpClf = 'Test_' + usedAAcType + '_Combined_S_KinasesPho15mer_202202'
-    sFInpClf = 'Test_AllCl' + usedAAcType + '_Combined_S_KinasesPho15mer_202202'
+sFInpClf, sFInpPrC = None, None
+if useFullSeqFrom == GC.S_COMB_INP:     # currently only option implemented
+    sFInpClf = GF.joinS([sFInpStart, usedAAcType, sFResCombS])
     sFInpPrC = sFInpClf
 
-sFConfMat = GC.S_US02.join([sFInpClf, 'ConfMat'])
-sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_OUT])
+sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
+sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_PROP])
 
-pInpClf = GC.P_DIR_TEMP
-pInpPrC = pInpClf
-pConfMat = pInpClf
-pOutPrC = pInpPrC
+pInpClf = GC.P_DIR_INP_CLF
+pInpPrC = GC.P_DIR_INP_CLF
+pConfMat = GC.P_DIR_RES_CLF
+pOutPrC = GC.P_DIR_RES_CLF
 
 # --- input for random forest classifier --------------------------------------
-nEstim = 200                    # [100]
+nEstim = 1000                    # [100]
 criterionQS = 'gini'            # {['gini'], 'entropy', 'log_loss'}
 maxDepth = None                 # {[None], 1, 2, 3,...}
 maxFtr = None                   # {['sqrt'], 'log2', None}, int or float

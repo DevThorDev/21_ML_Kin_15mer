@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
+import Core.F_01__SpcFunctions as SF
 
 from Core.O_02__SeqAnalysis import SeqAnalysis
 
@@ -29,6 +30,7 @@ class BaseClfPrC(SeqAnalysis):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
+        self.lSCl, self.serNmerSeq = None, None
         self.X, self.XTrans = None, None
         self.XTrain, self.XTest = None, None
         self.XTransTrain, self.XTransTest = None, None
@@ -49,19 +51,30 @@ class BaseClfPrC(SeqAnalysis):
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
+    # --- methods for loading input data --------------------------------------
     def loadInpData(self, dfrInp):
-        self.serNmerSeq = dfrInp[self.dITp['sCNmer']]
+        if self.dITp['sCY'] in dfrInp.columns:
+            self.lSCl = sorted(list(dfrInp[self.dITp['sCY']].unique()))
+        if self.dITp['sCNmer'] in dfrInp.columns:
+            self.serNmerSeq = dfrInp[self.dITp['sCNmer']]
         if self.dITp['usedNmerSeq'] == self.dITp['sUnqList']:
-            self.serNmerSeq = GF.iniPdSer(self.serNmerSeq.unique(),
-                                          nameS=self.dITp['sCNmer'])
-            lSer = []
-            for cSeq in self.serNmerSeq:
-                cDfr = dfrInp[dfrInp[self.dITp['sCNmer']] == cSeq]
-                lSer.append(cDfr.iloc[0, :])
-            dfrInp = GF.concLSer(lSer=lSer, ignIdx=True)
+            self.toUnqNmerSeq(dfrInp)
         self.X = dfrInp[self.dITp['lSCX']]
         self.y = dfrInp[self.dITp['sCY']]
 
+    # --- methods for modifying the input data to contain unique Nmer seq. ----
+    def toUnqNmerSeq(self, dfrInp):
+        lSer, sCNmer, sCY = [], self.dITp['sCNmer'], self.dITp['sCY']
+        self.serNmerSeq = GF.iniPdSer(self.serNmerSeq.unique(), nameS=sCNmer)
+        for cSeq in self.serNmerSeq:
+            cDfr = dfrInp[dfrInp[sCNmer] == cSeq]
+            lSC = GF.toListUnique(cDfr[sCY].to_list())
+            cSer = cDfr.iloc[0, :]
+            cSer.at[sCY] = SF.getClassStr(self.dITp, lSCl=lSC)
+            lSer.append(cSer)
+        dfrInp = GF.concLSer(lSer=lSer, ignIdx=True)
+
+    # --- print methods -------------------------------------------------------
     def printX(self):
         print(GC.S_DS20, GC.S_NEWL, 'Training input samples:', sep='')
         print(self.X)
@@ -238,9 +251,8 @@ class Classifier(BaseClfPrC):
         if self.dITp['calcConfMatrix']:
             self.confusMatrix = confusion_matrix(y_true=self.yTest,
                                                  y_pred=self.yPred)
-            self.lClPlt = self.dITp['lAllClPlt'][1:]
-            dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=self.lClPlt,
-                                lSNmR=self.lClPlt)
+            dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=self.lSCl,
+                                lSNmR=self.lSCl)
             if self.sMth is not None:
                 self.adaptPathConfMatrix()
             self.saveDfr(dfrCM, pF=self.dPF['ConfMat'])
@@ -248,7 +260,7 @@ class Classifier(BaseClfPrC):
     # --- method for plotting the confusion matrix ----------------------------
     def plotConfMatrix(self):
         if self.confusMatrix is not None:
-            CM, lCl = self.confusMatrix, self.lClPlt
+            CM, lCl = self.confusMatrix, self.lSCl
             D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
             D.plot()
             supTtl = self.dITp['sSupTtlPlt']
@@ -326,7 +338,7 @@ class PropCalculator(BaseClfPrC):
     # --- methods calculating the proportions of AAc at all Nmer positions ----
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:
-            self.lSCl = sorted(list(self.dfrInpPrC[self.dITp['sCY']].unique()))
+            # self.lSCl = sorted(list(self.dfrInpPrC[self.dITp['sCY']].unique()))
             for sCl in self.lSCl:
                 cDfrI = self.dfrInpPrC[self.dfrInpPrC[self.dITp['sCY']] == sCl]
                 cD2Out, nTtl = {}, cDfrI.shape[0]
