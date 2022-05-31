@@ -19,46 +19,53 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 # -----------------------------------------------------------------------------
 class BaseClfPrC(SeqAnalysis):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, iTp=7, lITpUpd=[1, 2]):
+    def __init__(self, inpDat, sKPar='A', iTp=7, lITpUpd=[1, 2]):
         super().__init__(inpDat)
         self.idO = 'O_07'
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
-        self.iniAttr()
+        self.iniAttr(sKPar=sKPar)
         self.addValsToDPF()
         print('Initiated "BaseClfPrC" base object.')
 
     # --- methods for initialising class attributes and loading input data ----
-    def iniAttr(self):
-        self.lSCl, self.serNmerSeq = None, None
-        self.X, self.XTrans = None, None
-        self.XTrain, self.XTest = None, None
-        self.XTransTrain, self.XTransTest = None, None
-        self.y, self.yPred = None, None
-        self.yTrain, self.yTest = None, None
-        self.Clf, self.sMth = None, None
-        self.scoreClf, self.confusMatrix = None, None
-        self.dPropAAc = {}
+    def iniAttr(self, sKPar='A'):
+        lAttr2None = ['lSCl', 'serNmerSeq', 'dfrInpClf', 'dfrInpPrC', 'X',
+                      'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
+                      'y', 'yPred', 'yTrain', 'yTest', 'Clf', 'sMth',
+                      'scoreClf', 'confusMatrix']
+        lAttrDict = ['d2ResClf', 'dPropAAc']
+        for cAttr in lAttr2None:
+            if not hasattr(self, cAttr):
+                setattr(self, cAttr, None)
+        for cAttr in lAttrDict:
+            if not hasattr(self, cAttr):
+                setattr(self, cAttr, {})
+        self.sKPar = sKPar
 
     # --- methods for filling the result paths dictionary ---------------------
     def addValsToDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
+        sFOutClf = (self.dITp['sUSC'].join([self.dITp['sFOutClf'],
+                                            self.sKPar]) + self.dITp['xtCSV'])
+        # sFOutClf = self.dITp['sFOutClf'] + self.dITp['xtCSV']
         sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
         sFConfMat = self.dITp['sFConfMat'] + self.dITp['xtCSV']
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
+        self.dPF['OutDataClf'] = GF.joinToPath(self.dITp['pOutClf'], sFOutClf)
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
     # --- methods for loading input data --------------------------------------
     def loadInpData(self, dfrInp):
-        if self.dITp['sCY'] in dfrInp.columns:
-            self.lSCl = sorted(list(dfrInp[self.dITp['sCY']].unique()))
+        assert self.dITp['sCY'] in dfrInp.columns
         if self.dITp['sCNmer'] in dfrInp.columns:
             self.serNmerSeq = dfrInp[self.dITp['sCNmer']]
         if self.dITp['usedNmerSeq'] == self.dITp['sUnqList']:
-            self.toUnqNmerSeq(dfrInp)
+            dfrInp = self.toUnqNmerSeq(dfrInp)
+        self.lSCl = sorted(list(dfrInp[self.dITp['sCY']].unique()))
         self.X = dfrInp[self.dITp['lSCX']]
         self.y = dfrInp[self.dITp['sCY']]
 
@@ -69,10 +76,12 @@ class BaseClfPrC(SeqAnalysis):
         for cSeq in self.serNmerSeq:
             cDfr = dfrInp[dfrInp[sCNmer] == cSeq]
             lSC = GF.toListUnique(cDfr[sCY].to_list())
+            # if len(lSC) > 1:
+            #     print(GC.S_ST80, GC.S_NEWL, 'TEMP: lSC =', lSC)
             cSer = cDfr.iloc[0, :]
             cSer.at[sCY] = SF.getClassStr(self.dITp, lSCl=lSC)
             lSer.append(cSer)
-        dfrInp = GF.concLSer(lSer=lSer, ignIdx=True)
+        return GF.concLSerAx1(lSer=lSer, ignIdx=True).T
 
     # --- print methods -------------------------------------------------------
     def printX(self):
@@ -103,8 +112,8 @@ class BaseClfPrC(SeqAnalysis):
 # -----------------------------------------------------------------------------
 class Classifier(BaseClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, iTp=7, lITpUpd=[1, 2]):
-        super().__init__(inpDat)
+    def __init__(self, inpDat, sKPar='A', iTp=7, lITpUpd=[1, 2]):
+        super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Classifier for data classification'
         self.loadInpDataClf()
         if self.dITp['encodeCatFtr'] and not self.dITp['doTrainTestSplit']:
@@ -117,7 +126,8 @@ class Classifier(BaseClfPrC):
 
     # --- methods for loading input data --------------------------------------
     def loadInpDataClf(self):
-        self.dfrInpClf = self.loadData(pF=self.dPF['InpDataClf'], iC=0)
+        if self.dfrInpClf is None:
+            self.dfrInpClf = self.loadData(pF=self.dPF['InpDataClf'], iC=0)
         self.loadInpData(dfrInp=self.dfrInpClf)
 
     # --- print methods -------------------------------------------------------
@@ -131,30 +141,25 @@ class Classifier(BaseClfPrC):
         print('Transformed array:', GC.S_NEWL, XTrans, GC.S_NEWL,
               'Shape: ', XTrans.shape, sep='')
 
-    def printPredictions(self, X2Pre=None):
-        print(GC.S_NEWL, GC.S_DS04, GC.S_SPACE, 'Predictions:', sep='')
-        if X2Pre is not None and len(X2Pre) == len(self.yPred):
-            if self.yTest is not None:
-                if self.dITp['lvlOut'] > 1:
-                    for xT, yT, yP in zip(X2Pre, self.yTest, self.yPred):
-                        print(xT[:10], GC.S_SPACE, GC.S_ARR_LR, GC.S_SPACE,
-                              '(', yT, GC.S_COMMA, GC.S_SPACE, yP, ')', sep='')
-                nPred = self.yPred.shape[0]
-                nCorrect = sum([1 for k in range(nPred) if
-                                self.yTest.iloc[k] == self.yPred[k]])
-                s1, s2 = (str(nCorrect) + ' out of ' + str(nPred) +
-                          ' correctly predicted.'), ''
-                if nPred > 0:
-                    x = round(nCorrect/nPred, self.dITp['rndDigCorrect'])
-                    sXPc = str(round(x*100., self.dITp['rndDigCorrect']))
-                    s2 = ('(' + str(sXPc) + GC.S_PERC + ')')
-                print((s1 if nPred == 0 else s1 + GC.S_SPACE + s2))
-            else:
-                if self.dITp['lvlOut'] > 1:
-                    for xT, yP in zip(X2Pre, self.yPred):
-                        print(xT, GC.S_ARR_LR, yP)
-        else:
-            if self.dITp['lvlOut'] > 1:
+    def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
+        if self.dITp['lvlOut'] > 0 and cSect in ['A2']:
+            s1, s2 = (str(nCr) + ' out of ' + str(nPr) + ' correctly' +
+                      ' predicted.'), ''
+            if nPr > 0:
+                x = round(nCr/nPr, self.dITp['rndDigCorrect'])
+                sXPc = str(round(x*100., self.dITp['rndDigCorrect']))
+                s2 = ('(' + str(sXPc) + GC.S_PERC + ')')
+            print((s1 if nPr == 0 else s1 + GC.S_SPACE + s2))
+        if self.dITp['lvlOut'] > 1 and cSect in ['A1', 'B', 'C']:
+            print(GC.S_NEWL, GC.S_DS04, GC.S_SPACE, 'Predictions:', sep='')
+            if cSect == 'A1':
+                for xT, yT, yP in zip(X2Pr, self.yTest, self.yPred):
+                    print(xT[:10], GC.S_SPACE, GC.S_ARR_LR, GC.S_SPACE,
+                          '(', yT, GC.S_COMMA, GC.S_SPACE, yP, ')', sep='')
+            elif cSect == 'B':
+                for xT, yP in zip(X2Pr, self.yPred):
+                    print(xT, GC.S_ARR_LR, yP)
+            elif cSect == 'C':
                 print(self.yPred)
 
     def printFitQuality(self):
@@ -229,6 +234,28 @@ class Classifier(BaseClfPrC):
                 if self.dITp['lvlOut'] > 1:
                     self.printXY()
 
+    # --- method for calculating values of the classifier results dictionary --
+    def calcPrintResPredict(self, X2Pre=None):
+        if X2Pre is not None and len(X2Pre) == len(self.yPred):
+            if self.yTest is not None:
+                self.printDetailedPredict(X2Pre, cSect='A1')
+                nPred = self.yPred.shape[0]
+                nCorrect = sum([1 for k in range(nPred) if
+                                self.yTest.iloc[k] == self.yPred[k]])
+                propCorrect = (nCorrect/nPred if nPred > 0 else None)
+                lV = [nPred, nCorrect, propCorrect]
+                lSK = ['numPredicted', 'numCorrect', 'propCorrect']
+                for sK, cV in zip(lSK, lV):
+                    GF.addToDictD(self.d2ResClf, cKMain=self.sKPar, cKSub=sK,
+                                  cVSub=cV)
+                # self.adaptPathOutDataClf()
+                self.saveData(self.d2ResClf, pF=self.dPF['OutDataClf'])
+                self.printDetailedPredict(X2Pre, nPred, nCorrect, cSect='A2')
+            else:
+                self.printDetailedPredict(X2Pre, cSect='B')
+        else:
+            self.printDetailedPredict(cSect='C')
+
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pre=None):
         if self.Clf is not None:
@@ -238,10 +265,15 @@ class Classifier(BaseClfPrC):
                 dat2Pre, self.yTest = self.getXY(getTrain=False)
             self.yPred = self.Clf.predict(dat2Pre)
             if self.dITp['lvlOut'] > 0:
-                self.printPredictions(X2Pre=dat2Pre)
+                self.calcPrintResPredict(X2Pre=dat2Pre)
             self.calcConfMatrix()
 
-    # --- method for adapting a key of the result paths dictionary ------------
+    # --- methods for adapting keys of the result paths dictionary ------------
+    # def adaptPathOutDataClf(self):
+    #     sFOutClf = (self.dITp['sUSC'].join([self.dITp['sFOutClf'], sKPar]) +
+    #                 self.dITp['xtCSV'])
+    #     self.dPF['OutDataClf'] = GF.joinToPath(self.dITp['pOutClf'], sFOutClf)
+
     def adaptPathConfMatrix(self):
         sFConfMat = self.dITp['sFConfMat'] + self.sMth + self.dITp['xtCSV']
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
@@ -249,13 +281,12 @@ class Classifier(BaseClfPrC):
     # --- method for calculating the confusion matrix -------------------------
     def calcConfMatrix(self):
         if self.dITp['calcConfMatrix']:
-            self.confusMatrix = confusion_matrix(y_true=self.yTest,
-                                                 y_pred=self.yPred)
-            dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=self.lSCl,
-                                lSNmR=self.lSCl)
+            t, p, lC = self.yTest, self.yPred, self.lSCl
+            self.confusMatrix = confusion_matrix(y_true=t, y_pred=p, labels=lC)
+            dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
             if self.sMth is not None:
                 self.adaptPathConfMatrix()
-            self.saveDfr(dfrCM, pF=self.dPF['ConfMat'])
+            self.saveData(dfrCM, pF=self.dPF['ConfMat'])
 
     # --- method for plotting the confusion matrix ----------------------------
     def plotConfMatrix(self):
@@ -272,8 +303,8 @@ class Classifier(BaseClfPrC):
 # -----------------------------------------------------------------------------
 class RndForestClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat):
-        super().__init__(inpDat)
+    def __init__(self, inpDat, sKPar='A'):
+        super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Random Forest classifier'
         self.sMth = self.dITp['sMthRF']
         if self.dITp['doRndForestClf']:
@@ -292,8 +323,8 @@ class RndForestClf(Classifier):
 # -----------------------------------------------------------------------------
 class NNMLPClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat):
-        super().__init__(inpDat)
+    def __init__(self, inpDat, sKPar='A'):
+        super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Neural Network MLP classifier'
         self.sMth = self.dITp['sMthMLP']
         if self.dITp['doNNMLPClf']:
@@ -304,9 +335,10 @@ class NNMLPClf(Classifier):
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
-        self.Clf = MLPClassifier(hidden_layer_sizes=self.dITp['tHiddenLayers'],
-                                 activation=self.dITp['sActivation'],
-                                 random_state=self.dITp['rndState'])
+        self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
+                                 verbose=self.dITp['bVerb'],
+                                 warm_start=self.dITp['bWarmStart'],
+                                 **self.dITp['d2Par_NNMLP'][self.sKPar])
 
     def getScoreClf(self):
         if self.dITp['doTrainTestSplit']:
@@ -324,7 +356,8 @@ class PropCalculator(BaseClfPrC):
 
     # --- methods for loading input data --------------------------------------
     def loadInpDataPrC(self):
-        self.dfrInpPrC = self.loadData(pF=self.dPF['InpDataPrC'], iC=0)
+        if self.dfrInpPrC is None:
+            self.dfrInpPrC = self.loadData(pF=self.dPF['InpDataPrC'], iC=0)
         self.loadInpData(dfrInp=self.dfrInpPrC)
 
     # --- method for adapting a key of the result paths dictionary ------------
@@ -338,7 +371,6 @@ class PropCalculator(BaseClfPrC):
     # --- methods calculating the proportions of AAc at all Nmer positions ----
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:
-            # self.lSCl = sorted(list(self.dfrInpPrC[self.dITp['sCY']].unique()))
             for sCl in self.lSCl:
                 cDfrI = self.dfrInpPrC[self.dfrInpPrC[self.dITp['sCY']] == sCl]
                 cD2Out, nTtl = {}, cDfrI.shape[0]
@@ -350,6 +382,6 @@ class PropCalculator(BaseClfPrC):
                                       cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
                 self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
                 self.adaptPathOutDataPrC(sCl=sCl)
-                self.saveDfr(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
+                self.saveData(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
 
 ###############################################################################

@@ -61,37 +61,45 @@ cValidation.createResultsTrain(stT=startTime)
 # cViterbiAlg.printDfrTransProb()
 # cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
 
-cStTime = GF.showElapsedTime(startTime)
-cRFClf = RndForestClf(inpDatG)
-# cRFClf.ClfPred(dat2Pre=[list('ACDADA'), list('BDBBCA'), list('CBDCCD'),
-#                         list('DDBADC'), list('CDCDAA'), list('AAACCC'),
-#                         list('CACCDB'), list('CACCDD'), list('DCBBDB'),
-#                         list('DCABDB')])
-print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
-cRFClf.ClfPred()
-cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
+# cStTime = GF.showElapsedTime(startTime)
+# cRFClf = RndForestClf(inpDatG)
+# print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
+# cRFClf.ClfPred()
+# cEndTime = GF.showElapsedTime(startTime)
+# cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
 
-cStTime = GF.showElapsedTime(startTime)
-cMLPClf = NNMLPClf(inpDatG)
-# cMLPClf.ClfPred(dat2Pre=[list('ACDADA'), list('BDBBCA'), list('CBDCCD'),
-#                          list('DDBADC'), list('CDCDAA'), list('AAACCC'),
-#                          list('CACCDB'), list('CACCDD'), list('DCBBDB'),
-#                          list('DCABDB')])
-print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
-cMLPClf.ClfPred()
-cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
+# cStTime = GF.showElapsedTime(startTime)
+# cMLPClf = NNMLPClf(inpDatG)
+# print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
+# cMLPClf.ClfPred()
+# cEndTime = GF.showElapsedTime(startTime)
+# cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
-cStTime = GF.showElapsedTime(startTime)
-cPropCalc = PropCalculator(inpDatG)
-cPropCalc.calcPropAAc()
-cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
+# cStTime = GF.showElapsedTime(startTime)
+# cPropCalc = PropCalculator(inpDatG)
+# cPropCalc.calcPropAAc()
+# cEndTime = GF.showElapsedTime(startTime)
+# cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
 
-for cClf in [cRFClf, cMLPClf]:
-    cClf.printFitQuality()
-    cClf.plotConfMatrix()
+# for cClf in [cRFClf, cMLPClf]:
+#     cClf.printFitQuality()
+#     cClf.plotConfMatrix()
+
+# for cClf in [cRFClf, cMLPClf]:
+#     print(cClf.descO, GC.S_VBAR, cClf.sMth)
+#     cClf.calcPrintResPredict(X2Pre=cClf.getXY(getTrain=False)[0])
+
+# Test parameter sets
+# for sKeyPar in inpDatG.dI['d2Par_NNMLP']:
+for sKeyPar in list('ABC'):
+    print(GC.S_ST80, GC.S_NEWL, GC.S_EQ20, ' Parameter set ', sKeyPar, sep='')
+    cStTime = GF.showElapsedTime(startTime)
+    cMLPClf = NNMLPClf(inpDatG, sKPar=sKeyPar)
+    cMLPClf.ClfPred()
+    cMLPClf.printFitQuality()
+    # cMLPClf.calcPrintResPredict(X2Pre=cMLPClf.getXY(getTrain=False)[0])
+    cEndTime = GF.showElapsedTime(startTime)
+    cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

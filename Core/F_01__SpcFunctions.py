@@ -117,7 +117,7 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_07__Classifier) --------------------------------------------
-def getClassStr(dITp, lSCl=[]):
+def getClassStrOldCl(dITp, setSDC, lSCl=[]):
     setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
     # step 1: fill setSDigC
     for sCl in lSCl:
@@ -131,5 +131,11 @@ def getClassStr(dITp, lSCl=[]):
         else:
             sClOut += dITp['sDash']
     return sClOut
+
+def getClassStr(dITp, lSCl=[]):
+    if dITp['usedClType'].startswith(GC.S_OLD):
+        return getClassStrOldCl(dITp, lSCl=lSCl)
+    elif dITp['usedClType'].startswith(GC.S_NEW):
+        return dITp['sDash'].join(lSCl)
 
 ###############################################################################

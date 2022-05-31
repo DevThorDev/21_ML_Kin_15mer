@@ -94,8 +94,8 @@ class ExpData(BaseClass):
     def saveProcInpDfrs(self):
         self.lDfrInp, lF = [self.dfrKin, self.dfrNmer], self.dITp['lSFProcInp']
         for cDfr, sFPI in zip(self.lDfrInp, lF):
-            self.saveDfr(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI),
-                         dropDup=True, saveAnyway=False)
+            self.saveData(cDfr, pF=GF.joinToPath(self.pDirProcInp, sFPI),
+                          dropDup=True, saveAnyway=False)
 
     # --- methods for processing experimental data ----------------------------
     def fillDfrResIGen(self, cDfr, lR, iSt=0):
@@ -165,8 +165,8 @@ class ExpData(BaseClass):
         self.dfrComb = GF.dDDfrToDfr(dDDfr=dEffTg, lSColL=lSCK, lSColR=lSCNmer)
         self.dTpDfr[self.dITp['sBase']][self.dITp['sCDfrComb']] = self.dfrComb
         sBase, sComb = self.dITp['sBase'], self.dITp['sCombined']
-        self.saveDfr(self.dfrComb, pF=self.dPF[sBase][sComb][sMd],
-                     dropDup=True)
+        self.saveData(self.dfrComb, pF=self.dPF[sBase][sComb][sMd],
+                      dropDup=True)
         self.fillDfrResIGen(self.dfrComb, lR=self.dITp['lRResIG'], iSt=iSt)
 
     def combineXS(self, iSt=0):
@@ -210,7 +210,7 @@ class ExpData(BaseClass):
             print('Created long combined result.')
         if self.dITp['genInfoGen']:
             self.dfrResIGen = self.dfrResIGen.convert_dtypes()
-            self.saveDfr(self.dfrResIGen, self.dPF[tpDfr][self.dITp['sIGen']])
+            self.saveData(self.dfrResIGen, self.dPF[tpDfr][self.dITp['sIGen']])
 
     # --- method calling sub-methods that process and combine exp. data -------
     def procExpData(self, nDigDsp=GC.R04):
@@ -240,16 +240,16 @@ class ExpData(BaseClass):
             dfrINmer.sort_values(by=self.dITp['lSortCDfrNmer'],
                                  ascending=self.dITp['lSortDirAscDfrNmer'],
                                  inplace=True, ignore_index=True)
-            self.saveDfr(dfrINmer, pF=self.dPF[tpDfr][self.dITp['sImer']],
-                         saveIdx=True)
+            self.saveData(dfrINmer, pF=self.dPF[tpDfr][self.dITp['sImer']],
+                          saveIdx=True)
             GF.showElapsedTime(stT)
         if self.dTpDfr[tpDfr][self.dITp['sBGenInfoEff']]:
             dfrIEff = SF.dDNumToDfrIEff(self.dITp, dNmer)
-            self.saveDfr(dfrIEff, pF=self.dPF[tpDfr][self.dITp['sIEff']],
-                         saveIdx=False)
+            self.saveData(dfrIEff, pF=self.dPF[tpDfr][self.dITp['sIEff']],
+                          saveIdx=False)
             dfrIEffF = SF.dDNumToDfrIEff(self.dITp, dNmer, wAnyEff=True)
-            self.saveDfr(dfrIEffF, pF=self.dPF[tpDfr][self.dITp['sIEffF']],
-                         saveIdx=False)
+            self.saveData(dfrIEffF, pF=self.dPF[tpDfr][self.dITp['sIEffF']],
+                          saveIdx=False)
             GF.showElapsedTime(stT)
 
     def getInfoKinNmer(self, stT, tpDfr, sMd=GC.S_X_SHORT):

@@ -190,16 +190,17 @@ class ViterbiLog(SeqAnalysis):
     def saveViterbiResData(self):
         pFStP, pFPPy = self.dPF['StatePath'], self.dPF['PosPyl']
         pFPrD, pFPrF = self.dPF['ProbDetail'], self.dPF['ProbFinal']
-        self.saveDfr(GF.iniDfrFromDictIt(self.dStatePath), pF=pFStP)
-        self.saveDfr(GF.iniDfrFromDictIt(self.dPosPyl), pF=pFPPy)
-        lC = [self.dITp['sFullSeq'], 'Index', self.dITp['sState'], self.dITp['sLnProb']]
-        self.saveDfr(GF.iniDfrFromD3(self.d3ProbDetail, colDfr=lC), pF=pFPrD)
+        self.saveData(GF.iniDfrFromDictIt(self.dStatePath), pF=pFStP)
+        self.saveData(GF.iniDfrFromDictIt(self.dPosPyl), pF=pFPPy)
+        lC = [self.dITp['sFullSeq'], 'Index', self.dITp['sState'],
+              self.dITp['sLnProb']]
+        self.saveData(GF.iniDfrFromD3(self.d3ProbDetail, colDfr=lC), pF=pFPrD)
         lVProb = [GF.X_exp(self.dRV[sFSeq]['maxProb']) for sFSeq in self.dRV]
         lVLnProb = [self.dRV[sFSeq]['maxProb'] for sFSeq in self.dRV]
         dProbFin = {self.dITp['sFullSeq']: list(self.dRV),
                     self.dITp['sProb']: lVProb,
                     self.dITp['sLnProb']: lVLnProb}
-        self.saveDfr(GF.iniDfrFromDictIt(dProbFin), pF=pFPrF)
+        self.saveData(GF.iniDfrFromDictIt(dProbFin), pF=pFPrF)
 
 
 ###############################################################################

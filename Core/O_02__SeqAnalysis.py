@@ -359,8 +359,8 @@ class SeqAnalysis(BaseClass):
         self.probTableLoop(lSerD, nXt=nXt, nSeq=nSeq, stT=stT)
         self.dfrProbTbl = GF.concLSerAx1(lSerD)
         self.dfrProbTbl.index = lSSeq
-        self.saveDfr(self.dfrProbTbl, pF=self.dPF['ProbTblFS'],
-                     idxLbl=self.dITp['sCNmer'])
+        self.saveData(self.dfrProbTbl, pF=self.dPF['ProbTblFS'],
+                      idxLbl=self.dITp['sCNmer'])
         cTim.updateTimes(iMth=8, stTMth=cStT, endTMth=time.time())
 
     # --- methods checking the Nmer-sequence snippet probability analysis -----
@@ -472,10 +472,10 @@ class SeqAnalysis(BaseClass):
     def saveDfrRelLikelihood(self, dLV, d3, lSCD3):
         if self.dITp['calcWtLh']:
             dfrVal = GF.dLV3CToDfr(dLV)
-            self.saveDfr(dfrVal, pF=self.dPF['ResWtLh'])
+            self.saveData(dfrVal, pF=self.dPF['ResWtLh'])
         if self.dITp['calcRelLh']:
             dfrDict = GF.d3ValToDfr(d3, lSCD3)
-            self.saveDfr(dfrDict, pF=self.dPF['ResRelLh'])
+            self.saveData(dfrDict, pF=self.dPF['ResRelLh'])
 
     def convDictToDfrS(self):
         dLV, lSCDfr = {}, self.dITp['lSCDfrProbS']
@@ -492,7 +492,7 @@ class SeqAnalysis(BaseClass):
             GF.pickleSaveDict(cD=self.dSnipS, pF=self.dPF['SnipDictS'])
             if self.dITp['saveAsDfrS']:
                 self.dfrSnipS = self.convDictToDfrS()
-                self.saveDfr(self.dfrSnipS, pF=self.dPF['SnipDfrS'])
+                self.saveData(self.dfrSnipS, pF=self.dPF['SnipDfrS'])
 
     def convDictToDfrX(self):
         dLV, lSCDfr = {}, self.dITp['lSCDfrWFSProbX']
@@ -512,8 +512,8 @@ class SeqAnalysis(BaseClass):
                 self.dfrSnipX = self.convDictToDfrX()
                 lIdx = self.dfrSnipX[self.dITp['sSnippet']].to_list()
                 self.dfrSnipX.index = lIdx
-                self.saveDfr(self.dfrSnipX, pF=self.dPF['SnipDfrX'],
-                             saveIdx=True, idxLbl=False)
+                self.saveData(self.dfrSnipX, pF=self.dPF['SnipDfrX'],
+                              saveIdx=True, idxLbl=False)
 
     def loadDfrSnipX(self, reLoad=False):
         pFDfr = self.dPF['SnipDfrX']
@@ -544,7 +544,7 @@ class SeqAnalysis(BaseClass):
                 for sC, cV in zip(lSCDfr, lElRow):
                     GF.addToDictL(dLV, cK=sC, cE=cV)
             dfrVal = GF.dictToDfr(dLV, idxDfr=list(cD2))
-            self.saveDfr(dfrVal, pF=pFC, idxLbl=self.dITp['sCNmer'])
+            self.saveData(dfrVal, pF=pFC, idxLbl=self.dITp['sCNmer'])
 
     def saveDfrResSglPos(self, sDSave='RelFreq'):
         cD2, pFC = self.d2NOccSglPos, self.dPF['ResNOccSP']
@@ -560,7 +560,7 @@ class SeqAnalysis(BaseClass):
             for sIP in dfrRes.columns:
                 if chAAc in cD2[dSCol[sIP]]:
                     dfrRes.at[chAAc, sIP] = cD2[dSCol[sIP]][chAAc]
-        self.saveDfr(dfrRes, pF=pFC, idxLbl=self.dITp['sAminoAcid'])
+        self.saveData(dfrRes, pF=pFC, idxLbl=self.dITp['sAminoAcid'])
 
     def saveDfrResNOccSglPos(self):
         self.saveDfrResSglPos(sDSave='NOcc')

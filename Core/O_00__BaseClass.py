@@ -129,13 +129,13 @@ class BaseClass:
         else:
             return cSer
 
-    def saveDfr(self, cDfr, pF, saveIdx=True, idxLbl=None, dropDup=False,
-                saveAnyway=True):
-        if (not os.path.isfile(pF) or saveAnyway) and cDfr is not None:
+    def saveData(self, cData, pF, saveIdx=True, idxLbl=None, dropDup=False,
+                 saveAnyway=True):
+        if (not os.path.isfile(pF) or saveAnyway) and cData is not None:
             print('Saving DataFrame as *.csv file to path ' + pF)
             if idxLbl is not None:
                 saveIdx = True
-            GF.checkDupSaveCSV(cDfr, pF, cSep=self.dITp['cSep'],
+            GF.checkDupSaveCSV(GF.toDfr(cData), pF, cSep=self.dITp['cSep'],
                                saveIdx=saveIdx, iLbl=idxLbl, dropDup=dropDup)
 
     def saveListAsSer(self, cL, pF, saveIdx=True, lSIdx=None, sName=None,

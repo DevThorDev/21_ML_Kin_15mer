@@ -12,22 +12,24 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doRndForestClf = True
+doRndForestClf = False
 doNNMLPClf = True
-doPropCalc = True
+doPropCalc = False
 
 doTrainTestSplit = True
 
 encodeCatFtr = True
-calcConfMatrix = True
+calcConfMatrix = False
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
 usedNmerSeq = GC.S_FULL_LIST        # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcType = GC.S_AAC        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
+usedClType = GC.S_NEW + GC.S_CL     # GC.S_NEW/GC.S_OLD + GC.S_CL
+
 # --- names and paths of files and dirs ---------------------------------------
-sFInpStart = 'NewClOrig70'                # '' / 'AllCl' / 'NewClOrig70'
+sFInpStart = usedClType + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
 sFResCombS = 'Combined_S_KinasesPho15mer_202202'
 
 sFInpClf, sFInpPrC = None, None
@@ -36,22 +38,85 @@ if useFullSeqFrom == GC.S_COMB_INP:     # currently only option implemented
     sFInpPrC = sFInpClf
 
 sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
+sFOutClf = GC.S_US02.join([sFInpClf, GC.S_OUT])
 sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_PROP])
 
 pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
 pConfMat = GC.P_DIR_RES_CLF
+pOutClf = GC.P_DIR_RES_CLF
 pOutPrC = GC.P_DIR_RES_CLF
 
 # --- input for random forest classifier --------------------------------------
-nEstim = 1000                    # [100]
+nEstim = 300                    # [100]
 criterionQS = 'gini'            # {['gini'], 'entropy', 'log_loss'}
 maxDepth = None                 # {[None], 1, 2, 3,...}
 maxFtr = None                   # {['sqrt'], 'log2', None}, int or float
 
 # --- input for neural network MLP classifier ---------------------------------
-tHiddenLayers = (256, 128, 64, 32)
-sActivation = 'relu'
+bVerb = True        # state of verbosity (True: print progress messages)
+bWarmStart = True   # warm start (True: use warm start)
+
+d2Par_NNMLP = {'A': {'hidden_layer_sizes': (256, 128, 64, 32),
+                     'activation': 'relu',
+                     'solver': 'adam',
+                     'alpha': 0.0001,
+                     'batch_size': 'auto',
+                     'learning_rate': 'constant',
+                     'learning_rate_init': 0.001,
+                     'power_t': 0.5,
+                     'max_iter': 200,
+                     'shuffle': True,
+                     'tol': 1e-4,
+                     'momentum': 0.9,
+                     'nesterovs_momentum': True,
+                     'early_stopping': False,
+                     'validation_fraction': 0.1,
+                     'beta_1': 0.9,
+                     'beta_2': 0.999,
+                     'epsilon': 1e-8,
+                     'n_iter_no_change': 10,
+                     'max_fun': 15000},
+               'B': {'hidden_layer_sizes': (1024, 256, 64, 16),
+                     'activation': 'relu',
+                     'solver': 'adam',
+                     'alpha': 0.0001,
+                     'batch_size': 'auto',
+                     'learning_rate': 'constant',
+                     'learning_rate_init': 0.001,
+                     'power_t': 0.5,
+                     'max_iter': 200,
+                     'shuffle': True,
+                     'tol': 1e-4,
+                     'momentum': 0.9,
+                     'nesterovs_momentum': True,
+                     'early_stopping': False,
+                     'validation_fraction': 0.1,
+                     'beta_1': 0.9,
+                     'beta_2': 0.999,
+                     'epsilon': 1e-8,
+                     'n_iter_no_change': 10,
+                     'max_fun': 15000},
+               'C': {'hidden_layer_sizes': (128, 32),
+                     'activation': 'relu',
+                     'solver': 'adam',
+                     'alpha': 0.0001,
+                     'batch_size': 'auto',
+                     'learning_rate': 'constant',
+                     'learning_rate_init': 0.001,
+                     'power_t': 0.5,
+                     'max_iter': 200,
+                     'shuffle': True,
+                     'tol': 1e-4,
+                     'momentum': 0.9,
+                     'nesterovs_momentum': True,
+                     'early_stopping': False,
+                     'validation_fraction': 0.1,
+                     'beta_1': 0.9,
+                     'beta_2': 0.999,
+                     'epsilon': 1e-8,
+                     'n_iter_no_change': 10,
+                     'max_fun': 15000}}
 
 # --- numbers -----------------------------------------------------------------
 rndState = None             # None (random) or integer (reproducible)
@@ -125,14 +190,17 @@ dIO = {# --- general
        'useFullSeqFrom': useFullSeqFrom,
        'usedNmerSeq': usedNmerSeq,
        'usedAAcType': usedAAcType,
+       'usedClType': usedClType,
        # --- names and paths of files and dirs
        'sFInpClf': sFInpClf,
        'sFInpPrC': sFInpPrC,
        'sFConfMat': sFConfMat,
+       'sFOutClf': sFOutClf,
        'sFOutPrC': sFOutPrC,
        'pInpClf': pInpClf,
        'pInpPrC': pInpPrC,
        'pConfMat': pConfMat,
+       'pOutClf': pOutClf,
        'pOutPrC': pOutPrC,
        # --- input for random forest classifier
        'nEstim': nEstim,
@@ -140,8 +208,9 @@ dIO = {# --- general
        'maxDepth': maxDepth,
        'maxFtr': maxFtr,
        # --- input for neural network MLP classifier
-       'tHiddenLayers': tHiddenLayers,
-       'sActivation': sActivation,
+       'bVerb': bVerb,
+       'bWarmStart': bWarmStart,
+       'd2Par_NNMLP': d2Par_NNMLP,
        # --- numbers
        'rndState': rndState,
        'maxLenNmer': maxLenNmer,
