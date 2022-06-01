@@ -162,6 +162,17 @@ class Classifier(BaseClfPrC):
             elif cSect == 'C':
                 print(self.yPred)
 
+    def printPredict(self, X2Pre=None):
+        nPred, nCorr, _ = tuple(self.d2ResClf[self.sKPar].values())
+        if X2Pre is not None and len(X2Pre) == len(self.yPred):
+            if self.yTest is not None:
+                self.printDetailedPredict(X2Pre, cSect='A1')
+                self.printDetailedPredict(X2Pre, nPred, nCorr, cSect='A2')
+            else:
+                self.printDetailedPredict(X2Pre, cSect='B')
+        else:
+            self.printDetailedPredict(cSect='C')
+
     def printFitQuality(self):
         print(GC.S_DS04, ' Fit quality for the "', self.sMth, '" method ',
               GC.S_DS04, sep='')
@@ -235,26 +246,16 @@ class Classifier(BaseClfPrC):
                     self.printXY()
 
     # --- method for calculating values of the classifier results dictionary --
-    def calcPrintResPredict(self, X2Pre=None):
-        if X2Pre is not None and len(X2Pre) == len(self.yPred):
-            if self.yTest is not None:
-                self.printDetailedPredict(X2Pre, cSect='A1')
-                nPred = self.yPred.shape[0]
-                nCorrect = sum([1 for k in range(nPred) if
-                                self.yTest.iloc[k] == self.yPred[k]])
-                propCorrect = (nCorrect/nPred if nPred > 0 else None)
-                lV = [nPred, nCorrect, propCorrect]
-                lSK = ['numPredicted', 'numCorrect', 'propCorrect']
-                for sK, cV in zip(lSK, lV):
-                    GF.addToDictD(self.d2ResClf, cKMain=self.sKPar, cKSub=sK,
-                                  cVSub=cV)
-                # self.adaptPathOutDataClf()
-                self.saveData(self.d2ResClf, pF=self.dPF['OutDataClf'])
-                self.printDetailedPredict(X2Pre, nPred, nCorrect, cSect='A2')
-            else:
-                self.printDetailedPredict(X2Pre, cSect='B')
-        else:
-            self.printDetailedPredict(cSect='C')
+    def calcResPredict(self, X2Pre=None):
+        if (X2Pre is not None and self.yTest is not None and
+            self.yPred is not None and len(X2Pre) == len(self.yPred)):
+            nPred, sKPar = self.yPred.shape[0], self.sKPar
+            nCorr = sum([1 for k in range(nPred) if
+                         self.yTest.iloc[k] == self.yPred[k]])
+            propCorr = (nCorr/nPred if nPred > 0 else None)
+            lVCalc = [nPred, nCorr, propCorr]
+            for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
+                GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pre=None):
@@ -264,16 +265,12 @@ class Classifier(BaseClfPrC):
             if dat2Pre is None:
                 dat2Pre, self.yTest = self.getXY(getTrain=False)
             self.yPred = self.Clf.predict(dat2Pre)
+            self.calcResPredict(X2Pre=dat2Pre)
             if self.dITp['lvlOut'] > 0:
-                self.calcPrintResPredict(X2Pre=dat2Pre)
+                self.printPredict(X2Pre=dat2Pre)
             self.calcConfMatrix()
 
     # --- methods for adapting keys of the result paths dictionary ------------
-    # def adaptPathOutDataClf(self):
-    #     sFOutClf = (self.dITp['sUSC'].join([self.dITp['sFOutClf'], sKPar]) +
-    #                 self.dITp['xtCSV'])
-    #     self.dPF['OutDataClf'] = GF.joinToPath(self.dITp['pOutClf'], sFOutClf)
-
     def adaptPathConfMatrix(self):
         sFConfMat = self.dITp['sFConfMat'] + self.sMth + self.dITp['xtCSV']
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
@@ -303,10 +300,11 @@ class Classifier(BaseClfPrC):
 # -----------------------------------------------------------------------------
 class RndForestClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, sKPar='A'):
+    def __init__(self, inpDat, d2Par, sKPar='A'):
         super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Random Forest classifier'
         self.sMth = self.dITp['sMthRF']
+        self.d2Par = d2Par
         if self.dITp['doRndForestClf']:
             self.getClf()
             self.ClfFit(self.Clf)
@@ -314,19 +312,21 @@ class RndForestClf(Classifier):
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
-        self.Clf = RandomForestClassifier(n_estimators=self.dITp['nEstim'],
-                                          criterion=self.dITp['criterionQS'],
-                                          max_depth=self.dITp['maxDepth'],
-                                          max_features=self.dITp['maxFtr'],
-                                          random_state=self.dITp['rndState'])
+        self.Clf = RandomForestClassifier(random_state=self.dITp['rndState'],
+                                          warm_start=self.dITp['bWarmStart'],
+                                          oob_score=self.dITp['estOobScore'],
+                                          n_jobs=self.dITp['nJobs'],
+                                          verbose=self.dITp['vVerb'],
+                                          **self.d2Par[self.sKPar])
 
 # -----------------------------------------------------------------------------
 class NNMLPClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, sKPar='A'):
+    def __init__(self, inpDat, d2Par, sKPar='A'):
         super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Neural Network MLP classifier'
         self.sMth = self.dITp['sMthMLP']
+        self.d2Par = d2Par
         if self.dITp['doNNMLPClf']:
             self.getClf()
             self.ClfFit(self.Clf)
@@ -336,9 +336,9 @@ class NNMLPClf(Classifier):
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
         self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
-                                 verbose=self.dITp['bVerb'],
                                  warm_start=self.dITp['bWarmStart'],
-                                 **self.dITp['d2Par_NNMLP'][self.sKPar])
+                                 verbose=self.dITp['bVerb'],
+                                 **self.d2Par[self.sKPar])
 
     def getScoreClf(self):
         if self.dITp['doTrainTestSplit']:

@@ -340,6 +340,21 @@ def addToD3(cD3, cKL1, cKL2, cKL3, cVL3=[], allowRpl=False):
     else:
         cD3[cKL1] = {cKL2: {cKL3: cVL3}}
 
+def calcMnSDFromD3Val(cD3):
+    d3MnSD, dT, N = {}, {}, len(cD3)
+    # rearrange
+    for cKL1, cD2 in cD3.items():
+        for cKL2, cD in cD2.items():
+            for cKL3, cV in cD.items():
+                addToDictL(dT, cK=(cKL2, cKL3), cE=cV)
+    for cKT, cLV in dT.items():
+        cMean, cSD = np.mean(cLV), np.std(cLV, ddof=1)
+        cSEM = (0. if N == 0 else cSD/np.sqrt(N))
+        addToD3(d3MnSD, cKL1=GC.S_MEAN, cKL2=cKT[0], cKL3=cKT[1], cVL3=cMean)
+        addToD3(d3MnSD, cKL1=GC.S_SD, cKL2=cKT[0], cKL3=cKT[1], cVL3=cSD)
+        addToD3(d3MnSD, cKL1=GC.S_SEM, cKL2=cKT[0], cKL3=cKT[1], cVL3=cSEM)
+    return d3MnSD
+
 def convDDNumToDDProp(dDNum, nDigRnd):
     dDSum, dDProp = {}, {}
     for cKM, cDSub in dDNum.items():

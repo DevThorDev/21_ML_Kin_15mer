@@ -12,7 +12,7 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doRndForestClf = False
+doRndForestClf = True
 doNNMLPClf = True
 doPropCalc = False
 
@@ -22,7 +22,7 @@ encodeCatFtr = True
 calcConfMatrix = False
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
-usedNmerSeq = GC.S_FULL_LIST        # S_FULL_LIST / S_UNQ_LIST
+usedNmerSeq = GC.S_UNQ_LIST        # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcType = GC.S_AAC        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
@@ -47,79 +47,19 @@ pConfMat = GC.P_DIR_RES_CLF
 pOutClf = GC.P_DIR_RES_CLF
 pOutPrC = GC.P_DIR_RES_CLF
 
-# --- input for random forest classifier --------------------------------------
-nEstim = 300                    # [100]
-criterionQS = 'gini'            # {['gini'], 'entropy', 'log_loss'}
-maxDepth = None                 # {[None], 1, 2, 3,...}
-maxFtr = None                   # {['sqrt'], 'log2', None}, int or float
+# --- general input for any classifier ----------------------------------------
+rndState = None             # None (random) or integer (reproducible)
+bWarmStart = True           # warm start (True: use warm start)
 
-# --- input for neural network MLP classifier ---------------------------------
-bVerb = True        # state of verbosity (True: print progress messages)
-bWarmStart = True   # warm start (True: use warm start)
+# --- general input for random forest classifier ------------------------------
+estOobScore = False         # estimate the generalization score
+nJobs = None                # number of jobs to run in parallel (None: 1)
+vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
-d2Par_NNMLP = {'A': {'hidden_layer_sizes': (256, 128, 64, 32),
-                     'activation': 'relu',
-                     'solver': 'adam',
-                     'alpha': 0.0001,
-                     'batch_size': 'auto',
-                     'learning_rate': 'constant',
-                     'learning_rate_init': 0.001,
-                     'power_t': 0.5,
-                     'max_iter': 200,
-                     'shuffle': True,
-                     'tol': 1e-4,
-                     'momentum': 0.9,
-                     'nesterovs_momentum': True,
-                     'early_stopping': False,
-                     'validation_fraction': 0.1,
-                     'beta_1': 0.9,
-                     'beta_2': 0.999,
-                     'epsilon': 1e-8,
-                     'n_iter_no_change': 10,
-                     'max_fun': 15000},
-               'B': {'hidden_layer_sizes': (1024, 256, 64, 16),
-                     'activation': 'relu',
-                     'solver': 'adam',
-                     'alpha': 0.0001,
-                     'batch_size': 'auto',
-                     'learning_rate': 'constant',
-                     'learning_rate_init': 0.001,
-                     'power_t': 0.5,
-                     'max_iter': 200,
-                     'shuffle': True,
-                     'tol': 1e-4,
-                     'momentum': 0.9,
-                     'nesterovs_momentum': True,
-                     'early_stopping': False,
-                     'validation_fraction': 0.1,
-                     'beta_1': 0.9,
-                     'beta_2': 0.999,
-                     'epsilon': 1e-8,
-                     'n_iter_no_change': 10,
-                     'max_fun': 15000},
-               'C': {'hidden_layer_sizes': (128, 32),
-                     'activation': 'relu',
-                     'solver': 'adam',
-                     'alpha': 0.0001,
-                     'batch_size': 'auto',
-                     'learning_rate': 'constant',
-                     'learning_rate_init': 0.001,
-                     'power_t': 0.5,
-                     'max_iter': 200,
-                     'shuffle': True,
-                     'tol': 1e-4,
-                     'momentum': 0.9,
-                     'nesterovs_momentum': True,
-                     'early_stopping': False,
-                     'validation_fraction': 0.1,
-                     'beta_1': 0.9,
-                     'beta_2': 0.999,
-                     'epsilon': 1e-8,
-                     'n_iter_no_change': 10,
-                     'max_fun': 15000}}
+# --- general input for neural network MLP classifier -------------------------
+bVerb = True                # state of verbosity (True: progress messages)
 
 # --- numbers -----------------------------------------------------------------
-rndState = None             # None (random) or integer (reproducible)
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
 propTestData = .2
 
@@ -131,9 +71,6 @@ sFullList = GC.S_FULL_LIST
 sUnqList = GC.S_UNQ_LIST
 
 sCY = GC.S_EFF_CL
-
-sMthRF = GC.S_MTH_RF
-sMthMLP = GC.S_MTH_MLP
 
 sSupTtlPlt = 'Confusion matrix'
 
@@ -147,12 +84,13 @@ setNmerLen = set(range(1, 15 + 1, 2))
 
 # --- lists -------------------------------------------------------------------
 lFeatSrt = sorted(list(setFeat))
-lAllClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
+lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
              'C12---', 'C1-3--', 'C1--4-', 'C1---5', 'C-23--', 'C-2-4-',
              'C-2--5', 'C--34-', 'C--3-5', 'C---45', 'C123--', 'C12-4-',
              'C12--5', 'C1-34-', 'C1-3-5', 'C1--45', 'C-234-', 'C-23-5',
              'C-2-45', 'C--345', 'C1234-', 'C123-5', 'C12-45', 'C1-345',
              'C-2345', 'C12345']
+lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # --- dictionaries ------------------------------------------------------------
 
@@ -202,17 +140,16 @@ dIO = {# --- general
        'pConfMat': pConfMat,
        'pOutClf': pOutClf,
        'pOutPrC': pOutPrC,
-       # --- input for random forest classifier
-       'nEstim': nEstim,
-       'criterionQS': criterionQS,
-       'maxDepth': maxDepth,
-       'maxFtr': maxFtr,
-       # --- input for neural network MLP classifier
-       'bVerb': bVerb,
-       'bWarmStart': bWarmStart,
-       'd2Par_NNMLP': d2Par_NNMLP,
-       # --- numbers
+       # --- general input for any classifier
        'rndState': rndState,
+       'bWarmStart': bWarmStart,
+       # --- general input for random forest classifier
+       'estOobScore': estOobScore,
+       'nJobs': nJobs,
+       'vVerb': vVerb,
+       # --- general input for neural network MLP classifier
+       'bVerb': bVerb,
+       # --- numbers
        'maxLenNmer': maxLenNmer,
        'propTestData': propTestData,
        'rndDigScore': rndDigScore,
@@ -221,14 +158,13 @@ dIO = {# --- general
        'sFullList': sFullList,
        'sUnqList': sUnqList,
        'sCY': sCY,
-       'sMthRF': sMthRF,
-       'sMthMLP': sMthMLP,
        'sSupTtlPlt': sSupTtlPlt,
        # --- sets
        'setFeat': setFeat,
        # --- lists
        'lFeatSrt': lFeatSrt,
-       'lAllClPlt': lAllClPlt,
+       'lOldClPlt': lOldClPlt,
+       'lSResClf': lSResClf,
        # --- dictionaries
        # === derived values and input processing
        'maxPosNmer': maxPosNmer,

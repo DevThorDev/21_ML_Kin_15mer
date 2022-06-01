@@ -39,6 +39,8 @@ sIGen = GC.S_I_GEN
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
+sMthRF = GC.S_MTH_RF
+sMthMLP = GC.S_MTH_MLP
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -83,6 +85,10 @@ dIO = {# --- general
        'sCapL': sCapL,
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
+       'sMthRF': sMthRF,
+       'sMthMLP': sMthMLP,
+       # --- lists
+       'lSMth': [sMthRF, sMthMLP],
        # --- file name extensions
        'xtPY': xtPY,
        'xtCSV': xtCSV,
