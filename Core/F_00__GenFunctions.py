@@ -209,6 +209,14 @@ def restrInt(cIt, lRestrLen=[]):
 def restrLenS(cIt, lRestrLen=[]):
     return restrIt(cIt=cIt, lRestrLen=lRestrLen, useLenS=True)
 
+def tryRoundX(x, RD=None):
+    if RD is not None:
+        try:
+            x = round(x, RD)
+        except:
+            print('Cannot round "', x, '" to ', RD, ' digits.', sep='')
+    return x
+
 # --- Functions handling lists ------------------------------------------------
 def fillCondList(elCond, lToFill=[], lLoop=[], lUniqEl=True):
     for elCheckContain in lLoop:
@@ -340,20 +348,21 @@ def addToD3(cD3, cKL1, cKL2, cKL3, cVL3=[], allowRpl=False):
     else:
         cD3[cKL1] = {cKL2: {cKL3: cVL3}}
 
-def calcMnSDFromD3Val(cD3):
-    d3MnSD, dT, N = {}, {}, len(cD3)
-    # rearrange
+def calcMnSEMFromD3Val(cD3, sJoin=GC.S_USC):
+    d2MnSEM, dT, N = {}, {}, len(cD3)
+    # rearrange data in temp dict dT
     for cKL1, cD2 in cD3.items():
         for cKL2, cD in cD2.items():
             for cKL3, cV in cD.items():
                 addToDictL(dT, cK=(cKL2, cKL3), cE=cV)
+    # fill d2MnSEM
     for cKT, cLV in dT.items():
-        cMean, cSD = np.mean(cLV), np.std(cLV, ddof=1)
-        cSEM = (0. if N == 0 else cSD/np.sqrt(N))
-        addToD3(d3MnSD, cKL1=GC.S_MEAN, cKL2=cKT[0], cKL3=cKT[1], cVL3=cMean)
-        addToD3(d3MnSD, cKL1=GC.S_SD, cKL2=cKT[0], cKL3=cKT[1], cVL3=cSD)
-        addToD3(d3MnSD, cKL1=GC.S_SEM, cKL2=cKT[0], cKL3=cKT[1], cVL3=cSEM)
-    return d3MnSD
+        addToDictD(d2MnSEM, cKMain=sJoin.join([cKT[0], GC.S_MEAN]),
+                   cKSub=cKT[1], cVSub=np.mean(cLV))
+        cSEM = (0. if N == 0 else np.std(cLV, ddof=1)/np.sqrt(N))
+        addToDictD(d2MnSEM, cKMain=sJoin.join([cKT[0], GC.S_SEM]),
+                   cKSub=cKT[1], cVSub=cSEM)
+    return d2MnSEM
 
 def convDDNumToDDProp(dDNum, nDigRnd):
     dDSum, dDProp = {}, {}
@@ -565,6 +574,13 @@ def getColDfr(nLvl=1, colDfr=None):
         colDfr = range(nCol)
     return nCol, colDfr
 
+def addToDfrSpc(d2, pdDfr=None, concAx=1):
+    if pdDfr is None:
+        pdDfr = iniPdDfr(d2)
+    else:
+        pdDfr = concPdDfrS(lPdDfr=[pdDfr, iniPdDfr(d2)], concAx=concAx)
+    return pdDfr
+
 def iniDfrFromDictIt(cD, idxDfr=None):
     maxLen = 0
     for cK, cIt in cD.items():
@@ -598,14 +614,6 @@ def iniDfrFromD3(d3, idxDfr=None, colDfr=None):
     if idxDfr is not None:
         fullDfr.index = idxDfr
     return fullDfr.reset_index(drop=True)
-
-def tryRoundX(x, RD=None):
-    if RD is not None:
-        try:
-            x = round(x, RD)
-        except:
-            print('Cannot round "', x, '" to ', RD, ' digits.', sep='')
-    return x
 
 def getSglElWSelC(pdDfr, sCVal, sCSel, xSel, RD=None):
     xSel = tryRoundX(xSel, RD=RD)

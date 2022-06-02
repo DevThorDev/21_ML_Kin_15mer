@@ -39,8 +39,11 @@ sIGen = GC.S_I_GEN
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
+sMthRF_L = GC.S_MTH_RF_L
 sMthRF = GC.S_MTH_RF
+sMthMLP_L = GC.S_MTH_MLP_L
 sMthMLP = GC.S_MTH_MLP
+sPar = GC.S_PAR
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -85,9 +88,13 @@ dIO = {# --- general
        'sCapL': sCapL,
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
+       'sMthRF_L': sMthRF_L,
        'sMthRF': sMthRF,
+       'sMthMLP_L': sMthMLP_L,
        'sMthMLP': sMthMLP,
+       'sPar': sPar,
        # --- lists
+       'lSMth_L': [sMthRF_L, sMthMLP_L],
        'lSMth': [sMthRF, sMthMLP],
        # --- file name extensions
        'xtPY': xtPY,

@@ -32,9 +32,9 @@ class BaseClfPrC(SeqAnalysis):
     def iniAttr(self, sKPar='A'):
         lAttr2None = ['lSCl', 'serNmerSeq', 'dfrInpClf', 'dfrInpPrC', 'X',
                       'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
-                      'y', 'yPred', 'yTrain', 'yTest', 'Clf', 'sMth',
+                      'y', 'yPred', 'yTrain', 'yTest', 'Clf', 'sMth', 'sMthL',
                       'scoreClf', 'confusMatrix']
-        lAttrDict = ['d2ResClf', 'dPropAAc']
+        lAttrDict = ['d2ResClf', 'dConfMat', 'dPropAAc']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
@@ -47,15 +47,11 @@ class BaseClfPrC(SeqAnalysis):
     def addValsToDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
-        sFOutClf = (self.dITp['sUSC'].join([self.dITp['sFOutClf'],
-                                            self.sKPar]) + self.dITp['xtCSV'])
-        # sFOutClf = self.dITp['sFOutClf'] + self.dITp['xtCSV']
         sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
         sFConfMat = self.dITp['sFConfMat'] + self.dITp['xtCSV']
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
-        self.dPF['OutDataClf'] = GF.joinToPath(self.dITp['pOutClf'], sFOutClf)
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
     # --- methods for loading input data --------------------------------------
@@ -174,7 +170,7 @@ class Classifier(BaseClfPrC):
             self.printDetailedPredict(cSect='C')
 
     def printFitQuality(self):
-        print(GC.S_DS04, ' Fit quality for the "', self.sMth, '" method ',
+        print(GC.S_DS04, ' Fit quality for the "', self.sMthL, '" method ',
               GC.S_DS04, sep='')
         if self.scoreClf is not None:
             print('Classification score for the test data:',
@@ -284,16 +280,17 @@ class Classifier(BaseClfPrC):
             if self.sMth is not None:
                 self.adaptPathConfMatrix()
             self.saveData(dfrCM, pF=self.dPF['ConfMat'])
+            self.dConfMat[self.sKPar] = dfrCM
 
     # --- method for plotting the confusion matrix ----------------------------
     def plotConfMatrix(self):
-        if self.confusMatrix is not None:
+        if self.dITp['plotConfMatrix'] and self.confusMatrix is not None:
             CM, lCl = self.confusMatrix, self.lSCl
             D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
             D.plot()
             supTtl = self.dITp['sSupTtlPlt']
-            if self.sMth is not None:
-                supTtl += ' (method: "' + self.sMth + '")'
+            if self.sMthL is not None:
+                supTtl += ' (method: "' + self.sMthL + '")'
             D.figure_.suptitle(supTtl)
             plt.show()
 
@@ -303,7 +300,7 @@ class RndForestClf(Classifier):
     def __init__(self, inpDat, d2Par, sKPar='A'):
         super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Random Forest classifier'
-        self.sMth = self.dITp['sMthRF']
+        self.sMthL, self.sMth = self.dITp['sMthRF_L'], self.dITp['sMthRF']
         self.d2Par = d2Par
         if self.dITp['doRndForestClf']:
             self.getClf()
@@ -325,7 +322,7 @@ class NNMLPClf(Classifier):
     def __init__(self, inpDat, d2Par, sKPar='A'):
         super().__init__(inpDat, sKPar=sKPar)
         self.descO = 'Neural Network MLP classifier'
-        self.sMth = self.dITp['sMthMLP']
+        self.sMthL, self.sMth = self.dITp['sMthMLP_L'], self.dITp['sMthMLP']
         self.d2Par = d2Par
         if self.dITp['doNNMLPClf']:
             self.getClf()

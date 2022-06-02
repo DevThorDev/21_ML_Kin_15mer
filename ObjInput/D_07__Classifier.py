@@ -18,8 +18,10 @@ doPropCalc = False
 
 doTrainTestSplit = True
 
-encodeCatFtr = True
 calcConfMatrix = False
+plotConfMatrix = False
+
+encodeCatFtr = True
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
 usedNmerSeq = GC.S_UNQ_LIST        # S_FULL_LIST / S_UNQ_LIST
@@ -38,7 +40,7 @@ if useFullSeqFrom == GC.S_COMB_INP:     # currently only option implemented
     sFInpPrC = sFInpClf
 
 sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
-sFOutClf = GC.S_US02.join([sFInpClf, GC.S_OUT])
+sFOutClf = sFInpClf
 sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_PROP])
 
 pInpClf = GC.P_DIR_INP_CLF
@@ -123,8 +125,9 @@ dIO = {# --- general
        'doNNMLPClf': doNNMLPClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
-       'encodeCatFtr': encodeCatFtr,
        'calcConfMatrix': calcConfMatrix,
+       'plotConfMatrix': plotConfMatrix,
+       'encodeCatFtr': encodeCatFtr,
        'useFullSeqFrom': useFullSeqFrom,
        'usedNmerSeq': usedNmerSeq,
        'usedAAcType': usedAAcType,
