@@ -131,7 +131,7 @@ class BaseClass:
 
     def saveData(self, cData=None, pF=None, saveIdx=True, idxLbl=None,
                  dropDup=False, saveAnyway=True):
-        if ((not os.path.isfile(pF) or saveAnyway) and cData is not None and
+        if ((not os.path.isfile(pF) or saveAnyway) and GF.Xist(cData) and
             pF is not None):
             print('Saving DataFrame as *.csv file to path ' + pF)
             if idxLbl is not None:

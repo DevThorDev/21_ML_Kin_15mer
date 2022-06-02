@@ -348,6 +348,15 @@ def addToD3(cD3, cKL1, cKL2, cKL3, cVL3=[], allowRpl=False):
     else:
         cD3[cKL1] = {cKL2: {cKL3: cVL3}}
 
+def updateDict(cDFull, cDUp, cK=None):
+    if cK is None:
+        cDFull.update(cDUp)
+    else:
+        if cK in cDFull:
+            cDFull[cK].update(cDUp)
+        else:
+            cDFull[cK] = cDUp
+
 def calcMnSEMFromD3Val(cD3, sJoin=GC.S_USC):
     d2MnSEM, dT, N = {}, {}, len(cD3)
     # rearrange data in temp dict dT

@@ -32,7 +32,7 @@ class Looper(BaseClass):
                   'method "', sMth, '":', sep='')
             dfrMnSEM = GF.iniPdDfr(self.d2MnSEM)
             for k in range(len(self.d2MnSEM)//2):
-                print(dfrMnSEM.iloc[:, (k*2):(k*2 + 2)])
+                print(GC.S_NEWL, dfrMnSEM.iloc[:, (k*2):(k*2 + 2)], sep='')
 
 # --- loop methods ------------------------------------------------------------
     def adaptDPF(self, cClf, sMth):
@@ -57,7 +57,7 @@ class Looper(BaseClass):
                 cClf = NNMLPClf(self.inpD, d2Par, sKPar=sKPar)
             cClf.ClfPred()
             cClf.printFitQuality()
-            self.d3ResClf[cRp] = cClf.d2ResClf
+            GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
             if k == 0 and cRp == 0:
                 self.adaptDPF(cClf=cClf, sMth=sMth)
             cEndT = GF.showElapsedTime(startTime=stT)
@@ -65,15 +65,15 @@ class Looper(BaseClass):
 
     def doDoubleLoop(self, cTim, stT=None):
         for sMth in self.dITp['lSMth']:
-            d2Par, self.d2MnSEM = self.dITp['d3Par'][sMth], {}
+            self.d3ResClf, d2Par = {}, self.dITp['d3Par'][sMth]
             for k, sKPar in enumerate(d2Par):
                 for cRep in range(self.dITp['dNumRep'][sMth]):
                     print(GC.S_EQ20, 'Method:', sMth, GC.S_VBAR, 'Parameter',
                           'set:', sKPar, GC.S_VBAR, 'Repetition:', cRep + 1)
                     self.doCRep(sMth, k, sKPar, cRp=cRep, cTim=cTim, stT=stT)
-                self.d2MnSEM.update(GF.calcMnSEMFromD3Val(self.d3ResClf))
             if self.dITp['dNumRep'][sMth] > 0:
                 self.saveData(GF.iniPdDfr(d2Par), pF=self.dPF['OutParClf'])
+            self.d2MnSEM = GF.calcMnSEMFromD3Val(self.d3ResClf)
             self.saveData(self.d2MnSEM, pF=self.dPF['OutDataClf'])
             self.printD2MnSEM(sMth=sMth)
 
