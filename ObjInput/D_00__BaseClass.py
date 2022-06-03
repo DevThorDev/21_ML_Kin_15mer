@@ -14,6 +14,11 @@ cSep = GC.S_SEMICOL
 # --- names and paths of files and dirs ---------------------------------------
 
 # --- strings -----------------------------------------------------------------
+sDash = GC.S_DASH
+sUSC = GC.S_USC
+sUS02 = GC.S_US02
+sNULL = GC.S_NULL
+s0, sC, sX = GC.S_0, GC.S_CAP_C, GC.S_CAP_X
 sBase = GC.S_BASE
 sTrain = GC.S_TRAIN
 sTest = GC.S_TEST
@@ -37,6 +42,7 @@ sIEffFTrain = GC.S_I_EFF_F_TRAIN
 sIEffFTest = GC.S_I_EFF_F_TEST
 sIGen = GC.S_I_GEN
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
+sCNmer = GC.S_C_N_MER
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sMthRF_L = GC.S_MTH_RF_L
@@ -60,6 +66,13 @@ dIO = {# --- general
        'cSep': cSep,
        # --- names and paths of files and dirs
        # --- strings
+       'sDash': sDash,
+       'sUSC': sUSC,
+       'sUS02': sUS02,
+       'sNULL': sNULL,
+       's0': s0,
+       'sC': sC,
+       'sX': sX,
        'sBase': sBase,
        'sTrain': sTrain,
        'sTest': sTest,
@@ -86,6 +99,7 @@ dIO = {# --- general
        'sCapS': sCapS,
        'sCapM': sCapM,
        'sCapL': sCapL,
+       'sCNmer': sCNmer,
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
        'sMthRF_L': sMthRF_L,

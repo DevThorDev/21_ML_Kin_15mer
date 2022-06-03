@@ -13,6 +13,7 @@ from Core.O_01__ExpData import ExpData
 from Core.O_02__SeqAnalysis import SeqAnalysis
 from Core.O_03__Validation import Validation
 # from Core.O_05__ViterbiLog import ViterbiLog
+from Core.O_06__ClfDataLoader import DataLoader
 # from Core.O_07__Classifier import RndForestClf, NNMLPClf, PropCalculator
 from Core.O_80__Looper import Looper
 
@@ -102,8 +103,11 @@ cValidation.createResultsTrain(stT=startTime)
 #     cEndTime = GF.showElapsedTime(startTime)
 #     cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
-cLooper = Looper(inpDatG)
-cLooper.doDoubleLoop(cTim=cTiming, stT=startTime)
+cDataLoader = DataLoader(inpDatG)
+cDataLoader.printXY()
+
+# cLooper = Looper(inpDatG)
+# cLooper.doDoubleLoop(cTim=cTiming, stT=startTime)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

@@ -58,11 +58,6 @@ iCentNmer = GC.I_CENT_N_MER
 rndDigProp = GC.R08
 
 # --- strings -----------------------------------------------------------------
-sDash = GC.S_DASH
-sUSC = GC.S_USC
-sUS02 = GC.S_US02
-s0, sC, sX = GC.S_0, GC.S_CAP_C, GC.S_CAP_X
-sNULL = 'NULL'
 sSeq = 'Seq'
 sMer = GC.S_MER
 sFull = GC.S_FULL
@@ -77,7 +72,6 @@ sPepMod = 'pep_mod'
 sCCode = 'code'
 sCCodeSeq = 'code_seq'
 sPepPIP = 'pep_pos_in_prot'
-sCNmer = GC.S_C_N_MER
 sLenSnip = GC.S_LEN_SNIP
 sExpName = GC.S_EXP_NAME
 sCodeTrunc = GC.S_CODE_TRUNC
@@ -193,13 +187,6 @@ dIO = {# --- general
        'iCentNmer': iCentNmer,
        'rndDigProp': rndDigProp,
        # --- strings
-       'sDash': sDash,
-       'sUSC': sUSC,
-       'sUS02': sUS02,
-       's0': s0,
-       'sC': sC,
-       'sX': sX,
-       'sNULL': sNULL,
        'sSeq': sSeq,
        'sMer': sMer,
        'sFull': sFull,
@@ -214,7 +201,6 @@ dIO = {# --- general
        'sCCode': sCCode,
        'sCCodeSeq': sCCodeSeq,
        'sPepPIP': sPepPIP,
-       'sCNmer': sCNmer,
        'sLenSnip': sLenSnip,
        'sExpName': sExpName,
        'sCodeTrunc': sCodeTrunc,

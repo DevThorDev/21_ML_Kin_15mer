@@ -109,7 +109,7 @@ class BaseClfPrC(SeqAnalysis):
 class Classifier(BaseClfPrC):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, sKPar='A', iTp=7, lITpUpd=[1, 2]):
-        super().__init__(inpDat, sKPar=sKPar)
+        super().__init__(inpDat, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Classifier for data classification'
         self.loadInpDataClf()
         if self.dITp['encodeCatFtr'] and not self.dITp['doTrainTestSplit']:
