@@ -30,9 +30,8 @@ class BaseClfPrC(SeqAnalysis):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar='A'):
-        lAttr2None = ['lSCl', 'serNmerSeq', 'dfrInpClf', 'dfrInpPrC', 'X',
-                      'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
-                      'y', 'yPred', 'yTrain', 'yTest', 'Clf', 'sMth', 'sMthL',
+        lAttr2None = ['XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
+                      'yPred', 'yTrain', 'yTest', 'Clf', 'sMth', 'sMthL',
                       'scoreClf', 'confusMatrix']
         lAttrDict = ['d2ResClf', 'dConfMat', 'dPropAAc']
         for cAttr in lAttr2None:

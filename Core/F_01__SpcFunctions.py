@@ -116,6 +116,32 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
         for sC, cV in zip(lSCWtLh[:3], [cSSq, cEff, wtLh]):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
+# --- Functions (O_06__ClfDataLoader) -----------------------------------------
+def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
+    lSer, sCY = [], dITp['sCY' + sMd]
+    serNmerSeq = GF.iniPdSer(serNmerSeq.unique(), nameS=dITp['sCNmer'])
+    for cSeq in serNmerSeq:
+        cDfr = dfrInp[dfrInp[dITp['sCNmer']] == cSeq]
+        lSC = GF.toListUnique(cDfr[sCY].to_list())
+        cSer = cDfr.iloc[0, :]
+        cSer.at[sCY] = getClassStr(dITp, lSCl=lSC, sMd=sMd)
+        lSer.append(cSer)
+    return GF.concLSerAx1(lSer=lSer, ignIdx=True).T, serNmerSeq
+
+def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
+    serNmerSeq, lSCl, X, y = None, None, None, None
+    if dITp['sCNmer'] in dfrInp.columns:
+        serNmerSeq = dfrInp[dITp['sCNmer']]
+    if dITp['usedNmerSeq' + sMd] == dITp['sUnqList']:
+        dfrInp, serNmerSeq = toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd=sMd)
+    assert dITp['sCY' + sMd] in dfrInp.columns
+    for sCX in dITp['lSCX' + sMd]:
+        assert sCX in dfrInp.columns
+    lSCl = sorted(list(dfrInp[dITp['sCY' + sMd]].unique()))
+    X = dfrInp[dITp['lSCX' + sMd]]
+    y = dfrInp[dITp['sCY' + sMd]]
+    return serNmerSeq, dfrInp, lSCl, X, y
+
 # --- Functions (O_07__Classifier) --------------------------------------------
 def getClassStrOldCl(dITp, setSDC, lSCl=[]):
     setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
@@ -132,10 +158,10 @@ def getClassStrOldCl(dITp, setSDC, lSCl=[]):
             sClOut += dITp['sDash']
     return sClOut
 
-def getClassStr(dITp, lSCl=[]):
-    if dITp['usedClType'].startswith(GC.S_OLD):
+def getClassStr(dITp, lSCl=[], sMd='Clf'):
+    if dITp['usedClType' + sMd].startswith(GC.S_OLD):
         return getClassStrOldCl(dITp, lSCl=lSCl)
-    elif dITp['usedClType'].startswith(GC.S_NEW):
+    elif dITp['usedClType' + sMd].startswith(GC.S_NEW):
         return dITp['sDash'].join(lSCl)
 
 ###############################################################################

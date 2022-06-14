@@ -301,9 +301,11 @@ class Timing:
         self.elT_02_11_saveD2TCProbSnipAsDfr = 0.
         self.elT_02_12_getProbSglPos = 0.
         self.elT_05_13_ViterbiAlgorithm = 0.
-        self.elT_07_14_RndForestClf = 0.
-        self.elT_07_15_NNMLPClf = 0.
-        self.elT_07_16_PropCalculator = 0.
+        self.elT_06_14_ClfDataLoader = 0.
+        self.elT_07_15_RndForestClf = 0.
+        self.elT_07_16_NNMLPClf = 0.
+        self.elT_07_17_PropCalculator = 0.
+        self.elT_XX_99_Other = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
         self.lSMth = ['getLInpSeq', 'genDLenSeq', 'performLhAnalysis',
@@ -311,8 +313,8 @@ class Timing:
                       'performProbAnalysis_C', 'performProbAnalysis_D',
                       'calcProbTable', 'getD2TotalProbSnip',
                       'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
-                      'getProbSglPos', 'ViterbiAlgorithm', 'RndForestClf',
-                      'NNMLPClf', 'PropCalculator']
+                      'getProbSglPos', 'ViterbiAlgorithm', 'ClfDataLoader',
+                      'RndForestClf', 'NNMLPClf', 'PropCalculator', 'Other']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -329,9 +331,11 @@ class Timing:
                      self.elT_02_11_saveD2TCProbSnipAsDfr,
                      self.elT_02_12_getProbSglPos,
                      self.elT_05_13_ViterbiAlgorithm,
-                     self.elT_07_14_RndForestClf,
-                     self.elT_07_15_NNMLPClf,
-                     self.elT_07_16_PropCalculator]
+                     self.elT_06_14_ClfDataLoader,
+                     self.elT_07_15_RndForestClf,
+                     self.elT_07_16_NNMLPClf,
+                     self.elT_07_17_PropCalculator,
+                     self.elT_XX_99_Other]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
         if stTMth is not None and endTMth is not None:
@@ -363,11 +367,15 @@ class Timing:
             elif iMth == 13:
                 self.elT_05_13_ViterbiAlgorithm += elT
             elif iMth == 14:
-                self.elT_07_14_RndForestClf += elT
+                self.elT_06_14_ClfDataLoader += elT
             elif iMth == 15:
-                self.elT_07_15_NNMLPClf += elT
+                self.elT_07_15_RndForestClf += elT
             elif iMth == 16:
-                self.elT_07_16_PropCalculator += elT
+                self.elT_07_16_NNMLPClf += elT
+            elif iMth == 17:
+                self.elT_07_17_PropCalculator += elT
+            elif iMth == 99:
+                self.elT_XX_99_Other += elT
             self.elT_Sum += elT
             self.updateLElTimes()
 
@@ -400,12 +408,16 @@ class Timing:
                str(round(self.elT_02_12_getProbSglPos, self.rdDig)) +
                GC.S_NEWL + 'Method 13 | "ViterbiAlgorithm":\t' +
                str(round(self.elT_05_13_ViterbiAlgorithm, self.rdDig)) +
-               GC.S_NEWL + 'Method 14 | "RndForestClf":\t' +
-               str(round(self.elT_07_14_RndForestClf, self.rdDig)) +
-               GC.S_NEWL + 'Method 15 | "NNMLPClf":\t' +
-               str(round(self.elT_07_15_NNMLPClf, self.rdDig)) +
-               GC.S_NEWL + 'Method 16 | "PropCalculator":\t' +
-               str(round(self.elT_07_16_PropCalculator, self.rdDig)) +
+               GC.S_NEWL + 'Method 14 | "ClfDataLoader":\t' +
+               str(round(self.elT_06_14_ClfDataLoader, self.rdDig)) +
+               GC.S_NEWL + 'Method 15 | "RndForestClf":\t' +
+               str(round(self.elT_07_15_RndForestClf, self.rdDig)) +
+               GC.S_NEWL + 'Method 16 | "NNMLPClf":\t' +
+               str(round(self.elT_07_16_NNMLPClf, self.rdDig)) +
+               GC.S_NEWL + 'Method 17 | "PropCalculator":\t' +
+               str(round(self.elT_07_17_PropCalculator, self.rdDig)) +
+               GC.S_NEWL + 'Method 99 | "Other":\t' +
+               str(round(self.elT_XX_99_Other, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 

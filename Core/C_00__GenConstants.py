@@ -32,6 +32,7 @@ S_NULL = 'NULL'
 S_0 = '0'
 S_CAP_C = 'C'
 S_CAP_X = 'X'
+S_CAP_Y = 'Y'
 S_CAP_XS, S_CAP_S, S_CAP_M, S_CAP_L = S_CAP_X + 'S', 'S', 'M', 'L'
 
 S_US02 = S_USC*2

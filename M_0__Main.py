@@ -20,6 +20,8 @@ from Core.O_80__Looper import Looper
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
 cTiming = Timing(stT=startTime)
+cStTime = GF.showElapsedTime(startTime)
+
 # -----------------------------------------------------------------------------
 sFMain = ' M_0__Main.py '
 print(GC.S_EQ80, GC.S_NEWL, GC.S_DS33, sFMain, GC.S_DS33, GC.S_NEWL, sep='')
@@ -29,59 +31,69 @@ print(GC.S_DS29, 'Added object types.', GC.S_DS30)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
-cData = ExpData(inpDatG)
-print(cData)
-GF.showElapsedTime(startTime)
-cData.procExpData()
-GF.showElapsedTime(startTime)
-cData.getInfoKinNmer(stT=startTime, tpDfr=GC.S_BASE)
-GF.showElapsedTime(startTime)
+
+# START - Loading and processing experimental data
+# cData = ExpData(inpDatG)
+# print(cData)
+# GF.showElapsedTime(startTime)
+# cData.procExpData()
+# GF.showElapsedTime(startTime)
+# cData.getInfoKinNmer(stT=startTime, tpDfr=GC.S_BASE)
+# GF.showElapsedTime(startTime)
 # cData.printDIG()
 # cData.printDITp()
 # cData.printInpDfrs()
-cSeqAnalysis = SeqAnalysis(inpDatG)
-GF.showElapsedTime(startTime)
+# END - Loading and processing experimental data
+
+# START - Sequence Analysis
+# cSeqAnalysis = SeqAnalysis(inpDatG)
+# GF.showElapsedTime(startTime)
 
 # cSeqAnalysis.performLhAnalysis(lEff=[None, 'AT1G01140', 'AT4G23650'])
-cSeqAnalysis.performLhAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
+# cSeqAnalysis.performLhAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 
-cSeqAnalysis.performProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
+# cSeqAnalysis.performProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 # cSeqAnalysis.calcProbTable(cTim=cTiming, stT=startTime)
 
-cSeqAnalysis.performTCProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
+# cSeqAnalysis.performTCProbAnalysis(cTim=cTiming, lEff=[None], stT=startTime)
 
-cSeqAnalysis.getProbSglPos(cTim=cTiming, lEff=[None], stT=startTime)
+# cSeqAnalysis.getProbSglPos(cTim=cTiming, lEff=[None], stT=startTime)
+# END - Sequence Analysis
 
-cValidation = Validation(inpDatG)
-cValidation.createResultsTrain(stT=startTime)
+# START - Validation
+# cValidation = Validation(inpDatG)
+# cValidation.createResultsTrain(stT=startTime)
 # cValidation.printTestObj(printDfrComb=True)
+# END - Validation
 
+# START - Viterbi algorithm (Hidden Markov Model)
 # cViterbiAlg = ViterbiLog(inpDatG)
 # cViterbiAlg.printDictPaths()
 # cViterbiAlg.printDfrEmitProb()
 # cViterbiAlg.printDfrStartProb()
 # cViterbiAlg.printDfrTransProb()
 # cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
+# END - Viterbi algorithm (Hidden Markov Model)
 
 # cStTime = GF.showElapsedTime(startTime)
 # cRFClf = RndForestClf(inpDatG)
 # print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
 # cRFClf.ClfPred()
 # cEndTime = GF.showElapsedTime(startTime)
-# cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
+# cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
 # cStTime = GF.showElapsedTime(startTime)
 # cMLPClf = NNMLPClf(inpDatG)
 # print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
 # cMLPClf.ClfPred()
 # cEndTime = GF.showElapsedTime(startTime)
-# cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
+# cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
 
 # cStTime = GF.showElapsedTime(startTime)
 # cPropCalc = PropCalculator(inpDatG)
 # cPropCalc.calcPropAAc()
 # cEndTime = GF.showElapsedTime(startTime)
-# cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
+# cTiming.updateTimes(iMth=17, stTMth=cStTime, endTMth=cEndTime)
 
 # for cClf in [cRFClf, cMLPClf]:
 #     cClf.printFitQuality()
@@ -101,10 +113,21 @@ cValidation.createResultsTrain(stT=startTime)
 #     cMLPClf.printFitQuality()
 #     # cMLPClf.calcPrintResPredict(X2Pre=cMLPClf.getXY(getTrain=False)[0])
 #     cEndTime = GF.showElapsedTime(startTime)
-#     cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
+#     cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
 
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(iMth=99, stTMth=cStTime, endTMth=cEndTime)
+
+cStTime = GF.showElapsedTime(startTime)
 cDataLoader = DataLoader(inpDatG)
-cDataLoader.printXY()
+cDataLoader.printXY(sMd='Clf')
+cDataLoader.printXY(sMd='PrC')
+cDataLoader.printSerNmerSeqClf()
+cDataLoader.printSerNmerSeqPrC()
+cDataLoader.printDfrInpClf()
+cDataLoader.printDfrInpPrC()
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
 
 # cLooper = Looper(inpDatG)
 # cLooper.doDoubleLoop(cTim=cTiming, stT=startTime)
