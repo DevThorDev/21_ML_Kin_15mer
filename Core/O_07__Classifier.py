@@ -250,7 +250,6 @@ class Classifier(BaseClfPrC):
             dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
             if self.sMth is not None:
                 self.adaptPathConfMatrix()
-            self.saveData(dfrCM, pF=self.dPF['ConfMat'])
             self.dConfMat[self.sKPar] = dfrCM
 
     # --- method for plotting the confusion matrix ----------------------------

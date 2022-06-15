@@ -47,6 +47,11 @@ def modSF(sF, sStart='', sEnd='', sJoin=''):
     else:
         return addSStartSEnd(sF, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
 
+def modPF(pF, sStart='', sEnd='', sJoin='', sJoinP=GC.S_DBLBACKSL):
+    lSSpl = pF.split(sJoinP)
+    sFMod = modSF(sF=lSSpl[-1], sStart=sStart, sEnd=sEnd, sJoin=sJoin)
+    return joinS(lSSpl[:-1] + [sFMod], sJoin=sJoinP)
+
 def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
     if os.path.isfile(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
@@ -357,10 +362,22 @@ def updateDict(cDFull, cDUp, cK=None):
         else:
             cDFull[cK] = cDUp
 
+def calcMeanSEMOfDfrs(itDfrs, idxDfr=None, colDfr=None):
+    d2Mn, d2SEM, N = {}, {}, len(itDfrs)
+    for i in idxDfr:
+        for j in colDfr:
+            for cDfr in itDfrs:
+                assert i in cDfr.index and j in cDfr.columns
+            cLV = [cDfr.at[i, j] for cDfr in itDfrs]
+            addToDictD(d2Mn, cKMain=i, cKSub=j, cVSub=np.mean(cLV))
+            cSEM = (0. if N == 0 else np.std(cLV, ddof=1)/np.sqrt(N))
+            addToDictD(d2SEM, cKMain=i, cKSub=j, cVSub=cSEM)
+    return iniPdDfr(d2Mn), iniPdDfr(d2SEM)
+
 def calcMnSEMFromD3Val(cD3, sJoin=GC.S_USC):
     d2MnSEM, dT, N = {}, {}, len(cD3)
     # rearrange data in temp dict dT
-    for cKL1, cD2 in cD3.items():
+    for cD2 in cD3.values():
         for cKL2, cD in cD2.items():
             for cKL3, cV in cD.items():
                 addToDictL(dT, cK=(cKL2, cKL3), cE=cV)
@@ -372,6 +389,23 @@ def calcMnSEMFromD3Val(cD3, sJoin=GC.S_USC):
         addToDictD(d2MnSEM, cKMain=sJoin.join([cKT[0], GC.S_SEM]),
                    cKSub=cKT[1], cVSub=cSEM)
     return d2MnSEM
+
+def calcMnSEMFromD2Dfr(d2Dfr, sJoin=GC.S_USC):
+    dMnSEM, dT, lI = {}, {}, None
+    # rearrange data in temp dict dT
+    for dDfr in d2Dfr.values():
+        for cKL2, cDfr in dDfr.items():
+            if lI is None:
+                lI = cDfr.index.to_list()
+            assert lI == cDfr.index.to_list() and lI == cDfr.columns.to_list()
+            addToDictL(dT, cK=cKL2, cE=cDfr)
+    # fill dMnSEM
+    assert lI is not None
+    for cK, cLDfr in dT.items():
+        dfrMn, dfrSEM = calcMeanSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
+        dMnSEM[sJoin.join([cK, GC.S_MEAN])] = dfrMn
+        dMnSEM[sJoin.join([cK, GC.S_SEM])] = dfrSEM
+    return dMnSEM
 
 def convDDNumToDDProp(dDNum, nDigRnd):
     dDSum, dDProp = {}, {}

@@ -18,7 +18,7 @@ doPropCalc = True
 
 doTrainTestSplit = True
 
-calcConfMatrix = False
+calcConfMatrix = True
 plotConfMatrix = False
 
 encodeCatFtr = True

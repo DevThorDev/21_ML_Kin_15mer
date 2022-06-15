@@ -22,27 +22,26 @@ class Looper(BaseClass):
         print('Initiated "Looper" base object.')
 
     def iniDicts(self):
-        self.d3ResClf, self.d2MnSEM, self.dPF = {}, {}, {}
-        self.dPF['OutParClf'] = None
-        self.dPF['OutDataClf'] = None
+        self.d3ResClf, self.d2MnSEMResClf = {}, {}
+        self.d2CnfMat, self.dMnSEMCnfMat = {}, {}
+        self.dPF = {'OutParClf': None, 'OutDataClf': None, 'ConfMat': None}
 
 # --- print methods -----------------------------------------------------------
-    def printD2MnSEM(self, sMth):
-        if GF.Xist(self.d2MnSEM):
+    def printD2MnSEMResClf(self, sMth):
+        if GF.Xist(self.d2MnSEMResClf):
             print(GC.S_DS04, ' Dictionary of results (means and SEMs) for ',
                   'method "', sMth, '":', sep='')
-            dfrMnSEM = GF.iniPdDfr(self.d2MnSEM)
-            for k in range(len(self.d2MnSEM)//2):
+            dfrMnSEM = GF.iniPdDfr(self.d2MnSEMResClf)
+            for k in range(len(self.d2MnSEMResClf)//2):
                 print(GC.S_NEWL, dfrMnSEM.iloc[:, (k*2):(k*2 + 2)], sep='')
 
 # --- loop methods ------------------------------------------------------------
     def adaptDPF(self, cClf, sMth):
-        sFCore = cClf.dITp['sUSC'].join([cClf.dITp['sFOutClf'], sMth])
-        sFPar = (cClf.dITp['sUSC'].join([sFCore, self.dITp['sPar']]) +
-                 self.dITp['xtCSV'])
-        sFData = sFCore + self.dITp['xtCSV']
-        sFConfMat = (cClf.dITp['sUSC'].join([cClf.dITp['sFConfMat'], sMth]) +
-                     self.dITp['xtCSV'])
+        sJ, xtCSV = cClf.dITp['sUSC'], self.dITp['xtCSV']
+        sFCore = GF.joinS([cClf.dITp['sFOutClf'], sMth], sJoin=sJ)
+        sFPar = GF.joinS([sFCore, self.dITp['sPar']], sJoin=sJ) + xtCSV
+        sFData = sFCore + xtCSV
+        sFConfMat = GF.joinS([cClf.dITp['sFConfMat'], sMth], sJoin=sJ) + xtCSV
         self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutClf'], sFPar)
         self.dPF['OutDataClf'] = GF.joinToPath(cClf.dITp['pOutClf'], sFData)
         self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfMat)
@@ -59,6 +58,7 @@ class Looper(BaseClass):
             cClf.ClfPred()
             cClf.printFitQuality()
             GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
+            GF.updateDict(self.d2CnfMat, cDUp=cClf.dConfMat, cK=cRp)
             if k == 0 and cRp == 0:
                 self.adaptDPF(cClf=cClf, sMth=sMth)
             cEndT = GF.showElapsedTime(startTime=stT)
@@ -66,16 +66,22 @@ class Looper(BaseClass):
 
     def doDoubleLoop(self, cTim, stT=None):
         for sMth in self.dITp['lSMth']:
-            self.d3ResClf, d2Par = {}, self.dITp['d3Par'][sMth]
+            self.d3ResClf, self.d2CnfMat = {}, {}
+            d2Par, nRep = self.dITp['d3Par'][sMth], self.dITp['dNumRep'][sMth]
             for k, sKPar in enumerate(d2Par):
-                for cRep in range(self.dITp['dNumRep'][sMth]):
+                for cRep in range(nRep):
                     print(GC.S_EQ20, 'Method:', sMth, GC.S_VBAR, 'Parameter',
                           'set:', sKPar, GC.S_VBAR, 'Repetition:', cRep + 1)
                     self.doCRep(sMth, k, sKPar, cRp=cRep, cTim=cTim, stT=stT)
-            if self.dITp['dNumRep'][sMth] > 0:
+            if nRep > 0:
                 self.saveData(GF.iniPdDfr(d2Par), pF=self.dPF['OutParClf'])
-            self.d2MnSEM = GF.calcMnSEMFromD3Val(self.d3ResClf)
-            self.saveData(self.d2MnSEM, pF=self.dPF['OutDataClf'])
-            self.printD2MnSEM(sMth=sMth)
+                self.d2MnSEMResClf = GF.calcMnSEMFromD3Val(self.d3ResClf)
+                self.dMnSEMCnfMat = GF.calcMnSEMFromD2Dfr(self.d2CnfMat)
+                self.saveData(self.d2MnSEMResClf, pF=self.dPF['OutDataClf'])
+                for sK in self.dMnSEMCnfMat:
+                    pFMod = GF.modPF(self.dPF['ConfMat'], sEnd=sK,
+                                     sJoin=self.dITp['sUSC'])
+                    self.saveData(self.dMnSEMCnfMat[sK], pF=pFMod)
+                self.printD2MnSEMResClf(sMth=sMth)
 
 ###############################################################################
