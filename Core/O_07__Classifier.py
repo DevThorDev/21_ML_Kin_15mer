@@ -47,7 +47,7 @@ class BaseClfPrC(BaseClass):
     def fillDPF(self):
         sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
         sFConfMat = self.dITp['sFConfMat'] + self.dITp['xtCSV']
-        self.dPF = {}
+        self.dPF = self.D.yieldDPF()
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
 
@@ -96,6 +96,9 @@ class Classifier(BaseClfPrC):
     def getInpData(self):
         (self.serNmerSeq, self.dfrInp, self.lSCl,
          self.X, self.y) = self.D.yieldData(sMd='Clf')
+        if self.dITp['usedNmerSeq'] == self.dITp['sUnqList']:
+            self.saveData(self.dfrInp, pF=self.dPF['DataClfU'],
+                          saveAnyway=False)
 
     # --- print methods -------------------------------------------------------
     def printEncAttr(self, XTrans):

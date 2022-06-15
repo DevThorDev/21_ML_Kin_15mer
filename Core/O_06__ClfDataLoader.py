@@ -26,7 +26,9 @@ class DataLoader(BaseClass):
     def fillDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
-        self.dPF = {}
+        sFClfU = (GF.joinS([self.dITp['sFInpClf'], self.dITp['sUnique']]) +
+                  self.dITp['xtCSV'])
+        self.dPF = {'DataClfU': GF.joinToPath(self.dITp['pInpClf'], sFClfU)}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
 
@@ -158,6 +160,9 @@ class DataLoader(BaseClass):
         self.printY(sMd=sMd)
 
     # --- methods for yielding data -------------------------------------------
+    def yieldDPF(self):
+        return self.dPF
+
     def yieldSerNmerSeqClf(self):
         return self.serNmerSeqClf
 

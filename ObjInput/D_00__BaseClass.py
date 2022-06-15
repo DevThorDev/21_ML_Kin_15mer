@@ -45,6 +45,7 @@ sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sCNmer = GC.S_C_N_MER
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
+sUnique = GC.S_UNIQUE
 sMthRF_L = GC.S_MTH_RF_L
 sMthRF = GC.S_MTH_RF
 sMthMLP_L = GC.S_MTH_MLP_L
@@ -102,6 +103,7 @@ dIO = {# --- general
        'sCNmer': sCNmer,
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
+       'sUnique': sUnique,
        'sMthRF_L': sMthRF_L,
        'sMthRF': sMthRF,
        'sMthMLP_L': sMthMLP_L,

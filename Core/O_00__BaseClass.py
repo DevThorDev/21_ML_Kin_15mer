@@ -133,11 +133,11 @@ class BaseClass:
                  dropDup=False, saveAnyway=True):
         if ((not os.path.isfile(pF) or saveAnyway) and GF.Xist(cData) and
             pF is not None):
-            print('Saving DataFrame as *.csv file to path ' + pF)
             if idxLbl is not None:
                 saveIdx = True
             GF.checkDupSaveCSV(GF.toDfr(cData), pF, cSep=self.dITp['cSep'],
                                saveIdx=saveIdx, iLbl=idxLbl, dropDup=dropDup)
+            print(GC.S_ARR_LR, 'Saved DataFrame as *.csv file to path ' + pF)
 
     def saveListAsSer(self, cL, pF, saveIdx=True, lSIdx=None, sName=None,
                       saveAnyway=True):
