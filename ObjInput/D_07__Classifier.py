@@ -14,7 +14,7 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 # --- flow control ------------------------------------------------------------
 doRndForestClf = True
 doNNMLPClf = True
-doPropCalc = False
+doPropCalc = True
 
 doTrainTestSplit = True
 

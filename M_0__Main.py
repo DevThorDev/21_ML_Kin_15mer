@@ -9,12 +9,13 @@ from Control.A_00__GenInput import dictInpG
 from Core.C_00__GenConstants import S_OBJINP
 from Core.I_01__InpData import InputData
 from Core.O_00__BaseClass import Timing
-from Core.O_01__ExpData import ExpData
-from Core.O_02__SeqAnalysis import SeqAnalysis
-from Core.O_03__Validation import Validation
+# from Core.O_01__ExpData import ExpData
+# from Core.O_02__SeqAnalysis import SeqAnalysis
+# from Core.O_03__Validation import Validation
 # from Core.O_05__ViterbiLog import ViterbiLog
 from Core.O_06__ClfDataLoader import DataLoader
 # from Core.O_07__Classifier import RndForestClf, NNMLPClf, PropCalculator
+from Core.O_07__Classifier import PropCalculator
 from Core.O_80__Looper import Looper
 
 # ### MAIN ####################################################################
@@ -89,12 +90,6 @@ print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
 # cEndTime = GF.showElapsedTime(startTime)
 # cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
 
-# cStTime = GF.showElapsedTime(startTime)
-# cPropCalc = PropCalculator(inpDatG)
-# cPropCalc.calcPropAAc()
-# cEndTime = GF.showElapsedTime(startTime)
-# cTiming.updateTimes(iMth=17, stTMth=cStTime, endTMth=cEndTime)
-
 # for cClf in [cRFClf, cMLPClf]:
 #     cClf.printFitQuality()
 #     cClf.plotConfMatrix()
@@ -126,11 +121,19 @@ cDataLoader.printSerNmerSeqClf()
 cDataLoader.printSerNmerSeqPrC()
 cDataLoader.printDfrInpClf()
 cDataLoader.printDfrInpPrC()
+cDataLoader.printLSClClf()
+cDataLoader.printLSClPrC()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
 
-# cLooper = Looper(inpDatG)
-# cLooper.doDoubleLoop(cTim=cTiming, stT=startTime)
+cLooper = Looper(inpDatG, D=cDataLoader)
+cLooper.doDoubleLoop(cTim=cTiming, stT=startTime)
+
+cStTime = GF.showElapsedTime(startTime)
+cPropCalc = PropCalculator(inpDatG, D=cDataLoader)
+cPropCalc.calcPropAAc()
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(iMth=17, stTMth=cStTime, endTMth=cEndTime)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

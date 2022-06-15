@@ -11,12 +11,13 @@ from Core.O_07__Classifier import RndForestClf, NNMLPClf
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
 # --- initialisation of the class ---------------------------------------------
-    def __init__(self, inpDat, iTp=80, lITpUpd=[]):
+    def __init__(self, inpDat, D, iTp=80, lITpUpd=[]):
         super().__init__(inpDat)
         self.idO = 'O_80'
         self.descO = 'Looper'
         self.inpD = inpDat
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
+        self.D = D
         self.iniDicts()
         print('Initiated "Looper" base object.')
 
@@ -50,11 +51,11 @@ class Looper(BaseClass):
         if sMth in self.dITp['lSMth']:
             cStT, iM = GF.showElapsedTime(startTime=stT), 0
             if sMth == self.dITp['sMthRF']:     # random forest classifier
-                d2Par, iM = self.dITp['d2Par_RF'], 14
-                cClf = RndForestClf(self.inpD, d2Par, sKPar=sKPar)
+                d2Par, iM = self.dITp['d2Par_RF'], 15
+                cClf = RndForestClf(self.inpD, self.D, d2Par, sKPar=sKPar)
             elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
-                d2Par, iM = self.dITp['d2Par_NNMLP'], 15
-                cClf = NNMLPClf(self.inpD, d2Par, sKPar=sKPar)
+                d2Par, iM = self.dITp['d2Par_NNMLP'], 16
+                cClf = NNMLPClf(self.inpD, self.D, d2Par, sKPar=sKPar)
             cClf.ClfPred()
             cClf.printFitQuality()
             GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)

@@ -20,7 +20,7 @@ class SeqAnalysis(BaseClass):
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.iniObj()
         self.getPDir()
-        self.fillDPFVal()
+        self.fillDPF()
         self.loadInpDfrs()
         print('Initiated "SeqAnalysis" base object.')
 
@@ -110,7 +110,7 @@ class SeqAnalysis(BaseClass):
             pDirR = self.pDirResComb
         return pDirR
 
-    def fillDPFVal(self):
+    def fillDPF(self):
         pI, pC, pP = self.pDirResInfo, self.pDirResComb, self.pDirResProb
         self.dPF = {'IEffInp': GF.joinToPath(pI, self.dITp['sFIEffInp']),
                     'ProcInp': GF.joinToPath(pC, self.dITp['sFProcInp']),

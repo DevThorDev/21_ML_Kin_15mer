@@ -40,31 +40,6 @@ class DataLoader(BaseClass):
                 setattr(self, cAttr, None)
 
     # --- methods for loading input data --------------------------------------
-    # def loadInpData(self, iC=0):
-    #     dfrInp = self.loadData(pF=self.dPF['InpDataClf'], iC=iC)
-    #     self.dfrInpClf, self.dfrInpPrC = dfrInp, dfrInp
-    #     if self.dPF['InpDataPrC'] != self.dPF['InpDataClf']:
-    #         self.dfrInpPrC = self.loadData(pF=self.dPF['InpDataPrC'], iC=iC)
-    #     if self.dITp['sCNmer'] in self.dfrInpClf.columns:
-    #         self.serNmerSeqClf = self.dfrInpClf[self.dITp['sCNmer']]
-    #     if self.dITp['sCNmer'] in self.dfrInpPrC.columns:
-    #         self.serNmerSeqPrC = self.dfrInpPrC[self.dITp['sCNmer']]
-    #     if self.dITp['usedNmerSeq'] == self.dITp['sUnqList']:
-    #         self.dfrInpClf = self.toUnqNmerSeq()
-    #         if self.dPF['InpDataPrC'] == self.dPF['InpDataClf']:
-    #             self.dfrInpPrC = self.dfrInpClf
-    #         else:
-    #             self.dfrInpPrC = self.toUnqNmerSeq(sUsedDfr='InpPrC')
-    #     assert (self.dITp['sCY'] in self.dfrInpClf.columns and
-    #             self.dITp['sCY'] in self.dfrInpPrC.columns)
-    #     for sCX in self.dITp['lSCX']:
-    #         assert (sCX in self.dfrInpClf.columns and
-    #                 sCX in self.dfrInpPrC.columns)
-    #     self.lSClClf = sorted(list(self.dfrInpClf[self.dITp['sCY']].unique()))
-    #     self.lSClPrC = sorted(list(self.dfrInpPrC[self.dITp['sCY']].unique()))
-    #     self.X = self.dfrInpClf[self.dITp['lSCX']]
-    #     self.y = self.dfrInpClf[self.dITp['sCY']]
-
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.dPF['InpDataClf'], iC=iC)
@@ -89,23 +64,23 @@ class DataLoader(BaseClass):
 
     # --- print methods -------------------------------------------------------
     def printSerNmerSeqClf(self):
-        print(GC.S_DS20, GC.S_NEWL, 'Classifier Nmer sequence:', sep='')
+        print(GC.S_DS80, GC.S_NEWL, 'Classifier Nmer sequence:', sep='')
         print(self.serNmerSeqClf)
         print(GC.S_DS80)
 
     def printSerNmerSeqPrC(self):
-        print(GC.S_DS20, GC.S_NEWL, 'Proportion calculator Nmer sequence:',
+        print(GC.S_DS80, GC.S_NEWL, 'Proportion calculator Nmer sequence:',
               sep='')
         print(self.serNmerSeqPrC)
         print(GC.S_DS80)
 
     def printDfrInpClf(self):
-        print(GC.S_DS20, GC.S_NEWL, 'Classifier input data:', sep='')
+        print(GC.S_DS80, GC.S_NEWL, 'Classifier input data:', sep='')
         print(self.dfrInpClf)
         print(GC.S_DS80)
 
     def printDfrInpPrC(self):
-        print(GC.S_DS20, GC.S_NEWL, 'Input data for proportion calculation:',
+        print(GC.S_DS80, GC.S_NEWL, 'Input data for proportion calculation:',
               sep='')
         dfrClf, dfrPrC = self.dfrInpClf, self.dfrInpPrC
         print(dfrPrC)
@@ -129,6 +104,16 @@ class DataLoader(BaseClass):
                       sep='')
         print(GC.S_DS80)
 
+    def printLSClClf(self):
+        print(GC.S_DS80, GC.S_NEWL, 'List of class strings for mode "Clf": ',
+              self.lSClClf, GC.S_NEWL, '(length = ', len(self.lSClClf), ')',
+              GC.S_NEWL, GC.S_DS80, sep='')
+
+    def printLSClPrC(self):
+        print(GC.S_DS80, GC.S_NEWL, 'List of class strings for mode "PrC": ',
+              self.lSClPrC, GC.S_NEWL, '(length = ', len(self.lSClPrC), ')',
+              GC.S_NEWL, GC.S_DS80, sep='')
+
     def getXorY(self, XorY=GC.S_CAP_X, sMd='Clf'):
         cDat = None
         if XorY == GC.S_CAP_X:
@@ -144,7 +129,7 @@ class DataLoader(BaseClass):
         return cDat
 
     def printX(self, sMd='Clf'):
-        print(GC.S_DS20, GC.S_NEWL, 'Training input samples for mode "', sMd,
+        print(GC.S_DS80, GC.S_NEWL, 'Training input samples for mode "', sMd,
               '":', sep='')
         X = self.getXorY(XorY=GC.S_CAP_X, sMd=sMd)
         print(X)
@@ -157,7 +142,7 @@ class DataLoader(BaseClass):
         print(GC.S_DS80)
 
     def printY(self, sMd='Clf'):
-        print(GC.S_DS20, GC.S_NEWL, 'Class labels for mode "', sMd, '":',
+        print(GC.S_DS80, GC.S_NEWL, 'Class labels for mode "', sMd, '":',
               sep='')
         y = self.getXorY(XorY=GC.S_CAP_Y, sMd=sMd)
         print(y)
@@ -184,5 +169,14 @@ class DataLoader(BaseClass):
 
     def yieldDfrInpPrC(self):
         return self.dfrInpPrC
+
+    def yieldData(self, sMd='Clf'):
+        if sMd == 'Clf':
+            return (self.serNmerSeqClf, self.dfrInpClf, self.lSClClf,
+                    self.XClf, self.yClf)
+        elif sMd == 'PrC':
+            return (self.serNmerSeqPrC, self.dfrInpPrC, self.lSClPrC,
+                    self.XPrC, self.yPrC)
+        else: return tuple([None]*5)
 
 ###############################################################################

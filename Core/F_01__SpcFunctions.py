@@ -117,6 +117,27 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_06__ClfDataLoader) -----------------------------------------
+def getClassStrOldCl(dITp, setSDC, lSCl=[]):
+    setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
+    # step 1: fill setSDigC
+    for sCl in lSCl:
+        for cChar in sCl:
+            if cChar in dITp['setSDig'] and cChar not in setSDigC:
+                setSDigC.add(cChar)
+    # step 2: assemble sClOut
+    for i in range(1, n):
+        if str(i) in setSDigC:
+            sClOut += str(i)
+        else:
+            sClOut += dITp['sDash']
+    return sClOut
+
+def getClassStr(dITp, lSCl=[], sMd='Clf'):
+    if dITp['usedClType' + sMd].startswith(GC.S_OLD):
+        return getClassStrOldCl(dITp, lSCl=lSCl)
+    elif dITp['usedClType' + sMd].startswith(GC.S_NEW):
+        return dITp['sDash'].join(lSCl)
+
 def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
     lSer, sCY = [], dITp['sCY' + sMd]
     serNmerSeq = GF.iniPdSer(serNmerSeq.unique(), nameS=dITp['sCNmer'])
@@ -143,25 +164,5 @@ def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     return serNmerSeq, dfrInp, lSCl, X, y
 
 # --- Functions (O_07__Classifier) --------------------------------------------
-def getClassStrOldCl(dITp, setSDC, lSCl=[]):
-    setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
-    # step 1: fill setSDigC
-    for sCl in lSCl:
-        for cChar in sCl:
-            if cChar in dITp['setSDig'] and cChar not in setSDigC:
-                setSDigC.add(cChar)
-    # step 2: assemble sClOut
-    for i in range(1, n):
-        if str(i) in setSDigC:
-            sClOut += str(i)
-        else:
-            sClOut += dITp['sDash']
-    return sClOut
-
-def getClassStr(dITp, lSCl=[], sMd='Clf'):
-    if dITp['usedClType' + sMd].startswith(GC.S_OLD):
-        return getClassStrOldCl(dITp, lSCl=lSCl)
-    elif dITp['usedClType' + sMd].startswith(GC.S_NEW):
-        return dITp['sDash'].join(lSCl)
 
 ###############################################################################
