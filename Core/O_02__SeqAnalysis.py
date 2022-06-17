@@ -357,7 +357,7 @@ class SeqAnalysis(BaseClass):
         lSC, nXt =  self.dITp['lSCMerAll'], len(self.dITp['lSCXt'])
         lSerD = [GF.iniPdSer(shape=(nSeq,), nameS=sC) for sC in lSC]
         self.probTableLoop(lSerD, nXt=nXt, nSeq=nSeq, stT=stT)
-        self.dfrProbTbl = GF.concLSerAx1(lSerD)
+        self.dfrProbTbl = GF.concLObjAx1(lObj=lSerD)
         self.dfrProbTbl.index = lSSeq
         self.saveData(self.dfrProbTbl, pF=self.dPF['ProbTblFS'],
                       idxLbl=self.dITp['sCNmer'])

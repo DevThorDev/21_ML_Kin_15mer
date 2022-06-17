@@ -40,6 +40,8 @@ sIEffTest = GC.S_I_EFF_TEST
 sIEffF = GC.S_I_EFF_F
 sIEffFTrain = GC.S_I_EFF_F_TRAIN
 sIEffFTest = GC.S_I_EFF_F_TEST
+sEffCl = GC.S_EFF_CL
+sPredCl = GC.S_PRED_CL
 sIGen = GC.S_I_GEN
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sCNmer = GC.S_C_N_MER
@@ -95,6 +97,8 @@ dIO = {# --- general
        'sIEffF': sIEffF,
        'sIEffFTrain': sIEffFTrain,
        'sIEffFTest': sIEffFTest,
+       'sEffCl': sEffCl,
+       'sPredCl': sPredCl,
        'sIGen': sIGen,
        'sCapXS': sCapXS,
        'sCapS': sCapS,

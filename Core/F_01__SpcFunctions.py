@@ -147,7 +147,7 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
         cSer = cDfr.iloc[0, :]
         cSer.at[sCY] = getClassStr(dITp, lSCl=lSC, sMd=sMd)
         lSer.append(cSer)
-    return GF.concLSerAx1(lSer=lSer, ignIdx=True).T, serNmerSeq
+    return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
 def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     serNmerSeq, lSCl, X, y = None, None, None, None

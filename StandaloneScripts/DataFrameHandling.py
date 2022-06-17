@@ -163,7 +163,7 @@ def saveDfrUniqueColAsCSV(cDfr, pFOut, colUnq=None, reprNA='', cSep=S_SEMICOL):
         lSerUnique = []
         for sC in cDfr.columns:
             lSerUnique.append(pd.Series(cDfr[sC].unique(), name=sC))
-        cDfrMod = concLSerAx1(lSer=lSerUnique).convert_dtypes()
+        cDfrMod = concLObjAx1(lObj=lSerUnique).convert_dtypes()
         saveAsCSV(cDfrMod, pF=pFOut, reprNA=reprNA, cSep=cSep)
         print('Saved DataFrame with all columns converted to unique values.')
     else:
@@ -259,15 +259,15 @@ def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
                 return pd.DataFrame(data, index=lSNmR, columns=lSNmC)
 
 # --- Functions performing pandas Series manipulation -------------------------
-def concLSer(lSer, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
-    return pd.concat(lSer, axis=concAx, ignore_index=ignIdx,
+def concLObj(lObj, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
+    return pd.concat(lObj, axis=concAx, ignore_index=ignIdx,
                      verify_integrity=verifInt, sort=srtDfr)
 
-def concLSerAx0(lSer, ignIdx=False, verifInt=False, srtDfr=False):
-    return concLSer(lSer, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+def concLObjAx0(lObj, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLObj(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
 
-def concLSerAx1(lSer, ignIdx=False, verifInt=False, srtDfr=False):
-    return concLSer(lSer, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
+def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLObj(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
                     srtDfr=srtDfr)
 
 # --- General-purpose functions -----------------------------------------------

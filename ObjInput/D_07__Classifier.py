@@ -18,6 +18,8 @@ doPropCalc = True
 
 doTrainTestSplit = True
 
+saveDetailedClfRes = True
+
 calcConfMatrix = True
 plotConfMatrix = False
 
@@ -39,14 +41,15 @@ if useFullSeqFrom == GC.S_COMB_INP:     # currently only option implemented
     sFInpClf = GF.joinS([sFInpStart, usedAAcType, sFResCombS])
     sFInpPrC = sFInpClf
 
-sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
 sFOutClf = sFInpClf
+sFOutClfDet = GC.S_US02.join([sFOutClf, GC.S_DETAILED])
+sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
 sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_PROP])
 
 pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
-pConfMat = GC.P_DIR_RES_CLF
 pOutClf = GC.P_DIR_RES_CLF
+pConfMat = GC.P_DIR_RES_CLF
 pOutPrC = GC.P_DIR_RES_CLF
 
 # --- general input for any classifier ----------------------------------------
@@ -115,6 +118,7 @@ dIO = {# --- general
        'doNNMLPClf': doNNMLPClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
+       'saveDetailedClfRes': saveDetailedClfRes,
        'calcConfMatrix': calcConfMatrix,
        'plotConfMatrix': plotConfMatrix,
        'encodeCatFtr': encodeCatFtr,
@@ -125,13 +129,14 @@ dIO = {# --- general
        # --- names and paths of files and dirs
        'sFInpClf': sFInpClf,
        'sFInpPrC': sFInpPrC,
-       'sFConfMat': sFConfMat,
        'sFOutClf': sFOutClf,
+       'sFOutClfDet': sFOutClfDet,
+       'sFConfMat': sFConfMat,
        'sFOutPrC': sFOutPrC,
        'pInpClf': pInpClf,
        'pInpPrC': pInpPrC,
-       'pConfMat': pConfMat,
        'pOutClf': pOutClf,
+       'pConfMat': pConfMat,
        'pOutPrC': pOutPrC,
        # --- general input for any classifier
        'rndState': rndState,

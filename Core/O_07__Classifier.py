@@ -45,9 +45,11 @@ class BaseClfPrC(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPF(self):
+        sFOutClfD = self.dITp['sFOutClfDet'] + self.dITp['xtCSV']
         sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
         sFConfMat = self.dITp['sFConfMat'] + self.dITp['xtCSV']
         self.dPF = self.D.yieldDPF()
+        self.dPF['OutClfDet'] = GF.joinToPath(self.dITp['pOutClf'], sFOutClfD)
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
 
@@ -171,18 +173,25 @@ class Classifier(BaseClfPrC):
         return X, y
 
     def setXY(self, X, y, setTrain=None):
-        self.X, self.y = X, y
-        if self.dITp['encodeCatFtr']:
-            self.XTrans = X
         if setTrain is not None and self.dITp['doTrainTestSplit']:
             if setTrain:
-                self.XTrain, self.yTrain = X, y
+                self.yTrain = y
                 if self.dITp['encodeCatFtr']:
                     self.XTransTrain = X
+                else:
+                    self.XTrain = X
             else:
-                self.XTest, self.yTest = X, y
+                self.yTest = y
                 if self.dITp['encodeCatFtr']:
                     self.XTransTest = X
+                else:
+                    self.XTest = X
+        else:
+            self.y = y
+            if self.dITp['encodeCatFtr']:
+                self.XTrans = X
+            else:
+                self.X = X
 
     # --- method for encoding and transforming the categorical features -------
     def encodeCatFeatures(self, catData=None):
@@ -226,6 +235,12 @@ class Classifier(BaseClfPrC):
             lVCalc = [nPred, nCorr, propCorr]
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
                 GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
+            # create dfrPred, containing the yTest and yPred columns
+            arrTP = GF.iniNpArr([self.yTest.to_numpy(), self.yPred]).T
+            dfrTP = GF.iniPdDfr(arrTP, lSNmR=self.yTest.index,
+                                lSNmC=[self.yTest.name, self.dITp['sPredCl']])
+            self.dfrPred = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], dfrTP])
+            self.dfrPred.dropna(axis=0, inplace=True)
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pre=None):
@@ -312,7 +327,8 @@ class NNMLPClf(Classifier):
 
     def getScoreClf(self):
         if self.dITp['doTrainTestSplit']:
-            self.scoreClf = self.Clf.score(self.XTest, self.yTest)
+            XTest, yTest = self.getXY(getTrain=False)
+            self.scoreClf = self.Clf.score(XTest, yTest)
 
 # -----------------------------------------------------------------------------
 class PropCalculator(BaseClfPrC):
