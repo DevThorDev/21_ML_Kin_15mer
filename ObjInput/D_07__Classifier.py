@@ -14,7 +14,7 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 # --- flow control ------------------------------------------------------------
 doRndForestClf = True
 doNNMLPClf = True
-doPropCalc = True
+doPropCalc = False
 
 doTrainTestSplit = True
 
@@ -42,15 +42,17 @@ if useFullSeqFrom == GC.S_COMB_INP:     # currently only option implemented
     sFInpPrC = sFInpClf
 
 sFOutClf = sFInpClf
-sFOutClfDet = GC.S_US02.join([sFOutClf, GC.S_DETAILED])
+sFOutDetClf = GC.S_US02.join([sFOutClf, GC.S_DETAILED])
 sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
 sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_PROP])
 
 pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
-pOutClf = GC.P_DIR_RES_CLF
-pConfMat = GC.P_DIR_RES_CLF
-pOutPrC = GC.P_DIR_RES_CLF
+pOutPar = GC.P_DIR_RES_CLF_PARS
+pOutSum = GC.P_DIR_RES_CLF_SUMMARIES
+pConfMat = GC.P_DIR_RES_CLF_CONF_MAT
+pOutDet = GC.P_DIR_RES_CLF_DETAILED
+pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # --- general input for any classifier ----------------------------------------
 rndState = None             # None (random) or integer (reproducible)
@@ -130,13 +132,15 @@ dIO = {# --- general
        'sFInpClf': sFInpClf,
        'sFInpPrC': sFInpPrC,
        'sFOutClf': sFOutClf,
-       'sFOutClfDet': sFOutClfDet,
+       'sFOutDetClf': sFOutDetClf,
        'sFConfMat': sFConfMat,
        'sFOutPrC': sFOutPrC,
        'pInpClf': pInpClf,
        'pInpPrC': pInpPrC,
-       'pOutClf': pOutClf,
+       'pOutPar': pOutPar,
+       'pOutSum': pOutSum,
        'pConfMat': pConfMat,
+       'pOutDet': pOutDet,
        'pOutPrC': pOutPrC,
        # --- general input for any classifier
        'rndState': rndState,

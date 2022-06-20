@@ -24,8 +24,8 @@ class Looper(BaseClass):
     def iniDicts(self):
         self.d3ResClf, self.d2MnSEMResClf = {}, {}
         self.d2CnfMat, self.dMnSEMCnfMat = {}, {}
-        self.dPF = {'OutParClf': None, 'OutDataClf': None,
-                    'OutDataClfDet': None, 'ConfMat': None}
+        self.dPF = {'OutParClf': None, 'OutSumClf': None, 'ConfMat': None,
+                    'OutDetClf': None}
 
 # --- print methods -----------------------------------------------------------
     def printD2MnSEMResClf(self, sMth):
@@ -43,17 +43,18 @@ class Looper(BaseClass):
         sFPar = GF.joinS([sFCore, self.dITp['sPar']], sJoin=sJ) + xtCSV
         sFData = sFCore + xtCSV
         sFConfMat = GF.joinS([cClf.dITp['sFConfMat'], sMth], sJoin=sJ) + xtCSV
-        self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutClf'], sFPar)
-        self.dPF['OutDataClf'] = GF.joinToPath(cClf.dITp['pOutClf'], sFData)
+        self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutPar'], sFPar)
+        self.dPF['OutSumClf'] = GF.joinToPath(cClf.dITp['pOutSum'], sFData)
         self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfMat)
+        self.dPF['OutDetClf'] = GF.joinToPath(cClf.dITp['pOutDet'], sFData)
 
     def adaptKParRpDPF(self, cClf, sMth, sKP, cRp):
         sJ, xtCSV = self.dITp['sUSC'], self.dITp['xtCSV']
         sKPRp = GF.joinS([sKP, str(cRp + 1)], sJoin=sJ)
-        sFDDet =  GF.joinS([cClf.dITp['sFOutClfDet'], sMth], sJoin=sJ) + xtCSV
-        self.dPF['OutDataClfDet'] = GF.joinToPath(cClf.dITp['pOutClf'], sFDDet)
-        self.dPF['OutDataClfDet'] = GF.modPF(self.dPF['OutDataClfDet'],
-                                             sEnd=sKPRp, sJoin=sJ)
+        sFDDet =  GF.joinS([cClf.dITp['sFOutDetClf'], sMth], sJoin=sJ) + xtCSV
+        self.dPF['OutDetClf'] = GF.joinToPath(cClf.dITp['pOutDet'], sFDDet)
+        self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClf'], sEnd=sKPRp,
+                                         sJoin=sJ)
 
     def doCRep(self, sMth, k, sKPar, cRp, cTim, stT=None):
         if sMth in self.dITp['lSMth']:
@@ -72,7 +73,7 @@ class Looper(BaseClass):
                 self.adapMthDPF(cClf=cClf, sMth=sMth)
             self.adaptKParRpDPF(cClf=cClf, sMth=sMth, sKP=sKPar, cRp=cRp)
             if cClf.dITp['saveDetailedClfRes']:
-                self.saveData(cClf.dfrPred, pF=self.dPF['OutDataClfDet'])
+                self.saveData(cClf.dfrPred, pF=self.dPF['OutDetClf'])
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
 
@@ -82,7 +83,7 @@ class Looper(BaseClass):
             self.saveData(GF.iniPdDfr(d2Par), pF=self.dPF['OutParClf'])
             self.d2MnSEMResClf = GF.calcMnSEMFromD3Val(self.d3ResClf)
             self.dMnSEMCnfMat = GF.calcMnSEMFromD2Dfr(self.d2CnfMat)
-            self.saveData(self.d2MnSEMResClf, pF=self.dPF['OutDataClf'])
+            self.saveData(self.d2MnSEMResClf, pF=self.dPF['OutSumClf'])
             for sK in self.dMnSEMCnfMat:
                 pFMod = GF.modPF(self.dPF['ConfMat'], sEnd=sK, sJoin=sJ)
                 self.saveData(self.dMnSEMCnfMat[sK], pF=pFMod)

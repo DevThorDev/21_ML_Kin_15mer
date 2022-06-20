@@ -150,7 +150,7 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
     return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
 def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
-    serNmerSeq, lSCl, X, y = None, None, None, None
+    serNmerSeq, lSCl, X, Y = None, None, None, None
     if dITp['sCNmer'] in dfrInp.columns:
         serNmerSeq = dfrInp[dITp['sCNmer']]
     if dITp['usedNmerSeq' + sMd] == dITp['sUnqList']:
@@ -160,8 +160,25 @@ def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
         assert sCX in dfrInp.columns
     lSCl = sorted(list(dfrInp[dITp['sCY' + sMd]].unique()))
     X = dfrInp[dITp['lSCX' + sMd]]
-    y = dfrInp[dITp['sCY' + sMd]]
-    return serNmerSeq, dfrInp, lSCl, X, y
+    Y = dfrInp[dITp['sCY' + sMd]]
+    return serNmerSeq, dfrInp, lSCl, X, Y
+
+def procInpData(dITp, dfrInp, sMd='Clf', iC=0):
+    sCNmer, sEffFam, dProc, lEffFam = dITp['sCNmer'], dITp['sEffFam'], {}, []
+    dfrProc, serNmerSeq, lSCl, X, Y = None, None, None, None, None
+    if sCNmer in dfrInp.columns:
+        serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
+        for cSeq in serNmerSeq:
+            GF.addToDictL(dProc, cK=sCNmer, cE=cSeq)
+            dfrT = dfrInp[dfrInp[sCNmer] == cSeq]
+            lEffFamSeq = dfrT[sEffFam].to_list()
+            GF.addToDictL(dProc, cK=sEffFam, cE=lEffFamSeq)
+            GF.fillListUnique(lEffFam, cIt=lEffFamSeq)
+        for cSeq in serNmerSeq:
+            lEffFamSeq = dProc[sEffFam]
+            for sEffFam in lEffFam:
+                GF.addToDictL(dProc, cK=dITp['sXCl'],
+                              cE=(1 if sEffFam in lEffFamSeq else 0))
 
 # --- Functions (O_07__Classifier) --------------------------------------------
 

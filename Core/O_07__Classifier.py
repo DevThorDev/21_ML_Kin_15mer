@@ -45,13 +45,13 @@ class BaseClfPrC(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPF(self):
-        sFOutClfD = self.dITp['sFOutClfDet'] + self.dITp['xtCSV']
-        sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
         sFConfMat = self.dITp['sFConfMat'] + self.dITp['xtCSV']
+        sFOutClfD = self.dITp['sFOutDetClf'] + self.dITp['xtCSV']
+        sFOutPrC = self.dITp['sFOutPrC'] + self.dITp['xtCSV']
         self.dPF = self.D.yieldDPF()
-        self.dPF['OutClfDet'] = GF.joinToPath(self.dITp['pOutClf'], sFOutClfD)
-        self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
         self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
+        self.dPF['OutDetClf'] = GF.joinToPath(self.dITp['pOutDet'], sFOutClfD)
+        self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
     # --- print methods -------------------------------------------------------
     def printX(self):
@@ -67,10 +67,10 @@ class BaseClfPrC(BaseClass):
 
     def printY(self):
         print(GC.S_DS20, GC.S_NEWL, 'Class labels:', sep='')
-        print(self.y)
+        print(self.Y)
         if self.dITp['lvlOut'] > 2:
             try:
-                print('Index:', self.y.index.to_list())
+                print('Index:', self.Y.index.to_list())
             except:
                 pass
         print(GC.S_DS80)
@@ -89,15 +89,15 @@ class Classifier(BaseClfPrC):
         if self.dITp['encodeCatFtr'] and not self.dITp['doTrainTestSplit']:
             self.XTrans = self.encodeCatFeatures()
         elif not self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
-            self.getTrainTestDS(X=self.X, y=self.y)
+            self.getTrainTestDS(X=self.X, Y=self.Y)
         elif self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
-            self.getTrainTestDS(X=self.encodeCatFeatures(), y=self.y)
+            self.getTrainTestDS(X=self.encodeCatFeatures(), Y=self.Y)
         print('Initiated "Classifier" base object.')
 
     # --- methods for getting input data --------------------------------------
     def getInpData(self):
         (self.serNmerSeq, self.dfrInp, self.lSCl,
-         self.X, self.y) = self.D.yieldData(sMd='Clf')
+         self.X, self.Y) = self.D.yieldData(sMd='Clf')
         if self.dITp['usedNmerSeq'] == self.dITp['sUnqList']:
             self.saveData(self.dfrInp, pF=self.dPF['DataClfU'],
                           saveAnyway=False)
@@ -125,19 +125,19 @@ class Classifier(BaseClfPrC):
         if self.dITp['lvlOut'] > 1 and cSect in ['A1', 'B', 'C']:
             print(GC.S_NEWL, GC.S_DS04, GC.S_SPACE, 'Predictions:', sep='')
             if cSect == 'A1':
-                for xT, yT, yP in zip(X2Pr, self.yTest, self.yPred):
+                for xT, yT, yP in zip(X2Pr, self.YTest, self.YPred):
                     print(xT[:10], GC.S_SPACE, GC.S_ARR_LR, GC.S_SPACE,
                           '(', yT, GC.S_COMMA, GC.S_SPACE, yP, ')', sep='')
             elif cSect == 'B':
-                for xT, yP in zip(X2Pr, self.yPred):
+                for xT, yP in zip(X2Pr, self.YPred):
                     print(xT, GC.S_ARR_LR, yP)
             elif cSect == 'C':
-                print(self.yPred)
+                print(self.YPred)
 
     def printPredict(self, X2Pre=None):
         nPred, nCorr, _ = tuple(self.d2ResClf[self.sKPar].values())
-        if X2Pre is not None and len(X2Pre) == len(self.yPred):
-            if self.yTest is not None:
+        if X2Pre is not None and len(X2Pre) == len(self.YPred):
+            if self.YTest is not None:
                 self.printDetailedPredict(X2Pre, cSect='A1')
                 self.printDetailedPredict(X2Pre, nPred, nCorr, cSect='A2')
             else:
@@ -158,36 +158,36 @@ class Classifier(BaseClfPrC):
 
     # --- methods for getting and setting X and y -----------------------------
     def getXY(self, getTrain=None):
-        X, y = self.X, self.y
+        X, Y = self.X, self.Y
         if self.dITp['encodeCatFtr']:
             X = self.XTrans
         if getTrain is not None and self.dITp['doTrainTestSplit']:
             if getTrain:
-                X, y = self.XTrain, self.yTrain
+                X, Y = self.XTrain, self.YTrain
                 if self.dITp['encodeCatFtr']:
                     X = self.XTransTrain
             else:
-                X, y = self.XTest, self.yTest
+                X, Y = self.XTest, self.YTest
                 if self.dITp['encodeCatFtr']:
                     X = self.XTransTest
-        return X, y
+        return X, Y
 
-    def setXY(self, X, y, setTrain=None):
+    def setXY(self, X, Y, setTrain=None):
         if setTrain is not None and self.dITp['doTrainTestSplit']:
             if setTrain:
-                self.yTrain = y
+                self.YTrain = Y
                 if self.dITp['encodeCatFtr']:
                     self.XTransTrain = X
                 else:
                     self.XTrain = X
             else:
-                self.yTest = y
+                self.YTest = Y
                 if self.dITp['encodeCatFtr']:
                     self.XTransTest = X
                 else:
                     self.XTest = X
         else:
-            self.y = y
+            self.Y = Y
             if self.dITp['encodeCatFtr']:
                 self.XTrans = X
             else:
@@ -226,19 +226,19 @@ class Classifier(BaseClfPrC):
 
     # --- method for calculating values of the classifier results dictionary --
     def calcResPredict(self, X2Pre=None):
-        if (X2Pre is not None and self.yTest is not None and
-            self.yPred is not None and len(X2Pre) == len(self.yPred)):
-            nPred, sKPar = self.yPred.shape[0], self.sKPar
+        if (X2Pre is not None and self.YTest is not None and
+            self.YPred is not None and len(X2Pre) == len(self.YPred)):
+            nPred, sKPar = self.YPred.shape[0], self.sKPar
             nCorr = sum([1 for k in range(nPred) if
-                         self.yTest.iloc[k] == self.yPred[k]])
+                         self.YTest.iloc[k] == self.YPred[k]])
             propCorr = (nCorr/nPred if nPred > 0 else None)
             lVCalc = [nPred, nCorr, propCorr]
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
                 GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
             # create dfrPred, containing the yTest and yPred columns
-            arrTP = GF.iniNpArr([self.yTest.to_numpy(), self.yPred]).T
-            dfrTP = GF.iniPdDfr(arrTP, lSNmR=self.yTest.index,
-                                lSNmC=[self.yTest.name, self.dITp['sPredCl']])
+            arrTP = GF.iniNpArr([self.YTest.to_numpy(), self.YPred]).T
+            dfrTP = GF.iniPdDfr(arrTP, lSNmR=self.YTest.index,
+                                lSNmC=[self.YTest.name, self.dITp['sPredCl']])
             self.dfrPred = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], dfrTP])
             self.dfrPred.dropna(axis=0, inplace=True)
 
@@ -248,8 +248,8 @@ class Classifier(BaseClfPrC):
             if dat2Pre is not None and self.dITp['encodeCatFtr']:
                 dat2Pre = self.cEnc.transform(dat2Pre).toarray()
             if dat2Pre is None:
-                dat2Pre, self.yTest = self.getXY(getTrain=False)
-            self.yPred = self.Clf.predict(dat2Pre)
+                dat2Pre, self.YTest = self.getXY(getTrain=False)
+            self.YPred = self.Clf.predict(dat2Pre)
             self.calcResPredict(X2Pre=dat2Pre)
             if self.dITp['lvlOut'] > 0:
                 self.printPredict(X2Pre=dat2Pre)
@@ -263,7 +263,7 @@ class Classifier(BaseClfPrC):
     # --- method for calculating the confusion matrix -------------------------
     def calcConfMatrix(self):
         if self.dITp['calcConfMatrix']:
-            t, p, lC = self.yTest, self.yPred, self.lSCl
+            t, p, lC = self.YTest, self.YPred, self.lSCl
             self.confusMatrix = confusion_matrix(y_true=t, y_pred=p, labels=lC)
             dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
             if self.sMth is not None:
@@ -342,7 +342,7 @@ class PropCalculator(BaseClfPrC):
     # --- methods for getting input data --------------------------------------
     def getInpData(self):
         (self.serNmerSeq, self.dfrInp, self.lSCl,
-         self.X, self.y) = self.D.yieldData(sMd='PrC')
+         self.X, self.Y) = self.D.yieldData(sMd='PrC')
 
     # --- method for adapting a key of the result paths dictionary ------------
     def adaptPathOutDataPrC(self, sCl=None):
