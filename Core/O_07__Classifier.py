@@ -244,14 +244,12 @@ class Classifier(BaseClfPrC):
                 GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
             # create dfrPred, containing the YTest and YPred columns
             sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
-            # arrTP = GF.iniNpArr([self.YTest.to_numpy(), self.YPred.to_numpy()])
             lSCTP = [GF.joinS([s, sTCl], sJoin=self.dITp['sUSC'])
                      for s in self.YTest.columns]
             lSCTP += [GF.joinS([s, sPCl], sJoin=self.dITp['sUSC'])
                       for s in self.YPred.columns]
             dfrTP = GF.concLObjAx1([self.YTest, self.YPred], ignIdx=True)
             dfrTP.columns = lSCTP
-            # dfrTP = GF.iniPdDfr(arrTP.T, lSNmR=self.YTest.index, lSNmC=lSC)
             self.dfrPred = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], dfrTP])
             self.dfrPred.dropna(axis=0, inplace=True)
 
@@ -361,8 +359,6 @@ class PropCalculator(BaseClfPrC):
     def getInpData(self):
         (self.dfrInp, self.X, self.Y, self.serNmerSeq,
          self.lSCl) = self.D.yieldData(sMd='PrC')
-        # (self.serNmerSeq, self.dfrInp, self.lSCl,
-        #  self.X, self.Y) = self.D.yieldData(sMd='PrC')
 
     # --- method for adapting a key of the result paths dictionary ------------
     def adaptPathOutDataPrC(self, sCl=None):
