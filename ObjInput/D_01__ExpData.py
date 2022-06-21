@@ -53,8 +53,6 @@ pDirResViterbi = GC.P_DIR_RES_VITERBI
 pDirTemp = GC.P_DIR_TEMP
 
 # --- numbers -----------------------------------------------------------------
-lenNmerDef = GC.LEN_N_MER_DEF
-iCentNmer = GC.I_CENT_N_MER
 rndDigProp = GC.R08
 
 # --- strings -----------------------------------------------------------------
@@ -123,7 +121,7 @@ dMer = GC.D_MER
 
 # === derived values and input processing =====================================
 if lLenNmer is None:
-    lLenNmer = list(range(1, lenNmerDef + 1, 2))
+    lLenNmer = list(range(1, GC.LEN_N_MER_DEF + 1, 2))
 lSCXt = ['', GC.S_PYL, GC.S_TOTAL, GC.S_REL_FREQ, GC.S_PROB]
 lSCMer = [str(n) + GC.S_MER for n in lLenNmer]
 lSCMerPy = [s + GC.S_USC + lSCXt[1] for s in lSCMer]
@@ -183,8 +181,6 @@ dIO = {# --- general
        'pDirResViterbi': pDirResViterbi,
        'pDirTemp': pDirTemp,
        # --- numbers
-       'lenNmerDef': lenNmerDef,
-       'iCentNmer': iCentNmer,
        'rndDigProp': rndDigProp,
        # --- strings
        'sSeq': sSeq,

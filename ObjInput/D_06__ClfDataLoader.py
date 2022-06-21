@@ -31,7 +31,7 @@ usedClTypePrC = usedClTypeClf
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
 # sFResCombSClf = 'Combined_S_KinasesPho15mer_202202'
 sFInpStartClf = ''
-sFResCombSClf = 'InpClf_Combined_KinasesPho15mer_202202'
+sFResCombSClf = 'InpClf_Combined_XS_KinasesPho15mer_202202'
 
 sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
@@ -46,9 +46,10 @@ sFResCombSPrC = sFResCombSClf
 
 sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
-    sFInpPrC = GF.joinS([sFInpStartPrC, usedAAcTypePrC, sFResCombSPrC])
+    # sFInpPrC = GF.joinS([sFInpStartPrC, usedAAcTypePrC, sFResCombSPrC])
+    sFInpPrC = GF.joinS([sFInpStartPrC, sFResCombSPrC])
 
-pInpPrC = GC.P_DIR_INP_CLF
+pInpPrC = pInpClf
 
 # --- numbers (general) -------------------------------------------------------
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)

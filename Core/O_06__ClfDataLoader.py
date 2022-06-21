@@ -19,7 +19,7 @@ class DataLoader(BaseClass):
         self.fillDPF()
         self.iniAttr()
         self.loadInpDataClf(iC=self.dITp['iCInpDataClf'])
-        self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
+        # self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
         print('Initiated "DataLoader" base object.')
 
     # --- methods for filling the result paths dictionary ---------------------
@@ -34,7 +34,7 @@ class DataLoader(BaseClass):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
-        lBase, lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl', 'X', 'y'], []
+        lBase, lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl', 'X', 'Y'], []
         for sTp in ['Clf', 'PrC']:
             lAttr2None += [s + sTp for s in lBase]
         for cAttr in lAttr2None:
@@ -45,23 +45,22 @@ class DataLoader(BaseClass):
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.dPF['InpDataClf'], iC=iC)
-        tInpData = SF.loadInpData(self.dITp, self.dfrInpClf, sMd='Clf', iC=iC)
-        (self.serNmerSeqClf, self.dfrInpClf, self.lSClClf,
-         self.XClf, self.YClf) = tInpData
+        (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
+         self.lSXClClf) = SF.procClfInp(self.dITp, self.dfrInpClf)
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
             self.dPF['InpDataPrC'] == self.dPF['InpDataClf']):
-            t = (self.serNmerSeqClf, self.dfrInpClf, self.lSClClf,
+            t = (self.serNmerSeqClf, self.dfrInpClf, self.lSXClClf,
                  self.XClf, self.YClf)
-            (self.serNmerSeqPrC, self.dfrInpPrC, self.lSClPrC,
+            (self.serNmerSeqPrC, self.dfrInpPrC, self.lSXClPrC,
              self.XPrC, self.YPrC) = t
         elif ((self.dfrInpPrC is None and self.dfrInpClf is not None and
                self.dPF['InpDataPrC'] != self.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
             self.dfrInpPrC = self.loadData(self.dPF['InpDataPrC'], iC=iC)
             t = SF.loadInpData(self.dITp, self.dfrInpPrC, sMd='PrC', iC=iC)
-            (self.serNmerSeqPrC, self.dfrInpPrC, self.lSClPrC,
+            (self.serNmerSeqPrC, self.dfrInpPrC, self.lSXClPrC,
              self.XPrC, self.YPrC) = t
 
     # --- print methods -------------------------------------------------------
@@ -108,12 +107,12 @@ class DataLoader(BaseClass):
 
     def printLSClClf(self):
         print(GC.S_DS80, GC.S_NEWL, 'List of class strings for mode "Clf": ',
-              self.lSClClf, GC.S_NEWL, '(length = ', len(self.lSClClf), ')',
+              self.lSXClClf, GC.S_NEWL, '(length = ', len(self.lSXClClf), ')',
               GC.S_NEWL, GC.S_DS80, sep='')
 
     def printLSClPrC(self):
         print(GC.S_DS80, GC.S_NEWL, 'List of class strings for mode "PrC": ',
-              self.lSClPrC, GC.S_NEWL, '(length = ', len(self.lSClPrC), ')',
+              self.lSXClPrC, GC.S_NEWL, '(length = ', len(self.lSXClPrC), ')',
               GC.S_NEWL, GC.S_DS80, sep='')
 
     def getXorY(self, XorY=GC.S_CAP_X, sMd='Clf'):
@@ -146,11 +145,11 @@ class DataLoader(BaseClass):
     def printY(self, sMd='Clf'):
         print(GC.S_DS80, GC.S_NEWL, 'Class labels for mode "', sMd, '":',
               sep='')
-        y = self.getXorY(XorY=GC.S_CAP_Y, sMd=sMd)
-        print(y)
+        Y = self.getXorY(XorY=GC.S_CAP_Y, sMd=sMd)
+        print(Y)
         if self.dITp['lvlOut'] > 2:
             try:
-                print('Index:', y.index.to_list())
+                print('Index:', Y.index.to_list())
             except:
                 pass
         print(GC.S_DS80)
@@ -177,11 +176,11 @@ class DataLoader(BaseClass):
 
     def yieldData(self, sMd='Clf'):
         if sMd == 'Clf':
-            return (self.serNmerSeqClf, self.dfrInpClf, self.lSClClf,
-                    self.XClf, self.YClf)
+            return (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
+                    self.lSXClClf)
         elif sMd == 'PrC':
-            return (self.serNmerSeqPrC, self.dfrInpPrC, self.lSClPrC,
-                    self.XPrC, self.YPrC)
+            return (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
+                    self.lSXClPrC)
         else: return tuple([None]*5)
 
 ###############################################################################

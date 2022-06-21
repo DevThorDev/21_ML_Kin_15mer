@@ -240,12 +240,12 @@ def fillLValSnip(lValSnip, lIdxPos=[], lIdxPyl=[]):
         return 1
     return 0
 
-def fillListUnique(cL, cIt):
+def fillListUnique(cL=[], cIt=[]):
     for cEl in cIt:
         if cEl not in cL:
             cL.append(cEl)
 
-def toListUnique(cL):
+def toListUnique(cL=[]):
     cLUnq = []
     for cEl in cL:
         if cEl not in cLUnq:
@@ -400,11 +400,11 @@ def calcMnSEMFromD2Dfr(d2Dfr, sJoin=GC.S_USC):
             assert lI == cDfr.index.to_list() and lI == cDfr.columns.to_list()
             addToDictL(dT, cK=cKL2, cE=cDfr)
     # fill dMnSEM
-    assert lI is not None
-    for cK, cLDfr in dT.items():
-        dfrMn, dfrSEM = calcMeanSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
-        dMnSEM[sJoin.join([cK, GC.S_MEAN])] = dfrMn
-        dMnSEM[sJoin.join([cK, GC.S_SEM])] = dfrSEM
+    if lI is not None:
+        for cK, cLDfr in dT.items():
+            dfrMn, dfrSEM = calcMeanSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
+            dMnSEM[sJoin.join([cK, GC.S_MEAN])] = dfrMn
+            dMnSEM[sJoin.join([cK, GC.S_SEM])] = dfrSEM
     return dMnSEM
 
 def convDDNumToDDProp(dDNum, nDigRnd):

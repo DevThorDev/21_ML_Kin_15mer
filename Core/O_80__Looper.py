@@ -39,7 +39,7 @@ class Looper(BaseClass):
 # --- loop methods ------------------------------------------------------------
     def adapMthDPF(self, cClf, sMth):
         sJ, xtCSV = self.dITp['sUSC'], self.dITp['xtCSV']
-        sFCore = GF.joinS([cClf.dITp['sFOutClf'], sMth], sJoin=sJ)
+        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth], sJoin=sJ)
         sFPar = GF.joinS([sFCore, self.dITp['sPar']], sJoin=sJ) + xtCSV
         sFData = sFCore + xtCSV
         sFConfMat = GF.joinS([cClf.dITp['sFConfMat'], sMth], sJoin=sJ) + xtCSV
@@ -51,7 +51,7 @@ class Looper(BaseClass):
     def adaptKParRpDPF(self, cClf, sMth, sKP, cRp):
         sJ, xtCSV = self.dITp['sUSC'], self.dITp['xtCSV']
         sKPRp = GF.joinS([sKP, str(cRp + 1)], sJoin=sJ)
-        sFDDet =  GF.joinS([cClf.dITp['sFOutDetClf'], sMth], sJoin=sJ) + xtCSV
+        sFDDet =  GF.joinS([cClf.dITp['sFOutClfD'], sMth], sJoin=sJ) + xtCSV
         self.dPF['OutDetClf'] = GF.joinToPath(cClf.dITp['pOutDet'], sFDDet)
         self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClf'], sEnd=sKPRp,
                                          sJoin=sJ)

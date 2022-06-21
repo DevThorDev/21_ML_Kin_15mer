@@ -13,6 +13,10 @@ cSep = GC.S_SEMICOL
 
 # --- names and paths of files and dirs ---------------------------------------
 
+# --- numbers -----------------------------------------------------------------
+lenNmerDef = GC.LEN_N_MER_DEF
+iCentNmer = GC.I_CENT_N_MER
+
 # --- strings -----------------------------------------------------------------
 sDash = GC.S_DASH
 sUSC = GC.S_USC
@@ -44,6 +48,7 @@ sEffCode = GC.S_EFF_CODE
 sEffCl = GC.S_EFF_CL
 sXCl = GC.S_X_CL
 sEffFam = GC.S_EFF_FAMILY
+sTrueCl = GC.S_TRUE_CL
 sPredCl = GC.S_PRED_CL
 sIGen = GC.S_I_GEN
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
@@ -51,6 +56,9 @@ sCNmer = GC.S_C_N_MER
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sUnique = GC.S_UNIQUE
+sConfMat = GC.S_CONF_MAT
+sDetailed = GC.S_DETAILED
+sProp = GC.S_PROP
 sMthRF_L = GC.S_MTH_RF_L
 sMthRF = GC.S_MTH_RF
 sMthMLP_L = GC.S_MTH_MLP_L
@@ -71,6 +79,9 @@ dIO = {# --- general
        # --- data specific
        'cSep': cSep,
        # --- names and paths of files and dirs
+       # --- numbers
+       'lenNmerDef': lenNmerDef,
+       'iCentNmer': iCentNmer,
        # --- strings
        'sDash': sDash,
        'sUSC': sUSC,
@@ -104,6 +115,7 @@ dIO = {# --- general
        'sEffCl': sEffCl,
        'sXCl': sXCl,
        'sEffFam': sEffFam,
+       'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sIGen': sIGen,
        'sCapXS': sCapXS,
@@ -114,11 +126,15 @@ dIO = {# --- general
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
        'sUnique': sUnique,
+       'sConfMat': sConfMat,
+       'sDetailed': sDetailed,
+       'sProp': sProp,
        'sMthRF_L': sMthRF_L,
        'sMthRF': sMthRF,
        'sMthMLP_L': sMthMLP_L,
        'sMthMLP': sMthMLP,
        'sPar': sPar,
+       # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],
        'lSMth': [sMthRF, sMthMLP],

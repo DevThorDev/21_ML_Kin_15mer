@@ -163,22 +163,42 @@ def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     Y = dfrInp[dITp['sCY' + sMd]]
     return serNmerSeq, dfrInp, lSCl, X, Y
 
-def procInpData(dITp, dfrInp, sMd='Clf', iC=0):
-    sCNmer, sEffFam, dProc, lEffFam = dITp['sCNmer'], dITp['sEffFam'], {}, []
-    dfrProc, serNmerSeq, lSCl, X, Y = None, None, None, None, None
-    if sCNmer in dfrInp.columns:
-        serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
+def iniObj(dITp, dfrInp):
+    lenNmer, sCNmer, sFam = dITp['lenNmerDef'], dITp['sCNmer'], dITp['sEffFam']
+    dX = {str(k): [] for k in range(-(lenNmer//2), lenNmer//2 + 1)}
+    dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
+    serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
+    for cSeq in serNmerSeq:
+        lFam = dfrInp[dfrInp[sCNmer] == cSeq][sFam].to_list()
+        dT[cSeq] = GF.toListUnique(lFam)
+    return dT, dProc, dX, dY, serNmerSeq
+
+def fill_DProc_DX(dITp, dProc, dX, cSeq):
+    assert len(cSeq) == len(dX)
+    GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
+    for sKeyX, sAAc in zip(dX, cSeq):
+        GF.addToDictL(dX, cK=sKeyX, cE=sAAc)
+
+def fill_DY(dITp, dT, dY, cSeq):
+    lXCl = []
+    for sCFam in dT[cSeq]:
+        if sCFam in dITp['dClasses']:
+            GF.fillListUnique(cL=lXCl, cIt=[dITp['dClasses'][sCFam]])
+    for cXCl in dITp['lXCl']:
+        GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
+    return lXCl
+
+def procClfInp(dITp, dfrInp):
+    dfrProc, X, Y, serNmerSeq, lSXCl = None, None, None, None, []
+    if dITp['sCNmer'] in dfrInp.columns:
+        dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp)
         for cSeq in serNmerSeq:
-            GF.addToDictL(dProc, cK=sCNmer, cE=cSeq)
-            dfrT = dfrInp[dfrInp[sCNmer] == cSeq]
-            lEffFamSeq = dfrT[sEffFam].to_list()
-            GF.addToDictL(dProc, cK=sEffFam, cE=lEffFamSeq)
-            GF.fillListUnique(lEffFam, cIt=lEffFamSeq)
-        for cSeq in serNmerSeq:
-            lEffFamSeq = dProc[sEffFam]
-            for sEffFam in lEffFam:
-                GF.addToDictL(dProc, cK=dITp['sXCl'],
-                              cE=(1 if sEffFam in lEffFamSeq else 0))
+            fill_DProc_DX(dITp, dProc, dX, cSeq)
+            GF.fillListUnique(cL=lSXCl, cIt=fill_DY(dITp, dT, dY, cSeq))
+        for cD in [dX, dY]:
+            GF.complDict(cDFull=dProc, cDAdd=cD)
+        dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
+    return dfrProc, X, Y, serNmerSeq, lSXCl
 
 # --- Functions (O_07__Classifier) --------------------------------------------
 

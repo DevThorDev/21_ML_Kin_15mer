@@ -3,7 +3,6 @@
 # --- D_07__Classifier.py -----------------------------------------------------
 ###############################################################################
 import Core.C_00__GenConstants as GC
-import Core.F_00__GenFunctions as GF
 
 # --- general -----------------------------------------------------------------
 sOType = 'Classifiers for data classification (D_07__Classifier)'
@@ -33,19 +32,6 @@ usedAAcType = GC.S_AAC        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 usedClType = GC.S_NEW + GC.S_CL     # GC.S_NEW/GC.S_OLD + GC.S_CL
 
 # --- names and paths of files and dirs ---------------------------------------
-sFInpStart = usedClType + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
-sFResCombS = 'Combined_S_KinasesPho15mer_202202'
-
-sFInpClf, sFInpPrC = None, None
-if useFullSeqFrom == GC.S_COMB_INP:     # currently only option implemented
-    sFInpClf = GF.joinS([sFInpStart, usedAAcType, sFResCombS])
-    sFInpPrC = sFInpClf
-
-sFOutClf = sFInpClf
-sFOutDetClf = GC.S_US02.join([sFOutClf, GC.S_DETAILED])
-sFConfMat = GC.S_US02.join([sFInpClf, GC.S_CONF_MAT])
-sFOutPrC = GC.S_US02.join([sFInpPrC, GC.S_PROP])
-
 pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
 pOutPar = GC.P_DIR_RES_CLF_PARS
@@ -129,12 +115,6 @@ dIO = {# --- general
        'usedAAcType': usedAAcType,
        'usedClType': usedClType,
        # --- names and paths of files and dirs
-       'sFInpClf': sFInpClf,
-       'sFInpPrC': sFInpPrC,
-       'sFOutClf': sFOutClf,
-       'sFOutDetClf': sFOutDetClf,
-       'sFConfMat': sFConfMat,
-       'sFOutPrC': sFOutPrC,
        'pInpClf': pInpClf,
        'pInpPrC': pInpPrC,
        'pOutPar': pOutPar,
