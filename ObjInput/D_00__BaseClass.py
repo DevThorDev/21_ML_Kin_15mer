@@ -56,14 +56,15 @@ sCNmer = GC.S_C_N_MER
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sUnique = GC.S_UNIQUE
-sConfMat = GC.S_CONF_MAT
-sDetailed = GC.S_DETAILED
-sProp = GC.S_PROP
 sMthRF_L = GC.S_MTH_RF_L
 sMthRF = GC.S_MTH_RF
 sMthMLP_L = GC.S_MTH_MLP_L
 sMthMLP = GC.S_MTH_MLP
 sPar = GC.S_PAR
+sSummary = GC.S_SUMMARY
+sConfMat = GC.S_CONF_MAT
+sDetailed = GC.S_DETAILED
+sProp = GC.S_PROP
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -126,14 +127,15 @@ dIO = {# --- general
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
        'sUnique': sUnique,
-       'sConfMat': sConfMat,
-       'sDetailed': sDetailed,
-       'sProp': sProp,
        'sMthRF_L': sMthRF_L,
        'sMthRF': sMthRF,
        'sMthMLP_L': sMthMLP_L,
        'sMthMLP': sMthMLP,
        'sPar': sPar,
+       'sSummary': sSummary,
+       'sConfMat': sConfMat,
+       'sDetailed': sDetailed,
+       'sProp': sProp,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

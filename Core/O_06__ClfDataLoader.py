@@ -19,7 +19,7 @@ class DataLoader(BaseClass):
         self.fillDPF()
         self.iniAttr()
         self.loadInpDataClf(iC=self.dITp['iCInpDataClf'])
-        # self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
+        self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
         print('Initiated "DataLoader" base object.')
 
     # --- methods for filling the result paths dictionary ---------------------

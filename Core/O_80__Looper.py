@@ -38,23 +38,23 @@ class Looper(BaseClass):
 
 # --- loop methods ------------------------------------------------------------
     def adapMthDPF(self, cClf, sMth):
-        sJ, xtCSV = self.dITp['sUSC'], self.dITp['xtCSV']
-        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth], sJoin=sJ)
-        sFPar = GF.joinS([sFCore, self.dITp['sPar']], sJoin=sJ) + xtCSV
-        sFData = sFCore + xtCSV
-        sFConfMat = GF.joinS([cClf.dITp['sFConfMat'], sMth], sJoin=sJ) + xtCSV
+        sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
+        xtCSV, sSum = self.dITp['xtCSV'], self.dITp['sSummary']
+        sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), sJoin=sJ1)
+        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth], sJoin=sJ1)
+        sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCore], sJoin=sJ2) + xtCSV
+        sFSum = GF.joinS([sSum, sLKP, sFCore], sJoin=sJ2) + xtCSV
+        sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], sJoin=sJ2) + xtCSV
+        sFDet = GF.joinS([self.dITp['sDetailed'], sFCore], sJoin=sJ2) + xtCSV
         self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutPar'], sFPar)
-        self.dPF['OutSumClf'] = GF.joinToPath(cClf.dITp['pOutSum'], sFData)
-        self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfMat)
-        self.dPF['OutDetClf'] = GF.joinToPath(cClf.dITp['pOutDet'], sFData)
+        self.dPF['OutSumClf'] = GF.joinToPath(cClf.dITp['pOutSum'], sFSum)
+        self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfM)
+        self.dPF['OutDetClfB'] = GF.joinToPath(cClf.dITp['pOutDet'], sFDet)
 
     def adaptKParRpDPF(self, cClf, sMth, sKP, cRp):
-        sJ, xtCSV = self.dITp['sUSC'], self.dITp['xtCSV']
-        sKPRp = GF.joinS([sKP, str(cRp + 1)], sJoin=sJ)
-        sFDDet =  GF.joinS([cClf.dITp['sFOutClfD'], sMth], sJoin=sJ) + xtCSV
-        self.dPF['OutDetClf'] = GF.joinToPath(cClf.dITp['pOutDet'], sFDDet)
-        self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClf'], sEnd=sKPRp,
-                                         sJoin=sJ)
+        sKPRp = GF.joinS([sKP, str(cRp + 1)], sJoin=self.dITp['sUSC'])
+        self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClfB'], sEnd=sKPRp,
+                                         sJoin=self.dITp['sUSC'])
 
     def doCRep(self, sMth, k, sKPar, cRp, cTim, stT=None):
         if sMth in self.dITp['lSMth']:

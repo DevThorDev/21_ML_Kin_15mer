@@ -25,7 +25,7 @@ class BaseClfPrC(BaseClass):
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.D = D
         self.iniAttr(sKPar=sKPar)
-        self.fillDPF()
+        self.getDPF()
         print('Initiated "BaseClfPrC" base object.')
 
     # --- methods for initialising class attributes and loading input data ----
@@ -44,21 +44,13 @@ class BaseClfPrC(BaseClass):
         self.sKPar = sKPar
 
     # --- methods for filling the result paths dictionary ---------------------
-    def fillDPF(self):
-        self.dITp['sOutClf'], sJ = self.D.dITp['sFInpClf'], self.dITp['sUS02']
-        sFConfMat = GF.joinS([self.dITp['sOutClf'], self.dITp['sConfMat']],
-                             sJoin=sJ) + self.dITp['xtCSV']
-        sFOutClfD = GF.joinS([self.dITp['sOutClf'], self.dITp['sDetailed']],
-                             sJoin=sJ) + self.dITp['xtCSV']
-        sFOutPrC = GF.joinS([self.D.dITp['sFInpPrC'], self.dITp['sProp']],
-                            sJoin=sJ) + self.dITp['xtCSV']
+    def getDPF(self):
+        sBClf, sBPrC = self.D.dITp['sFInpBaseClf'], self.D.dITp['sFInpBasePrC']
+        self.dITp['sOutClf'] = GF.joinS([self.D.dITp['sSetClf'], sBClf],
+                                        sJoin=self.dITp['sUSC'])
+        self.dITp['sOutPrC'] = GF.joinS([self.D.dITp['sSetPrC'], sBPrC],
+                                        sJoin=self.dITp['sUSC'])
         self.dPF = self.D.yieldDPF()
-        self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
-        self.dPF['OutDetClf'] = GF.joinToPath(self.dITp['pOutDet'], sFOutClfD)
-        self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
-        self.dITp['sFConfMat'] = sFConfMat
-        self.dITp['sFOutClfD'] = sFOutClfD
-        self.dITp['sFOutPrC'] = sFOutPrC
 
     # --- print methods -------------------------------------------------------
     def printX(self):
@@ -268,13 +260,6 @@ class Classifier(BaseClfPrC):
                 self.printPredict(X2Pred=dat2Pred)
             self.calcConfMatrix()
 
-    # --- methods for adapting keys of the result paths dictionary ------------
-    def adaptPathConfMatrix(self):
-        sFE = self.dITp['sUSC'] + self.sMth + self.dITp['xtCSV']
-        sFConfMat = GF.joinS([self.dITp['sOutClf'], self.dITp['sConfMat']],
-                             sJoin=self.dITp['sUS02']) + sFE
-        self.dPF['ConfMat'] = GF.joinToPath(self.dITp['pConfMat'], sFConfMat)
-
     # --- method for calculating the confusion matrix -------------------------
     def calcConfMatrix(self):
         if (self.dITp['calcConfMatrix'] and self.YTest.shape[1] <= 1 and
@@ -282,8 +267,6 @@ class Classifier(BaseClfPrC):
             t, p, lC = self.YTest, self.YPred, self.lSCl
             self.confusMatrix = confusion_matrix(y_true=t, y_pred=p, labels=lC)
             dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
-            if self.sMth is not None:
-                self.adaptPathConfMatrix()
             self.dConfMat[self.sKPar] = dfrCM
 
     # --- method for plotting the confusion matrix ----------------------------
@@ -361,8 +344,8 @@ class PropCalculator(BaseClfPrC):
          self.lSCl) = self.D.yieldData(sMd='PrC')
 
     # --- method for adapting a key of the result paths dictionary ------------
-    def adaptPathOutDataPrC(self, sCl=None):
-        sFOutBase = GF.joinS([self.D.dITp['sFInpPrC'], self.dITp['sProp']],
+    def setPathOutDataPrC(self, sCl=None):
+        sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
                              sJoin=self.dITp['sUS02'])
         sFOutPrC = sFOutBase + self.dITp['xtCSV']
         if sCl is not None:
@@ -374,16 +357,16 @@ class PropCalculator(BaseClfPrC):
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:
             for sCl in self.lSCl:
-                cDfrI = self.dfrInp[self.dfrInp[self.dITp['sCY']] == sCl]
+                cDfrI = self.dfrInp[self.dfrInp[sCl] > 0]
                 cD2Out, nTtl = {}, cDfrI.shape[0]
-                for sPos in self.dITp['lSCX']:
+                for sPos in self.D.dITp['lSCXPrC']:
                     serCPos = cDfrI[sPos]
                     for sAAc in self.dITp['lFeatSrt']:
                         nCAAc = serCPos[serCPos == sAAc].count()
                         GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
                                       cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
                 self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
-                self.adaptPathOutDataPrC(sCl=sCl)
+                self.setPathOutDataPrC(sCl=sCl)
                 self.saveData(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
 
 ###############################################################################

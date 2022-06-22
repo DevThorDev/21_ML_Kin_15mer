@@ -28,26 +28,29 @@ usedAAcTypePrC = usedAAcTypeClf
 usedClTypePrC = usedClTypeClf
 
 # --- names and paths of files and dirs (classifier) --------------------------
+sSetClf = 'Set01_11Cl'
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
 # sFResCombSClf = 'Combined_S_KinasesPho15mer_202202'
-sFInpStartClf = ''
-sFResCombSClf = 'InpClf_Combined_XS_KinasesPho15mer_202202'
+sFInpStartClf = 'InpClf'
+sFInpBaseClf = 'Combined_XS_KinasesPho15mer_202202'
 
 sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
     # sFInpClf = GF.joinS([sFInpStartClf, usedAAcTypeClf, sFResCombSClf])
-    sFInpClf = GF.joinS([sFInpStartClf, sFResCombSClf])
+    sFInpClf = GF.joinS([sFInpStartClf, sFInpBaseClf])
 
 pInpClf = GC.P_DIR_INP_CLF
 
 # --- names and paths of files and dirs (proportion calculator) ---------------
+sSetPrC = sSetClf
+
 sFInpStartPrC = sFInpStartClf
-sFResCombSPrC = sFResCombSClf
+sFInpBasePrC = sFInpBaseClf
 
 sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
     # sFInpPrC = GF.joinS([sFInpStartPrC, usedAAcTypePrC, sFResCombSPrC])
-    sFInpPrC = GF.joinS([sFInpStartPrC, sFResCombSPrC])
+    sFInpPrC = GF.joinS([sFInpStartPrC, sFInpBasePrC])
 
 pInpPrC = pInpClf
 
@@ -135,7 +138,11 @@ dIO = {# --- general
        'usedAAcTypePrC': usedAAcTypePrC,
        'usedClTypePrC': usedClTypePrC,
        # --- names and paths of files and dirs (classifier)
+       'sSetClf': sSetClf,
+       'sFInpBaseClf': sFInpBaseClf,
        'sFInpClf': sFInpClf,
+       'sSetPrC': sSetPrC,
+       'sFInpBasePrC': sFInpBasePrC,
        'pInpClf': pInpClf,
        # --- names and paths of files and dirs (proportion calculator)
        'sFInpPrC': sFInpPrC,

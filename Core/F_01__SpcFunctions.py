@@ -164,8 +164,8 @@ def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     return serNmerSeq, dfrInp, lSCl, X, Y
 
 def iniObj(dITp, dfrInp):
-    lenNmer, sCNmer, sFam = dITp['lenNmerDef'], dITp['sCNmer'], dITp['sEffFam']
-    dX = {str(k): [] for k in range(-(lenNmer//2), lenNmer//2 + 1)}
+    sCNmer, sFam = dITp['sCNmer'], dITp['sEffFam']
+    dX = {sI: [] for sI in dITp['lSCXClf']}
     dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
     serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
     for cSeq in serNmerSeq:

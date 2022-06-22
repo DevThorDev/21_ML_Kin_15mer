@@ -63,8 +63,6 @@ rndDigCorrect = GC.R04
 sFullList = GC.S_FULL_LIST
 sUnqList = GC.S_UNQ_LIST
 
-sCY = GC.S_EFF_CL
-
 sSupTtlPlt = 'Confusion matrix'
 
 # --- sets --------------------------------------------------------------------
@@ -85,16 +83,9 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
              'C-2345', 'C12345']
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
-# --- dictionaries ------------------------------------------------------------
-
 # === assertions ==============================================================
 if maxLenNmer not in setNmerLen:
     maxLenNmer = max(setNmerLen)
-
-# === derived values and input processing =====================================
-maxPosNmer = maxLenNmer//2
-rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)
-lSCX = [str(n) for n in rngPosNmer]
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -139,18 +130,12 @@ dIO = {# --- general
        # --- strings
        'sFullList': sFullList,
        'sUnqList': sUnqList,
-       'sCY': sCY,
        'sSupTtlPlt': sSupTtlPlt,
        # --- sets
        'setFeat': setFeat,
        # --- lists
        'lFeatSrt': lFeatSrt,
        'lOldClPlt': lOldClPlt,
-       'lSResClf': lSResClf,
-       # --- dictionaries
-       # === derived values and input processing
-       'maxPosNmer': maxPosNmer,
-       'rngPosNmer': rngPosNmer,
-       'lSCX': lSCX}
+       'lSResClf': lSResClf}
 
 ###############################################################################
