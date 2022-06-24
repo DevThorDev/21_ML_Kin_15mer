@@ -354,19 +354,27 @@ class PropCalculator(BaseClfPrC):
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
     # --- methods calculating the proportions of AAc at all Nmer positions ----
+    def calcPropCDfr(self, cDfrI, sCl):
+        cD2Out, nTtl = {}, cDfrI.shape[0]
+        for sPos in self.D.dITp['lSCXPrC']:
+            serCPos = cDfrI[sPos]
+            for sAAc in self.dITp['lFeatSrt']:
+                nCAAc = serCPos[serCPos == sAAc].count()
+                GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
+                              cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
+        self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
+        self.setPathOutDataPrC(sCl=sCl)
+        self.saveData(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
+
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:
             for sCl in self.lSCl:
                 cDfrI = self.dfrInp[self.dfrInp[sCl] > 0]
-                cD2Out, nTtl = {}, cDfrI.shape[0]
-                for sPos in self.D.dITp['lSCXPrC']:
-                    serCPos = cDfrI[sPos]
-                    for sAAc in self.dITp['lFeatSrt']:
-                        nCAAc = serCPos[serCPos == sAAc].count()
-                        GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
-                                      cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
-                self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
-                self.setPathOutDataPrC(sCl=sCl)
-                self.saveData(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
+                self.calcPropCDfr(cDfrI, sCl=sCl)
+            # any XCl
+            cDfrI = self.dfrInp[(self.dfrInp[self.lSCl] > 0).any(axis=1)]
+            self.calcPropCDfr(cDfrI, sCl=self.dITp['sCapX'])
+            # entire dataset
+            self.calcPropCDfr(self.dfrInp, sCl=self.dITp['sAllSeq'])
 
 ###############################################################################

@@ -51,8 +51,10 @@ sEffFam = GC.S_EFF_FAMILY
 sTrueCl = GC.S_TRUE_CL
 sPredCl = GC.S_PRED_CL
 sIGen = GC.S_I_GEN
+sCapC, sCapX, sCapY = GC.S_CAP_C, GC.S_CAP_X, GC.S_CAP_Y
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sCNmer = GC.S_C_N_MER
+sAllSeq = GC.S_ALL_SEQ
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sUnique = GC.S_UNIQUE
@@ -119,11 +121,15 @@ dIO = {# --- general
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sIGen': sIGen,
+       'sCapC': sCapC,
+       'sCapX': sCapX,
+       'sCapY': sCapY,
        'sCapXS': sCapXS,
        'sCapS': sCapS,
        'sCapM': sCapM,
        'sCapL': sCapL,
        'sCNmer': sCNmer,
+       'sAllSeq': sAllSeq,
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
        'sUnique': sUnique,

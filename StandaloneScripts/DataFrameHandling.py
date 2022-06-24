@@ -71,7 +71,8 @@ inpTbl = 'CombS'            # 'ProcI' / 'CombS'
 doAllUniqueCol = False
 doUniqueCodeSeqRetPepPos = False
 doUniqueCodeSeqRetNmer = False
-doRelFreqSnip = True
+doRelFreqSnip = False
+getAllPotentialSnips = True
 
 # --- numbers -----------------------------------------------------------------
 
@@ -362,6 +363,9 @@ if doRelFreqSnip:
     dResult = calcProbPylData(dInp, dfrInp, pFOut=dInp['pFOutRFSnip'],
                               sSnip=dInp['sSnipCalcRF'])
     printRes(dResult, sSnip=dInp['sSnipCalcRF'])
+if getAllPotentialSnips:
+    dfrInp = readCSV(pF=dInp['pFInpUnqC'], iCol=0)
+    print('dfrInp:\n', dfrInp, sep='')
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
 ###############################################################################
