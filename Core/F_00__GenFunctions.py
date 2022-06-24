@@ -544,6 +544,14 @@ def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
     else:       # ignore shape
         return np.array(data)
 
+def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, iCl1=1):
+    arrProba = cClf.predict_proba(dat2Pr)
+    if type(arrProba) == list:    # e.g. result of a random forest classifier
+        return iniPdDfr(np.column_stack([cArr[:, iCl1] for cArr in arrProba]),
+                        lSNmC=lSC, lSNmR=lSR)
+    elif type(arrProba) == np.ndarray:      # standard case
+        return iniPdDfr(arrProba, lSNmC=lSC, lSNmR=lSR)
+
 # --- Functions performing pandas Series manipulation -------------------------
 def concLObj(lObj, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
     return pd.concat(lObj, axis=concAx, ignore_index=ignIdx,

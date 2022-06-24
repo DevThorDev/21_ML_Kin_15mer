@@ -32,8 +32,9 @@ class BaseClfPrC(BaseClass):
     def iniAttr(self, sKPar='A'):
         lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl', 'X', 'Y',
                       'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
-                      'YPred', 'YTrain', 'YTest',
-                      'Clf', 'sMth', 'sMthL', 'scoreClf', 'confusMatrix']
+                      'YPred', 'YProba', 'YTrain', 'YTest',
+                      'Clf', 'sMth', 'sMthL', 'scoreClf', 'confusMatrix',
+                      'dfrPred', 'dfrProba']
         lAttrDict = ['d2ResClf', 'dConfMat', 'dPropAAc']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
@@ -224,6 +225,15 @@ class Classifier(BaseClfPrC):
                     self.printXY()
 
     # --- method for calculating values of the classifier results dictionary --
+    def assembleDfrPredProba(self, lSCTP):
+        lDfr = [self.dfrPred, self.dfrProba]
+        for k, cYP in enumerate([self.YPred, self.YProba]):
+            lDfr[k] = GF.concLObjAx1([self.YTest, cYP], ignIdx=True)
+            lDfr[k].columns = lSCTP
+            lDfr[k] = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], lDfr[k]])
+            lDfr[k].dropna(axis=0, inplace=True)
+        [self.dfrPred, self.dfrProba] = lDfr
+
     def calcResPredict(self, X2Pred=None):
         if (X2Pred is not None and self.YTest is not None and
             self.YPred is not None and X2Pred.shape[0] == self.YPred.shape[0]):
@@ -234,16 +244,13 @@ class Classifier(BaseClfPrC):
             lVCalc = [nPred, nOK, propOK]
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
                 GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
-            # create dfrPred, containing the YTest and YPred columns
+            # create dfrPred/dfrProba, containing YTest and YPred/YProba
             sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
             lSCTP = [GF.joinS([s, sTCl], sJoin=self.dITp['sUSC'])
                      for s in self.YTest.columns]
             lSCTP += [GF.joinS([s, sPCl], sJoin=self.dITp['sUSC'])
                       for s in self.YPred.columns]
-            dfrTP = GF.concLObjAx1([self.YTest, self.YPred], ignIdx=True)
-            dfrTP.columns = lSCTP
-            self.dfrPred = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], dfrTP])
-            self.dfrPred.dropna(axis=0, inplace=True)
+            self.assembleDfrPredProba(lSCTP=lSCTP)
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
@@ -252,9 +259,11 @@ class Classifier(BaseClfPrC):
                 dat2Pred = self.cEnc.transform(dat2Pred).toarray()
             if dat2Pred is None:
                 dat2Pred, self.YTest = self.getXY(getTrain=False)
-            self.YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred),
-                                     lSNmC=self.YTest.columns,
-                                     lSNmR=self.YTest.index)
+            lSC, lSR = self.YTest.columns, self.YTest.index
+            self.YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred), lSNmC=lSC,
+                                     lSNmR=lSR)
+            self.YProba = GF.getYProba(self.Clf, dat2Pred, lSC=lSC, lSR=lSR)
+            assert self.YProba.shape == self.YPred.shape
             self.calcResPredict(X2Pred=dat2Pred)
             if self.dITp['lvlOut'] > 0:
                 self.printPredict(X2Pred=dat2Pred)

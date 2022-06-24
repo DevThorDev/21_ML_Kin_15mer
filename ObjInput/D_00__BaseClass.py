@@ -66,6 +66,7 @@ sPar = GC.S_PAR
 sSummary = GC.S_SUMMARY
 sConfMat = GC.S_CONF_MAT
 sDetailed = GC.S_DETAILED
+sProba = GC.S_PROB
 sProp = GC.S_PROP
 
 # --- file name extensions ----------------------------------------------------
@@ -141,6 +142,7 @@ dIO = {# --- general
        'sSummary': sSummary,
        'sConfMat': sConfMat,
        'sDetailed': sDetailed,
+       'sProba': sProba,
        'sProp': sProp,
        # --- numbers
        # --- lists

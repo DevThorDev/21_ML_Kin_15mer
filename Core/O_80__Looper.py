@@ -25,7 +25,7 @@ class Looper(BaseClass):
         self.d3ResClf, self.d2MnSEMResClf = {}, {}
         self.d2CnfMat, self.dMnSEMCnfMat = {}, {}
         self.dPF = {'OutParClf': None, 'OutSumClf': None, 'ConfMat': None,
-                    'OutDetClf': None}
+                    'OutDetClf': None, 'OutProbaClf': None}
 
 # --- print methods -----------------------------------------------------------
     def printD2MnSEMResClf(self, sMth):
@@ -46,15 +46,19 @@ class Looper(BaseClass):
         sFSum = GF.joinS([sSum, sLKP, sFCore], sJoin=sJ2) + xtCSV
         sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], sJoin=sJ2) + xtCSV
         sFDet = GF.joinS([self.dITp['sDetailed'], sFCore], sJoin=sJ2) + xtCSV
+        sFProba = GF.joinS([self.dITp['sProba'], sFCore], sJoin=sJ2) + xtCSV
         self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutPar'], sFPar)
         self.dPF['OutSumClf'] = GF.joinToPath(cClf.dITp['pOutSum'], sFSum)
         self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfM)
         self.dPF['OutDetClfB'] = GF.joinToPath(cClf.dITp['pOutDet'], sFDet)
+        self.dPF['OutProbaClfB'] = GF.joinToPath(cClf.dITp['pOutDet'], sFProba)
 
     def adaptKParRpDPF(self, cClf, sMth, sKP, cRp):
-        sKPRp = GF.joinS([sKP, str(cRp + 1)], sJoin=self.dITp['sUSC'])
-        self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClfB'], sEnd=sKPRp,
+        sKPR = GF.joinS([sKP, str(cRp + 1)], sJoin=self.dITp['sUSC'])
+        self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClfB'], sEnd=sKPR,
                                          sJoin=self.dITp['sUSC'])
+        self.dPF['OutProbaClf'] = GF.modPF(self.dPF['OutProbaClfB'], sEnd=sKPR,
+                                           sJoin=self.dITp['sUSC'])
 
     def doCRep(self, sMth, k, sKPar, cRp, cTim, stT=None):
         if sMth in self.dITp['lSMth']:
@@ -74,6 +78,7 @@ class Looper(BaseClass):
             self.adaptKParRpDPF(cClf=cClf, sMth=sMth, sKP=sKPar, cRp=cRp)
             if cClf.dITp['saveDetailedClfRes']:
                 self.saveData(cClf.dfrPred, pF=self.dPF['OutDetClf'])
+                self.saveData(cClf.dfrProba, pF=self.dPF['OutProbaClf'])
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
 
