@@ -41,8 +41,9 @@ class Looper(BaseClass):
         sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
         xtCSV, sSum = self.dITp['xtCSV'], self.dITp['sSummary']
         sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), sJoin=sJ1)
+        sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], sJoin=sJ1)
         sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth], sJoin=sJ1)
-        sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCore], sJoin=sJ2) + xtCSV
+        sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCPar], sJoin=sJ2) + xtCSV
         sFSum = GF.joinS([sSum, sLKP, sFCore], sJoin=sJ2) + xtCSV
         sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], sJoin=sJ2) + xtCSV
         sFDet = GF.joinS([self.dITp['sDetailed'], sFCore], sJoin=sJ2) + xtCSV
@@ -85,7 +86,8 @@ class Looper(BaseClass):
     def saveCombRes(self, sMth, d2Par, nRep=0):
         sJ = self.dITp['sUSC']
         if nRep > 0:
-            self.saveData(GF.iniPdDfr(d2Par), pF=self.dPF['OutParClf'])
+            self.saveData(GF.iniPdDfr(d2Par), pF=self.dPF['OutParClf'],
+                          saveAnyway=False)
             self.d2MnSEMResClf = GF.calcMnSEMFromD3Val(self.d3ResClf)
             self.dMnSEMCnfMat = GF.calcMnSEMFromD2Dfr(self.d2CnfMat)
             self.saveData(self.d2MnSEMResClf, pF=self.dPF['OutSumClf'])

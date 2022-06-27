@@ -47,6 +47,7 @@ class BaseClfPrC(BaseClass):
     # --- methods for filling the result paths dictionary ---------------------
     def getDPF(self):
         sBClf, sBPrC = self.D.dITp['sFInpBaseClf'], self.D.dITp['sFInpBasePrC']
+        self.dITp['sParClf'] = GF.joinS([sBClf], sJoin=self.dITp['sUSC'])
         self.dITp['sOutClf'] = GF.joinS([self.D.dITp['sSetClf'], sBClf],
                                         sJoin=self.dITp['sUSC'])
         self.dITp['sOutPrC'] = GF.joinS([self.D.dITp['sSetPrC'], sBPrC],
@@ -98,9 +99,7 @@ class Classifier(BaseClfPrC):
     def getInpData(self):
         (self.dfrInp, self.X, self.Y, self.serNmerSeq,
          self.lSCl) = self.D.yieldData(sMd='Clf')
-        if self.dITp['usedNmerSeq'] == self.dITp['sUnqList']:
-            self.saveData(self.dfrInp, pF=self.dPF['DataClfU'],
-                          saveAnyway=False)
+        self.saveData(self.dfrInp, pF=self.dPF['DataClfU'])
 
     # --- print methods -------------------------------------------------------
     def printEncAttr(self, XTrans):

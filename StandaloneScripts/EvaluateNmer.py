@@ -266,9 +266,9 @@ def findAllSSubInStr(sFull, sSub, overLap=False):
 def startPosToCentPos(iPSt, sSeq):
     return iPSt + len(sSeq)//2
 
-def addToDictL(cD, cK, cE, lUniqEl=False):
+def addToDictL(cD, cK, cE, lUnqEl=False):
     if cK in cD:
-        if not lUniqEl or cE not in cD[cK]:
+        if not lUnqEl or cE not in cD[cK]:
             cD[cK].append(cE)
     else:
         cD[cK] = [cE]
@@ -311,7 +311,7 @@ def printDINmerNOcc(cDINmerNOcc, maxLenL=3):
 #                     (cResTp, cTp, sRp, cClass), cGT = lSplNm[:4], lSplNm[-1]
 #                 if (cResTp == sResTp and cTp in [dI['sXDatTp'], sTp] and
 #                     cClass == sClass and cGT == sGT):
-#                     addToDictL(dLRep, cTp, int(sRp), lUniqEl=True)
+#                     addToDictL(dLRep, cTp, int(sRp), lUnqEl=True)
 #                     d2Dfr[sTp][int(sRp)] = readCSV(joinToPath(sP, sF), iCol=0)
 #             else:
 #                 print('ERROR: lSplNm =', lSplNm, 'with length', len(lSplNm))

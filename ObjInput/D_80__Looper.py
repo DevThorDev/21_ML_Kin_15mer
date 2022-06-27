@@ -9,7 +9,7 @@ sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
-dNumRep = {GC.S_MTH_RF: 0,
+dNumRep = {GC.S_MTH_RF: 5,
            GC.S_MTH_MLP: 5}
 
 # --- names and paths of files and dirs ---------------------------------------

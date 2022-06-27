@@ -223,10 +223,10 @@ def tryRoundX(x, RD=None):
     return x
 
 # --- Functions handling lists ------------------------------------------------
-def fillCondList(elCond, lToFill=[], lLoop=[], lUniqEl=True):
+def fillCondList(elCond, lToFill=[], lLoop=[], lUnqEl=True):
     for elCheckContain in lLoop:
         if elCond in elCheckContain:
-            if not lUniqEl or elCond not in lToFill:
+            if not lUnqEl or elCond not in lToFill:
                 lToFill.append(elCond)
             break
 
@@ -239,6 +239,16 @@ def fillLValSnip(lValSnip, lIdxPos=[], lIdxPyl=[]):
         lValSnip[3] += nPyl/nOcc
         return 1
     return 0
+
+def addToList(cL, cEl, isUnq=False):
+    if isUnq:
+        if cEl not in cL:
+            cL.append(cEl)
+    else:
+        cL.append(cEl)
+
+def addToListUnq(cL, cEl):
+    addToList(cL=cL, cEl=cEl, isUnq=True)
 
 def fillListUnique(cL=[], cIt=[]):
     for cEl in cIt:
@@ -304,17 +314,17 @@ def addToDictMnV(cD, cK, cEl, nEl):
     else:
         cD[cK] = cEl/nEl
 
-def addToDictL(cD, cK, cE, lUniqEl=False):
+def addToDictL(cD, cK, cE, lUnqEl=False):
     if cK in cD:
-        if not lUniqEl or cE not in cD[cK]:
+        if not lUnqEl or cE not in cD[cK]:
             cD[cK].append(cE)
     else:
         cD[cK] = [cE]
 
-def addToDict2L(cD, cKMain, cKSub, cE, lUniqEl=False):
+def addToDict2L(cD, cKMain, cKSub, cE, lUnqEl=False):
     if cKMain not in cD:
         cD[cKMain] = {}
-    addToDictL(cD[cKMain], cKSub, cE, lUniqEl=lUniqEl)
+    addToDictL(cD[cKMain], cKSub, cE, lUnqEl=lUnqEl)
 
 def addToDictDNum(d2N, cKMain, cKSub, nInc=1, bothDir=False):
     if bothDir and cKSub[::-1] < cKSub:    # reverse cKSub string
@@ -544,10 +554,10 @@ def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
     else:       # ignore shape
         return np.array(data)
 
-def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, iCl1=1):
+def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, i=0):
     arrProba = cClf.predict_proba(dat2Pr)
     if type(arrProba) == list:    # e.g. result of a random forest classifier
-        return iniPdDfr(np.column_stack([cArr[:, iCl1] for cArr in arrProba]),
+        return iniPdDfr(np.column_stack([1 - cArr[:, i] for cArr in arrProba]),
                         lSNmC=lSC, lSNmR=lSR)
     elif type(arrProba) == np.ndarray:      # standard case
         return iniPdDfr(arrProba, lSNmC=lSC, lSNmR=lSR)

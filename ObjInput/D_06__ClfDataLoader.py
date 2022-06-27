@@ -28,7 +28,8 @@ usedAAcTypePrC = usedAAcTypeClf
 usedClTypePrC = usedClTypeClf
 
 # --- names and paths of files and dirs (classifier) --------------------------
-sSetClf = 'Set01_11Cl'
+sSetClf = GC.S_SET_02
+
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
 # sFResCombSClf = 'Combined_S_KinasesPho15mer_202202'
 sFInpStartClf = 'InpClf'
@@ -38,6 +39,7 @@ sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
     # sFInpClf = GF.joinS([sFInpStartClf, usedAAcTypeClf, sFResCombSClf])
     sFInpClf = GF.joinS([sFInpStartClf, sFInpBaseClf])
+sFInpDClClf = GF.joinS([sFInpStartClf, GC.S_CL_MAPPING, sSetClf])
 
 pInpClf = GC.P_DIR_INP_CLF
 
@@ -51,8 +53,12 @@ sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
     # sFInpPrC = GF.joinS([sFInpStartPrC, usedAAcTypePrC, sFResCombSPrC])
     sFInpPrC = GF.joinS([sFInpStartPrC, sFInpBasePrC])
+sFInpDClPrC = sFInpDClClf
 
 pInpPrC = pInpClf
+
+# --- boolean values (general) ------------------------------------------------
+printDClasses = True
 
 # --- numbers (general) -------------------------------------------------------
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
@@ -75,11 +81,6 @@ sCYPrC = GC.S_EFF_CL
 
 # --- sets --------------------------------------------------------------------
 setNmerLen = set(range(1, 15 + 1, 2))
-
-# --- lists (classifier) ------------------------------------------------------
-lCl = ['AGC', 'CDK', 'CDPK', 'CK_II', 'LRR', 'MAPNK', 'MAPK', 'RLCK', 'SLK',
-       'SnRK', 'soluble']
-lXCl = ['X_' + s for s in lCl]
 
 # --- dictionaries (classifier) -----------------------------------------------
 dClasses = {'AGC': 'X_AGC',
@@ -141,12 +142,16 @@ dIO = {# --- general
        'sSetClf': sSetClf,
        'sFInpBaseClf': sFInpBaseClf,
        'sFInpClf': sFInpClf,
+       'sFInpDClClf': sFInpDClClf,
        'sSetPrC': sSetPrC,
        'sFInpBasePrC': sFInpBasePrC,
        'pInpClf': pInpClf,
        # --- names and paths of files and dirs (proportion calculator)
        'sFInpPrC': sFInpPrC,
+       'sFInpDClPrC': sFInpDClPrC,
        'pInpPrC': pInpPrC,
+       # --- boolean values (general)
+       'printDClasses': printDClasses,
        # --- numbers (general)
        'maxLenNmer': maxLenNmer,
        # --- numbers (classifier)
@@ -161,9 +166,6 @@ dIO = {# --- general
        # --- strings (proportion calculator)
        'sCYPrC': sCYPrC,
        # --- sets
-       # --- lists (classifier)
-       'lCl': lCl,
-       'lXCl': lXCl,
        # --- dictionaries (classifier)
        'dClasses': dClasses,
        # === derived values and input processing

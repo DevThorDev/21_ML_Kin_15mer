@@ -18,9 +18,17 @@ lenNmerDef = GC.LEN_N_MER_DEF
 iCentNmer = GC.I_CENT_N_MER
 
 # --- strings -----------------------------------------------------------------
+sSpace = GC.S_SPACE
+sDot = GC.S_DOT
+sComma = GC.S_COMMA
+sSemicol = GC.S_SEMICOL
+sColon = GC.S_COL
 sDash = GC.S_DASH
+sStar = GC.S_STAR
 sUSC = GC.S_USC
 sUS02 = GC.S_US02
+sTab = GC.S_TAB
+sNewl = GC.S_NEWL
 sNULL = GC.S_NULL
 s0, sC, sX = GC.S_0, GC.S_CAP_C, GC.S_CAP_X
 sBase = GC.S_BASE
@@ -68,6 +76,7 @@ sConfMat = GC.S_CONF_MAT
 sDetailed = GC.S_DETAILED
 sProba = GC.S_PROB
 sProp = GC.S_PROP
+sClMapping = GC.S_CL_MAPPING
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -87,9 +96,17 @@ dIO = {# --- general
        'lenNmerDef': lenNmerDef,
        'iCentNmer': iCentNmer,
        # --- strings
+       'sSpace': sSpace,
+       'sDot': sDot,
+       'sComma': sComma,
+       'sSemicol': sSemicol,
+       'sColon': sColon,
        'sDash': sDash,
+       'sStar': sStar,
        'sUSC': sUSC,
        'sUS02': sUS02,
+       'sTab': sTab,
+       'sNewl': sNewl,
        'sNULL': sNULL,
        's0': s0,
        'sC': sC,
@@ -144,6 +161,7 @@ dIO = {# --- general
        'sDetailed': sDetailed,
        'sProba': sProba,
        'sProp': sProp,
+       'sClMapping': sClMapping,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

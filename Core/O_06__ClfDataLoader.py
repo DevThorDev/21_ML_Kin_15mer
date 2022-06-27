@@ -26,8 +26,8 @@ class DataLoader(BaseClass):
     def fillDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
-        sFClfU = (GF.joinS([self.dITp['sFInpClf'], self.dITp['sUnique']]) +
-                  self.dITp['xtCSV'])
+        sFClfU = (GF.joinS([self.dITp['sFInpClf'], self.dITp['sSetClf'],
+                            self.dITp['sUnique']]) + self.dITp['xtCSV'])
         self.dPF = {'DataClfU': GF.joinToPath(self.dITp['pInpClf'], sFClfU)}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
@@ -51,17 +51,17 @@ class DataLoader(BaseClass):
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
             self.dPF['InpDataPrC'] == self.dPF['InpDataClf']):
-            t = (self.serNmerSeqClf, self.dfrInpClf, self.lSXClClf,
-                 self.XClf, self.YClf)
-            (self.serNmerSeqPrC, self.dfrInpPrC, self.lSXClPrC,
-             self.XPrC, self.YPrC) = t
+            t = (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
+                 self.lSXClClf)
+            (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
+             self.lSXClPrC) = t
         elif ((self.dfrInpPrC is None and self.dfrInpClf is not None and
                self.dPF['InpDataPrC'] != self.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
             self.dfrInpPrC = self.loadData(self.dPF['InpDataPrC'], iC=iC)
             t = SF.loadInpData(self.dITp, self.dfrInpPrC, sMd='PrC', iC=iC)
-            (self.serNmerSeqPrC, self.dfrInpPrC, self.lSXClPrC,
-             self.XPrC, self.YPrC) = t
+            (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
+             self.lSXClPrC) = t
 
     # --- print methods -------------------------------------------------------
     def printSerNmerSeqClf(self):

@@ -259,10 +259,10 @@ class ExpData(BaseClass):
             for dRec in cDfr.to_dict('records'):
                 # considering all effectors pooled
                 GF.addToDictL(dENmer, self.dITp['sAnyEff'],
-                              dRec[self.dITp['sCNmer']], lUniqEl=False)
+                              dRec[self.dITp['sCNmer']], lUnqEl=False)
                 # considering the different effectors separately
                 GF.addToDictL(dENmer, dRec[self.dITp['sEffCode']],
-                              dRec[self.dITp['sCNmer']], lUniqEl=False)
+                              dRec[self.dITp['sCNmer']], lUnqEl=False)
         GF.addSCentNmerToDict(dNmer, dENmer, iCNmer)
         GF.showElapsedTime(stT)
         self.convDNmerToDfr(dNmer, stT, tpDfr=tpDfr)

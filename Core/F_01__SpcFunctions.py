@@ -158,13 +158,30 @@ def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     assert dITp['sCY' + sMd] in dfrInp.columns
     for sCX in dITp['lSCX' + sMd]:
         assert sCX in dfrInp.columns
-    lSCl = sorted(list(dfrInp[dITp['sCY' + sMd]].unique()))
     X = dfrInp[dITp['lSCX' + sMd]]
     Y = dfrInp[dITp['sCY' + sMd]]
-    return serNmerSeq, dfrInp, lSCl, X, Y
+    lSCl = sorted(list(dfrInp[dITp['sCY' + sMd]].unique()))
+    return dfrInp, X, Y, serNmerSeq, lSCl
+
+def getDClasses(dITp):
+    dITp['dClasses'], dITp['lXCl'] = {}, []
+    pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClClf'] + dITp['xtCSV'])
+    dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
+    for _, cRow in dfrClMap.iterrows():
+        [sK, sV] = cRow.to_list()
+        if sK != dITp['sStar'] and sV != dITp['sStar']:
+            dITp['dClasses'][sK] = sV
+            GF.addToListUnq(dITp['lXCl'], cEl=sV)
+    print('Calculated class dictionary.')
+    if dITp['printDClasses']:
+        for sK, sV in dITp['dClasses'].items():
+            print(sK, dITp['sColon'], dITp['sTab'], sV, sep='')
+        print(len(dITp['lXCl']), 'different X classes. List of X classes:')
+        print(dITp['lXCl'])
 
 def iniObj(dITp, dfrInp):
     sCNmer, sFam = dITp['sCNmer'], dITp['sEffFam']
+    getDClasses(dITp)
     dX = {sI: [] for sI in dITp['lSCXClf']}
     dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
     serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)

@@ -28,6 +28,7 @@ S_VBAR = '|'
 S_SLASH = '/'
 S_DBLBACKSL = '\\'
 S_QMK = '?'
+S_TAB = '\t'
 S_NEWL = '\n'
 S_NULL = 'NULL'
 S_0 = '0'
@@ -234,6 +235,11 @@ S_SUMMARY = 'Summary'
 S_CONF_MAT = 'ConfMat'
 S_DETAILED = 'Detailed'
 S_PROP = 'Prop'
+S_CL_MAPPING = 'ClMapping'
+
+# --- sets for X class mapping ------------------------------------------------
+S_SET_01 = 'Set01_11Cl'
+S_SET_02 = 'Set02_06Cl'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15

@@ -233,7 +233,7 @@ class SeqAnalysis(BaseClass):
                                            self.dITp['sCombInp']]:
             for n, cNmerSeq in enumerate(self.lNmerSeq):
                 for cLen, sSeq in cNmerSeq.dPrf.items():
-                    GF.addToDictL(self.dLenSeq, cK=cLen, cE=sSeq, lUniqEl=True)
+                    GF.addToDictL(self.dLenSeq, cK=cLen, cE=sSeq, lUnqEl=True)
                 GF.showProgress(N=len(self.lNmerSeq), n=n, modeDisp=mDsp,
                                 varText=varTxt, startTime=stT)
         elif self.dITp['useNmerSeqFrom'] == self.dITp['sIEffInp']:

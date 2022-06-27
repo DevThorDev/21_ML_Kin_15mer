@@ -234,9 +234,9 @@ def addToDictCt(cD, cK, cIncr=1):
     else:
         cD[cK] = cIncr
 
-def addToDictL(cD, cK, cE, lUniqEl=False):
+def addToDictL(cD, cK, cE, lUnqEl=False):
     if cK in cD:
-        if not lUniqEl or cE not in cD[cK]:
+        if not lUnqEl or cE not in cD[cK]:
             cD[cK].append(cE)
     else:
         cD[cK] = [cE]
