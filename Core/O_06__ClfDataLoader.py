@@ -26,7 +26,7 @@ class DataLoader(BaseClass):
     def fillDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
-        sFClfU = (GF.joinS([self.dITp['sFInpClf'], self.dITp['sSetClf'],
+        sFClfU = (GF.joinS([self.dITp['sFInpClf'], self.dITp['sSet'],
                             self.dITp['sUnique']]) + self.dITp['xtCSV'])
         self.dPF = {'DataClfU': GF.joinToPath(self.dITp['pInpClf'], sFClfU)}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)

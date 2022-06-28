@@ -11,8 +11,9 @@ import pandas as pd
 # --- sets for class dictionary -----------------------------------------------
 SET01 = 'Set01_11Cl'
 SET02 = 'Set02_06Cl'
+SET03 = 'Set03_05Cl'
 
-C_SET = SET02
+C_SET = SET03
 
 # --- files, directories and paths --------------------------------------------
 P_PROC_I_N_MER = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
@@ -113,35 +114,6 @@ sSnipCalcRF = 'LSV'
 # --- lists -------------------------------------------------------------------
 
 # --- dictionaries ------------------------------------------------------------
-# dClasses = {'AGC': 'X_AGC',
-#             'CDK': 'X_CDK',
-#             'CDPK': 'X_CDPK',
-#             'CK_II': 'X_CK_II',
-#             'LRR_1': 'X_LRR',
-#             'LRR_10': 'X_LRR',
-#             'LRR_11': 'X_LRR',
-#             'LRR_12': 'X_LRR',
-#             'LRR_2': 'X_LRR',
-#             'LRR_3': 'X_LRR',
-#             'LRR_6B': 'X_LRR',
-#             'LRR_7': 'X_LRR',
-#             'LRR_7A': 'X_LRR',
-#             'LRR_8A': 'X_LRR',
-#             'LRR_8B': 'X_LRR',
-#             'LRR_8C': 'X_LRR',
-#             'LRR_9': 'X_LRR',
-#             'LRR_9A': 'X_LRR',
-#             'MAP2K': 'X_MAPNK',
-#             'MAP3K': 'X_MAPNK',
-#             'MAPK': 'X_MAPK',
-#             'RLCK_2': 'X_RLCK',
-#             'RLCK_6': 'X_RLCK',
-#             'RLCK_7': 'X_RLCK',
-#             'SLK': 'X_SLK',
-#             'SnRK1': 'X_SnRK',
-#             'SnRK2': 'X_SnRK',
-#             'SnRK3': 'X_SnRK',
-#             'soluble': 'X_soluble'}
 
 # === assertions ==============================================================
 
@@ -167,12 +139,12 @@ if inpTbl == 'CombS':
 sFInpDClf = S_F_INP_CLF_COMB_XS
 sFInpDClMap = S_F_INP_D_CLASSES
 sFOutRFEffFam = S_F_REL_FREQ_EFF_FAM
-sFOutRFXCl = S_F_REL_FREQ_X_CL
+sFOutRFXCl = joinS([S_F_REL_FREQ_X_CL, C_SET])
 sFOutMap = S_F_NMER_KIN_FAM_MAP
 if NmerUnique:
-    sFOutRFEffFam = joinS([S_F_REL_FREQ_EFF_FAM, S_UNIQUE])
-    sFOutRFXCl = joinS([S_F_REL_FREQ_X_CL, S_UNIQUE])
-    sFOutMap = joinS([S_F_NMER_KIN_FAM_MAP, S_UNIQUE])
+    sFOutRFEffFam = joinS([sFOutRFEffFam, S_UNIQUE])
+    sFOutRFXCl = joinS([sFOutRFXCl, S_UNIQUE])
+    sFOutMap = joinS([sFOutMap, S_UNIQUE])
 
 pFInpUnqC = os.path.join(pInp, sFBase + XT_CSV)
 pFInpRFSnip = os.path.join(P_TEMP_RES, sFBaseUnqCSNmer + XT_CSV)
@@ -215,7 +187,6 @@ dInp = {# --- flow control ----------------------------------------------------
         'iCentNmer': I_CENT_N_MER,
         # --- lists -----------------------------------------------------------
         # --- dictionaries ----------------------------------------------------
-        # 'dClasses': dClasses,
         # === derived values and input processing =============================
         'pFInpUnqC': pFInpUnqC,
         'pFInpRFSnip': pFInpRFSnip,
@@ -589,7 +560,7 @@ if getFreqAllKinCl or getFreqAllXCl or getKinClNmerMapping:
         calcRelFreqCl(dTemp, serNmerSeq, doXCl=True)
     if getKinClNmerMapping:
         calcKinClNmerMapping(dTemp, serNmerSeq)
-    
+
 if getAllPotentialSnips:
     dfrInp = readCSV(pF=dInp['pFInpUnqC'], iCol=0)
     print('dfrInp:\n', dfrInp, sep='')

@@ -27,9 +27,10 @@ usedAAcTypePrC = usedAAcTypeClf
 
 usedClTypePrC = usedClTypeClf
 
-# --- names and paths of files and dirs (classifier) --------------------------
-sSetClf = GC.S_SET_02
+# --- names and paths of files and dirs (general) -----------------------------
+sSet = GC.S_SET_03
 
+# --- names and paths of files and dirs (classifier) --------------------------
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
 # sFResCombSClf = 'Combined_S_KinasesPho15mer_202202'
 sFInpStartClf = 'InpClf'
@@ -39,13 +40,11 @@ sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
     # sFInpClf = GF.joinS([sFInpStartClf, usedAAcTypeClf, sFResCombSClf])
     sFInpClf = GF.joinS([sFInpStartClf, sFInpBaseClf])
-sFInpDClClf = GF.joinS([sFInpStartClf, GC.S_CL_MAPPING, sSetClf])
+sFInpDClClf = GF.joinS([sFInpStartClf, GC.S_CL_MAPPING, sSet])
 
 pInpClf = GC.P_DIR_INP_CLF
 
 # --- names and paths of files and dirs (proportion calculator) ---------------
-sSetPrC = sSetClf
-
 sFInpStartPrC = sFInpStartClf
 sFInpBasePrC = sFInpBaseClf
 
@@ -82,37 +81,6 @@ sCYPrC = GC.S_EFF_CL
 # --- sets --------------------------------------------------------------------
 setNmerLen = set(range(1, 15 + 1, 2))
 
-# --- dictionaries (classifier) -----------------------------------------------
-dClasses = {'AGC': 'X_AGC',
-            'CDK': 'X_CDK',
-            'CDPK': 'X_CDPK',
-            'CK_II': 'X_CK_II',
-            'LRR_1': 'X_LRR',
-            'LRR_10': 'X_LRR',
-            'LRR_11': 'X_LRR',
-            'LRR_12': 'X_LRR',
-            'LRR_2': 'X_LRR',
-            'LRR_3': 'X_LRR',
-            'LRR_6B': 'X_LRR',
-            'LRR_7': 'X_LRR',
-            'LRR_7A': 'X_LRR',
-            'LRR_8A': 'X_LRR',
-            'LRR_8B': 'X_LRR',
-            'LRR_8C': 'X_LRR',
-            'LRR_9': 'X_LRR',
-            'LRR_9A': 'X_LRR',
-            'MAP2K': 'X_MAPNK',
-            'MAP3K': 'X_MAPNK',
-            'MAPK': 'X_MAPK',
-            'RLCK_2': 'X_RLCK',
-            'RLCK_6': 'X_RLCK',
-            'RLCK_7': 'X_RLCK',
-            'SLK': 'X_SLK',
-            'SnRK1': 'X_SnRK',
-            'SnRK2': 'X_SnRK',
-            'SnRK3': 'X_SnRK',
-            'soluble': 'X_soluble'}
-
 # === assertions ==============================================================
 if maxLenNmer not in setNmerLen:
     maxLenNmer = max(setNmerLen)
@@ -138,12 +106,12 @@ dIO = {# --- general
        'usedNmerSeqPrC': usedNmerSeqPrC,
        'usedAAcTypePrC': usedAAcTypePrC,
        'usedClTypePrC': usedClTypePrC,
+       # --- names and paths of files and dirs (general)
+       'sSet': sSet,
        # --- names and paths of files and dirs (classifier)
-       'sSetClf': sSetClf,
        'sFInpBaseClf': sFInpBaseClf,
        'sFInpClf': sFInpClf,
        'sFInpDClClf': sFInpDClClf,
-       'sSetPrC': sSetPrC,
        'sFInpBasePrC': sFInpBasePrC,
        'pInpClf': pInpClf,
        # --- names and paths of files and dirs (proportion calculator)
@@ -166,8 +134,6 @@ dIO = {# --- general
        # --- strings (proportion calculator)
        'sCYPrC': sCYPrC,
        # --- sets
-       # --- dictionaries (classifier)
-       'dClasses': dClasses,
        # === derived values and input processing
        'maxPosNmer': maxPosNmer,
        'rngPosNmer': rngPosNmer,

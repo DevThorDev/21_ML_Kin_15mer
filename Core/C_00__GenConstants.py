@@ -240,6 +240,7 @@ S_CL_MAPPING = 'ClMapping'
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'
 S_SET_02 = 'Set02_06Cl'
+S_SET_03 = 'Set03_05Cl'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15
