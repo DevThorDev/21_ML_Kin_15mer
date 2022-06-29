@@ -60,7 +60,8 @@ pInpPrC = pInpClf
 printDClasses = True
 
 # --- numbers (general) -------------------------------------------------------
-maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
+# maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
+maxLenNmer = 1           # odd number between 1 and 15 or None (max. len)
 
 # --- numbers (classifier) -------------------------------------------------------
 iCInpDataClf = 0
@@ -79,9 +80,14 @@ sCYClf = GC.S_EFF_CL
 sCYPrC = GC.S_EFF_CL
 
 # --- sets --------------------------------------------------------------------
-setNmerLen = set(range(1, 15 + 1, 2))
+setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 
 # === assertions ==============================================================
+
+if maxLenNmer is not None:
+    maxLenNmer = max(1, round(maxLenNmer))
+    if 2*(maxLenNmer//2) >= maxLenNmer:     # i.e. maxLenNmer is even
+        maxLenNmer += 1
 if maxLenNmer not in setNmerLen:
     maxLenNmer = max(setNmerLen)
 

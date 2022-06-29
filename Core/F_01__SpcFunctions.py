@@ -206,11 +206,13 @@ def fill_DY(dITp, dT, dY, cSeq):
     return lXCl
 
 def procClfInp(dITp, dfrInp):
+    iCent, maxPos = dITp['iCentNmer'], dITp['maxPosNmer']
     dfrProc, X, Y, serNmerSeq, lSXCl = None, None, None, None, []
     if dITp['sCNmer'] in dfrInp.columns:
         dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp)
         for cSeq in serNmerSeq:
-            fill_DProc_DX(dITp, dProc, dX, cSeq)
+            cSeqRed = cSeq[(iCent - maxPos):(iCent + maxPos + 1)]
+            fill_DProc_DX(dITp, dProc, dX, cSeq=cSeqRed)
             GF.fillListUnique(cL=lSXCl, cIt=fill_DY(dITp, dT, dY, cSeq))
         for cD in [dX, dY]:
             GF.complDict(cDFull=dProc, cDAdd=cD)
