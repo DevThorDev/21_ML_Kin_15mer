@@ -77,6 +77,9 @@ sDetailed = GC.S_DETAILED
 sProba = GC.S_PROB
 sProp = GC.S_PROP
 sClMapping = GC.S_CL_MAPPING
+sMaxLenS = GC.S_MAX_LEN_S
+sRestr = GC.S_RESTR
+sSglLblTrain = GC.S_SGL_LBL_TRAIN
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -162,6 +165,9 @@ dIO = {# --- general
        'sProba': sProba,
        'sProp': sProp,
        'sClMapping': sClMapping,
+       'sMaxLenS': sMaxLenS,
+       'sRestr': sRestr,
+       'sSglLblTrain': sSglLblTrain,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

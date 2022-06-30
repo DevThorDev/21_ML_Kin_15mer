@@ -236,6 +236,9 @@ S_CONF_MAT = 'ConfMat'
 S_DETAILED = 'Detailed'
 S_PROP = 'Prop'
 S_CL_MAPPING = 'ClMapping'
+S_MAX_LEN_S = 'mxL'
+S_RESTR = 'restr'
+S_SGL_LBL_TRAIN = 'sglLblTrain'
 
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'

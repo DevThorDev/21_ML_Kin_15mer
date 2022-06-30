@@ -40,9 +40,12 @@ class Looper(BaseClass):
     def adapMthDPF(self, cClf, sMth):
         sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
         xtCSV, sSum = self.dITp['xtCSV'], self.dITp['sSummary']
+        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sAAcRestr'],
+                        (cClf.dITp['sSglLblTrain'] if cClf.dITp['sglLblTrain']
+                         else '')], sJoin=sJ1)
         sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), sJoin=sJ1)
         sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], sJoin=sJ1)
-        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth], sJoin=sJ1)
+        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth, sFE], sJoin=sJ1)
         sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCPar], sJoin=sJ2) + xtCSV
         sFSum = GF.joinS([sSum, sLKP, sFCore], sJoin=sJ2) + xtCSV
         sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], sJoin=sJ2) + xtCSV

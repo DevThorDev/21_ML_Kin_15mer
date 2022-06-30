@@ -117,6 +117,16 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_06__ClfDataLoader) -----------------------------------------
+def filterNmerSeq(dITp, serSeq):
+    if dITp['dAAcPosRestr'] is not None:
+        assert min([len(sSeq) for sSeq in serSeq]) >= dITp['lenNmerDef']
+        for iP, lAAc in dITp['dAAcPosRestr'].items():
+            iSeq = iP + dITp['iCentNmer']
+            if iSeq >= 0 and iSeq < dITp['lenNmerDef']:
+                lB = [(sSeq[iSeq] in lAAc) for sSeq in serSeq]
+                serSeq = serSeq[lB]
+    return serSeq
+
 def getClassStrOldCl(dITp, setSDC, lSCl=[]):
     setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
     # step 1: fill setSDigC
@@ -141,6 +151,7 @@ def getClassStr(dITp, lSCl=[], sMd='Clf'):
 def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
     lSer, sCY = [], dITp['sCY' + sMd]
     serNmerSeq = GF.iniPdSer(serNmerSeq.unique(), nameS=dITp['sCNmer'])
+    serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
     for cSeq in serNmerSeq:
         cDfr = dfrInp[dfrInp[dITp['sCNmer']] == cSeq]
         lSC = GF.toListUnique(cDfr[sCY].to_list())
@@ -185,6 +196,7 @@ def iniObj(dITp, dfrInp):
     dX = {sI: [] for sI in dITp['lSCXClf']}
     dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
     serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
+    serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
     for cSeq in serNmerSeq:
         lFam = dfrInp[dfrInp[sCNmer] == cSeq][sFam].to_list()
         dT[cSeq] = GF.toListUnique(lFam)

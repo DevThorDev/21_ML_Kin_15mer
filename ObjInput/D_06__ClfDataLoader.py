@@ -60,8 +60,8 @@ pInpPrC = pInpClf
 printDClasses = True
 
 # --- numbers (general) -------------------------------------------------------
-# maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
-maxLenNmer = 1           # odd number between 1 and 15 or None (max. len)
+maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
+# maxLenNmer = 9           # odd number between 1 and 15 or None (max. len)
 
 # --- numbers (classifier) -------------------------------------------------------
 iCInpDataClf = 0
@@ -82,6 +82,10 @@ sCYPrC = GC.S_EFF_CL
 # --- sets --------------------------------------------------------------------
 setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 
+# --- dictionaries ------------------------------------------------------------
+dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
+# dAAcPosRestr = {0: ['S', 'T', 'Y']}     # None or dict. {iPos: lAAc restrict}
+
 # === assertions ==============================================================
 
 if maxLenNmer is not None:
@@ -96,6 +100,13 @@ maxPosNmer = maxLenNmer//2
 rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)
 lSCXClf = [str(n) for n in rngPosNmer]
 lSCXPrC = lSCXClf
+
+sMaxLenNmer, sAAcRestr, sMxLen = '', '', str(maxLenNmer)
+if maxLenNmer is not None and maxLenNmer != GC.LEN_N_MER_DEF:
+    sMaxLenNmer = GC.S_MAX_LEN_S + str(GC.S_0)*(2 - len(sMxLen)) + sMxLen
+if dAAcPosRestr is not None:
+    for sK, lV in dAAcPosRestr.items():
+        sAAcRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -140,10 +151,14 @@ dIO = {# --- general
        # --- strings (proportion calculator)
        'sCYPrC': sCYPrC,
        # --- sets
+       # --- dictionaries
+       'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
        'maxPosNmer': maxPosNmer,
        'rngPosNmer': rngPosNmer,
        'lSCXClf': lSCXClf,
-       'lSCXPrC': lSCXPrC}
+       'lSCXPrC': lSCXPrC,
+       'sMaxLenNmer': sMaxLenNmer,
+       'sAAcRestr': sAAcRestr}
 
 ###############################################################################

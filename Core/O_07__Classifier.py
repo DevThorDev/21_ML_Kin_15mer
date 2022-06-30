@@ -201,13 +201,16 @@ class Classifier(BaseClfPrC):
         XTrans = self.cEnc.transform(catData).toarray()
         if self.dITp['lvlOut'] > 1:
             self.printEncAttr(XTrans=XTrans)
-        return XTrans
+        return GF.iniPdDfr(XTrans, lSNmR=self.Y.index)
 
     # --- method for splitting data into training and test data ---------------
     def getTrainTestDS(self, X, Y):
         tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
                                  test_size=self.dITp['propTestData'])
         XTrain, XTest, YTrain, YTest = tTrTe
+        if self.dITp['sglLblTrain']:
+            lB = [serR.sum() == 1 for _, serR in YTrain.iterrows()]
+            XTrain, YTrain = XTrain[lB], YTrain[lB]
         self.setXY(X=XTrain, Y=YTrain, setTrain=True)
         self.setXY(X=XTest, Y=YTest, setTrain=False)
 
@@ -353,12 +356,15 @@ class PropCalculator(BaseClfPrC):
 
     # --- method for adapting a key of the result paths dictionary ------------
     def setPathOutDataPrC(self, sCl=None):
+        sJ1, sJ2, x = self.dITp['sUSC'], self.dITp['sUS02'], self.dITp['xtCSV']
         sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
-                             sJoin=self.dITp['sUS02'])
-        sFOutPrC = sFOutBase + self.dITp['xtCSV']
+                             sJoin=sJ2)
+        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sAAcRestr'],
+                        (self.dITp['sSglLblTrain'] if self.dITp['sglLblTrain']
+                         else '')], sJoin=sJ1)
+        sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
         if sCl is not None:
-            sFOutPrC = (GF.joinS([sFOutBase, sCl], sJoin=self.dITp['sUSC']) +
-                        self.dITp['xtCSV'])
+            sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], sJoin=sJ1) + x
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
     # --- methods calculating the proportions of AAc at all Nmer positions ----

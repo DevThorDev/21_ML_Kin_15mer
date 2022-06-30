@@ -13,7 +13,7 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 # --- flow control ------------------------------------------------------------
 doRndForestClf = True
 doNNMLPClf = True
-doPropCalc = False
+doPropCalc = True
 
 doTrainTestSplit = True
 
@@ -24,10 +24,12 @@ plotConfMatrix = False
 
 encodeCatFtr = True
 
-useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
-usedNmerSeq = GC.S_UNQ_LIST        # S_FULL_LIST / S_UNQ_LIST
+sglLblTrain = False                  # use only single-label training data?
 
-usedAAcType = GC.S_AAC        # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
+useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
+usedNmerSeq = GC.S_UNQ_LIST         # S_FULL_LIST / S_UNQ_LIST
+
+usedAAcType = GC.S_AAC              # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
 usedClType = GC.S_NEW + GC.S_CL     # GC.S_NEW/GC.S_OLD + GC.S_CL
 
@@ -53,7 +55,6 @@ vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # --- numbers -----------------------------------------------------------------
-maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
 propTestData = .2
 
 rndDigScore = GC.R04
@@ -71,7 +72,6 @@ if usedAAcType == GC.S_AAC_CHARGE:
     setFeat = set('NPST')
 elif usedAAcType == GC.S_AAC_POLAR:
     setFeat = set('ABCNPQ')
-setNmerLen = set(range(1, 15 + 1, 2))
 
 # --- lists -------------------------------------------------------------------
 lFeatSrt = sorted(list(setFeat))
@@ -84,8 +84,6 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # === assertions ==============================================================
-if maxLenNmer not in setNmerLen:
-    maxLenNmer = max(setNmerLen)
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -101,6 +99,7 @@ dIO = {# --- general
        'calcConfMatrix': calcConfMatrix,
        'plotConfMatrix': plotConfMatrix,
        'encodeCatFtr': encodeCatFtr,
+       'sglLblTrain': sglLblTrain,
        'useFullSeqFrom': useFullSeqFrom,
        'usedNmerSeq': usedNmerSeq,
        'usedAAcType': usedAAcType,
@@ -123,7 +122,6 @@ dIO = {# --- general
        # --- general input for neural network MLP classifier
        'bVerb': bVerb,
        # --- numbers
-       'maxLenNmer': maxLenNmer,
        'propTestData': propTestData,
        'rndDigScore': rndDigScore,
        'rndDigCorrect': rndDigCorrect,
