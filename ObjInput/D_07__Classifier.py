@@ -24,7 +24,8 @@ plotConfMatrix = False
 
 encodeCatFtr = True
 
-sglLblTrain = False                  # use only single-label training data?
+lLblTrain = None                    # number of labels used for training data
+                                    # or None [use all labels]
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
 usedNmerSeq = GC.S_UNQ_LIST         # S_FULL_LIST / S_UNQ_LIST
@@ -85,6 +86,12 @@ lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # === assertions ==============================================================
 
+# === derived values and input processing =====================================
+sCLblsTrain = ''
+if lLblTrain is not None:
+    sCLblsTrain = GC.S_USC.join([str(nLbl) for nLbl in lLblTrain])
+    sCLblsTrain = GC.S_USC.join([GC.S_LBL, sCLblsTrain, GC.S_TRAIN])
+
 # === create input dictionary =================================================
 dIO = {# --- general
        'sOType': sOType,
@@ -99,7 +106,7 @@ dIO = {# --- general
        'calcConfMatrix': calcConfMatrix,
        'plotConfMatrix': plotConfMatrix,
        'encodeCatFtr': encodeCatFtr,
-       'sglLblTrain': sglLblTrain,
+       'lLblTrain': lLblTrain,
        'useFullSeqFrom': useFullSeqFrom,
        'usedNmerSeq': usedNmerSeq,
        'usedAAcType': usedAAcType,
@@ -134,6 +141,8 @@ dIO = {# --- general
        # --- lists
        'lFeatSrt': lFeatSrt,
        'lOldClPlt': lOldClPlt,
-       'lSResClf': lSResClf}
+       'lSResClf': lSResClf,
+       # === derived values and input processing
+       'sCLblsTrain': sCLblsTrain}
 
 ###############################################################################

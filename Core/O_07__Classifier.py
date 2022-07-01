@@ -208,8 +208,9 @@ class Classifier(BaseClfPrC):
         tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
                                  test_size=self.dITp['propTestData'])
         XTrain, XTest, YTrain, YTest = tTrTe
-        if self.dITp['sglLblTrain']:
-            lB = [serR.sum() == 1 for _, serR in YTrain.iterrows()]
+        if self.dITp['lLblTrain'] is not None:
+            lB = [serR.sum() in self.dITp['lLblTrain'] for _, serR in
+                  YTrain.iterrows()]
             XTrain, YTrain = XTrain[lB], YTrain[lB]
         self.setXY(X=XTrain, Y=YTrain, setTrain=True)
         self.setXY(X=XTest, Y=YTest, setTrain=False)
@@ -359,9 +360,8 @@ class PropCalculator(BaseClfPrC):
         sJ1, sJ2, x = self.dITp['sUSC'], self.dITp['sUS02'], self.dITp['xtCSV']
         sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
                              sJoin=sJ2)
-        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sAAcRestr'],
-                        (self.dITp['sSglLblTrain'] if self.dITp['sglLblTrain']
-                         else '')], sJoin=sJ1)
+        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sAAcRestr']],
+                       sJoin=sJ1)
         sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
         if sCl is not None:
             sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], sJoin=sJ1) + x

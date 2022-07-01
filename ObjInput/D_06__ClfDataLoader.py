@@ -11,6 +11,9 @@ sNmSpec = 'Input data for the data loader class in O_06__ClfDataLoader'
 
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
+# --- flow control (general) --------------------------------------------------
+sSet = GC.S_SET_03
+
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
@@ -26,9 +29,6 @@ usedNmerSeqPrC = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 usedAAcTypePrC = usedAAcTypeClf
 
 usedClTypePrC = usedClTypeClf
-
-# --- names and paths of files and dirs (general) -----------------------------
-sSet = GC.S_SET_03
 
 # --- names and paths of files and dirs (classifier) --------------------------
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
@@ -113,6 +113,8 @@ dIO = {# --- general
        'sOType': sOType,
        'sNmSpec': sNmSpec,
        'lvlOut': lvlOut,
+       # --- flow control (general)
+       'sSet': sSet,
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
        'usedNmerSeqClf': usedNmerSeqClf,
@@ -123,8 +125,6 @@ dIO = {# --- general
        'usedNmerSeqPrC': usedNmerSeqPrC,
        'usedAAcTypePrC': usedAAcTypePrC,
        'usedClTypePrC': usedClTypePrC,
-       # --- names and paths of files and dirs (general)
-       'sSet': sSet,
        # --- names and paths of files and dirs (classifier)
        'sFInpBaseClf': sFInpBaseClf,
        'sFInpClf': sFInpClf,
