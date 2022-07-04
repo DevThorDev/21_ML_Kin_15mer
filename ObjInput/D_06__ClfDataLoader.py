@@ -87,7 +87,6 @@ dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
 # dAAcPosRestr = {0: ['S', 'T', 'Y']}     # None or dict. {iPos: lAAc restrict}
 
 # === assertions ==============================================================
-
 if maxLenNmer is not None:
     maxLenNmer = max(1, round(maxLenNmer))
     if 2*(maxLenNmer//2) >= maxLenNmer:     # i.e. maxLenNmer is even

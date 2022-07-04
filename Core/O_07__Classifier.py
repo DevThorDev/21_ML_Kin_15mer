@@ -235,6 +235,7 @@ class Classifier(BaseClfPrC):
             lDfr[k].columns = lSCTP
             lDfr[k] = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], lDfr[k]])
             lDfr[k].dropna(axis=0, inplace=True)
+            lDfr[k] = lDfr[k].convert_dtypes()
         [self.dfrPred, self.dfrProba] = lDfr
 
     def calcResPredict(self, X2Pred=None):
