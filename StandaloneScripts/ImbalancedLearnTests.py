@@ -10,8 +10,10 @@ import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 
-from imblearn.over_sampling import RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import (RandomOverSampler, SMOTE, ADASYN)
 
 # ### CONSTANTS ###############################################################
 # --- sets for class dictionary -----------------------------------------------
@@ -69,6 +71,8 @@ S_CL = 'Cl'
 S_TRUE_CL = 'True' + S_CL
 S_PRED_CL = 'Pred' + S_CL
 S_ALL = 'All'
+S_EFF = 'Eff'
+S_EFF_FAMILY = S_EFF + 'Family'
 S_NUM_PRED = 'numPredicted'
 S_NUM_CORR = 'numCorrect'
 S_PROP_CORR = 'propCorrect'
@@ -85,17 +89,44 @@ R04 = 4
 R08 = 8
 
 # ### INPUT ###################################################################
-# --- flow control ------------------------------------------------------------
+# === flow control ============================================================
 doRndOvSamplTest = True
 
 NmerUnique = True
 
-lLblTrain = [1]                    # number of labels used for training data
+# lLblTrain = [0, 1]                  # number of labels used for training data
+lLblTrain = [1]                  # number of labels used for training data
                                     # or None [use all labels]
 
-sSampler = 'RandomOverSampler'      # string matching the over/under-sampler
+# === general input for any classifier ========================================
+sUsedClf = 'NNMLP'   # 'RandomForest' / 'NNMLP'
+rndState = None             # None (random) or integer (reproducible)
+
+# --- input for random forest classifier --------------------------------------
+n_estimators = 200
+criterion = 'log_loss'
+
+# --- input for neural network MLP classifier ---------------------------------
+hidden_layer_sizes = (100,)
+activation = 'relu'
+solver = 'adam'
+max_iter = 50000
+
+# === general over- and undersampler input ====================================
+sSampler = 'SMOTE'      # string matching the over/under-sampler
 stratSampling = 'auto'              # sampling strategy
+
+# --- RandomUnderSampler input ------------------------------------------------
+wReplacement = False                # is sample with or without replacement?
+
+# --- RandomOverSampler input -------------------------------------------------
 shrinkSampling = None               # shrinkage applied to covariance matrix
+
+# --- SMOTE input -------------------------------------------------------------
+kNeighbors = 5
+
+# --- ADASYN input ------------------------------------------------------------
+nNeighbors = 5
 
 # --- numbers -----------------------------------------------------------------
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
@@ -109,6 +140,7 @@ sCNmer = S_C_N_MER
 sSnipCalcRF = 'LSV'
 sTrueCl = S_TRUE_CL
 sPredCl = S_PRED_CL
+sEffFamily = S_EFF_FAMILY
 sNumPred = S_NUM_PRED
 sNumCorr = S_NUM_CORR
 sPropCorr = S_PROP_CORR
@@ -120,9 +152,6 @@ setNmerLen = set(range(1, LEN_N_MER_DEF + 1, 2))
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # --- dictionaries ------------------------------------------------------------
-
-# --- general input for any classifier ----------------------------------------
-rndState = None             # None (random) or integer (reproducible)
 
 # === assertions ==============================================================
 if maxLenNmer is not None:
@@ -163,7 +192,10 @@ dITp = {# --- flow control ----------------------------------------------------
         'lLblTrain': lLblTrain,
         'sSampler': sSampler,
         'stratSampling': stratSampling,
+        'wReplacement': wReplacement,
         'shrinkSampling': shrinkSampling,
+        'kNeighbors': kNeighbors,
+        'nNeighbors': nNeighbors,
         # --- files, directories and paths ------------------------------------
         'sFInpDClf': sFInpDClf,
         'sFInpDClMap': sFInpDClMap,
@@ -180,6 +212,7 @@ dITp = {# --- flow control ----------------------------------------------------
         'sSnipCalcRF': sSnipCalcRF,
         'sTrueCl': sTrueCl,
         'sPredCl': sPredCl,
+        'sEffFamily': sEffFamily,
         'sNumPred': sNumPred,
         'sNumCorr': sNumCorr,
         'sPropCorr': sPropCorr,
@@ -197,7 +230,16 @@ dITp = {# --- flow control ----------------------------------------------------
         'lSResClf': lSResClf,
         # --- dictionaries ----------------------------------------------------
         # --- general input for any classifier --------------------------------
+        'sUsedClf': sUsedClf,
         'rndState': rndState,
+        # --- input for random forest classifier ------------------------------
+        'n_estimators': n_estimators,
+        'criterion': criterion,
+        # --- input for neural network MLP classifier -------------------------
+        'hidden_layer_sizes': hidden_layer_sizes,
+        'activation': activation,
+        'solver': solver,
+        'max_iter': max_iter,
         # === derived values and input processing =============================
         'pFInpDClf': pFInpDClf,
         'pFInpDClMap': pFInpDClMap,
@@ -281,7 +323,9 @@ def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
 
 # --- Functions initialising pandas objects -----------------------------------
 def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
-    assert len(shape) == 1
+    assert (((type(data) == np.ndarray and len(data.shape) == 1) or
+             (type(data) in [list, tuple]) or (data is None))
+            and (len(shape) == 1))
     if lSNmI is None or len(lSNmI) == 0:
         if data is None:
             return pd.Series(np.full(shape, fillV), name=nameS)
@@ -292,7 +336,8 @@ def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
             return pd.Series(np.full(len(lSNmI), fillV), index=lSNmI,
                              name=nameS)
         else:
-            assert data.size == len(lSNmI)
+            assert ((type(data) == np.ndarray and data.shape[0] == len(lSNmI))
+                    or (type(data) == list and len(data) == len(lSNmI)))
             return pd.Series(data, index=lSNmI, name=nameS)
 
 def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
@@ -355,10 +400,29 @@ def getCentralSnipOfNmer(dITp, sNmer, sSnip=S_CAP_S):
 def checkCentralSnipOfNmer(dITp, sNmer, sSnip=S_CAP_S):
     return getCentralSnipOfNmer(dITp, sNmer=sNmer, sSnip=sSnip) == sSnip
 
+# --- Functions converting between single- and multi-label systems ------------
+def toMultiLbl(dITp, serY):
+    dY = {}
+    for sLbl in serY:
+        for sXCl in dITp['lSCY']:           # lSCY <-> lXCl
+            addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
+    return iniPdDfr(dY, lSNmR=serY.index)
+
+def toSglLbl(dITp, dfrY):
+    serY = None
+    # check sanity
+    if iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
+        lY = [None]*dfrY.shape[0]
+        lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
+        for k, cI in enumerate(lSer):
+            if cI.size >= 1:
+                lY[k] = cI.to_list()[0]
+        serY = iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFamily'])
+    return serY
+
 # --- Function loading the input for the classifier(s) ------------------------
 def getClfInp(dITp, dfrInp):
     X, Y, serSeq = None, None, None
-    # iCent, maxP, sCNmer = dITp['iCentNmer'], dITp['maxPosNmer'], dITp['sCNmer']
     sCNmer = dITp['sCNmer']
     if sCNmer in dfrInp.columns:
         X, Y = dfrInp[dITp['lSCX']], dfrInp[dITp['lSCY']]
@@ -388,34 +452,60 @@ def getTrainTestDS(X, Y):
     return XTrain, XTest, YTrain, YTest
 
 # --- Function implementing imbalanced classes ("imblearn") -------------------
-def getOverSampler(dITp):
-    cOvSampler = None
+def getSampler(dITp):
+    cSampler = None
+    if dITp['sSampler'] == 'RandomUnderSampler':
+        cSampler = RandomUnderSampler(sampling_strategy=dITp['stratSampling'],
+                                      random_state=dITp['rndState'],
+                                      replacement=dITp['wReplacement'])
     if dITp['sSampler'] == 'RandomOverSampler':
-        cOvSampler = RandomOverSampler(sampling_strategy=dITp['stratSampling'],
-                                       random_state=dITp['rndState'],
-                                       shrinkage=dITp['shrinkSampling'])
-    return cOvSampler
+        cSampler = RandomOverSampler(sampling_strategy=dITp['stratSampling'],
+                                     random_state=dITp['rndState'],
+                                     shrinkage=dITp['shrinkSampling'])
+    elif dITp['sSampler'] == 'SMOTE':
+        cSampler = SMOTE(sampling_strategy=dITp['stratSampling'],
+                         random_state=dITp['rndState'],
+                         k_neighbors=dITp['kNeighbors'])
+    elif dITp['sSampler'] == 'ADASYN':
+        cSampler = ADASYN(sampling_strategy=dITp['stratSampling'],
+                          random_state=dITp['rndState'],
+                          n_neighbors=dITp['nNeighbors'])
+    return cSampler
 
-def fitResampleImbalanced(cSampler, XTrain, YTrain):
-    print('XTrain (BEFORE):\n', XTrain, sep='')
-    print('YTrain (BEFORE):\n', YTrain, sep='')
-    serYTrain = pd.Series([None]*YTrain.shape[0], index=YTrain.index,
-                          name='YClass')
-    for cI, serR in YTrain.iterrows():
-        assert sum(serR) <= 1
-        for s in YTrain.columns:
-            if serR.at[s] == 1:
-                serYTrain.at[cI] = s
-                break
+def fitResampleImbalanced(dITp, cSampler, XTrain, YTrain):
+    print('Shape of YTrain (BEFORE):\n', YTrain.shape, sep='')
+    serYTrain = toSglLbl(dITp, dfrY=YTrain)
+    print('Shape of serYTrain (BEFORE):\n', serYTrain.shape, sep='')
     XTrain, serYTrain = cSampler.fit_resample(XTrain, serYTrain)
-    print('XTrain (AFTER):\n', XTrain, sep='')
-    print('YTrain (AFTER):\n', YTrain, sep='')
-    print('serYTrain (AFTER):\n', serYTrain, sep='')
-    return XTrain, serYTrain
+    print('Shape of serYTrain (AFTER):\n', serYTrain.shape, sep='')
+    for s in serYTrain.unique():
+        print(s, ':', serYTrain[serYTrain == s].size)
+    return XTrain, serYTrain, toMultiLbl(dITp, serY=serYTrain)
+
+# --- Function fitting the selected classifier --------------------------------
+def getClf(dITp, X, Y):
+    if dITp['sUsedClf'] == 'RandomForest':
+        return fitRndForestClf(dITp, X, Y)
+    elif dITp['sUsedClf'] == 'NNMLP':
+        return fitNNMLPClf(dITp, X, Y)
+    else:
+        return None
 
 # --- Function implementing and fitting the random forest classifier ----------
 def fitRndForestClf(dITp, X, Y):
-    cClf = RandomForestClassifier(random_state=dITp['rndState'])
+    cClf = RandomForestClassifier(random_state=dITp['rndState'],
+                                  n_estimators=dITp['n_estimators'],
+                                  criterion=dITp['criterion'])
+    cClf.fit(X, Y)
+    return cClf
+
+# --- Function implementing and fitting the neural network MLP classifier -----
+def fitNNMLPClf(dITp, X, Y):
+    cClf = MLPClassifier(random_state=dITp['rndState'],
+                         hidden_layer_sizes=dITp['hidden_layer_sizes'],
+                         activation=dITp['activation'],
+                         solver=dITp['solver'],
+                         max_iter=dITp['max_iter'])
     cClf.fit(X, Y)
     return cClf
 
@@ -476,9 +566,9 @@ def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, i=0):
 # --- Function for predicting with a Classifier -------------------------------
 def ClfPred(dITp, dRes, fittedClf, XTest, YTest, serSeq):
     if fittedClf is not None:
-        lSC, lSR = YTest.columns, YTest.index
-        YPred = iniPdDfr(fittedClf.predict(XTest), lSNmC=lSC, lSNmR=lSR)
-        YProba = getYProba(fittedClf, XTest, lSC=lSC, lSR=lSR)
+        lSCMlt, lSI = YTest.columns, YTest.index
+        YPred = iniPdDfr(fittedClf.predict(XTest), lSNmC=lSCMlt, lSNmR=lSI)
+        YProba = getYProba(fittedClf, XTest, lSC=lSCMlt, lSR=lSI)
         assert YProba.shape == YPred.shape
         return calcResPredict(dITp, dResClf=dRes, X2Pred=XTest, YTest=YTest,
                               YPred=YPred, YProba=YProba, serSeq=serSeq)
@@ -501,6 +591,14 @@ def printDfrRes(dITp, dRes):
                   round((nOK/nC if (nC > 0) else (0.))*100, R02), S_PERC,
                   sep='')
 
+# --- Function saving the results ---------------------------------------------
+def saveDfrPredProba(dITp, dfrPred, dfrProba):
+    xtCSV = dITp['xtCSV']
+    sFPred = joinS(['dfrPred', dITp['sUsedClf'], dITp['sSampler']]) + xtCSV
+    sFProba = joinS(['dfrProba', dITp['sUsedClf'], dITp['sSampler']]) + xtCSV
+    saveAsCSV(dfrPred, pF=joinToPath(pF='SavedData', nmF=sFPred))
+    saveAsCSV(dfrProba, pF=joinToPath(pF='SavedData', nmF=sFProba))
+
 # ### MAIN ####################################################################
 print(S_EQ80, S_NEWL, S_DS30, ' ImbalancedLearnTests.py ', S_DS25, S_NEWL,
       sep='')
@@ -513,15 +611,15 @@ if (doRndOvSamplTest):
     print('Y:\n', Y, sep='')
     XEnc = encodeCatFeatures(catData=X)
     XTrain, XTest, YTrain, YTest = getTrainTestDS(X=XEnc, Y=Y)
-    
+
     # imbalanced part
-    cOverSampler = getOverSampler(dITp)
-    XTrain, YTrain = fitResampleImbalanced(cSampler=cOverSampler,
-                                           XTrain=XTrain, YTrain=YTrain)
-    
-    # RF Classifier fit part
-    RFClf = fitRndForestClf(dITp, X=XTrain, Y=YTrain)
-    dfrPredicted, dfrProbabilities = ClfPred(dITp, dRes=dRes, fittedClf=RFClf,
+    cSampler = getSampler(dITp)
+    t = fitResampleImbalanced(dITp, cSampler, XTrain, YTrain)
+    XTrain, YTrainSgl, YTrainMlt = t
+
+    # classifier fit part
+    cClf = getClf(dITp, X=XTrain, Y=YTrainMlt)
+    dfrPredicted, dfrProbabilities = ClfPred(dITp, dRes=dRes, fittedClf=cClf,
                                              XTest=XTest, YTest=YTest,
                                              serSeq=serNmerSeq)
     print('dfrPredicted:\n', dfrPredicted, sep='')
@@ -530,6 +628,7 @@ if (doRndOvSamplTest):
           dfrPredicted[dfrPredicted['X_MAPK_PredCl'] > 0], sep='')
     print('dRes:\n', dRes, sep='')
     printDfrRes(dITp, dRes=dRes)
+    saveDfrPredProba(dITp, dfrPred=dfrPredicted, dfrProba=dfrProbabilities)
 
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 

@@ -576,7 +576,9 @@ def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
 
 # --- Functions performing pandas DataFrame calculation and manipulation ------
 def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
-    assert len(shape) == 1
+    assert (((type(data) == np.ndarray and len(data.shape) == 1) or
+             (type(data) in [list, tuple]) or (data is None))
+            and (len(shape) == 1))
     if lSNmI is None or len(lSNmI) == 0:
         if data is None:
             return pd.Series(np.full(shape, fillV), name=nameS)
@@ -587,7 +589,8 @@ def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
             return pd.Series(np.full(len(lSNmI), fillV), index=lSNmI,
                              name=nameS)
         else:
-            assert data.size == len(lSNmI)
+            assert ((type(data) == np.ndarray and data.shape[0] == len(lSNmI))
+                    or (type(data) == list and len(data) == len(lSNmI)))
             return pd.Series(data, index=lSNmI, name=nameS)
 
 def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
