@@ -12,8 +12,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
-from imblearn.under_sampling import RandomUnderSampler
+from imblearn.under_sampling import (ClusterCentroids, AllKNN,
+                                     NeighbourhoodCleaningRule,
+                                     RandomUnderSampler, TomekLinks)
 from imblearn.over_sampling import (RandomOverSampler, SMOTE, ADASYN)
+
+from imblearn.ensemble import BalancedRandomForestClassifier
 
 # ### CONSTANTS ###############################################################
 # --- sets for class dictionary -----------------------------------------------
@@ -63,6 +67,8 @@ S_DS44 = S_DASH*44
 S_DS80 = S_DASH*80
 S_EQ80 = S_EQ*80
 S_TB02 = S_TAB*2
+S_TB03 = S_TAB*3
+S_TB04 = S_TAB*4
 
 S_C_N_MER = 'c15mer'
 S_TRAIN = 'Train'
@@ -99,10 +105,11 @@ lLblTrain = [1]                  # number of labels used for training data
                                     # or None [use all labels]
 
 # === general input for any classifier ========================================
-sUsedClf = 'NNMLP'   # 'RandomForest' / 'NNMLP'
+sUsedClf = 'NNMLP'   # 'RandomForest' / 'BalancedRandomForest'
+                                    # 'NNMLP'
 rndState = None             # None (random) or integer (reproducible)
 
-# --- input for random forest classifier --------------------------------------
+# --- input for (balanced) random forest classifier ---------------------------
 n_estimators = 200
 criterion = 'log_loss'
 
@@ -113,14 +120,36 @@ solver = 'adam'
 max_iter = 50000
 
 # === general over- and undersampler input ====================================
-sSampler = 'SMOTE'      # string matching the over/under-sampler
-stratSampling = 'auto'              # sampling strategy
+sSampler = 'TomekLinks'   # string matching the over/under-sampler
+sStrat = 'all'                 # sampling strategy
+                    # 'all' / 'majority' / 'not majority' / 'not minority'
+# sStrat = {'X_AGC': 50,
+#           'X_CDPK': 50,
+#           'X_CK_II': 50,
+#           'X_MAPK': 50,
+#           'X_SnRK2': 50}
 
-# --- RandomUnderSampler input ------------------------------------------------
-wReplacement = False                # is sample with or without replacement?
+# --- ClusterCentroids input --------------------------------------------------
+estimator = None                # a KMeans estimator (None --> default est.)
+voting = 'auto'                 # ['auto'] / 'hard' / 'soft'
+
+# --- AllKNN input ------------------------------------------------------------
+n_neighbors_AllKNN = 3          # number of nearest neighbors
+kind_sel_AllKNN = 'all'         # strategy to exclude samples [‘all’ / ‘mode’]
+allow_minority = False          # allows majority classes --> minority class
+
+# --- NeighbourhoodCleaningRule input -----------------------------------------
+n_neighbors_NCR = 3             # number of nearest neighbors
+kind_sel_NCR = 'mode'            # strategy to exclude samples [‘all’ / ‘mode’]
+threshold_cleaning = 0.5        # threshold 4 class considered during cleaning
+
+# --- RandomUnderSampler and BalancedRandomForestClassifier input -------------
+wReplacement = False            # is sample with or without replacement?
+
+# --- TomekLinks input --------------------------------------------------------
 
 # --- RandomOverSampler input -------------------------------------------------
-shrinkSampling = None               # shrinkage applied to covariance matrix
+shrinkSampling = None           # shrinkage applied to covariance matrix
 
 # --- SMOTE input -------------------------------------------------------------
 kNeighbors = 5
@@ -149,7 +178,7 @@ sPropCorr = S_PROP_CORR
 setNmerLen = set(range(1, LEN_N_MER_DEF + 1, 2))
 
 # --- lists -------------------------------------------------------------------
-lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
+lSResClf = [sNumPred, sNumCorr, sPropCorr]
 
 # --- dictionaries ------------------------------------------------------------
 
@@ -190,12 +219,6 @@ dITp = {# --- flow control ----------------------------------------------------
         'doRndOvSamplTest': doRndOvSamplTest,
         'NmerUnique': NmerUnique,
         'lLblTrain': lLblTrain,
-        'sSampler': sSampler,
-        'stratSampling': stratSampling,
-        'wReplacement': wReplacement,
-        'shrinkSampling': shrinkSampling,
-        'kNeighbors': kNeighbors,
-        'nNeighbors': nNeighbors,
         # --- files, directories and paths ------------------------------------
         'sFInpDClf': sFInpDClf,
         'sFInpDClMap': sFInpDClMap,
@@ -229,10 +252,10 @@ dITp = {# --- flow control ----------------------------------------------------
         # --- lists -----------------------------------------------------------
         'lSResClf': lSResClf,
         # --- dictionaries ----------------------------------------------------
-        # --- general input for any classifier --------------------------------
+        # === general input for any classifier --------------------------------
         'sUsedClf': sUsedClf,
         'rndState': rndState,
-        # --- input for random forest classifier ------------------------------
+        # --- input for (balanced) random forest classifier -------------------
         'n_estimators': n_estimators,
         'criterion': criterion,
         # --- input for neural network MLP classifier -------------------------
@@ -240,6 +263,29 @@ dITp = {# --- flow control ----------------------------------------------------
         'activation': activation,
         'solver': solver,
         'max_iter': max_iter,
+        # === general over- and undersampler input
+        'sSampler': sSampler,
+        'sStrat': sStrat,
+        # --- ClusterCentroids input
+        'estimator': estimator,
+        'voting': voting,
+        # --- AllKNN input
+        'n_neighbors_AllKNN': n_neighbors_AllKNN,
+        'kind_sel_AllKNN': kind_sel_AllKNN,
+        'allow_minority': allow_minority,
+        # --- NeighbourhoodCleaningRule input
+        'n_neighbors_NCR': n_neighbors_NCR,
+        'kind_sel_NCR': kind_sel_NCR,
+        'threshold_cleaning': threshold_cleaning,
+        # --- RandomUnderSampler and BalancedRandomForestClassifier input
+        'wReplacement': wReplacement,
+        # --- TomekLinks input
+        # --- RandomOverSampler input
+        'shrinkSampling': shrinkSampling,
+        # --- SMOTE input
+        'kNeighbors': kNeighbors,
+        # --- ADASYN input
+        'nNeighbors': nNeighbors,
         # === derived values and input processing =============================
         'pFInpDClf': pFInpDClf,
         'pFInpDClMap': pFInpDClMap,
@@ -454,32 +500,48 @@ def getTrainTestDS(X, Y):
 # --- Function implementing imbalanced classes ("imblearn") -------------------
 def getSampler(dITp):
     cSampler = None
-    if dITp['sSampler'] == 'RandomUnderSampler':
-        cSampler = RandomUnderSampler(sampling_strategy=dITp['stratSampling'],
+    if dITp['sSampler'] == 'ClusterCentroids':
+        cSampler = ClusterCentroids(sampling_strategy=dITp['sStrat'],
+                                    random_state=dITp['rndState'],
+                                    estimator=dITp['estimator'],
+                                    voting=dITp['voting'])
+    elif dITp['sSampler'] == 'AllKNN':
+        cSampler = AllKNN(sampling_strategy=dITp['sStrat'],
+                          n_neighbors=dITp['n_neighbors_AllKNN'],
+                          kind_sel=dITp['kind_sel_AllKNN'],
+                          allow_minority=dITp['allow_minority'])
+    elif dITp['sSampler'] == 'NeighbourhoodCleaningRule':
+        cSampler = NeighbourhoodCleaningRule(sampling_strategy=dITp['sStrat'],
+                                             n_neighbors=dITp['n_neighbors_NCR'],
+                                             kind_sel=dITp['kind_sel_NCR'],
+                                             threshold_cleaning=dITp['threshold_cleaning'])
+    elif dITp['sSampler'] == 'RandomUnderSampler':
+        cSampler = RandomUnderSampler(sampling_strategy=dITp['sStrat'],
                                       random_state=dITp['rndState'],
                                       replacement=dITp['wReplacement'])
-    if dITp['sSampler'] == 'RandomOverSampler':
-        cSampler = RandomOverSampler(sampling_strategy=dITp['stratSampling'],
+    elif dITp['sSampler'] == 'TomekLinks':
+        cSampler = TomekLinks(sampling_strategy=dITp['sStrat'])
+    elif dITp['sSampler'] == 'RandomOverSampler':
+        cSampler = RandomOverSampler(sampling_strategy=dITp['sStrat'],
                                      random_state=dITp['rndState'],
                                      shrinkage=dITp['shrinkSampling'])
     elif dITp['sSampler'] == 'SMOTE':
-        cSampler = SMOTE(sampling_strategy=dITp['stratSampling'],
+        cSampler = SMOTE(sampling_strategy=dITp['sStrat'],
                          random_state=dITp['rndState'],
                          k_neighbors=dITp['kNeighbors'])
     elif dITp['sSampler'] == 'ADASYN':
-        cSampler = ADASYN(sampling_strategy=dITp['stratSampling'],
+        cSampler = ADASYN(sampling_strategy=dITp['sStrat'],
                           random_state=dITp['rndState'],
                           n_neighbors=dITp['nNeighbors'])
     return cSampler
 
 def fitResampleImbalanced(dITp, cSampler, XTrain, YTrain):
-    print('Shape of YTrain (BEFORE):\n', YTrain.shape, sep='')
     serYTrain = toSglLbl(dITp, dfrY=YTrain)
-    print('Shape of serYTrain (BEFORE):\n', serYTrain.shape, sep='')
+    print('Initial shape of serYTrain:', serYTrain.shape)
     XTrain, serYTrain = cSampler.fit_resample(XTrain, serYTrain)
-    print('Shape of serYTrain (AFTER):\n', serYTrain.shape, sep='')
+    print('Final shape of serYTrain:', serYTrain.shape)
     for s in serYTrain.unique():
-        print(s, ':', serYTrain[serYTrain == s].size)
+        print(s, S_TAB, serYTrain[serYTrain == s].size, sep='')
     return XTrain, serYTrain, toMultiLbl(dITp, serY=serYTrain)
 
 # --- Function fitting the selected classifier --------------------------------
@@ -488,6 +550,8 @@ def getClf(dITp, X, Y):
         return fitRndForestClf(dITp, X, Y)
     elif dITp['sUsedClf'] == 'NNMLP':
         return fitNNMLPClf(dITp, X, Y)
+    elif dITp['sUsedClf'] == 'BalancedRandomForest':
+        return fitBalancedRndForestClf(dITp, X, Y)
     else:
         return None
 
@@ -506,6 +570,16 @@ def fitNNMLPClf(dITp, X, Y):
                          activation=dITp['activation'],
                          solver=dITp['solver'],
                          max_iter=dITp['max_iter'])
+    cClf.fit(X, Y)
+    return cClf
+
+# --- Function implementing and fitting the balanced random forest classifier -
+def fitBalancedRndForestClf(dITp, X, Y):
+    cClf = BalancedRandomForestClassifier(sampling_strategy=dITp['sStrat'],
+                                          random_state=dITp['rndState'],
+                                          replacement=dITp['wReplacement'],
+                                          n_estimators=dITp['n_estimators'],
+                                          criterion=dITp['criterion'])
     cClf.fit(X, Y)
     return cClf
 
@@ -532,13 +606,18 @@ def calcResPredict(dITp, dResClf, X2Pred=None, YTest=None, YPred=None,
         for sK, cV in zip(dITp['lSResClf'], lVCalc):
             dResClf[sK] = cV
         assert (YTest.columns == YPred.columns).all()
+        nOKA, nFA = 0, 0
         for s in YTest.columns:
             nOK = sum([1 for k in range(nPred) if
                        (YTest.iloc[k, :].at[s] == YPred.iloc[k, :]).at[s]])
             nF = sum([1 for k in range(nPred) if
                       (YTest.iloc[k, :].at[s] != YPred.iloc[k, :]).at[s]])
             dResClf[joinS([s, dITp['sAll']])] = (nOK, nF)
+            nOKA += nOK
+            nFA += nF
+        dResClf[dITp['sAll']] = (nOKA, nFA)
         for i, sI in zip([0, 1], [dITp['s0'], dITp['s1']]):
+            nOKI, nFI = 0, 0
             for s in YTest.columns:
                 nOK = sum([1 for k in range(nPred) if
                            YTest.iloc[k, :].at[s] == i and
@@ -547,6 +626,9 @@ def calcResPredict(dITp, dResClf, X2Pred=None, YTest=None, YPred=None,
                           YTest.iloc[k, :].at[s] == i and
                           YPred.iloc[k, :].at[s] == 1 - i])
                 dResClf[joinS([s, sI])] = (nOK, nF)
+                nOKI += nOK
+                nFI += nF
+            dResClf[sI] = (nOKI, nFI)
         sTCl, sPCl, sJ = dITp['sTrueCl'], dITp['sPredCl'], dITp['sUSC']
         # create dfrPred/dfrProba, containing YTest and YPred/YProba
         lSCTP = [joinS([s, sTCl], sJoin=sJ) for s in YTest.columns]
@@ -584,7 +666,9 @@ def printDfrRes(dITp, dRes):
         else:
             assert type(cV) == tuple and len(cV) == 2
             (nOK, nF), nC = cV, sum(cV)
-            print(sK, S_COLON, (S_TAB if (len(sK) >= 11) else S_TB02),
+            print(sK, S_COLON, (S_TAB if (len(sK) >= 11) else
+                                (S_TB02 if (len(sK) >= 7) else
+                                 (S_TB03 if (len(sK) >= 3) else S_TB04))),
                   round(nOK, R04), S_TAB, S_VBAR, S_TAB,
                   round(nF, R04), S_TAB, S_VBAR, S_TAB,
                   round(nC, R04), S_TAB, S_VBAR, S_TAB,
@@ -593,9 +677,14 @@ def printDfrRes(dITp, dRes):
 
 # --- Function saving the results ---------------------------------------------
 def saveDfrPredProba(dITp, dfrPred, dfrProba):
-    xtCSV = dITp['xtCSV']
-    sFPred = joinS(['dfrPred', dITp['sUsedClf'], dITp['sSampler']]) + xtCSV
-    sFProba = joinS(['dfrProba', dITp['sUsedClf'], dITp['sSampler']]) + xtCSV
+    sStrat = dITp['sStrat']
+    if type(dITp['sStrat']) == str:
+        sStrat = dITp['sStrat'].replace(S_SPACE, '')
+    elif type(dITp['sStrat']) == dict:
+        sStrat = joinS(['Dict', 'minN', str(min(dITp['sStrat'].values()))])
+    sFCore = joinS([dITp['sUsedClf'], dITp['sSampler'], sStrat])
+    sFPred = joinS(['dfrPred', sFCore]) + dITp['xtCSV']
+    sFProba = joinS(['dfrProba', sFCore]) + dITp['xtCSV']
     saveAsCSV(dfrPred, pF=joinToPath(pF='SavedData', nmF=sFPred))
     saveAsCSV(dfrProba, pF=joinToPath(pF='SavedData', nmF=sFProba))
 
@@ -604,29 +693,20 @@ print(S_EQ80, S_NEWL, S_DS30, ' ImbalancedLearnTests.py ', S_DS25, S_NEWL,
       sep='')
 if (doRndOvSamplTest):
     dRes, dfrInpClf = {}, readCSV(pF=dITp['pFInpDClf'], iCol=0)
-    print('dfrInpClf:\n', dfrInpClf, sep='')
     X, Y, serNmerSeq = getClfInp(dITp, dfrInp=dfrInpClf)
-    print('serNmerSeq:\n', serNmerSeq, sep='')
-    print('X:\n', X, sep='')
-    print('Y:\n', Y, sep='')
     XEnc = encodeCatFeatures(catData=X)
     XTrain, XTest, YTrain, YTest = getTrainTestDS(X=XEnc, Y=Y)
 
     # imbalanced part
-    cSampler = getSampler(dITp)
-    t = fitResampleImbalanced(dITp, cSampler, XTrain, YTrain)
-    XTrain, YTrainSgl, YTrainMlt = t
+    if dITp['sUsedClf'] not in ['BalancedRandomForest']:
+        t = fitResampleImbalanced(dITp, getSampler(dITp), XTrain, YTrain)
+        XTrain, YTrainSgl, YTrain = t
 
     # classifier fit part
-    cClf = getClf(dITp, X=XTrain, Y=YTrainMlt)
+    cClf = getClf(dITp, X=XTrain, Y=YTrain)
     dfrPredicted, dfrProbabilities = ClfPred(dITp, dRes=dRes, fittedClf=cClf,
                                              XTest=XTest, YTest=YTest,
                                              serSeq=serNmerSeq)
-    print('dfrPredicted:\n', dfrPredicted, sep='')
-    print('dfrProbabilities:\n', dfrProbabilities, sep='')
-    print('dfrPredicted with X_MAPK:\n',
-          dfrPredicted[dfrPredicted['X_MAPK_PredCl'] > 0], sep='')
-    print('dRes:\n', dRes, sep='')
     printDfrRes(dITp, dRes=dRes)
     saveDfrPredProba(dITp, dfrPred=dfrPredicted, dfrProba=dfrProbabilities)
 
