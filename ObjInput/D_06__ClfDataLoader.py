@@ -83,8 +83,8 @@ sCYPrC = GC.S_EFF_CL
 setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 
 # --- dictionaries ------------------------------------------------------------
-dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
-# dAAcPosRestr = {0: ['S', 'T', 'Y']}     # None or dict. {iPos: lAAc restrict}
+# dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
+dAAcPosRestr = {0: ['S', 'T', 'Y']}     # None or dict. {iPos: lAAc restrict}
 
 # === assertions ==============================================================
 if maxLenNmer is not None:
