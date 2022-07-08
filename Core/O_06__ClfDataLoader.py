@@ -174,7 +174,7 @@ class DataLoader(BaseClass):
     def yieldDfrInpPrC(self):
         return self.dfrInpPrC
 
-    def yieldData(self, sMd='Clf'):
+    def yieldData(self, sMd=None):
         if sMd == 'Clf':
             return (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
                     self.lSXClClf)

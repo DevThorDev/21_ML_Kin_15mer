@@ -218,12 +218,13 @@ def fill_DY(dITp, dT, dY, cSeq):
     return lXCl
 
 def procClfInp(dITp, dfrInp):
-    iCent, maxPos = dITp['iCentNmer'], dITp['maxPosNmer']
+    iCent, lIPosUsed = dITp['iCentNmer'], dITp['lIPosUsed']
     dfrProc, X, Y, serNmerSeq, lSXCl = None, None, None, None, []
     if dITp['sCNmer'] in dfrInp.columns:
         dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp)
         for cSeq in serNmerSeq:
-            cSeqRed = cSeq[(iCent - maxPos):(iCent + maxPos + 1)]
+            cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
+            # cSeqRed = cSeq.iloc[[i + iCent for i in lIPosUsed]]
             fill_DProc_DX(dITp, dProc, dX, cSeq=cSeqRed)
             GF.fillListUnique(cL=lSXCl, cIt=fill_DY(dITp, dT, dY, cSeq))
         for cD in [dX, dY]:
@@ -232,5 +233,24 @@ def procClfInp(dITp, dfrInp):
     return dfrProc, X, Y, serNmerSeq, lSXCl
 
 # --- Functions (O_07__Classifier) --------------------------------------------
+# --- Functions converting between single- and multi-labels (imbalanced) ------
+def toMultiLbl(dITp, serY, lXCl):
+    dY = {}
+    for sLbl in serY:
+        for sXCl in lXCl:
+            GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
+    return GF.iniPdDfr(dY, lSNmR=serY.index)
+
+def toSglLbl(dITp, dfrY):
+    serY = None
+    # check sanity
+    if GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
+        lY = [None]*dfrY.shape[0]
+        lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
+        for k, cI in enumerate(lSer):
+            if cI.size >= 1:
+                lY[k] = cI.to_list()[0]
+        serY = GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
+    return serY
 
 ###############################################################################

@@ -82,6 +82,10 @@ sCYPrC = GC.S_EFF_CL
 # --- sets --------------------------------------------------------------------
 setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 
+# --- lists -------------------------------------------------------------------
+# lIPosUsed = None                # None or list of positions used for classific.
+lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]                # None or list of positions used for classific.
+
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
 dAAcPosRestr = {0: ['S', 'T', 'Y']}     # None or dict. {iPos: lAAc restrict}
@@ -97,15 +101,21 @@ if maxLenNmer not in setNmerLen:
 # === derived values and input processing =====================================
 maxPosNmer = maxLenNmer//2
 rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)
-lSCXClf = [str(n) for n in rngPosNmer]
+if lIPosUsed is None:
+    lIPosUsed = list(rngPosNmer)
+else:
+    lIPosUsed = sorted(list(set(lIPosUsed) & set(rngPosNmer)))
+lSCXClf = [str(n) for n in lIPosUsed]
 lSCXPrC = lSCXClf
 
-sMaxLenNmer, sAAcRestr, sMxLen = '', '', str(maxLenNmer)
+sMaxLenNmer, sRestr, sMxLen = '', '', str(maxLenNmer)
 if maxLenNmer is not None and maxLenNmer != GC.LEN_N_MER_DEF:
     sMaxLenNmer = GC.S_MAX_LEN_S + str(GC.S_0)*(2 - len(sMxLen)) + sMxLen
 if dAAcPosRestr is not None:
     for sK, lV in dAAcPosRestr.items():
-        sAAcRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
+        sRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
+if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
+    sRestr += GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -150,6 +160,8 @@ dIO = {# --- general
        # --- strings (proportion calculator)
        'sCYPrC': sCYPrC,
        # --- sets
+       # --- lists
+       'lIPosUsed': lIPosUsed,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
@@ -158,6 +170,6 @@ dIO = {# --- general
        'lSCXClf': lSCXClf,
        'lSCXPrC': lSCXPrC,
        'sMaxLenNmer': sMaxLenNmer,
-       'sAAcRestr': sAAcRestr}
+       'sRestr': sRestr}
 
 ###############################################################################

@@ -178,6 +178,10 @@ sPropCorr = S_PROP_CORR
 setNmerLen = set(range(1, LEN_N_MER_DEF + 1, 2))
 
 # --- lists -------------------------------------------------------------------
+lIPosUsed = None                # None or list of positions used for classific.
+# lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]
+
+# --- lists -------------------------------------------------------------------
 lSResClf = [sNumPred, sNumCorr, sPropCorr]
 
 # --- dictionaries ------------------------------------------------------------
@@ -206,7 +210,11 @@ pFInpDClMap = os.path.join(P_INP_CLF, sFInpDClMap + XT_CSV)
 
 maxPosNmer = maxLenNmer//2
 rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)
-lSCX = [str(n) for n in rngPosNmer]
+if lIPosUsed is None:
+    lIPosUsed = list(rngPosNmer)
+else:
+    lIPosUsed = sorted(list(set(lIPosUsed) & set(rngPosNmer)))
+lSCX = [str(n) for n in lIPosUsed]
 lSCY = ['X_AGC', 'X_CDPK', 'X_CK_II', 'X_MAPK', 'X_SnRK2']
 
 sCLblsTrain = ''
@@ -242,6 +250,8 @@ dITp = {# --- flow control ----------------------------------------------------
         'sAll': S_ALL,
         # --- sets
         'setNmerLen': setNmerLen,
+        # --- lists
+        'lIPosUsed': lIPosUsed,
         # --- file name extensions --------------------------------------------
         'xtCSV': XT_CSV,
         # --- numbers ---------------------------------------------------------

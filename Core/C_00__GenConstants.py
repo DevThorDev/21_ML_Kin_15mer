@@ -238,6 +238,7 @@ S_PROP = 'Prop'
 S_CL_MAPPING = 'ClMapping'
 S_MAX_LEN_S = 'mxL'
 S_RESTR = 'restr'
+S_I_POS = 'iPos'
 S_LBL = 'lbl'
 
 # --- sets for X class mapping ------------------------------------------------

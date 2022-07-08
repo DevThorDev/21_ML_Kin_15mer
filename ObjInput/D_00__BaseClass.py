@@ -79,6 +79,7 @@ sProp = GC.S_PROP
 sClMapping = GC.S_CL_MAPPING
 sMaxLenS = GC.S_MAX_LEN_S
 sRestr = GC.S_RESTR
+sIPos = GC.S_I_POS
 sLbl = GC.S_LBL
 
 # --- file name extensions ----------------------------------------------------
@@ -167,6 +168,7 @@ dIO = {# --- general
        'sClMapping': sClMapping,
        'sMaxLenS': sMaxLenS,
        'sRestr': sRestr,
+       'sIPos': sIPos,
        'sLbl': sLbl,
        # --- numbers
        # --- lists

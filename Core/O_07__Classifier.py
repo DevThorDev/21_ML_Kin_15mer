@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
+import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 
@@ -15,8 +16,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
+from imblearn.under_sampling import (ClusterCentroids, AllKNN,
+                                     NeighbourhoodCleaningRule,
+                                     RandomUnderSampler, TomekLinks)
+
 # -----------------------------------------------------------------------------
-class BaseClfPrC(BaseClass):
+class BaseSmplClfPrC(BaseClass):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
         super().__init__(inpDat)
@@ -26,13 +31,14 @@ class BaseClfPrC(BaseClass):
         self.D = D
         self.iniAttr(sKPar=sKPar)
         self.getDPF()
-        print('Initiated "BaseClfPrC" base object.')
+        print('Initiated "BaseSmplClfPrC" base object.')
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar='A'):
-        lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl', 'X', 'Y',
-                      'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
-                      'YPred', 'YProba', 'YTrain', 'YTest',
+        lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl',
+                      'X', 'XTrans', 'XTrain', 'XTest',
+                      'XTransTrain', 'XTransTest',
+                      'Y', 'YTrain', 'YTest', 'YPred', 'YProba',
                       'Clf', 'sMth', 'sMthL', 'scoreClf', 'confusMatrix',
                       'dfrPred', 'dfrProba']
         lAttrDict = ['d2ResClf', 'dConfMat', 'dPropAAc']
@@ -44,6 +50,11 @@ class BaseClfPrC(BaseClass):
                 setattr(self, cAttr, {})
         self.sKPar = sKPar
 
+    # --- methods for getting input data --------------------------------------
+    def getInpData(self, sMd=None):
+        (self.dfrInp, self.X, self.Y, self.serNmerSeq,
+         self.lSCl) = self.D.yieldData(sMd=sMd)
+
     # --- methods for filling the result paths dictionary ---------------------
     def getDPF(self):
         sBClf, sBPrC = self.D.dITp['sFInpBaseClf'], self.D.dITp['sFInpBasePrC']
@@ -53,6 +64,81 @@ class BaseClfPrC(BaseClass):
         self.dITp['sOutPrC'] = GF.joinS([self.D.dITp['sSet'], sBPrC],
                                         sJoin=self.dITp['sUSC'])
         self.dPF = self.D.yieldDPF()
+
+    # --- methods for getting and setting X and Y -----------------------------
+    def getXY(self, getTrain=None):
+        X, Y = self.X, self.Y
+        if self.dITp['encodeCatFtr']:
+            X = self.XTrans
+        if getTrain is not None and self.dITp['doTrainTestSplit']:
+            if getTrain:
+                X, Y = self.XTrain, self.YTrain
+                if self.dITp['encodeCatFtr']:
+                    X = self.XTransTrain
+            else:
+                X, Y = self.XTest, self.YTest
+                if self.dITp['encodeCatFtr']:
+                    X = self.XTransTest
+        return X, Y
+
+    def setXY(self, X, Y, setTrain=None):
+        if setTrain is not None and self.dITp['doTrainTestSplit']:
+            if setTrain:
+                self.YTrain = Y
+                if self.dITp['encodeCatFtr']:
+                    self.XTransTrain = X
+                else:
+                    self.XTrain = X
+            else:
+                self.YTest = Y
+                if self.dITp['encodeCatFtr']:
+                    self.XTransTest = X
+                else:
+                    self.XTest = X
+        else:
+            self.Y = Y
+            if self.dITp['encodeCatFtr']:
+                self.XTrans = X
+            else:
+                self.X = X
+
+    # --- methods for yielding data -------------------------------------------
+    def yieldData(self):
+        return (self.X, self.XTrans, self.XTrain, self.XTest,
+                self.XTransTrain, self.XTransTest,
+                self.Y, self.YTrain, self.YTest, self.YPred, self.YProba)
+
+    # --- method for encoding and transforming the categorical features -------
+    def encodeCatFeatures(self, catData=None):
+        if catData is None:
+            catData = self.X
+        self.cEnc = OneHotEncoder()
+        self.cEnc.fit(self.X)
+        XTrans = self.cEnc.transform(catData).toarray()
+        if self.dITp['lvlOut'] > 1:
+            self.printEncAttr(XTrans=XTrans)
+        return GF.iniPdDfr(XTrans, lSNmR=self.Y.index)
+
+    # --- method for splitting data into training and test data ---------------
+    def getTrainTestDS(self, X, Y):
+        tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
+                                 test_size=self.dITp['propTestData'])
+        XTrain, XTest, YTrain, YTest = tTrTe
+        if self.dITp['lLblTrain'] is not None:
+            lB = [serR.sum() in self.dITp['lLblTrain'] for _, serR in
+                  YTrain.iterrows()]
+            XTrain, YTrain = XTrain[lB], YTrain[lB]
+        self.setXY(X=XTrain, Y=YTrain, setTrain=True)
+        self.setXY(X=XTest, Y=YTest, setTrain=False)
+
+    # --- method for splitting data into training and test data ---------------
+    def encodeSplitData(self):
+        if self.dITp['encodeCatFtr'] and not self.dITp['doTrainTestSplit']:
+            self.XTrans = self.encodeCatFeatures()
+        elif not self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
+            self.getTrainTestDS(X=self.X, Y=self.Y)
+        elif self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
+            self.getTrainTestDS(X=self.encodeCatFeatures(), Y=self.Y)
 
     # --- print methods -------------------------------------------------------
     def printX(self):
@@ -80,28 +166,6 @@ class BaseClfPrC(BaseClass):
         self.printX()
         self.printY()
 
-# -----------------------------------------------------------------------------
-class Classifier(BaseClfPrC):
-    # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
-        super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
-        self.descO = 'Classifier for data classification'
-        self.getInpData()
-        if self.dITp['encodeCatFtr'] and not self.dITp['doTrainTestSplit']:
-            self.XTrans = self.encodeCatFeatures()
-        elif not self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
-            self.getTrainTestDS(X=self.X, Y=self.Y)
-        elif self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
-            self.getTrainTestDS(X=self.encodeCatFeatures(), Y=self.Y)
-        print('Initiated "Classifier" base object.')
-
-    # --- methods for getting input data --------------------------------------
-    def getInpData(self):
-        (self.dfrInp, self.X, self.Y, self.serNmerSeq,
-         self.lSCl) = self.D.yieldData(sMd='Clf')
-        self.saveData(self.dfrInp, pF=self.dPF['DataClfU'], saveAnyway=False)
-
-    # --- print methods -------------------------------------------------------
     def printEncAttr(self, XTrans):
         nFIn, nmFIn = self.cEnc.n_features_in_, self.cEnc.feature_names_in_
         print('Categories:', GC.S_NEWL, self.cEnc.categories_, sep='')
@@ -112,6 +176,73 @@ class Classifier(BaseClfPrC):
         print('Transformed array:', GC.S_NEWL, XTrans, GC.S_NEWL,
               'Shape: ', XTrans.shape, sep='')
 
+# -----------------------------------------------------------------------------
+class ImbSampler(BaseSmplClfPrC):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
+        super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
+        self.descO = 'Sampler for imbalanced learning'
+        self.getInpData(sMd='Clf')
+        self.encodeSplitData()
+        print('Initiated "ImbSampler" base object.')
+
+    # --- Function implementing imbalanced classes ("imblearn") ---------------
+    def getSampler(self):
+        cSampler, dITp = None, self.dITp
+        if dITp['sSampler'] == 'ClusterCentroids':
+            cSampler = ClusterCentroids(sampling_strategy=dITp['sStrat'],
+                                        random_state=dITp['rndState'],
+                                        estimator=dITp['estimator'],
+                                        voting=dITp['voting'])
+        elif dITp['sSampler'] == 'AllKNN':
+            cSampler = AllKNN(sampling_strategy=dITp['sStrat'],
+                              n_neighbors=dITp['n_neighbors_AllKNN'],
+                              kind_sel=dITp['kind_sel_AllKNN'],
+                              allow_minority=dITp['allow_minority'])
+        elif dITp['sSampler'] == 'NeighbourhoodCleaningRule':
+            sStrat, nNbr = dITp['sStrat'], dITp['n_neighbors_NCR']
+            kindSel, thrCln = dITp['kind_sel_NCR'], dITp['threshold_cleaning']
+            cSampler = NeighbourhoodCleaningRule(sampling_strategy=sStrat,
+                                                 n_neighbors=nNbr,
+                                                 kind_sel=kindSel,
+                                                 threshold_cleaning=thrCln)
+        elif dITp['sSampler'] == 'RandomUnderSampler':
+            cSampler = RandomUnderSampler(sampling_strategy=dITp['sStrat'],
+                                          random_state=dITp['rndState'],
+                                          replacement=dITp['wReplacement'])
+        elif dITp['sSampler'] == 'TomekLinks':
+            cSampler = TomekLinks(sampling_strategy=dITp['sStrat'])
+        return cSampler
+
+    def fitResampleImbalanced(self):
+        bTrain = (True if self.dITp['doTrainTestSplit'] else None)
+        X, Y = self.getXY(getTrain=bTrain)
+        serY = SF.toSglLbl(self.dITp, dfrY=Y)
+        print('Initial shape of serY:', serY.shape)
+        X, serY = self.getSampler().fit_resample(X, serY)
+        print('Final shape of serY:', serY.shape)
+        for cY in serY.unique():
+            print(cY, self.dITp['sTab'], serY[serY == cY].size, sep='')
+        YMlt = SF.toMultiLbl(self.dITp, serY=serY, lXCl=self.lSCl)
+        self.setXY(X=X, Y=YMlt, setTrain=bTrain)
+
+# -----------------------------------------------------------------------------
+class Classifier(BaseSmplClfPrC):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
+        super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
+        self.descO = 'Classifier for data classification'
+        cSmp = ImbSampler(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
+        t = cSmp.yieldData()
+        (self.X, self.XTrans, self.XTrain, self.XTest,
+         self.XTransTrain, self.XTransTest,
+         self.Y, self.YTrain, self.YTest, self.YPred, self.YProba) = t
+        if self.dITp['doImbSampling']:
+            cSmp.fitResampleImbalanced()
+        self.saveData(self.dfrInp, pF=self.dPF['DataClfU'], saveAnyway=False)
+        print('Initiated "Classifier" base object.')
+
+    # --- print methods -------------------------------------------------------
     def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
         if self.dITp['lvlOut'] > 0 and cSect in ['A2']:
             s1, s2 = (str(nCr) + ' out of ' + str(nPr) + ' correctly' +
@@ -154,66 +285,6 @@ class Classifier(BaseClfPrC):
             if self.confusMatrix is not None:
                 print('Confusion matrix:', GC.S_NEWL, self.confusMatrix,
                       sep='')
-
-    # --- methods for getting and setting X and Y -----------------------------
-    def getXY(self, getTrain=None):
-        X, Y = self.X, self.Y
-        if self.dITp['encodeCatFtr']:
-            X = self.XTrans
-        if getTrain is not None and self.dITp['doTrainTestSplit']:
-            if getTrain:
-                X, Y = self.XTrain, self.YTrain
-                if self.dITp['encodeCatFtr']:
-                    X = self.XTransTrain
-            else:
-                X, Y = self.XTest, self.YTest
-                if self.dITp['encodeCatFtr']:
-                    X = self.XTransTest
-        return X, Y
-
-    def setXY(self, X, Y, setTrain=None):
-        if setTrain is not None and self.dITp['doTrainTestSplit']:
-            if setTrain:
-                self.YTrain = Y
-                if self.dITp['encodeCatFtr']:
-                    self.XTransTrain = X
-                else:
-                    self.XTrain = X
-            else:
-                self.YTest = Y
-                if self.dITp['encodeCatFtr']:
-                    self.XTransTest = X
-                else:
-                    self.XTest = X
-        else:
-            self.Y = Y
-            if self.dITp['encodeCatFtr']:
-                self.XTrans = X
-            else:
-                self.X = X
-
-    # --- method for encoding and transforming the categorical features -------
-    def encodeCatFeatures(self, catData=None):
-        if catData is None:
-            catData = self.X
-        self.cEnc = OneHotEncoder()
-        self.cEnc.fit(self.X)
-        XTrans = self.cEnc.transform(catData).toarray()
-        if self.dITp['lvlOut'] > 1:
-            self.printEncAttr(XTrans=XTrans)
-        return GF.iniPdDfr(XTrans, lSNmR=self.Y.index)
-
-    # --- method for splitting data into training and test data ---------------
-    def getTrainTestDS(self, X, Y):
-        tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
-                                 test_size=self.dITp['propTestData'])
-        XTrain, XTest, YTrain, YTest = tTrTe
-        if self.dITp['lLblTrain'] is not None:
-            lB = [serR.sum() in self.dITp['lLblTrain'] for _, serR in
-                  YTrain.iterrows()]
-            XTrain, YTrain = XTrain[lB], YTrain[lB]
-        self.setXY(X=XTrain, Y=YTrain, setTrain=True)
-        self.setXY(X=XTest, Y=YTest, setTrain=False)
 
     # --- method for fitting a Classifier -------------------------------------
     def ClfFit(self, cClf):
@@ -343,25 +414,20 @@ class NNMLPClf(Classifier):
             self.scoreClf = self.Clf.score(XTest, YTest)
 
 # -----------------------------------------------------------------------------
-class PropCalculator(BaseClfPrC):
+class PropCalculator(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, iTp=7, lITpUpd=[1, 2]):
         super().__init__(inpDat, D=D, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Calculator: AAc proportions per kinase (class)'
-        self.getInpData()
+        self.getInpData(sMd='PrC')
         print('Initiated "PropCalculator" base object.')
-
-    # --- methods for getting input data --------------------------------------
-    def getInpData(self):
-        (self.dfrInp, self.X, self.Y, self.serNmerSeq,
-         self.lSCl) = self.D.yieldData(sMd='PrC')
 
     # --- method for adapting a key of the result paths dictionary ------------
     def setPathOutDataPrC(self, sCl=None):
         sJ1, sJ2, x = self.dITp['sUSC'], self.dITp['sUS02'], self.dITp['xtCSV']
         sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
                              sJoin=sJ2)
-        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sAAcRestr']],
+        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr']],
                        sJoin=sJ1)
         sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
         if sCl is not None:
