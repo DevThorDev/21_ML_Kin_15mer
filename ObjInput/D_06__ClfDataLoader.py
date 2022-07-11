@@ -83,8 +83,8 @@ sCYPrC = GC.S_EFF_CL
 setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 
 # --- lists -------------------------------------------------------------------
-# lIPosUsed = None                # None or list of positions used for classific.
-lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]                # None or list of positions used for classific.
+lIPosUsed = None                # None or list of positions used for classific.
+# lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]                # None or list of positions used for classific.
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -115,7 +115,7 @@ if dAAcPosRestr is not None:
     for sK, lV in dAAcPosRestr.items():
         sRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
 if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
-    sRestr += GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
+    sRestr = GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
 
 # === create input dictionary =================================================
 dIO = {# --- general

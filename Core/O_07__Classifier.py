@@ -102,9 +102,20 @@ class BaseSmplClfPrC(BaseClass):
             else:
                 self.X = X
 
+    # --- methods for setting data --------------------------------------------
+    def setData(self, tData):
+        lSAttr = ['dfrInp', 'serNmerSeq', 'lSCl', 'X', 'XTrans', 'XTrain',
+                  'XTest', 'XTransTrain', 'XTransTest', 'Y', 'YTrain', 'YTest',
+                  'YPred', 'YProba']
+        assert len(tData) == len(lSAttr)
+        for sAttr, cV in zip(lSAttr, tData):
+            if cV is not None:
+                setattr(self, sAttr, cV)
+
     # --- methods for yielding data -------------------------------------------
     def yieldData(self):
-        return (self.X, self.XTrans, self.XTrain, self.XTest,
+        return (self.dfrInp, self.serNmerSeq, self.lSCl,
+                self.X, self.XTrans, self.XTrain, self.XTest,
                 self.XTransTrain, self.XTransTest,
                 self.Y, self.YTrain, self.YTest, self.YPred, self.YProba)
 
@@ -215,6 +226,8 @@ class ImbSampler(BaseSmplClfPrC):
         return cSampler
 
     def fitResampleImbalanced(self):
+        print('Resampling data using resampler "', self.dITp['sSampler'],
+              '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
         bTrain = (True if self.dITp['doTrainTestSplit'] else None)
         X, Y = self.getXY(getTrain=bTrain)
         serY = SF.toSglLbl(self.dITp, dfrY=Y)
@@ -233,12 +246,10 @@ class Classifier(BaseSmplClfPrC):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Classifier for data classification'
         cSmp = ImbSampler(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
-        t = cSmp.yieldData()
-        (self.X, self.XTrans, self.XTrain, self.XTest,
-         self.XTransTrain, self.XTransTest,
-         self.Y, self.YTrain, self.YTest, self.YPred, self.YProba) = t
+        self.setData(cSmp.yieldData())
         if self.dITp['doImbSampling']:
             cSmp.fitResampleImbalanced()
+            self.setData(cSmp.yieldData())
         self.saveData(self.dfrInp, pF=self.dPF['DataClfU'], saveAnyway=False)
         print('Initiated "Classifier" base object.')
 

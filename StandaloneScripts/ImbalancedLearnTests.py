@@ -120,8 +120,8 @@ solver = 'adam'
 max_iter = 50000
 
 # === general over- and undersampler input ====================================
-sSampler = 'TomekLinks'   # string matching the over/under-sampler
-sStrat = 'all'                 # sampling strategy
+sSampler = 'AllKNN'   # string matching the over/under-sampler
+sStrat = 'majority'                 # sampling strategy
                     # 'all' / 'majority' / 'not majority' / 'not minority'
 # sStrat = {'X_AGC': 50,
 #           'X_CDPK': 50,
@@ -135,12 +135,12 @@ voting = 'auto'                 # ['auto'] / 'hard' / 'soft'
 
 # --- AllKNN input ------------------------------------------------------------
 n_neighbors_AllKNN = 3          # number of nearest neighbors
-kind_sel_AllKNN = 'all'         # strategy to exclude samples [‘all’ / ‘mode’]
+kind_sel_AllKNN = 'mode'         # strategy to exclude samples ['all' / 'mode']
 allow_minority = False          # allows majority classes --> minority class
 
 # --- NeighbourhoodCleaningRule input -----------------------------------------
 n_neighbors_NCR = 3             # number of nearest neighbors
-kind_sel_NCR = 'mode'            # strategy to exclude samples [‘all’ / ‘mode’]
+kind_sel_NCR = 'mode'            # strategy to exclude samples ['all' / 'mode']
 threshold_cleaning = 0.5        # threshold 4 class considered during cleaning
 
 # --- RandomUnderSampler and BalancedRandomForestClassifier input -------------

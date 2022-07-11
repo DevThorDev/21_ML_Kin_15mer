@@ -45,21 +45,10 @@ pConfMat = GC.P_DIR_RES_CLF_CONF_MAT
 pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
-# === general input for any classifier ========================================
-rndState = None             # None (random) or integer (reproducible)
-bWarmStart = True           # warm start (True: use warm start)
-
-# --- general input for random forest classifier ------------------------------
-estOobScore = False         # estimate the generalization score
-nJobs = None                # number of jobs to run in parallel (None: 1)
-vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
-
-# --- general input for neural network MLP classifier -------------------------
-bVerb = True                # state of verbosity (True: progress messages)
-# =============================================================================
-
 # === general over- and undersampler input ====================================
-sSampler = 'TomekLinks'     # string matching the over/under-sampler
+sSampler = 'AllKNN'         # string matching the over/under-sampler
+                            # ClusterCentroids, AllKNN, TomekLinks
+                            # NeighbourhoodCleaningRule, RandomUnderSampler,
 sStrat = 'majority'         # sampling strategy
                         # 'all' / 'majority' / 'not majority' / 'not minority'
 # sStrat = {'X_AGC': 50,
@@ -74,12 +63,12 @@ voting = 'auto'                 # ['auto'] / 'hard' / 'soft'
 
 # --- AllKNN input ------------------------------------------------------------
 n_neighbors_AllKNN = 3          # number of nearest neighbors
-kind_sel_AllKNN = 'all'         # strategy to exclude samples [‘all’ / ‘mode’]
+kind_sel_AllKNN = 'mode'        # strategy to exclude samples ['all' / 'mode']
 allow_minority = False          # allows majority classes --> minority class
 
 # --- NeighbourhoodCleaningRule input -----------------------------------------
 n_neighbors_NCR = 3             # number of nearest neighbors
-kind_sel_NCR = 'mode'            # strategy to exclude samples [‘all’ / ‘mode’]
+kind_sel_NCR = 'mode'            # strategy to exclude samples ['all' / 'mode']
 threshold_cleaning = 0.5        # threshold 4 class considered during cleaning
 
 # --- RandomUnderSampler and BalancedRandomForestClassifier input -------------
@@ -88,6 +77,19 @@ wReplacement = False            # is sample with or without replacement?
 # --- TomekLinks input --------------------------------------------------------
 # =============================================================================
 
+# === general input for any classifier ========================================
+rndState = None             # None (random) or integer (reproducible)
+bWarmStart = True           # warm start (True: use warm start)
+
+# --- general input for random forest classifier ------------------------------
+estOobScore = False         # estimate the generalization score
+nJobs = None                # number of jobs to run in parallel (None: 1)
+vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
+
+# --- general input for neural network MLP classifier -------------------------
+bVerb = True                # state of verbosity (True: progress messages)
+
+# =============================================================================
 # --- numbers -----------------------------------------------------------------
 propTestData = .2
 
@@ -153,16 +155,7 @@ dIO = {# --- general
        'pConfMat': pConfMat,
        'pOutDet': pOutDet,
        'pOutPrC': pOutPrC,
-       # === general input for any classifier
-       'rndState': rndState,
-       'bWarmStart': bWarmStart,
-       # --- general input for random forest classifier
-       'estOobScore': estOobScore,
-       'nJobs': nJobs,
-       'vVerb': vVerb,
-       # --- general input for neural network MLP classifier
-       'bVerb': bVerb,
-       # === general over- and undersampler input
+       # === general over- and undersampler input =============================
        'sSampler': sSampler,
        'sStrat': sStrat,
        # --- ClusterCentroids input
@@ -179,6 +172,17 @@ dIO = {# --- general
        # --- RandomUnderSampler and BalancedRandomForestClassifier input
        'wReplacement': wReplacement,
        # --- TomekLinks input
+       # ======================================================================
+       # === general input for any classifier =================================
+       'rndState': rndState,
+       'bWarmStart': bWarmStart,
+       # --- general input for random forest classifier
+       'estOobScore': estOobScore,
+       'nJobs': nJobs,
+       'vVerb': vVerb,
+       # --- general input for neural network MLP classifier
+       'bVerb': bVerb,
+       # ======================================================================
        # --- numbers
        'propTestData': propTestData,
        'rndDigScore': rndDigScore,

@@ -230,7 +230,7 @@ def procClfInp(dITp, dfrInp):
         for cD in [dX, dY]:
             GF.complDict(cDFull=dProc, cDAdd=cD)
         dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
-    return dfrProc, X, Y, serNmerSeq, lSXCl
+    return dfrProc, X, Y, serNmerSeq, sorted(lSXCl)
 
 # --- Functions (O_07__Classifier) --------------------------------------------
 # --- Functions converting between single- and multi-labels (imbalanced) ------
