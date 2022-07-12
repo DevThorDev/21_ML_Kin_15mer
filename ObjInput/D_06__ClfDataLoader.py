@@ -12,7 +12,7 @@ sNmSpec = 'Input data for the data loader class in O_06__ClfDataLoader'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control (general) --------------------------------------------------
-sSet = GC.S_SET_03
+sSet = GC.S_SET_05
 
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP

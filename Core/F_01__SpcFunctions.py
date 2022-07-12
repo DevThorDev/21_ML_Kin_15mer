@@ -180,7 +180,7 @@ def getDClasses(dITp):
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
     for _, cRow in dfrClMap.iterrows():
         [sK, sV] = cRow.to_list()
-        if sK != dITp['sStar'] and sV != dITp['sStar']:
+        if sV != dITp['sStar']:
             dITp['dClasses'][sK] = sV
             GF.addToListUnq(dITp['lXCl'], cEl=sV)
     print('Calculated class dictionary.')
@@ -224,7 +224,6 @@ def procClfInp(dITp, dfrInp):
         dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp)
         for cSeq in serNmerSeq:
             cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
-            # cSeqRed = cSeq.iloc[[i + iCent for i in lIPosUsed]]
             fill_DProc_DX(dITp, dProc, dX, cSeq=cSeqRed)
             GF.fillListUnique(cL=lSXCl, cIt=fill_DY(dITp, dT, dY, cSeq))
         for cD in [dX, dY]:
