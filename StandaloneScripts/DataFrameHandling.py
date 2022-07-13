@@ -12,8 +12,9 @@ import pandas as pd
 SET01 = 'Set01_11Cl'
 SET02 = 'Set02_06Cl'
 SET03 = 'Set03_05Cl'
+SET06 = 'Set06_06Cl'
 
-C_SET = SET03
+C_SET = SET06
 
 # --- files, directories and paths --------------------------------------------
 P_PROC_I_N_MER = os.path.join('..', '..', '..', '13_Sysbio03_Phospho15mer',
@@ -100,9 +101,9 @@ doUniqueCodeSeqRetPepPos = False
 doUniqueCodeSeqRetNmer = False
 doRelFreqSnip = False
 getFreqAllKinCl = False
-getFreqAllXCl = True
+getFreqAllXCl = False
 getKinClNmerMapping = False
-getAllPotentialSnips = False
+getAllPotentialSnips = True
 
 NmerUnique = True
 
@@ -112,6 +113,7 @@ NmerUnique = True
 sSnipCalcRF = 'LSV'
 
 # --- lists -------------------------------------------------------------------
+lAAcRestrPos0 = ['S', 'T', 'Y']
 
 # --- dictionaries ------------------------------------------------------------
 
@@ -179,6 +181,9 @@ dInp = {# --- flow control ----------------------------------------------------
         'sDot': S_DOT,
         'sSemicol': S_SEMICOL,
         'sCSV': S_CSV,
+        'sCCodeSeq': S_C_CODE_SEQ,
+        'sCPepPos': S_C_PEP_POS,
+        'sCNmer': S_C_N_MER,
         'sSnipCalcRF': sSnipCalcRF,
         # --- file name extensions --------------------------------------------
         'xtCSV': XT_CSV,
@@ -186,6 +191,7 @@ dInp = {# --- flow control ----------------------------------------------------
         'lenNmerDef': LEN_N_MER_DEF,
         'iCentNmer': I_CENT_N_MER,
         # --- lists -----------------------------------------------------------
+        'lAAcRestrPos0': lAAcRestrPos0,
         # --- dictionaries ----------------------------------------------------
         # === derived values and input processing =============================
         'pFInpUnqC': pFInpUnqC,
@@ -505,6 +511,20 @@ def calcKinClNmerMapping(dT, serNmerSeq):
     print('Calculated lists of kinase classes operating on Nmers.')
     saveAsCSV(dfrMapping, pF=dInp['pFOutRFMap'])
 
+# --- Function finding all potential Nmers in a series of full sequences ------
+def getNmerSnipsFromFullSeq(dITp, dfrI, serNmerSeq=None):
+    dSnip, sCCodeSeq, iCentNmer = {}, dITp['sCCodeSeq'], dITp['iCentNmer']
+    for sFullSeq in dfrI[sCCodeSeq]:
+        lenSeq = len(sFullSeq)
+        if lenSeq >= dITp['lenNmerDef']:
+            for iCentC in range(iCentNmer, lenSeq - iCentNmer):
+                sSnip = sFullSeq[(iCentC - iCentNmer):(iCentC + iCentNmer + 1)]
+                sAAc = sSnip[iCentNmer]
+                if sAAc in dITp['lAAcRestrPos0']:
+                    if serNmerSeq is None or sSnip not in serNmerSeq:
+                        addToDictL(dSnip, cK=sAAc, cE=sSnip, lUnqEl=True)
+    return dSnip
+
 # --- Function printing the results -------------------------------------------
 def printRes(dRes, sSnip=S_CAP_S):
     print('Dictionary mapping the number of occurrences in a sequence to the',
@@ -563,8 +583,14 @@ if getFreqAllKinCl or getFreqAllXCl or getKinClNmerMapping:
 
 if getAllPotentialSnips:
     dfrInp = readCSV(pF=dInp['pFInpUnqC'], iCol=0)
-    print('dfrInp:\n', dfrInp, sep='')
-
+    dNmerSnips = getNmerSnipsFromFullSeq(dITp=dInp, dfrI=dfrInp)
+    N = sum([len(cL) for cL in dNmerSnips.values()])
+    print('N:', N)
+    print('Keys of dNmerSnips:', list(dNmerSnips))
+    print('Lengths of values (lists) of dNmerSnips:',
+          {cK: len(cL) for cK, cL in dNmerSnips.items()})
+    print('Shares of values (list lengths) for each key of dNmerSnips:',
+          {cK: round(len(cL)/N*100, 2) for cK, cL in dNmerSnips.items()})
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
 ###############################################################################

@@ -11,7 +11,7 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doImbSampling = True
+doImbSampling = False
 doRndForestClf = True
 doNNMLPClf = True
 doPropCalc = True

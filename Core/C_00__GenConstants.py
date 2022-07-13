@@ -247,6 +247,7 @@ S_SET_02 = 'Set02_06Cl'
 S_SET_03 = 'Set03_05Cl'
 S_SET_04 = 'Set04_14Cl'
 S_SET_05 = 'Set05_09Cl'
+S_SET_06 = 'Set06_06Cl'
 
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15
