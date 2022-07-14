@@ -273,6 +273,12 @@ def addToDictL(cD, cK, cE, lUnqEl=False):
     else:
         cD[cK] = [cE]
 
+def toSerUnique(pdSer, sName=None):
+    nameS = pdSer.name
+    if sName is not None:
+        nameS = sName
+    return pd.Series(pdSer.unique(), name=nameS)
+
 def printDINmerNOcc(cDINmerNOcc, maxLenL=3):
     for cK, cL in cDINmerNOcc.items():
         print(cK, ': (', len(cL), ' elements)', cL[:maxLenL], '...', sep='')
@@ -371,13 +377,13 @@ def printDINmerNOcc(cDINmerNOcc, maxLenL=3):
 print('='*80, '\n', '-'*31, ' EvaluateNMer.py ', '-'*32, '\n', sep='')
 if dInp['readProcInpKin']:
     dfrKinIn = readCSV(dInp['pFProcInpKin'], iCol=0)
-    serKin = dfrKinIn['Effector'].unique()
+    serKin = toSerUnique(dfrKinIn['Effector'])
     print('Number of different Kinases:', serKin.size)
     # print(dfrKinIn)
 if dInp['readProcInpNmer']:
     dfrNmerIn = readCSV(dInp['pFProcInpNmer'], iCol=0)
-    serNmer = dfrNmerIn['c15mer'].unique()
-    serCodeSeq = dfrNmerIn['code_seq'].unique()
+    serNmer = toSerUnique(dfrNmerIn['c15mer'])
+    serCodeSeq = toSerUnique(dfrNmerIn['code_seq'])
     dfrINmerNOcc = readCSV(dInp['pFResINmerNOcc'], iCol=0)
     dfrINmerNOccF = dfrINmerNOcc[dfrINmerNOcc[S_EFF].isin(dInp['lSEff'])]
     # dINmerNOccFS creation BEGIN

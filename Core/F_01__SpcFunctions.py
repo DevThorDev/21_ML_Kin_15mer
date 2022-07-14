@@ -79,7 +79,7 @@ def dDNumToDfrIEff(dITp, dDNum, wAnyEff=False):
 # --- Functions (O_02__SeqAnalysis) -------------------------------------------
 def getLSFullSeq(dITp, dfrInpSeq, iS=None, iE=None, unqS=True):
     if unqS:
-        lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']].unique())
+        lSFullSeq = GF.toListUnqViaSer(dfrInpSeq[dITp['sCCodeSeq']])
     else:
         lSFullSeq = list(dfrInpSeq[dITp['sCCodeSeq']])
     return GF.getItStartToEnd(lSFullSeq, iS, iE)
@@ -91,7 +91,7 @@ def getLSNmer(dITp, dfrInpSeq, lSFull=[], lSNmer=[], red2WF=True, unqS=True):
             # reduce to Nmer sequences with corresponding full sequences
             dfrCSeq = dfrInpSeq[dfrInpSeq[dITp['sCCodeSeq']].isin(lSFull)]
         if unqS:
-            lSNmer = list(dfrCSeq[dITp['sCNmer']].unique())
+            lSNmer = GF.toListUnqViaSer(dfrCSeq[dITp['sCNmer']])
         else:
             lSNmer = list(dfrCSeq[dITp['sCNmer']])
     return lSNmer
@@ -150,15 +150,29 @@ def getClassStr(dITp, lSCl=[], sMd='Clf'):
 
 def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
     lSer, sCY = [], dITp['sCY' + sMd]
-    serNmerSeq = GF.iniPdSer(serNmerSeq.unique(), nameS=dITp['sCNmer'])
+    serNmerSeq = GF.toSerUnique(serNmerSeq, sName=dITp['sCNmer'])
     serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
     for cSeq in serNmerSeq:
         cDfr = dfrInp[dfrInp[dITp['sCNmer']] == cSeq]
-        lSC = GF.toListUnique(cDfr[sCY].to_list())
+        lSC = GF.toListUnqViaSer(cDfr[sCY].to_list())
         cSer = cDfr.iloc[0, :]
         cSer.at[sCY] = getClassStr(dITp, lSCl=lSC, sMd=sMd)
         lSer.append(cSer)
     return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
+
+def complDfrInpNoCl(dITp, dfrInp, dNmerNoCl):
+    # dInpNoCl = {dITp['sEffCode']: [], dITp['sCNmer']: [], dITp['sEffFam']: []}
+    # assert dfrInp.columns.to_list() == list(dInpNoCl)
+    if dNmerNoCl is None:
+        return dfrInp
+    lInpNoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam']]
+    assert dfrInp.columns.to_list() == lInpNoCl
+    dCompl = dfrInp.to_dict(orient='list')
+    for sAAc, lNmer in dNmerNoCl.items():
+        for sNmer in lNmer:
+            for k, sC in enumerate(dfrInp.columns):
+                dCompl[sC].append([dITp['sNoEff'], sNmer, dITp['sNoEff']][k])
+    return GF.iniPdDfr(dCompl)
 
 def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     serNmerSeq, lSCl, X, Y = None, None, None, None
@@ -171,7 +185,7 @@ def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
         assert sCX in dfrInp.columns
     X = dfrInp[dITp['lSCX' + sMd]]
     Y = dfrInp[dITp['sCY' + sMd]]
-    lSCl = sorted(list(dfrInp[dITp['sCY' + sMd]].unique()))
+    lSCl = sorted(GF.toListUnqViaSer(dfrInp[dITp['sCY' + sMd]]))
     return dfrInp, X, Y, serNmerSeq, lSCl
 
 def getDClasses(dITp):
@@ -195,11 +209,13 @@ def iniObj(dITp, dfrInp):
     getDClasses(dITp)
     dX = {sI: [] for sI in dITp['lSCXClf']}
     dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
-    serNmerSeq = GF.iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
+    serNmerSeq = GF.toSerUnique(dfrInp[sCNmer], sName=sCNmer)
     serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
-    for cSeq in serNmerSeq:
+    for k, cSeq in enumerate(serNmerSeq):
         lFam = dfrInp[dfrInp[sCNmer] == cSeq][sFam].to_list()
-        dT[cSeq] = GF.toListUnique(lFam)
+        dT[cSeq] = GF.toListUnqViaSer(lFam)
+        if k % 1000 == 0:
+            print('Processed', k, 'of', serNmerSeq.size)
     return dT, dProc, dX, dY, serNmerSeq
 
 def fill_DProc_DX(dITp, dProc, dX, cSeq):
@@ -230,6 +246,19 @@ def procClfInp(dITp, dfrInp):
             GF.complDict(cDFull=dProc, cDAdd=cD)
         dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
     return dfrProc, X, Y, serNmerSeq, sorted(lSXCl)
+
+def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
+    dSnip, iCentNmer = {}, dITp['iCentNmer']
+    for sFullSeq in serFullSeqUnq:
+        lenSeq = len(sFullSeq)
+        if lenSeq >= dITp['lenNmerDef']:
+            for iCentC in range(iCentNmer, lenSeq - iCentNmer):
+                sSnip = sFullSeq[(iCentC - iCentNmer):(iCentC + iCentNmer + 1)]
+                sAAc = sSnip[iCentNmer]
+                if sAAc in dITp['dAAcPosRestr'][iPCent]:
+                    if lNmerSeqUnq is None or sSnip not in lNmerSeqUnq:
+                        GF.addToDictL(dSnip, cK=sAAc, cE=sSnip, lUnqEl=False)
+    return {cK: GF.toListUnqViaSer(cL) for cK, cL in dSnip.items()}
 
 # --- Functions (O_07__Classifier) --------------------------------------------
 # --- Functions converting between single- and multi-labels (imbalanced) ------

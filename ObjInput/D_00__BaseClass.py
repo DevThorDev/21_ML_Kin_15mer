@@ -42,6 +42,7 @@ sBGenInfoNmer = GC.S_B_GEN_INFO_N_MER
 sBGenInfoEff = GC.S_B_GEN_INFO_EFF
 sEff = GC.S_EFF
 sEffF = GC.S_EFF_F
+sNoEff = GC.S_NO_EFF
 sNmer = GC.S_N_MER
 sImer = GC.S_I_MER
 sImerTrain = GC.S_I_MER_TRAIN
@@ -126,6 +127,7 @@ dIO = {# --- general
        'sBGenInfoEff': sBGenInfoEff,
        'sEff': sEff,
        'sEffF': sEffF,
+       'sNoEff': sNoEff,
        'sNmer': sNmer,
        'sImer': sImer,
        'sImerTrain': sImerTrain,

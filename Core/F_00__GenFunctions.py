@@ -52,8 +52,11 @@ def modPF(pF, sStart='', sEnd='', sJoin='', sJoinP=GC.S_DBLBACKSL):
     sFMod = modSF(sF=lSSpl[-1], sStart=sStart, sEnd=sEnd, sJoin=sJoin)
     return joinS(lSSpl[:-1] + [sFMod], sJoin=sJoinP)
 
+def fileXist(pF):
+    return os.path.isfile(pF)
+
 def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
-    if os.path.isfile(pF):
+    if fileXist(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
 
 def saveCSV(pdObj, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True, iLbl=None):
@@ -78,7 +81,7 @@ def pickleSaveDict(cD, pF=('Dict' + GC.XT_BIN)):
 
 def pickleLoadDict(pF=('Dict' + GC.XT_BIN), reLoad=False):
     cD = None
-    if os.path.isfile(pF) and (cD is None or len(cD) == 0 or reLoad):
+    if fileXist(pF) and (cD is None or len(cD) == 0 or reLoad):
         with open(pF, 'rb') as fDict:
             cD = pickle.load(fDict)
         print('Loaded dictionary from', pF)
@@ -255,12 +258,17 @@ def fillListUnique(cL=[], cIt=[]):
         if cEl not in cL:
             cL.append(cEl)
 
-def toListUnique(cL=[]):
+def toListUnique(cIt=[]):
     cLUnq = []
-    for cEl in cL:
+    for cEl in cIt:
         if cEl not in cLUnq:
             cLUnq.append(cEl)
     return cLUnq
+
+def toListUnqViaSer(cIt=None):
+    if cIt is not None:
+        return toSerUnique(pd.Series(cIt)).to_list()
+    return None
 
 def getListUniqueWD2(d2, srtDir=None):
     lUnq = []
@@ -573,6 +581,12 @@ def concLObjAx0(lObj, ignIdx=False, verifInt=False, srtDfr=False):
 def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
     return concLObj(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
                     srtDfr=srtDfr)
+
+def toSerUnique(pdSer, sName=None):
+    nameS = pdSer.name
+    if sName is not None:
+        nameS = sName
+    return pd.Series(pdSer.unique(), name=nameS)
 
 # --- Functions performing pandas DataFrame calculation and manipulation ------
 def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
@@ -916,7 +930,6 @@ def printDataD2(sKL0, dL0, maxLvl=1):
 def startSimu():
     startTime = time.time()
     print(GC.S_PL24 + ' START', time.ctime(startTime), GC.S_PL24)
-    print('Process and handle data and generate plots.')
     return startTime
 
 def printElapsedTimeSim(stT=None, cT=None, sPre='Time', nDig=GC.R04):

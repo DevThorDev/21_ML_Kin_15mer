@@ -16,6 +16,9 @@ sSet = GC.S_SET_06
 
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
+
+useDictNmerNoCl = True               # use "no class" Nmers from full seq.?
+
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcTypeClf = GC.S_AAC            # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
@@ -29,6 +32,13 @@ usedNmerSeqPrC = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 usedAAcTypePrC = usedAAcTypeClf
 
 usedClTypePrC = usedClTypeClf
+
+# --- names and paths of files and dirs (general) -----------------------------
+sFResComb = 'Combined_S_KinasesPho15mer_202202'
+sFDictNmerSnips = 'DictNmerSnips'
+
+pResComb = GC.P_DIR_RES_COMB
+pBinData = GC.P_DIR_BIN_DATA
 
 # --- names and paths of files and dirs (classifier) --------------------------
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
@@ -72,6 +82,7 @@ iCInpDataPrC = 0
 # --- strings (general) -------------------------------------------------------
 sFullList = GC.S_FULL_LIST
 sUnqList = GC.S_UNQ_LIST
+sCCodeSeq = 'code_seq'
 
 # --- strings (classifier) ----------------------------------------------------
 sCYClf = GC.S_EFF_CL
@@ -126,6 +137,7 @@ dIO = {# --- general
        'sSet': sSet,
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
+       'useDictNmerNoCl': useDictNmerNoCl,
        'usedNmerSeqClf': usedNmerSeqClf,
        'usedAAcTypeClf': usedAAcTypeClf,
        'usedClTypeClf': usedClTypeClf,
@@ -134,6 +146,11 @@ dIO = {# --- general
        'usedNmerSeqPrC': usedNmerSeqPrC,
        'usedAAcTypePrC': usedAAcTypePrC,
        'usedClTypePrC': usedClTypePrC,
+       # --- names and paths of files and dirs (general)
+       'sFResComb': sFResComb,
+       'sFDictNmerSnips': sFDictNmerSnips,
+       'pResComb': pResComb,
+       'pBinData': pBinData,
        # --- names and paths of files and dirs (classifier)
        'sFInpBaseClf': sFInpBaseClf,
        'sFInpClf': sFInpClf,
@@ -155,6 +172,7 @@ dIO = {# --- general
        # --- strings (general)
        'sFullList': sFullList,
        'sUnqList': sUnqList,
+       'sCCodeSeq': sCCodeSeq,
        # --- strings (classifier)
        'sCYClf': sCYClf,
        # --- strings (proportion calculator)

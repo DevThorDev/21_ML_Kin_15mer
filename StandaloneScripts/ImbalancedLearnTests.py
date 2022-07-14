@@ -343,6 +343,9 @@ def toListUnique(cL=[]):
             cLUnq.append(cEl)
     return cLUnq
 
+def toListUnqViaSer(cIt=[]):
+    return toSerUnique(pd.Series(cIt)).to_list()
+
 # --- Functions handling dictionaries -----------------------------------------
 def addToDictCt(cD, cK, cIncr=1):
     if cK in cD:
@@ -437,6 +440,12 @@ def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
     return concLObj(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
                     srtDfr=srtDfr)
 
+def toSerUnique(pdSer, sName=None):
+    nameS = pdSer.name
+    if sName is not None:
+        nameS = sName
+    return pd.Series(pdSer.unique(), name=nameS)
+
 # --- General-purpose functions -----------------------------------------------
 def getAAcPyl(dITp, sNmer):
     if len(sNmer) == dITp['lenNmerDef']:
@@ -482,7 +491,7 @@ def getClfInp(dITp, dfrInp):
     sCNmer = dITp['sCNmer']
     if sCNmer in dfrInp.columns:
         X, Y = dfrInp[dITp['lSCX']], dfrInp[dITp['lSCY']]
-        serSeq = iniPdSer(dfrInp[sCNmer].unique(), nameS=sCNmer)
+        serSeq = toSerUnique(dfrInp[sCNmer])
         # for cSeq in serSeq:
             # cSeqRed = cSeq[(iCent - maxP):(iCent + maxP + 1)]
     return X, Y, serSeq

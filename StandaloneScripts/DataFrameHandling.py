@@ -2,7 +2,7 @@
 ###############################################################################
 # --- DataFrameHandling.py ----------------------------------------------------
 ###############################################################################
-import os
+import os, pickle, time
 
 import numpy as np
 import pandas as pd
@@ -33,6 +33,7 @@ S_F_INP_D_CLASSES = 'InpClf_ClMapping_' + C_SET
 S_F_REL_FREQ_EFF_FAM = 'RelFreqEffFamily_Combined_XS_KinasesPho15mer_202202'
 S_F_REL_FREQ_X_CL = 'RelFreqXClasses_Combined_XS_KinasesPho15mer_202202'
 S_F_NMER_KIN_FAM_MAP = 'MapNmer2KinFamily_Combined_XS_KinasesPho15mer_202202'
+S_F_D_NMER_SNIPS = 'DictNmerSnips_Combined_S_KinasesPho15mer_202202'
 
 # --- strings -----------------------------------------------------------------
 S_SPACE = ' '
@@ -83,13 +84,18 @@ S_REL_FREQ_SNIP = 'RelFreqSnip'
 S_N_OCC = 'nOcc'
 S_REL_FREQ = 'relFreq'
 
+S_EXT_CSV = 'csv'
+S_EXT_BIN = 'bin'
+
 # --- file name extensions ----------------------------------------------------
-XT_CSV = S_DOT + S_CSV
+XT_CSV = S_DOT + S_EXT_CSV
+XT_BIN = S_DOT + S_EXT_BIN
 
 # --- numbers -----------------------------------------------------------------
 LEN_N_MER_DEF = 15
 I_CENT_N_MER = LEN_N_MER_DEF//2
 
+R04 = 4
 R08 = 8
 
 # ### INPUT ###################################################################
@@ -147,6 +153,7 @@ if NmerUnique:
     sFOutRFEffFam = joinS([sFOutRFEffFam, S_UNIQUE])
     sFOutRFXCl = joinS([sFOutRFXCl, S_UNIQUE])
     sFOutMap = joinS([sFOutMap, S_UNIQUE])
+sFDNmerSnips = S_F_D_NMER_SNIPS
 
 pFInpUnqC = os.path.join(pInp, sFBase + XT_CSV)
 pFInpRFSnip = os.path.join(P_TEMP_RES, sFBaseUnqCSNmer + XT_CSV)
@@ -159,6 +166,7 @@ pFOutRFSnip = os.path.join(P_TEMP_RES, sFBaseRFSnip + XT_CSV)
 pFOutRFEffFam = os.path.join(P_TEMP_RES, sFOutRFEffFam + XT_CSV)
 pFOutRFXCl = os.path.join(P_TEMP_RES, sFOutRFXCl + XT_CSV)
 pFOutRFMap = os.path.join(P_TEMP_RES, sFOutMap + XT_CSV)
+pFDNmerSnips = os.path.join(P_TEMP_RES, sFDNmerSnips + XT_BIN)
 
 # --- fill input dictionary ---------------------------------------------------
 dInp = {# --- flow control ----------------------------------------------------
@@ -204,7 +212,8 @@ dInp = {# --- flow control ----------------------------------------------------
         'pFOutRFSnip': pFOutRFSnip,
         'pFOutRFEffFam': pFOutRFEffFam,
         'pFOutRFXCl': pFOutRFXCl,
-        'pFOutRFMap': pFOutRFMap}
+        'pFOutRFMap': pFOutRFMap,
+        'pFDNmerSnips': pFDNmerSnips}
 
 # ### FUNCTIONS ###############################################################
 # --- General file system related functions -----------------------------------
@@ -234,7 +243,7 @@ def saveDfrUniqueColAsCSV(cDfr, pFOut, colUnq=None, reprNA='', cSep=S_SEMICOL):
     elif colUnq == True:
         lSerUnique = []
         for sC in cDfr.columns:
-            lSerUnique.append(pd.Series(cDfr[sC].unique(), name=sC))
+            lSerUnique.append(toSerUnique(pdSer=cDfr[sC]))
         cDfrMod = concLObjAx1(lObj=lSerUnique).convert_dtypes()
         saveAsCSV(cDfrMod, pF=pFOut, reprNA=reprNA, cSep=cSep)
         print('Saved DataFrame with all columns converted to unique values.')
@@ -246,7 +255,7 @@ def saveDfrUniqueColSpecAsCSV(cDfr, pFOut, colUnq=None, colIRet=None,
                               reprNA='', cSep=S_SEMICOL):
     if colUnq in cDfr.columns:
         if colIRet in cDfr.columns:
-            lVUnq, lArr = list(cDfr[colUnq].unique()), []
+            lVUnq, lArr = toListUnqViaSer(cDfr[colUnq]), []
             for cV in lVUnq:
                 cSer = cDfr[cDfr[colUnq] == cV].loc[:, colIRet]
                 lArr.append(cSer.unique())
@@ -269,6 +278,53 @@ def saveDfrUniqueColSpecAsCSV(cDfr, pFOut, colUnq=None, colIRet=None,
         print('ERROR: "', colUnq, '" is not in DataFrame columns: ',
               cDfr.columns.to_list(), '!', sep='')
 
+def pickleSaveDict(cD, pF=('Dict' + XT_BIN)):
+    try:
+        with open(pF, 'wb') as fDict:
+            pickle.dump(cD, fDict)
+    except:
+        print('ERROR: Dumping dictionary to', pF, 'failed.')
+
+def pickleLoadDict(pF=('Dict' + XT_BIN), reLoad=False):
+    cD = None
+    if os.path.isfile(pF) and (cD is None or len(cD) == 0 or reLoad):
+        with open(pF, 'rb') as fDict:
+            cD = pickle.load(fDict)
+        print('Loaded dictionary from', pF)
+    if cD is None:
+        print('ERROR: Loading dictionary from', pF, 'failed.')
+    return cD
+
+
+# --- Time printing functions -------------------------------------------------
+def startSimu():
+    startTime = time.time()
+    print(S_PL24 + ' START', time.ctime(startTime), S_PL24)
+    return startTime
+
+def printElapsedTimeSim(stT=None, cT=None, sPre='Time', nDig=R04):
+    if stT is not None and cT is not None:
+        # calculate and display elapsed time
+        elT = round(cT - stT, nDig)
+        print(sPre, 'elapsed:', elT, 'seconds, this is', round(elT/60, nDig),
+              'minutes or', round(elT/3600, nDig), 'hours or',
+              round(elT/(3600*24), nDig), 'days.')
+
+def showElapsedTime(startTime=None):
+    cTime = time.time()
+    if startTime is not None:
+        print(S_DS80)
+        printElapsedTimeSim(startTime, cTime, 'Time')
+        print(S_SP04 + 'Current time:', time.ctime(cTime), S_SP04)
+        print(S_DS80)
+    return cTime
+
+def endSimu(startTime=None):
+    if startTime is not None:
+        print(S_DS80)
+        printElapsedTimeSim(startTime, time.time(), 'Total time')
+        print(S_ST24 + ' DONE', time.ctime(time.time()), S_ST25)
+
 # --- Functions handling lists ------------------------------------------------
 def addToList(cL, cEl, isUnq=False):
     if isUnq:
@@ -286,6 +342,9 @@ def toListUnique(cL=[]):
         if cEl not in cLUnq:
             cLUnq.append(cEl)
     return cLUnq
+
+def toListUnqViaSer(cIt=[]):
+    return toSerUnique(pd.Series(cIt)).to_list()
 
 # --- Functions handling dictionaries -----------------------------------------
 def addToDictCt(cD, cK, cIncr=1):
@@ -375,6 +434,12 @@ def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
     return concLObj(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
                     srtDfr=srtDfr)
 
+def toSerUnique(pdSer, sName=None):
+    nameS = pdSer.name
+    if sName is not None:
+        nameS = sName
+    return pd.Series(pdSer.unique(), name=nameS)
+
 # --- General-purpose functions -----------------------------------------------
 def getAAcPyl(dInp, sNmer):
     if len(sNmer) == dInp['lenNmerDef']:
@@ -426,7 +491,7 @@ def calcProbPylData(dInp, cDfr, pFOut, sSnip=S_CAP_S):
 def getDictDfrTemp(dfrInp):
     dT, serNmerSeq = {}, dfrInp[S_C_N_MER]
     if dInp['NmerUnique']:
-        serNmerSeq = iniPdSer(serNmerSeq.unique(), nameS=serNmerSeq.name)
+        serNmerSeq = toSerUnique(serNmerSeq)
     for cNmerSeq in serNmerSeq:
         dT[cNmerSeq] = dfrInp[dfrInp[S_C_N_MER] == cNmerSeq]
     print('Calculated series of Nmer sequences and temporary dictionary.')
@@ -482,7 +547,7 @@ def calcRelFreqCl(dT, serNmerSeq, doXCl=False):
     for cDfr in dT.values():
         lCl = cDfr[S_EFF_FAMILY].to_list()
         if dInp['NmerUnique']:
-            lCl = list(cDfr[S_EFF_FAMILY].unique())
+            lCl = toListUnqViaSer(cDfr[S_EFF_FAMILY])
         if doXCl:
             lCl = mapEffFamToXCl(lCl, dClasses=dClasses)
         for sCl in lCl:
@@ -497,7 +562,7 @@ def calcKinClNmerMapping(dT, serNmerSeq):
         lEffFam = cDfr[S_EFF_FAMILY].to_list()
         dMap[sNmerSeq] = lEffFam
         if dInp['NmerUnique']:
-            dMap[sNmerSeq] = toListUnique(lEffFam)
+            dMap[sNmerSeq] = toListUnqViaSer(lEffFam)
         maxNEffFam = max(maxNEffFam, len(dMap[sNmerSeq]))
     # dLV = {joinS([S_FAM, str(k)]): [] for k in range(maxNEffFam)}
     for sNmerSeq, lEffFam in dMap.items():
@@ -512,18 +577,19 @@ def calcKinClNmerMapping(dT, serNmerSeq):
     saveAsCSV(dfrMapping, pF=dInp['pFOutRFMap'])
 
 # --- Function finding all potential Nmers in a series of full sequences ------
-def getNmerSnipsFromFullSeq(dITp, dfrI, serNmerSeq=None):
+def getNmerSnipsFromFullSeq(dITp, dfrI, lNmerSeqUnq=None):
     dSnip, sCCodeSeq, iCentNmer = {}, dITp['sCCodeSeq'], dITp['iCentNmer']
-    for sFullSeq in dfrI[sCCodeSeq]:
+    serFullSeqUnq = toSerUnique(pdSer=dfrI[sCCodeSeq])
+    for sFullSeq in serFullSeqUnq:
         lenSeq = len(sFullSeq)
         if lenSeq >= dITp['lenNmerDef']:
             for iCentC in range(iCentNmer, lenSeq - iCentNmer):
                 sSnip = sFullSeq[(iCentC - iCentNmer):(iCentC + iCentNmer + 1)]
                 sAAc = sSnip[iCentNmer]
                 if sAAc in dITp['lAAcRestrPos0']:
-                    if serNmerSeq is None or sSnip not in serNmerSeq:
-                        addToDictL(dSnip, cK=sAAc, cE=sSnip, lUnqEl=True)
-    return dSnip
+                    if lNmerSeqUnq is None or sSnip not in lNmerSeqUnq:
+                        addToDictL(dSnip, cK=sAAc, cE=sSnip, lUnqEl=False)
+    return {cK: toListUnqViaSer(cL) for cK, cL in dSnip.items()}
 
 # --- Function printing the results -------------------------------------------
 def printRes(dRes, sSnip=S_CAP_S):
@@ -554,6 +620,8 @@ def printRes(dRes, sSnip=S_CAP_S):
           round(dRes['probPylSnip'], R08), sep='')
 
 # ### MAIN ####################################################################
+startTime = startSimu()
+cStTime = showElapsedTime(startTime)
 print(S_EQ80, S_NEWL, S_DS30, ' DataFrameHandling.py ', S_DS28, S_NEWL, sep='')
 if (doAllUniqueCol or doUniqueCodeSeqRetPepPos or doUniqueCodeSeqRetNmer):
     dfrInp = readCSV(pF=dInp['pFInpUnqC'], iCol=0)
@@ -582,8 +650,16 @@ if getFreqAllKinCl or getFreqAllXCl or getKinClNmerMapping:
         calcKinClNmerMapping(dTemp, serNmerSeq)
 
 if getAllPotentialSnips:
-    dfrInp = readCSV(pF=dInp['pFInpUnqC'], iCol=0)
-    dNmerSnips = getNmerSnipsFromFullSeq(dITp=dInp, dfrI=dfrInp)
+    if os.path.isfile(dInp['pFDNmerSnips']):
+        dNmerSnips = pickleLoadDict(pF=dInp['pFDNmerSnips'])
+    else:
+        dfrInp, serNmerUnq = readCSV(pF=dInp['pFInpUnqC'], iCol=0), None
+        if dInp['sCNmer'] in dfrInp.columns:
+            serNmerUnq = toSerUnique(dfrInp[dInp['sCNmer']])
+        lNmerUnq = toListUnqViaSer(serNmerUnq)
+        dNmerSnips = getNmerSnipsFromFullSeq(dITp=dInp, dfrI=dfrInp,
+                                             lNmerSeqUnq=lNmerUnq)
+        pickleSaveDict(cD=dNmerSnips, pF=dInp['pFDNmerSnips'])
     N = sum([len(cL) for cL in dNmerSnips.values()])
     print('N:', N)
     print('Keys of dNmerSnips:', list(dNmerSnips))
@@ -591,6 +667,7 @@ if getAllPotentialSnips:
           {cK: len(cL) for cK, cL in dNmerSnips.items()})
     print('Shares of values (list lengths) for each key of dNmerSnips:',
           {cK: round(len(cL)/N*100, 2) for cK, cL in dNmerSnips.items()})
-print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 
+print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
+endSimu(startTime)
 ###############################################################################

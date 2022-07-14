@@ -112,6 +112,7 @@ class SeqAnalysis(BaseClass):
 
     def fillDPF(self):
         pI, pC, pP = self.pDirResInfo, self.pDirResComb, self.pDirResProb
+        pB = self.dITp['pBinData']
         self.dPF = {'IEffInp': GF.joinToPath(pI, self.dITp['sFIEffInp']),
                     'ProcInp': GF.joinToPath(pC, self.dITp['sFProcInp']),
                     'CombInp': GF.joinToPath(pC, self.dITp['sFCombInp'])}
@@ -121,8 +122,8 @@ class SeqAnalysis(BaseClass):
         self.dPF['lFullSeq'] = GF.joinToPath(pP, self.dITp['sFLFullSeq'])
         self.dPF['ResWtLh'] = GF.joinToPath(pP, self.dITp['sFResWtLh'])
         self.dPF['ResRelLh'] = GF.joinToPath(pP, self.dITp['sFResRelLh'])
-        self.dPF['SnipDictS'] = GF.joinToPath(pP, self.dITp['sFSnipDictS'])
-        self.dPF['SnipDictX'] = GF.joinToPath(pP, self.dITp['sFSnipDictX'])
+        self.dPF['SnipDictS'] = GF.joinToPath(pB, self.dITp['sFSnipDictS'])
+        self.dPF['SnipDictX'] = GF.joinToPath(pB, self.dITp['sFSnipDictX'])
         self.dPF['SnipDfrS'] = GF.joinToPath(pP, self.dITp['sFSnipDfrS'])
         self.dPF['SnipDfrX'] = GF.joinToPath(pP, self.dITp['sFSnipDfrX'])
         self.dPF['ProbTblFS'] = GF.joinToPath(pP, self.dITp['sFProbTblFS'])
@@ -130,8 +131,8 @@ class SeqAnalysis(BaseClass):
         self.dPF['ProbTblCP'] = GF.joinToPath(pP, self.dITp['sFProbTblCP'])
         self.dPF['ResWtProb'] = GF.joinToPath(pP, self.dITp['sFResWtProb'])
         self.dPF['ResRelProb'] = GF.joinToPath(pP, self.dITp['sFResRelProb'])
-        self.dPF['DictNOccSP'] = GF.joinToPath(pP, self.dITp['sFDictNOccSP'])
-        self.dPF['DictRFreqSP'] = GF.joinToPath(pP, self.dITp['sFDictRFreqSP'])
+        self.dPF['DictNOccSP'] = GF.joinToPath(pB, self.dITp['sFDictNOccSP'])
+        self.dPF['DictRFreqSP'] = GF.joinToPath(pB, self.dITp['sFDictRFreqSP'])
         self.dPF['ResNOccSP'] = GF.joinToPath(pP, self.dITp['sFResNOccSP'])
         self.dPF['ResRFreqSP'] = GF.joinToPath(pP, self.dITp['sFResRFreqSP'])
 
@@ -158,20 +159,20 @@ class SeqAnalysis(BaseClass):
 
     # --- methods for loading data --------------------------------------------
     def loadInpDfrs(self):
-        self.lCombSeq, self.dLenSeq = [], {}
+        self.lCombSeq, self.dLenSeq, sCNmer = [], {}, self.dITp['sCNmer']
         if self.dITp['useNmerSeqFrom'] == self.dITp['sIEffInp']:
             self.dfrIEff = self.loadData(pF=self.dPF['IEffInp'], iC=0)
         if self.dITp['calcWtLh'] or self.dITp['calcRelLh']:
             self.dfrComb = self.loadData(pF=self.dPF['CombInp'], iC=0)
-        if GF.Xist(self.dfrComb) and self.dITp['sCNmer'] in self.dfrComb:
-            self.lCombSeq = list(self.dfrComb[self.dITp['sCNmer']].unique())
+        if GF.Xist(self.dfrComb) and sCNmer in self.dfrComb:
+            self.lCombSeq = GF.toListUnqViaSer(self.dfrComb[sCNmer])
 
     # --- methods for obtaining the list of input Nmer-sequences --------------
     def getLIPosPyl(self, sFullSeq):
         lIPosPyl, cDfr = [], self.dfrInpSeq
         if self.dITp['sPepPIP'] in cDfr.columns:
             dfrCSeq = cDfr[cDfr[self.dITp['sCCodeSeq']] == sFullSeq]
-            lIPosPyl = dfrCSeq[self.dITp['sPepPIP']].unique()
+            lIPosPyl = GF.toListUnqViaSer(dfrCSeq[self.dITp['sPepPIP']])
         return [i - 1 for i in lIPosPyl]
 
     def fillLFullSeq(self, sTxt='', stT=None):

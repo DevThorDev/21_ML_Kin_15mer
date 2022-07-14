@@ -231,6 +231,24 @@ def getLSubStrNmer(dI, sNmer):
     return [sNmer[(dI['iCent'] - cLen//2):(dI['iCent'] + cLen//2 + 1)]
             for cLen in dI['lLenNmer']]
 
+# --- Functions handling iterators and lists ----------------------------------
+def toListUnique(cIt=[]):
+    cLUnq = []
+    for cEl in cIt:
+        if cEl not in cLUnq:
+            cLUnq.append(cEl)
+    return cLUnq
+
+def toListUnqViaSer(cIt=[]):
+    return toSerUnique(pd.Series(cIt)).to_list()
+
+# --- Functions performing pandas Series manipulation -------------------------
+def toSerUnique(pdSer, sName=None):
+    nameS = pdSer.name
+    if sName is not None:
+        nameS = sName
+    return pd.Series(pdSer.unique(), name=nameS)
+
 # --- Functions initialising numpy arrays -------------------------------------
 def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
     if data is None:
@@ -399,11 +417,11 @@ if dInp['inpTbl'] == 'CombS':
     pFInp, sFInp = dInp['pCombRes'], dInp['sFResCombS']
 if calcSnipTbl or calcNmerTbl:
     dfrInp = readCSV(pF=joinToPath(pF=pFInp, nmF=sFInp), iCol=0)
-# lFullSeqUnique = list(dfrInp[S_CODE_SEQ].unique())[:iMaxLFullSeqUnique]
+# lFullSeqUnique = toListUnqViaSer(dfrInp[S_CODE_SEQ])[:iMaxLFullSeqUnique]
 if calcSnipTbl:
-    lFullSeqUnique = list(dfrInp[S_CODE_SEQ].unique())
+    lFullSeqUnique = toListUnqViaSer(dfrInp[S_CODE_SEQ])
 if calcSnipTbl or calcNmerTbl:
-    lNmerSeqUnique = list(dfrInp[S_N_MER_SEQ].unique())
+    lNmerSeqUnique = toListUnqViaSer(dfrInp[S_N_MER_SEQ])
     if dInp['lNmerSeq2Test'] is None:
         # dInp['lNmerSeq2Test'] = lNmerSeqUnique[:iMaxLNmerSeqUnique]
         dInp['lNmerSeq2Test'] = lNmerSeqUnique

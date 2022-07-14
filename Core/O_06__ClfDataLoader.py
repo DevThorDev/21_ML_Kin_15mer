@@ -18,6 +18,8 @@ class DataLoader(BaseClass):
         self.getDITp(iTp=iTp)
         self.fillDPF()
         self.iniAttr()
+        if self.dITp['useDictNmerNoCl']:
+            self.getDictNmerNoCl()
         self.loadInpDataClf(iC=self.dITp['iCInpDataClf'])
         self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
         print('Initiated "DataLoader" base object.')
@@ -26,26 +28,50 @@ class DataLoader(BaseClass):
     def fillDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
+        sFResComb = self.dITp['sFResComb'] + self.dITp['xtCSV']
+        lSF = [self.dITp['sFDictNmerSnips'], self.dITp['sFResComb']]
+        sFDNS = GF.joinS(lSF, sJoin=self.dITp['sUS02']) + self.dITp['xtBIN']
         sFClfU = (GF.joinS([self.dITp['sFInpClf'], self.dITp['sSet'],
-                            self.dITp['sUnique'], self.dITp['sRestr'],]) +
+                            self.dITp['sUnique'], self.dITp['sRestr']]) +
                   self.dITp['xtCSV'])
         self.dPF = {'DataClfU': GF.joinToPath(self.dITp['pInpClf'], sFClfU)}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
+        self.dPF['ResComb'] = GF.joinToPath(self.dITp['pResComb'], sFResComb)
+        self.dPF['DictNmerSnips'] = GF.joinToPath(self.dITp['pBinData'], sFDNS)
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
         lBase, lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl', 'X', 'Y'], []
         for sTp in ['Clf', 'PrC']:
             lAttr2None += [s + sTp for s in lBase]
+        lAttr2None += ['dNmerNoCl']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
+
+    # --- method for generating the "no class" Nmer dictionary ----------------
+    def getDictNmerNoCl(self):
+        if GF.fileXist(pF=self.dPF['DictNmerSnips']):
+            self.dNmerNoCl = GF.pickleLoadDict(pF=self.dPF['DictNmerSnips'])
+        else:
+            dfrComb = GF.readCSV(pF=self.dPF['ResComb'], iCol=0)
+            assert self.dITp['sCCodeSeq'] in dfrComb.columns
+            serFullUnq = GF.toSerUnique(pdSer=dfrComb[self.dITp['sCCodeSeq']])
+            serNmerUnq = None
+            if self.dITp['sCNmer'] in dfrComb.columns:
+                serNmerUnq = GF.toSerUnique(dfrComb[self.dITp['sCNmer']])
+            lNmerUnq =  GF.toListUnqViaSer(serNmerUnq)
+            self.dNmerNoCl = SF.getDSqNoCl(self.dITp, serFullSeqUnq=serFullUnq,
+                                           lNmerSeqUnq=lNmerUnq)
+            GF.pickleSaveDict(cD=self.dNmerNoCl, pF=self.dPF['DictNmerSnips'])
 
     # --- methods for loading input data --------------------------------------
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.dPF['InpDataClf'], iC=iC)
+        self.dfrInpClf = SF.complDfrInpNoCl(self.dITp, dfrInp=self.dfrInpClf,
+                                            dNmerNoCl=self.dNmerNoCl)
         (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
          self.lSXClClf) = SF.procClfInp(self.dITp, self.dfrInpClf)
 
@@ -60,6 +86,9 @@ class DataLoader(BaseClass):
                self.dPF['InpDataPrC'] != self.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
             self.dfrInpPrC = self.loadData(self.dPF['InpDataPrC'], iC=iC)
+            self.dfrInpPrC = SF.complDfrInpNoCl(self.dITp,
+                                                dfrInp=self.dfrInpPrC,
+                                                dNmerNoCl=self.dNmerNoCl)
             t = SF.loadInpData(self.dITp, self.dfrInpPrC, sMd='PrC', iC=iC)
             (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
              self.lSXClPrC) = t
@@ -104,6 +133,20 @@ class DataLoader(BaseClass):
                 print('Classifier input data is', GC.S_NEWL, dfrClf, ', there',
                       'fore unequal to input data for proportion calculation!',
                       sep='')
+        print(GC.S_DS80)
+
+    def printDictNmerNoCl(self):
+        print(GC.S_DS80, GC.S_NEWL, '"No class" Nmer sequences:', sep='')
+        if self.dNmerNoCl is not None:
+            for cK, cL in self.dNmerNoCl.items():
+                print(cK, ': ', cL[:5], '...', sep='')
+            nNmer = sum([len(cL) for cL in self.dNmerNoCl.values()])
+            print('Number of "no class" Nmer sequences:', nNmer)
+            print('Lengths of lists of "no class" Nmer sequences:',
+                  {cK: len(cL) for cK, cL in self.dNmerNoCl.items()})
+            print('Shares of "no class" Nmer sequences for each central',
+                  'position amino acid:', {cK: round(len(cL)/nNmer*100, 2) for
+                                           cK, cL in self.dNmerNoCl.items()})
         print(GC.S_DS80)
 
     def printLSClClf(self):
