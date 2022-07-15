@@ -525,6 +525,10 @@ def fillDProbSnip(dProb, lSeq, sSnip):
     else:
         dProb[sSnip] = lV
 
+def appendToDictL(cD, itKeys, lVApp):
+    for k, cKey in enumerate(itKeys):
+        cD[cKey].append(lVApp[k])
+
 # --- Functions handling iterables --------------------------------------------
 def allTrue(cIt):
     return [cB for cB in cIt] == [True]*len(cIt)

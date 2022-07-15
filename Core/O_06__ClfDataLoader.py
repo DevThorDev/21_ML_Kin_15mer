@@ -28,6 +28,8 @@ class DataLoader(BaseClass):
     def fillDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
+        sFDTmp = (GF.joinS([self.dITp['sTempDict'], self.dITp['sFInpClf']]) +
+                  self.dITp['xtBIN'])
         sFResComb = self.dITp['sFResComb'] + self.dITp['xtCSV']
         lSF = [self.dITp['sFDictNmerSnips'], self.dITp['sFResComb']]
         sFDNS = GF.joinS(lSF, sJoin=self.dITp['sUS02']) + self.dITp['xtBIN']
@@ -37,6 +39,7 @@ class DataLoader(BaseClass):
         self.dPF = {'DataClfU': GF.joinToPath(self.dITp['pInpClf'], sFClfU)}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
+        self.dPF['TempDict'] = GF.joinToPath(self.dITp['pBinData'], sFDTmp)
         self.dPF['ResComb'] = GF.joinToPath(self.dITp['pResComb'], sFResComb)
         self.dPF['DictNmerSnips'] = GF.joinToPath(self.dITp['pBinData'], sFDNS)
 
@@ -73,7 +76,8 @@ class DataLoader(BaseClass):
         self.dfrInpClf = SF.complDfrInpNoCl(self.dITp, dfrInp=self.dfrInpClf,
                                             dNmerNoCl=self.dNmerNoCl)
         (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
-         self.lSXClClf) = SF.procClfInp(self.dITp, self.dfrInpClf)
+         self.lSXClClf) = SF.procClfInp(self.dITp, dfrInp=self.dfrInpClf,
+                                        pFDTmp=self.dPF['TempDict'])
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and

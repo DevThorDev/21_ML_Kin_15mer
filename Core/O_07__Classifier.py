@@ -29,9 +29,18 @@ class BaseSmplClfPrC(BaseClass):
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.D = D
+        self.complDITp()
         self.iniAttr(sKPar=sKPar)
         self.getDPF()
         print('Initiated "BaseSmplClfPrC" base object.')
+
+    # --- method for complementing the type input dictionary ------------------
+    def complDITp(self):
+        lLblTrain, sCLblsTrain = self.dITp['lLblTrain'], ''
+        if not (lLblTrain is None or self.D.dITp['onlySglLbl']):
+            sCLblsTrain = GC.S_USC.join([str(nLbl) for nLbl in lLblTrain])
+            sCLblsTrain = GC.S_USC.join([GC.S_LBL, sCLblsTrain, GC.S_TRAIN])
+        self.dITp['sCLblsTrain'] = sCLblsTrain
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar='A'):
@@ -230,14 +239,15 @@ class ImbSampler(BaseSmplClfPrC):
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
         bTrain = (True if self.dITp['doTrainTestSplit'] else None)
         X, Y = self.getXY(getTrain=bTrain)
-        serY = SF.toSglLbl(self.dITp, dfrY=Y)
-        print('Initial shape of serY:', serY.shape)
-        X, serY = self.getSampler().fit_resample(X, serY)
-        print('Final shape of serY:', serY.shape)
-        for cY in serY.unique():
-            print(cY, self.dITp['sTab'], serY[serY == cY].size, sep='')
-        YMlt = SF.toMultiLbl(self.dITp, serY=serY, lXCl=self.lSCl)
-        self.setXY(X=X, Y=YMlt, setTrain=bTrain)
+        YSgl = SF.toSglLbl(self.dITp, dfrY=Y)
+        print('Initial shape of YSgl:', YSgl.shape)
+        X, YRes = self.getSampler().fit_resample(X, YSgl)
+        print('Final shape of YRes:', YRes.shape)
+        for cY in YRes.unique():
+            print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
+        if not self.D.dITp['onlySglLbl']:
+            YRes = SF.toMultiLbl(self.dITp, serY=YRes, lXCl=self.lSCl)
+        self.setXY(X=X, Y=YRes, setTrain=bTrain)
 
 # -----------------------------------------------------------------------------
 class Classifier(BaseSmplClfPrC):

@@ -82,6 +82,7 @@ sMaxLenS = GC.S_MAX_LEN_S
 sRestr = GC.S_RESTR
 sIPos = GC.S_I_POS
 sLbl = GC.S_LBL
+sTempDict = GC.S_TEMP_DICT
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -172,6 +173,7 @@ dIO = {# --- general
        'sRestr': sRestr,
        'sIPos': sIPos,
        'sLbl': sLbl,
+       'sTempDict': sTempDict,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

@@ -19,6 +19,8 @@ useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 
 useDictNmerNoCl = True               # use "no class" Nmers from full seq.?
 
+onlySglLbl = False                   # perform single-label classifcation?
+
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcTypeClf = GC.S_AAC            # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
@@ -75,6 +77,7 @@ maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
 
 # --- numbers (classifier) -------------------------------------------------------
 iCInpDataClf = 0
+modDispIni = 1000
 
 # --- numbers (proportion calculator) -------------------------------------------------------
 iCInpDataPrC = 0
@@ -110,6 +113,10 @@ if maxLenNmer not in setNmerLen:
     maxLenNmer = max(setNmerLen)
 
 # === derived values and input processing =====================================
+sSglMltLbl = GC.S_MLT_LBL
+if onlySglLbl:
+    sSglMltLbl = GC.S_SGL_LBL
+
 maxPosNmer = maxLenNmer//2
 rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)
 if lIPosUsed is None:
@@ -138,6 +145,7 @@ dIO = {# --- general
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
        'useDictNmerNoCl': useDictNmerNoCl,
+       'onlySglLbl': onlySglLbl,
        'usedNmerSeqClf': usedNmerSeqClf,
        'usedAAcTypeClf': usedAAcTypeClf,
        'usedClTypeClf': usedClTypeClf,
@@ -167,6 +175,7 @@ dIO = {# --- general
        'maxLenNmer': maxLenNmer,
        # --- numbers (classifier)
        'iCInpDataClf': iCInpDataClf,
+       'modDispIni': modDispIni,
        # --- numbers (proportion calculator)
        'iCInpDataPrC': iCInpDataPrC,
        # --- strings (general)
@@ -183,6 +192,7 @@ dIO = {# --- general
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
+       'sSglMltLbl': sSglMltLbl,
        'maxPosNmer': maxPosNmer,
        'rngPosNmer': rngPosNmer,
        'lSCXClf': lSCXClf,

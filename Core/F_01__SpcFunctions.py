@@ -161,8 +161,6 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
     return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
 def complDfrInpNoCl(dITp, dfrInp, dNmerNoCl):
-    # dInpNoCl = {dITp['sEffCode']: [], dITp['sCNmer']: [], dITp['sEffFam']: []}
-    # assert dfrInp.columns.to_list() == list(dInpNoCl)
     if dNmerNoCl is None:
         return dfrInp
     lInpNoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam']]
@@ -170,8 +168,14 @@ def complDfrInpNoCl(dITp, dfrInp, dNmerNoCl):
     dCompl = dfrInp.to_dict(orient='list')
     for sAAc, lNmer in dNmerNoCl.items():
         for sNmer in lNmer:
-            for k, sC in enumerate(dfrInp.columns):
-                dCompl[sC].append([dITp['sNoEff'], sNmer, dITp['sNoEff']][k])
+            lVApp = [dITp['sNoEff'], sNmer, dITp['sNoEff']]
+            if not dITp['onlySglLbl']:
+                for k, sC in enumerate(dfrInp.columns):
+                    dCmpl[sC].append(lVA[k])
+            else:
+                if sNmer in dCmpl[dITp['sCNmer']]:
+                    for k, sC in enumerate(dfrInp.columns):
+                        dCmpl[sC].append(lVA[k])
     return GF.iniPdDfr(dCompl)
 
 def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
@@ -204,18 +208,22 @@ def getDClasses(dITp):
         print(len(dITp['lXCl']), 'different X classes. List of X classes:')
         print(dITp['lXCl'])
 
-def iniObj(dITp, dfrInp):
+def iniObj(dITp, dfrInp, pFDTmp):
     sCNmer, sFam = dITp['sCNmer'], dITp['sEffFam']
     getDClasses(dITp)
     dX = {sI: [] for sI in dITp['lSCXClf']}
     dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
     serNmerSeq = GF.toSerUnique(dfrInp[sCNmer], sName=sCNmer)
     serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
-    for k, cSeq in enumerate(serNmerSeq):
-        lFam = dfrInp[dfrInp[sCNmer] == cSeq][sFam].to_list()
-        dT[cSeq] = GF.toListUnqViaSer(lFam)
-        if k % 1000 == 0:
-            print('Processed', k, 'of', serNmerSeq.size)
+    if GF.fileXist(pF=pFDTmp):
+        dT = GF.pickleLoadDict(pF=pFDTmp)
+    else:
+        for k, cSeq in enumerate(serNmerSeq):
+            lFam = dfrInp[dfrInp[sCNmer] == cSeq][sFam].to_list()
+            dT[cSeq] = GF.toListUnqViaSer(lFam)
+            if k % dITp['modDispIni'] == 0:
+                print('Processed', k, 'of', serNmerSeq.size)
+        GF.pickleSaveDict(cD=dT, pF=pFDTmp)
     return dT, dProc, dX, dY, serNmerSeq
 
 def fill_DProc_DX(dITp, dProc, dX, cSeq):
@@ -233,11 +241,11 @@ def fill_DY(dITp, dT, dY, cSeq):
         GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
     return lXCl
 
-def procClfInp(dITp, dfrInp):
+def procClfInp(dITp, dfrInp, pFDTmp):
     iCent, lIPosUsed = dITp['iCentNmer'], dITp['lIPosUsed']
     dfrProc, X, Y, serNmerSeq, lSXCl = None, None, None, None, []
     if dITp['sCNmer'] in dfrInp.columns:
-        dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp)
+        dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp, pFDTmp=pFDTmp)
         for cSeq in serNmerSeq:
             cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
             fill_DProc_DX(dITp, dProc, dX, cSeq=cSeqRed)

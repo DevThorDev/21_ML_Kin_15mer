@@ -41,7 +41,8 @@ class Looper(BaseClass):
         sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
         xtCSV, sSum = self.dITp['xtCSV'], self.dITp['sSummary']
         sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr'],
-                        cClf.dITp['sCLblsTrain']], sJoin=sJ1)
+                        cClf.dITp['sCLblsTrain'], cClf.D.dITp['sSglMltLbl']],
+                       sJoin=sJ1)
         sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), sJoin=sJ1)
         sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], sJoin=sJ1)
         sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth, sFE], sJoin=sJ1)

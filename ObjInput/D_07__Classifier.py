@@ -11,7 +11,7 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doImbSampling = False
+doImbSampling = True
 doRndForestClf = True
 doNNMLPClf = True
 doPropCalc = True
@@ -28,6 +28,7 @@ encodeCatFtr = True
 lLblTrain = [1]                     # number of labels used for training data
 # lLblTrain = None                    # number of labels used for training data
                                     # or None [use all labels]
+                                    # ignored if D.dITp['onlySglLbl'] == True
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
 usedNmerSeq = GC.S_UNQ_LIST         # S_FULL_LIST / S_UNQ_LIST
@@ -122,8 +123,12 @@ lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-sCLblsTrain = ''
-if lLblTrain is not None:
+sSglMltLbl, sCLblsTrain = '', ''
+if onlySglLbl:
+    sSglMltLbl = GC.S_SGL_LBL
+elif not onlySglLbl and lLblTrain is None:
+    sSglMltLbl = GC.S_MLT_LBL
+if lLblTrain is not None and not onlySglLbl:
     sCLblsTrain = GC.S_USC.join([str(nLbl) for nLbl in lLblTrain])
     sCLblsTrain = GC.S_USC.join([GC.S_LBL, sCLblsTrain, GC.S_TRAIN])
 
@@ -198,6 +203,7 @@ dIO = {# --- general
        'lOldClPlt': lOldClPlt,
        'lSResClf': lSResClf,
        # === derived values and input processing
+       'sSglMltLbl': sSglMltLbl,
        'sCLblsTrain': sCLblsTrain}
 
 ###############################################################################

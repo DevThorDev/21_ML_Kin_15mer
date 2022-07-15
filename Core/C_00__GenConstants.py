@@ -220,8 +220,10 @@ S_TEST_DATA = S_TEST + S_DATA
 S_PREV = 'prev'
 S_STATE = 'State'
 S_START_PROB = 'Start' + S_PROB
-S_SGL_POS_OCC = 'SglPosNOcc'
-S_SGL_POS_FRQ = 'SglPosRFreq'
+S_SGL = 'Sgl'
+S_MLT = 'Mlt'
+S_SGL_POS_OCC = S_SGL + 'PosNOcc'
+S_SGL_POS_FRQ = S_SGL + 'PosRFreq'
 S_LIST = 'List'
 S_UNIQUE = 'Unique'
 S_FULL_LIST = S_FULL + S_LIST
@@ -243,6 +245,9 @@ S_MAX_LEN_S = 'mxL'
 S_RESTR = 'restr'
 S_I_POS = 'iPos'
 S_LBL = 'lbl'
+S_SGL_LBL = S_SGL + S_LBL
+S_MLT_LBL = S_MLT + S_LBL
+S_TEMP_DICT = 'TempDict'
 
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'
