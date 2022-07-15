@@ -168,14 +168,12 @@ def complDfrInpNoCl(dITp, dfrInp, dNmerNoCl):
     dCompl = dfrInp.to_dict(orient='list')
     for sAAc, lNmer in dNmerNoCl.items():
         for sNmer in lNmer:
-            lVApp = [dITp['sNoEff'], sNmer, dITp['sNoEff']]
+            lVA = [dITp['sNoEff'], sNmer, dITp['sNoEff']]
             if not dITp['onlySglLbl']:
-                for k, sC in enumerate(dfrInp.columns):
-                    dCmpl[sC].append(lVA[k])
+                GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
             else:
-                if sNmer in dCmpl[dITp['sCNmer']]:
-                    for k, sC in enumerate(dfrInp.columns):
-                        dCmpl[sC].append(lVA[k])
+                if sNmer not in dCompl[dITp['sCNmer']]:
+                    GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
     return GF.iniPdDfr(dCompl)
 
 def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
@@ -253,6 +251,8 @@ def procClfInp(dITp, dfrInp, pFDTmp):
         for cD in [dX, dY]:
             GF.complDict(cDFull=dProc, cDAdd=cD)
         dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
+    if dITp['onlySglLbl']:
+        Y = toSglLbl(dITp, dfrY=Y)
     return dfrProc, X, Y, serNmerSeq, sorted(lSXCl)
 
 def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
@@ -277,14 +277,26 @@ def toMultiLbl(dITp, serY, lXCl):
             GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
     return GF.iniPdDfr(dY, lSNmR=serY.index)
 
+# def toSglLbl(dITp, dfrY):
+#     serY = None
+#     # check sanity
+#     if GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
+#         lY = [dITp['sStar']]*dfrY.shape[0]
+#         lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
+#         for k, cI in enumerate(lSer):
+#             if cI.size >= 1:
+#                 lY[k] = cI.to_list()[0]
+#         serY = GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
+#     return serY
 def toSglLbl(dITp, dfrY):
     serY = None
     # check sanity
-    if GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
-        lY = [None]*dfrY.shape[0]
+    if (GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all()
+        or dITp['onlySglLbl']):
+        lY = [dITp['sStar']]*dfrY.shape[0]
         lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
         for k, cI in enumerate(lSer):
-            if cI.size >= 1:
+            if cI.size == 1:
                 lY[k] = cI.to_list()[0]
         serY = GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
     return serY

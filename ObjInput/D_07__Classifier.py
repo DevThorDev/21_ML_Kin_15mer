@@ -123,14 +123,6 @@ lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
-sSglMltLbl, sCLblsTrain = '', ''
-if onlySglLbl:
-    sSglMltLbl = GC.S_SGL_LBL
-elif not onlySglLbl and lLblTrain is None:
-    sSglMltLbl = GC.S_MLT_LBL
-if lLblTrain is not None and not onlySglLbl:
-    sCLblsTrain = GC.S_USC.join([str(nLbl) for nLbl in lLblTrain])
-    sCLblsTrain = GC.S_USC.join([GC.S_LBL, sCLblsTrain, GC.S_TRAIN])
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -201,9 +193,6 @@ dIO = {# --- general
        # --- lists
        'lFeatSrt': lFeatSrt,
        'lOldClPlt': lOldClPlt,
-       'lSResClf': lSResClf,
-       # === derived values and input processing
-       'sSglMltLbl': sSglMltLbl,
-       'sCLblsTrain': sCLblsTrain}
+       'lSResClf': lSResClf}
 
 ###############################################################################
