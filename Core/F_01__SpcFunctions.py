@@ -209,8 +209,9 @@ def getDClasses(dITp):
 def iniObj(dITp, dfrInp, pFDTmp):
     sCNmer, sFam = dITp['sCNmer'], dITp['sEffFam']
     getDClasses(dITp)
-    dX = {sI: [] for sI in dITp['lSCXClf']}
-    dY, dT, dProc = {sXCl: [] for sXCl in dITp['lXCl']}, {}, {}
+    dT, dX, dY = {}, {sI: [] for sI in dITp['lSCXClf']}, {dITp['sEffFam']: []}
+    if not dITp['onlySglLbl']:
+        dY = {sXCl: [] for sXCl in dITp['lXCl']}
     serNmerSeq = GF.toSerUnique(dfrInp[sCNmer], sName=sCNmer)
     serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
     if GF.fileXist(pF=pFDTmp):
@@ -222,21 +223,33 @@ def iniObj(dITp, dfrInp, pFDTmp):
             if k % dITp['modDispIni'] == 0:
                 print('Processed', k, 'of', serNmerSeq.size)
         GF.pickleSaveDict(cD=dT, pF=pFDTmp)
-    return dT, dProc, dX, dY, serNmerSeq
+    return dT, {}, dX, dY, serNmerSeq
 
 def fill_DProc_DX(dITp, dProc, dX, cSeq):
-    assert len(cSeq) == len(dX)
     GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
     for sKeyX, sAAc in zip(dX, cSeq):
         GF.addToDictL(dX, cK=sKeyX, cE=sAAc)
 
-def fill_DY(dITp, dT, dY, cSeq):
+def fill_DX_DY_Sgl(dITp, dProc, dX, dY, cSeq, lXCl=[]):
+    if len(lXCl) == 1:      # exactly 1 XCl assigned to this Nmer sequence
+        GF.addToDictL(dY, cK=dITp['sEffFam'], cE=lXCl[0])
+        fill_DProc_DX(dITp, dProc=dProc, dX=dX, cSeq=cSeq)
+
+def fill_DX_DY_Mlt(dITp, dProc, dX, dY, cSeq, lXCl=[]):
+    for cXCl in dITp['lXCl']:
+        GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
+    fill_DProc_DX(dITp, dProc=dProc, dX=dX, cSeq=cSeq)
+
+def fill_DProc_DX_DY(dITp, dT, dProc, dX, dY, cSeq):
+    assert len(cSeq) == len(dX)
     lXCl = []
     for sCFam in dT[cSeq]:
         if sCFam in dITp['dClasses']:
             GF.fillListUnique(cL=lXCl, cIt=[dITp['dClasses'][sCFam]])
-    for cXCl in dITp['lXCl']:
-        GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
+    if dITp['onlySglLbl']:
+        fill_DX_DY_Sgl(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
+    else:
+        fill_DX_DY_Mlt(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
     return lXCl
 
 def procClfInp(dITp, dfrInp, pFDTmp):
@@ -246,13 +259,13 @@ def procClfInp(dITp, dfrInp, pFDTmp):
         dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp, pFDTmp=pFDTmp)
         for cSeq in serNmerSeq:
             cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
-            fill_DProc_DX(dITp, dProc, dX, cSeq=cSeqRed)
-            GF.fillListUnique(cL=lSXCl, cIt=fill_DY(dITp, dT, dY, cSeq))
+            lXCl = fill_DProc_DX_DY(dITp, dT, dProc, dX, dY, cSeq=cSeqRed)
+            GF.fillListUnique(cL=lSXCl, cIt=lXCl)
         for cD in [dX, dY]:
             GF.complDict(cDFull=dProc, cDAdd=cD)
         dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
-    if dITp['onlySglLbl']:
-        Y = toSglLbl(dITp, dfrY=Y)
+        if dITp['onlySglLbl']:
+            Y = GF.dictSglKey2Ser(dY)
     return dfrProc, X, Y, serNmerSeq, sorted(lSXCl)
 
 def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
@@ -277,17 +290,6 @@ def toMultiLbl(dITp, serY, lXCl):
             GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
     return GF.iniPdDfr(dY, lSNmR=serY.index)
 
-# def toSglLbl(dITp, dfrY):
-#     serY = None
-#     # check sanity
-#     if GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
-#         lY = [dITp['sStar']]*dfrY.shape[0]
-#         lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
-#         for k, cI in enumerate(lSer):
-#             if cI.size >= 1:
-#                 lY[k] = cI.to_list()[0]
-#         serY = GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
-#     return serY
 def toSglLbl(dITp, dfrY):
     serY = None
     # check sanity

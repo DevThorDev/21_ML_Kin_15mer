@@ -66,13 +66,18 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def getDPF(self):
-        sBClf, sBPrC = self.D.dITp['sFInpBaseClf'], self.D.dITp['sFInpBasePrC']
-        self.dITp['sParClf'] = GF.joinS([sBClf], sJoin=self.dITp['sUSC'])
-        self.dITp['sOutClf'] = GF.joinS([self.D.dITp['sSet'], sBClf],
-                                        sJoin=self.dITp['sUSC'])
-        self.dITp['sOutPrC'] = GF.joinS([self.D.dITp['sSet'], sBPrC],
-                                        sJoin=self.dITp['sUSC'])
+        xtCSV, dITp, dITpD = self.dITp['xtCSV'], self.dITp, self.D.dITp
+        sBClf, sBPrC = dITpD['sFInpBaseClf'], dITpD['sFInpBasePrC']
+        dITp['sParClf'] = GF.joinS([sBClf], sJoin=dITp['sUSC'])
+        dITp['sOutClf'] = GF.joinS([dITpD['sSet'], sBClf], sJoin=dITp['sUSC'])
+        dITp['sOutPrC'] = GF.joinS([dITpD['sSet'], sBPrC], sJoin=dITp['sUSC'])
+        sFUSgl = (GF.joinS([dITpD['sFInpClf'], dITpD['sSet'], dITpD['sUnique'],
+                            dITpD['sRestr'], dITpD['sSglLbl']]) + xtCSV)
+        sFUMlt = (GF.joinS([dITpD['sFInpClf'], dITpD['sSet'], dITpD['sUnique'],
+                            dITpD['sRestr'], dITpD['sMltLbl']]) + xtCSV)
         self.dPF = self.D.yieldDPF()
+        self.dPF = {'DataClfUSgl': GF.joinToPath(dITp['pUnqNmer'], sFUSgl),
+                    'DataClfUMlt': GF.joinToPath(dITp['pUnqNmer'], sFUMlt)}
 
     # --- methods for getting and setting X and Y -----------------------------
     def getXY(self, getTrain=None):
@@ -144,8 +149,8 @@ class BaseSmplClfPrC(BaseClass):
         tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
                                  test_size=self.dITp['propTestData'])
         XTrain, XTest, YTrain, YTest = tTrTe
-        if self.dITp['lLblTrain'] is not None:
-            lB = [serR.sum() in self.dITp['lLblTrain'] for _, serR in
+        if not (self.D.dITp['onlySglLbl'] or self.dITp['lLblTrain'] is None):
+            lB = [(serR.sum() in self.dITp['lLblTrain']) for _, serR in
                   YTrain.iterrows()]
             XTrain, YTrain = XTrain[lB], YTrain[lB]
         self.setXY(X=XTrain, Y=YTrain, setTrain=True)
@@ -239,9 +244,10 @@ class ImbSampler(BaseSmplClfPrC):
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
         bTrain = (True if self.dITp['doTrainTestSplit'] else None)
         X, Y = self.getXY(getTrain=bTrain)
-        YSgl = SF.toSglLbl(self.dITp, dfrY=Y)
-        print('Initial shape of YSgl:', YSgl.shape)
-        X, YRes = self.getSampler().fit_resample(X, YSgl)
+        # if not self.D.dITp['onlySglLbl']:
+        #     Y = SF.toSglLbl(self.dITp, dfrY=Y)
+        print('Initial shape of Y:', Y.shape)
+        X, YRes = self.getSampler().fit_resample(X, Y)
         print('Final shape of YRes:', YRes.shape)
         for cY in YRes.unique():
             print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
@@ -260,7 +266,10 @@ class Classifier(BaseSmplClfPrC):
         if self.dITp['doImbSampling']:
             cSmp.fitResampleImbalanced()
             self.setData(cSmp.yieldData())
-        self.saveData(self.dfrInp, pF=self.dPF['DataClfU'], saveAnyway=False)
+        pFU = self.dPF['DataClfUMlt']
+        if self.D.dITp['onlySglLbl']:
+            pFU = self.dPF['DataClfUSgl']
+        self.saveData(self.dfrInp, pF=pFU, saveAnyway=False)
         print('Initiated "Classifier" base object.')
 
     # --- print methods -------------------------------------------------------
@@ -351,26 +360,37 @@ class Classifier(BaseSmplClfPrC):
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
         if self.Clf is not None:
-            if dat2Pred is not None and self.dITp['encodeCatFtr']:
+            dITp, lSXCl = self.dITp, self.lSCl
+            if dat2Pred is not None and dITp['encodeCatFtr']:
                 dat2Pred = self.cEnc.transform(dat2Pred).toarray()
             if dat2Pred is None:
                 dat2Pred, self.YTest = self.getXY(getTrain=False)
+            if self.D.dITp['onlySglLbl']:
+                self.YTest = SF.toMultiLbl(dITp, serY=self.YTest, lXCl=lSXCl)
             lSC, lSR = self.YTest.columns, self.YTest.index
-            self.YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred), lSNmC=lSC,
-                                     lSNmR=lSR)
+            if self.D.dITp['onlySglLbl']:
+                YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred),
+                                    lSNmC=[dITp['sEffFam']], lSNmR=lSR)
+                self.YPred = SF.toMultiLbl(dITp, serY=YPred, lXCl=lSXCl)
+            else:
+                self.YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred), lSNmC=lSC,
+                                         lSNmR=lSR)
             self.YProba = GF.getYProba(self.Clf, dat2Pred, lSC=lSC, lSR=lSR)
             assert self.YProba.shape == self.YPred.shape
             self.calcResPredict(X2Pred=dat2Pred)
-            if self.dITp['lvlOut'] > 0:
+            if dITp['lvlOut'] > 0:
                 self.printPredict(X2Pred=dat2Pred)
             self.calcConfMatrix()
 
     # --- method for calculating the confusion matrix -------------------------
     def calcConfMatrix(self):
-        if (self.dITp['calcConfMatrix'] and self.YTest.shape[1] <= 1 and
-            self.YPred.shape[1] <= 1):
-            t, p, lC = self.YTest, self.YPred, self.lSCl
-            self.confusMatrix = confusion_matrix(y_true=t, y_pred=p, labels=lC)
+        if self.dITp['calcConfMatrix']:
+            YTest, YPred, lC = self.YTest, self.YPred, self.lSCl
+            if self.D.dITp['onlySglLbl']:
+                YTest = SF.toSglLbl(self.dITp, dfrY=self.YTest)
+                YPred = SF.toSglLbl(self.dITp, dfrY=self.YPred)
+            self.confusMatrix = confusion_matrix(y_true=YTest, y_pred=YPred,
+                                                 labels=lC)
             dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
             self.dConfMat[self.sKPar] = dfrCM
 
@@ -470,13 +490,20 @@ class PropCalculator(BaseSmplClfPrC):
 
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:
+            dfrInp, dITp = self.dfrInp, self.dITp
             for sCl in self.lSCl:
-                cDfrI = self.dfrInp[self.dfrInp[sCl] > 0]
+                if self.D.dITp['onlySglLbl']:
+                    cDfrI = dfrInp[dfrInp[dITp['sEffFam']] == sCl]
+                else:
+                    cDfrI = dfrInp[dfrInp[sCl] > 0]
                 self.calcPropCDfr(cDfrI, sCl=sCl)
             # any XCl
-            cDfrI = self.dfrInp[(self.dfrInp[self.lSCl] > 0).any(axis=1)]
-            self.calcPropCDfr(cDfrI, sCl=self.dITp['sCapX'])
+            if self.D.dITp['onlySglLbl']:
+                cDfrI = dfrInp[dfrInp[dITp['sEffFam']].isin(self.lSCl)]
+            else:
+                cDfrI = dfrInp[(dfrInp[self.lSCl] > 0).any(axis=1)]
+            self.calcPropCDfr(cDfrI, sCl=dITp['sCapX'])
             # entire dataset
-            self.calcPropCDfr(self.dfrInp, sCl=self.dITp['sAllSeq'])
+            self.calcPropCDfr(dfrInp, sCl=dITp['sAllSeq'])
 
 ###############################################################################

@@ -71,8 +71,11 @@ class Looper(BaseClass):
                 d2Par, iM = self.dITp['d2Par_RF'], 15
                 cClf = RndForestClf(self.inpD, self.D, d2Par, sKPar=sKPar)
             elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
-                d2Par, iM = self.dITp['d2Par_NNMLP'], 16
+                d2Par, iM = self.dITp['d2Par_NNMLP'], 17
                 cClf = NNMLPClf(self.inpD, self.D, d2Par, sKPar=sKPar)
+            cEndT = GF.showElapsedTime(startTime=stT)
+            cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
+            cStT = GF.showElapsedTime(startTime=stT)
             cClf.ClfPred()
             cClf.printFitQuality()
             GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
@@ -84,7 +87,7 @@ class Looper(BaseClass):
                 self.saveData(cClf.dfrPred, pF=self.dPF['OutDetClf'])
                 self.saveData(cClf.dfrProba, pF=self.dPF['OutProbaClf'])
             cEndT = GF.showElapsedTime(startTime=stT)
-            cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
+            cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
 
     def saveCombRes(self, sMth, d2Par, nRep=0):
         sJ = self.dITp['sUSC']

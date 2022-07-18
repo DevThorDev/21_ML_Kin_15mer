@@ -19,7 +19,7 @@ useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 
 useDictNmerNoCl = True               # use "no class" Nmers from full seq.?
 
-onlySglLbl = False                   # perform single-label classifcation?
+onlySglLbl = True                   # perform single-label classifcation?
 
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
@@ -192,6 +192,8 @@ dIO = {# --- general
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
+       'sSglLbl': GC.S_SGL_LBL,
+       'sMltLbl': GC.S_MLT_LBL,
        'sSglMltLbl': sSglMltLbl,
        'maxPosNmer': maxPosNmer,
        'rngPosNmer': rngPosNmer,

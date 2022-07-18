@@ -643,6 +643,10 @@ def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
 def iniWShape(tmplDfr, fillV=np.nan):
     iniPdDfr(shape=tmplDfr.shape, fillV=fillV)
 
+def dictSglKey2Ser(cD):
+    assert len(cD) == 1
+    return pd.Series(list(cD.values())[0], name=list(cD.keys())[0])
+
 def getIdxDfr(maxLen=0, idxDfr=None):
     if idxDfr is not None and len(idxDfr) >= maxLen:
         idxDfr = idxDfr[:maxLen]

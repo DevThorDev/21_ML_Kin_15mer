@@ -42,6 +42,7 @@ pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
 pOutPar = GC.P_DIR_RES_CLF_PARS
 pOutSum = GC.P_DIR_RES_CLF_SUMMARIES
+pUnqNmer = GC.P_DIR_RES_UNQ_N_MER
 pConfMat = GC.P_DIR_RES_CLF_CONF_MAT
 pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
@@ -149,6 +150,7 @@ dIO = {# --- general
        'pInpPrC': pInpPrC,
        'pOutPar': pOutPar,
        'pOutSum': pOutSum,
+       'pUnqNmer': pUnqNmer,
        'pConfMat': pConfMat,
        'pOutDet': pOutDet,
        'pOutPrC': pOutPrC,
