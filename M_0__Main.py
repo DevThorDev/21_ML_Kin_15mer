@@ -134,7 +134,7 @@ cStTime = GF.showElapsedTime(startTime)
 cPropCalc = PropCalculator(inpDatG, D=cDataLoader)
 cPropCalc.calcPropAAc()
 cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=17, stTMth=cStTime, endTMth=cEndTime)
+cTiming.updateTimes(iMth=19, stTMth=cStTime, endTMth=cEndTime)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

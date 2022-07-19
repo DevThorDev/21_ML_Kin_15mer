@@ -17,9 +17,9 @@ sSet = GC.S_SET_06
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 
-useDictNmerNoCl = True               # use "no class" Nmers from full seq.?
+useNmerNoCl = True                   # use "no class" Nmers from full seq.?
 
-onlySglLbl = True                   # perform single-label classifcation?
+onlySglLbl = True                    # perform single-label classifcation?
 
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
@@ -37,7 +37,8 @@ usedClTypePrC = usedClTypeClf
 
 # --- names and paths of files and dirs (general) -----------------------------
 sFResComb = 'Combined_S_KinasesPho15mer_202202'
-sFDictNmerSnips = 'DictNmerSnips'
+sFDictNmerSnips = 'DictNmerSnipsNoCl'
+sFDictNmerEffF = 'DictNmerEffF'
 
 pResComb = GC.P_DIR_RES_COMB
 pBinData = GC.P_DIR_BIN_DATA
@@ -144,7 +145,7 @@ dIO = {# --- general
        'sSet': sSet,
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
-       'useDictNmerNoCl': useDictNmerNoCl,
+       'useNmerNoCl': useNmerNoCl,
        'onlySglLbl': onlySglLbl,
        'usedNmerSeqClf': usedNmerSeqClf,
        'usedAAcTypeClf': usedAAcTypeClf,
@@ -157,6 +158,7 @@ dIO = {# --- general
        # --- names and paths of files and dirs (general)
        'sFResComb': sFResComb,
        'sFDictNmerSnips': sFDictNmerSnips,
+       'sFDictNmerEffF': sFDictNmerEffF,
        'pResComb': pResComb,
        'pBinData': pBinData,
        # --- names and paths of files and dirs (classifier)

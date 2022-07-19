@@ -261,16 +261,20 @@ class Classifier(BaseSmplClfPrC):
     def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Classifier for data classification'
+        self.saveDfrInpUnq()
         cSmp = ImbSampler(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.setData(cSmp.yieldData())
         if self.dITp['doImbSampling']:
             cSmp.fitResampleImbalanced()
             self.setData(cSmp.yieldData())
+        print('Initiated "Classifier" base object.')
+
+    # --- method for saving the unique Nmer input DataFrame -------------------
+    def saveDfrInpUnq(self):
         pFU = self.dPF['DataClfUMlt']
         if self.D.dITp['onlySglLbl']:
             pFU = self.dPF['DataClfUSgl']
         self.saveData(self.dfrInp, pF=pFU, saveAnyway=False)
-        print('Initiated "Classifier" base object.')
 
     # --- print methods -------------------------------------------------------
     def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
@@ -468,8 +472,10 @@ class PropCalculator(BaseSmplClfPrC):
         sJ1, sJ2, x = self.dITp['sUSC'], self.dITp['sUS02'], self.dITp['xtCSV']
         sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
                              sJoin=sJ2)
-        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr']],
-                       sJoin=sJ1)
+        # sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr']],
+        #                sJoin=sJ1)
+        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr'],
+                        self.D.dITp['sSglMltLbl']], sJoin=sJ1)
         sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
         if sCl is not None:
             sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], sJoin=sJ1) + x

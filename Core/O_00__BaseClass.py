@@ -441,6 +441,8 @@ class Timing:
             for k, (sMth, cElT) in enumerate(zip(self.lSMth, self.lElT)):
                 sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'
                 sWS = GC.S_SPACE*(6 - len(sX))
+                if k == len(self.lElT) - 1:
+                    k = 99 - 1
                 print(GC.S_SP04 + sWS + sX + '\t(share of time in Method ' +
                       str(k + 1) + ' | "' + sMth + '")')
             print(GC.S_WV80)

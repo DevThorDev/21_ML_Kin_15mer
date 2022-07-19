@@ -160,21 +160,30 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
         lSer.append(cSer)
     return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
-def complDfrInpNoCl(dITp, dfrInp, dNmerNoCl):
-    if dNmerNoCl is None:
-        return dfrInp
+def preProcClfInp(dITp, dfrInp, dNmerNoCl):
     lInpNoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam']]
     assert dfrInp.columns.to_list() == lInpNoCl
-    dCompl = dfrInp.to_dict(orient='list')
+    dCompl, dNmerEffF = dfrInp.to_dict(orient='list'), {}
+    for sNmer, sEffFam in zip(dCompl[dITp['sCNmer']], dCompl[dITp['sEffFam']]):
+        GF.addToDictL(dNmerEffF, cK=sNmer, cE=sEffFam, lUnqEl=True)
+    if dNmerNoCl is None:
+        return dfrInp
+    # for sAAc, lNmer in dNmerNoCl.items():
+    #     for sNmer in lNmer:
+    #         if dITp['onlySglLbl']:
+    #         else:
+    #             GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
     for sAAc, lNmer in dNmerNoCl.items():
         for sNmer in lNmer:
-            lVA = [dITp['sNoEff'], sNmer, dITp['sNoEff']]
-            if not dITp['onlySglLbl']:
-                GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
-            else:
-                if sNmer not in dCompl[dITp['sCNmer']]:
-                    GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
-    return GF.iniPdDfr(dCompl)
+            GF.addToDictL(dNmerEffF, cK=sNmer, cE=dITp['sNoFam'], lUnqEl=True)
+    serNmerSeq = GF.iniPdSer(list(dNmerNoCl), nameS=dITp['sCNmer'])
+    for sNmer in dNmerEffF:
+        lVA = [dITp['sNoEff'], sNmer, dITp['sNoFam']]
+        if (not dITp['onlySglLbl']) or (sNmer not in dCompl[dITp['sCNmer']]):
+            GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
+    dfrCompl = GF.iniPdDfr(dCompl)
+    return dfrCompl
+    # return GF.iniPdDfr(dCompl)
 
 def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
     serNmerSeq, lSCl, X, Y = None, None, None, None
@@ -196,7 +205,7 @@ def getDClasses(dITp):
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
     for _, cRow in dfrClMap.iterrows():
         [sK, sV] = cRow.to_list()
-        if sV != dITp['sStar']:
+        if sV != dITp['sNone']:
             dITp['dClasses'][sK] = sV
             GF.addToListUnq(dITp['lXCl'], cEl=sV)
     print('Calculated class dictionary.')
@@ -293,9 +302,8 @@ def toMultiLbl(dITp, serY, lXCl):
 def toSglLbl(dITp, dfrY):
     serY = None
     # check sanity
-    if (GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all()
-        or dITp['onlySglLbl']):
-        lY = [dITp['sStar']]*dfrY.shape[0]
+    if GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
+        lY = [dITp['sNone']]*dfrY.shape[0]
         lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
         for k, cI in enumerate(lSer):
             if cI.size == 1:

@@ -18,7 +18,7 @@ class DataLoader(BaseClass):
         self.getDITp(iTp=iTp)
         self.fillDPF()
         self.iniAttr()
-        if self.dITp['useDictNmerNoCl']:
+        if self.dITp['useNmerNoCl']:
             self.getDictNmerNoCl()
         self.loadInpDataClf(iC=self.dITp['iCInpDataClf'])
         self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
@@ -28,17 +28,20 @@ class DataLoader(BaseClass):
     def fillDPF(self):
         sFInpClf = self.dITp['sFInpClf'] + self.dITp['xtCSV']
         sFInpPrC = self.dITp['sFInpPrC'] + self.dITp['xtCSV']
-        sFDTmp = (GF.joinS([self.dITp['sTempDict'], self.dITp['sFInpClf']]) +
-                  self.dITp['xtBIN'])
+        sFDTmp = (GF.joinS([self.dITp['sTempDict'], self.dITp['sFInpClf']],
+                           sJoin=self.dITp['sUS02']) + self.dITp['xtBIN'])
         sFResComb = self.dITp['sFResComb'] + self.dITp['xtCSV']
         lSF = [self.dITp['sFDictNmerSnips'], self.dITp['sFResComb']]
         sFDNS = GF.joinS(lSF, sJoin=self.dITp['sUS02']) + self.dITp['xtBIN']
+        lSF = [self.dITp['sFDictNmerEffF'], self.dITp['sFResComb']]
+        sFDNX = GF.joinS(lSF, sJoin=self.dITp['sUS02']) + self.dITp['xtBIN']
         self.dPF = {}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
         self.dPF['TempDict'] = GF.joinToPath(self.dITp['pBinData'], sFDTmp)
         self.dPF['ResComb'] = GF.joinToPath(self.dITp['pResComb'], sFResComb)
         self.dPF['DictNmerSnips'] = GF.joinToPath(self.dITp['pBinData'], sFDNS)
+        self.dPF['DictNmerEffF'] = GF.joinToPath(self.dITp['pBinData'], sFDNX)
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
@@ -61,7 +64,7 @@ class DataLoader(BaseClass):
             serNmerUnq = None
             if self.dITp['sCNmer'] in dfrComb.columns:
                 serNmerUnq = GF.toSerUnique(dfrComb[self.dITp['sCNmer']])
-            lNmerUnq =  GF.toListUnqViaSer(serNmerUnq)
+            lNmerUnq = GF.toListUnqViaSer(serNmerUnq)
             self.dNmerNoCl = SF.getDSqNoCl(self.dITp, serFullSeqUnq=serFullUnq,
                                            lNmerSeqUnq=lNmerUnq)
             GF.pickleSaveDict(cD=self.dNmerNoCl, pF=self.dPF['DictNmerSnips'])
@@ -70,8 +73,8 @@ class DataLoader(BaseClass):
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.dPF['InpDataClf'], iC=iC)
-        self.dfrInpClf = SF.complDfrInpNoCl(self.dITp, dfrInp=self.dfrInpClf,
-                                            dNmerNoCl=self.dNmerNoCl)
+        self.dfrInpClf = SF.preProcClfInp(self.dITp, dfrInp=self.dfrInpClf,
+                                          dNmerNoCl=self.dNmerNoCl)
         (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
          self.lSXClClf) = SF.procClfInp(self.dITp, dfrInp=self.dfrInpClf,
                                         pFDTmp=self.dPF['TempDict'])
@@ -87,9 +90,8 @@ class DataLoader(BaseClass):
                self.dPF['InpDataPrC'] != self.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
             self.dfrInpPrC = self.loadData(self.dPF['InpDataPrC'], iC=iC)
-            self.dfrInpPrC = SF.complDfrInpNoCl(self.dITp,
-                                                dfrInp=self.dfrInpPrC,
-                                                dNmerNoCl=self.dNmerNoCl)
+            self.dfrInpPrC = SF.preProcClfInp(self.dITp, dfrInp=self.dfrInpPrC,
+                                              dNmerNoCl=self.dNmerNoCl)
             t = SF.loadInpData(self.dITp, self.dfrInpPrC, sMd='PrC', iC=iC)
             (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
              self.lSXClPrC) = t
