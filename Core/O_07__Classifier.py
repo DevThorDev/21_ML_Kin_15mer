@@ -23,7 +23,7 @@ from imblearn.under_sampling import (ClusterCentroids, AllKNN,
 # -----------------------------------------------------------------------------
 class BaseSmplClfPrC(BaseClass):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
+    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
         super().__init__(inpDat)
         self.idO = 'O_07'
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
@@ -37,7 +37,7 @@ class BaseSmplClfPrC(BaseClass):
     # --- method for complementing the type input dictionary ------------------
     def complDITp(self):
         lLblTrain, sCLblsTrain = self.dITp['lLblTrain'], ''
-        if not (lLblTrain is None or self.D.dITp['onlySglLbl']):
+        if not (lLblTrain is None or self.dITp['onlySglLbl']):
             sCLblsTrain = GC.S_USC.join([str(nLbl) for nLbl in lLblTrain])
             sCLblsTrain = GC.S_USC.join([GC.S_LBL, sCLblsTrain, GC.S_TRAIN])
         self.dITp['sCLblsTrain'] = sCLblsTrain
@@ -66,15 +66,15 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def getDPF(self):
-        xtCSV, dITp, dITpD = self.dITp['xtCSV'], self.dITp, self.D.dITp
-        sBClf, sBPrC = dITpD['sFInpBaseClf'], dITpD['sFInpBasePrC']
+        xtCSV, dITp = self.dITp['xtCSV'], self.dITp
+        sBClf, sBPrC = dITp['sFInpBaseClf'], dITp['sFInpBasePrC']
         dITp['sParClf'] = GF.joinS([sBClf], sJoin=dITp['sUSC'])
-        dITp['sOutClf'] = GF.joinS([dITpD['sSet'], sBClf], sJoin=dITp['sUSC'])
-        dITp['sOutPrC'] = GF.joinS([dITpD['sSet'], sBPrC], sJoin=dITp['sUSC'])
-        sFUSgl = (GF.joinS([dITpD['sFInpClf'], dITpD['sSet'], dITpD['sUnique'],
-                            dITpD['sRestr'], dITpD['sSglLbl']]) + xtCSV)
-        sFUMlt = (GF.joinS([dITpD['sFInpClf'], dITpD['sSet'], dITpD['sUnique'],
-                            dITpD['sRestr'], dITpD['sMltLbl']]) + xtCSV)
+        dITp['sOutClf'] = GF.joinS([dITp['sSet'], sBClf], sJoin=dITp['sUSC'])
+        dITp['sOutPrC'] = GF.joinS([dITp['sSet'], sBPrC], sJoin=dITp['sUSC'])
+        sFUSgl = (GF.joinS([dITp['sFInpClf'], dITp['sSet'], dITp['sUnique'],
+                            dITp['sRestr'], dITp['sSglLbl']]) + xtCSV)
+        sFUMlt = (GF.joinS([dITp['sFInpClf'], dITp['sSet'], dITp['sUnique'],
+                            dITp['sRestr'], dITp['sMltLbl']]) + xtCSV)
         self.dPF = self.D.yieldDPF()
         self.dPF = {'DataClfUSgl': GF.joinToPath(dITp['pUnqNmer'], sFUSgl),
                     'DataClfUMlt': GF.joinToPath(dITp['pUnqNmer'], sFUMlt)}
@@ -149,7 +149,7 @@ class BaseSmplClfPrC(BaseClass):
         tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
                                  test_size=self.dITp['propTestData'])
         XTrain, XTest, YTrain, YTest = tTrTe
-        if not (self.D.dITp['onlySglLbl'] or self.dITp['lLblTrain'] is None):
+        if not (self.dITp['onlySglLbl'] or self.dITp['lLblTrain'] is None):
             lB = [(serR.sum() in self.dITp['lLblTrain']) for _, serR in
                   YTrain.iterrows()]
             XTrain, YTrain = XTrain[lB], YTrain[lB]
@@ -204,10 +204,10 @@ class BaseSmplClfPrC(BaseClass):
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
+    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Sampler for imbalanced learning'
-        self.getInpData(sMd='Clf')
+        self.getInpData(sMd=GC.S_CLF)
         self.encodeSplitData()
         print('Initiated "ImbSampler" base object.')
 
@@ -244,21 +244,21 @@ class ImbSampler(BaseSmplClfPrC):
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
         bTrain = (True if self.dITp['doTrainTestSplit'] else None)
         X, Y = self.getXY(getTrain=bTrain)
-        # if not self.D.dITp['onlySglLbl']:
+        # if not self.dITp['onlySglLbl']:
         #     Y = SF.toSglLbl(self.dITp, dfrY=Y)
         print('Initial shape of Y:', Y.shape)
         X, YRes = self.getSampler().fit_resample(X, Y)
         print('Final shape of YRes:', YRes.shape)
         for cY in YRes.unique():
             print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
-        if not self.D.dITp['onlySglLbl']:
+        if not self.dITp['onlySglLbl']:
             YRes = SF.toMultiLbl(self.dITp, serY=YRes, lXCl=self.lSCl)
         self.setXY(X=X, Y=YRes, setTrain=bTrain)
 
 # -----------------------------------------------------------------------------
 class Classifier(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2]):
+    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Classifier for data classification'
         self.saveDfrInpUnq()
@@ -272,7 +272,7 @@ class Classifier(BaseSmplClfPrC):
     # --- method for saving the unique Nmer input DataFrame -------------------
     def saveDfrInpUnq(self):
         pFU = self.dPF['DataClfUMlt']
-        if self.D.dITp['onlySglLbl']:
+        if self.dITp['onlySglLbl']:
             pFU = self.dPF['DataClfUSgl']
         self.saveData(self.dfrInp, pF=pFU, saveAnyway=False)
 
@@ -369,10 +369,10 @@ class Classifier(BaseSmplClfPrC):
                 dat2Pred = self.cEnc.transform(dat2Pred).toarray()
             if dat2Pred is None:
                 dat2Pred, self.YTest = self.getXY(getTrain=False)
-            if self.D.dITp['onlySglLbl']:
+            if self.dITp['onlySglLbl']:
                 self.YTest = SF.toMultiLbl(dITp, serY=self.YTest, lXCl=lSXCl)
             lSC, lSR = self.YTest.columns, self.YTest.index
-            if self.D.dITp['onlySglLbl']:
+            if self.dITp['onlySglLbl']:
                 YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred),
                                     lSNmC=[dITp['sEffFam']], lSNmR=lSR)
                 self.YPred = SF.toMultiLbl(dITp, serY=YPred, lXCl=lSXCl)
@@ -390,7 +390,7 @@ class Classifier(BaseSmplClfPrC):
     def calcConfMatrix(self):
         if self.dITp['calcConfMatrix']:
             YTest, YPred, lC = self.YTest, self.YPred, self.lSCl
-            if self.D.dITp['onlySglLbl']:
+            if self.dITp['onlySglLbl']:
                 YTest = SF.toSglLbl(self.dITp, dfrY=self.YTest)
                 YPred = SF.toSglLbl(self.dITp, dfrY=self.YPred)
             self.confusMatrix = confusion_matrix(y_true=YTest, y_pred=YPred,
@@ -461,10 +461,10 @@ class NNMLPClf(Classifier):
 # -----------------------------------------------------------------------------
 class PropCalculator(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, iTp=7, lITpUpd=[1, 2]):
+    def __init__(self, inpDat, D, iTp=7, lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Calculator: AAc proportions per kinase (class)'
-        self.getInpData(sMd='PrC')
+        self.getInpData(sMd=self.dITp['sPrC'])
         print('Initiated "PropCalculator" base object.')
 
     # --- method for adapting a key of the result paths dictionary ------------
@@ -472,10 +472,10 @@ class PropCalculator(BaseSmplClfPrC):
         sJ1, sJ2, x = self.dITp['sUSC'], self.dITp['sUS02'], self.dITp['xtCSV']
         sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
                              sJoin=sJ2)
-        # sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr']],
+        # sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr']],
         #                sJoin=sJ1)
-        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr'],
-                        self.D.dITp['sSglMltLbl']], sJoin=sJ1)
+        sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
+                        self.dITp['sSglMltLbl']], sJoin=sJ1)
         sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
         if sCl is not None:
             sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], sJoin=sJ1) + x
@@ -484,7 +484,7 @@ class PropCalculator(BaseSmplClfPrC):
     # --- methods calculating the proportions of AAc at all Nmer positions ----
     def calcPropCDfr(self, cDfrI, sCl):
         cD2Out, nTtl = {}, cDfrI.shape[0]
-        for sPos in self.D.dITp['lSCXPrC']:
+        for sPos in self.dITp['lSCXPrC']:
             serCPos = cDfrI[sPos]
             for sAAc in self.dITp['lFeatSrt']:
                 nCAAc = serCPos[serCPos == sAAc].count()
@@ -498,17 +498,17 @@ class PropCalculator(BaseSmplClfPrC):
         if self.dITp['doPropCalc']:
             dfrInp, dITp = self.dfrInp, self.dITp
             for sCl in self.lSCl:
-                if self.D.dITp['onlySglLbl']:
+                if self.dITp['onlySglLbl']:
                     cDfrI = dfrInp[dfrInp[dITp['sEffFam']] == sCl]
                 else:
                     cDfrI = dfrInp[dfrInp[sCl] > 0]
                 self.calcPropCDfr(cDfrI, sCl=sCl)
             # any XCl
-            if self.D.dITp['onlySglLbl']:
+            if self.dITp['onlySglLbl']:
                 cDfrI = dfrInp[dfrInp[dITp['sEffFam']].isin(self.lSCl)]
             else:
                 cDfrI = dfrInp[(dfrInp[self.lSCl] > 0).any(axis=1)]
-            self.calcPropCDfr(cDfrI, sCl=dITp['sCapX'])
+            self.calcPropCDfr(cDfrI, sCl=dITp['sX'])
             # entire dataset
             self.calcPropCDfr(dfrInp, sCl=dITp['sAllSeq'])
 

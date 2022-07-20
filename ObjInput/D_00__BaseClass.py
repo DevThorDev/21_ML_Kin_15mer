@@ -30,7 +30,7 @@ sUS02 = GC.S_US02
 sTab = GC.S_TAB
 sNewl = GC.S_NEWL
 sNULL = GC.S_NULL
-s0, sC, sX = GC.S_0, GC.S_CAP_C, GC.S_CAP_X
+s0, sC, sX, sY = GC.S_0, GC.S_CAP_C, GC.S_CAP_X, GC.S_CAP_Y
 sBase = GC.S_BASE
 sTrain = GC.S_TRAIN
 sTest = GC.S_TEST
@@ -58,11 +58,11 @@ sEffCode = GC.S_EFF_CODE
 sEffCl = GC.S_EFF_CL
 sXCl = GC.S_X_CL
 sNone = GC.S_NONE
+sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
 sTrueCl = GC.S_TRUE_CL
 sPredCl = GC.S_PRED_CL
 sIGen = GC.S_I_GEN
-sCapC, sCapX, sCapY = GC.S_CAP_C, GC.S_CAP_X, GC.S_CAP_Y
 sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sCNmer = GC.S_C_N_MER
 sAllSeq = GC.S_ALL_SEQ
@@ -84,7 +84,9 @@ sMaxLenS = GC.S_MAX_LEN_S
 sRestr = GC.S_RESTR
 sIPos = GC.S_I_POS
 sLbl = GC.S_LBL
-sTempDict = GC.S_TEMP_DICT
+sNmerEffF = GC.S_N_MER_EFF_FAM
+sNmerSeqU = GC.S_N_MER_SEQ_UNQ
+sInpData = GC.S_INP_DATA
 
 # --- file name extensions ----------------------------------------------------
 xtPY = GC.XT_PY
@@ -119,6 +121,7 @@ dIO = {# --- general
        's0': s0,
        'sC': sC,
        'sX': sX,
+       'sY': sY,
        'sBase': sBase,
        'sTrain': sTrain,
        'sTest': sTest,
@@ -146,13 +149,12 @@ dIO = {# --- general
        'sEffCl': sEffCl,
        'sXCl': sXCl,
        'sNone': sNone,
+       'sClf': sClf,
+       'sPrC': sPrC,
        'sEffFam': sEffFam,
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sIGen': sIGen,
-       'sCapC': sCapC,
-       'sCapX': sCapX,
-       'sCapY': sCapY,
        'sCapXS': sCapXS,
        'sCapS': sCapS,
        'sCapM': sCapM,
@@ -177,7 +179,9 @@ dIO = {# --- general
        'sRestr': sRestr,
        'sIPos': sIPos,
        'sLbl': sLbl,
-       'sTempDict': sTempDict,
+       'sNmerEffF': sNmerEffF,
+       'sNmerSeqU': sNmerSeqU,
+       'sInpData': sInpData,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

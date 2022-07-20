@@ -644,8 +644,23 @@ def iniWShape(tmplDfr, fillV=np.nan):
     iniPdDfr(shape=tmplDfr.shape, fillV=fillV)
 
 def dictSglKey2Ser(cD):
-    assert len(cD) == 1
-    return pd.Series(list(cD.values())[0], name=list(cD.keys())[0])
+    if len(cD) == 1:
+        return pd.Series(list(cD.values())[0], name=list(cD.keys())[0])
+    return None
+
+def dictLUneqLen2Dfr(cD, itIdx=None, itCol=None, fillV=np.nan, doTrans=False):
+    maxLenL = max([len(l) for l in cD.values()])
+    cDX = {cK: (cL + [fillV]*(maxLenL - len(cL))) for cK, cL in cD.items()}
+    if doTrans:
+        dfrOut = pd.DataFrame(cDX).T
+    else:
+        dfrOut = pd.DataFrame(cDX)
+    # if given and of correct size, set index and/or columns
+    if (itIdx is not None) and (len(itIdx) == dfrOut.index.size):
+        dfrOut.index = itIdx
+    if (itCol is not None) and (len(itCol) == dfrOut.columns.size):
+        dfrOut.columns = itCol
+    return dfrOut
 
 def getIdxDfr(maxLen=0, idxDfr=None):
     if idxDfr is not None and len(idxDfr) >= maxLen:

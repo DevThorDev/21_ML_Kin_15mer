@@ -117,7 +117,8 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_06__ClfDataLoader) -----------------------------------------
-def filterNmerSeq(dITp, serSeq):
+def filterNmerSeq(dITp, dSeq, serSeq):
+    dSeqFilt = dSeq
     if dITp['dAAcPosRestr'] is not None:
         assert min([len(sSeq) for sSeq in serSeq]) >= dITp['lenNmerDef']
         for iP, lAAc in dITp['dAAcPosRestr'].items():
@@ -125,7 +126,8 @@ def filterNmerSeq(dITp, serSeq):
             if iSeq >= 0 and iSeq < dITp['lenNmerDef']:
                 lB = [(sSeq[iSeq] in lAAc) for sSeq in serSeq]
                 serSeq = serSeq[lB]
-    return serSeq
+        dSeqFilt = {sSeq: dSeq[sSeq] for sSeq in serSeq}
+    return dSeqFilt, serSeq
 
 def getClassStrOldCl(dITp, setSDC, lSCl=[]):
     setSDigC, n, sClOut = set(), max([len(sCl) for sCl in lSCl]), dITp['sC']
@@ -142,13 +144,13 @@ def getClassStrOldCl(dITp, setSDC, lSCl=[]):
             sClOut += dITp['sDash']
     return sClOut
 
-def getClassStr(dITp, lSCl=[], sMd='Clf'):
+def getClassStr(dITp, lSCl=[], sMd=GC.S_CLF):
     if dITp['usedClType' + sMd].startswith(GC.S_OLD):
         return getClassStrOldCl(dITp, lSCl=lSCl)
     elif dITp['usedClType' + sMd].startswith(GC.S_NEW):
         return dITp['sDash'].join(lSCl)
 
-def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
+def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd=GC.S_CLF):
     lSer, sCY = [], dITp['sCY' + sMd]
     serNmerSeq = GF.toSerUnique(serNmerSeq, sName=dITp['sCNmer'])
     serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
@@ -160,32 +162,40 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd='Clf'):
         lSer.append(cSer)
     return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
-def preProcClfInp(dITp, dfrInp, dNmerNoCl):
+def preProcInp(dITp, dfrInp, dNmerNoCl):
     lInpNoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam']]
+    if dfrInp.columns.to_list() != lInpNoCl:
+        print('ERROR: Columns of dfrInp:', dfrInp.columns.to_list())
     assert dfrInp.columns.to_list() == lInpNoCl
-    dCompl, dNmerEffF = dfrInp.to_dict(orient='list'), {}
-    for sNmer, sEffFam in zip(dCompl[dITp['sCNmer']], dCompl[dITp['sEffFam']]):
+    dIC, dNmerEffF = dfrInp.to_dict(orient='list'), {}
+    for sNmer, sEffFam in zip(dIC[dITp['sCNmer']], dIC[dITp['sEffFam']]):
         GF.addToDictL(dNmerEffF, cK=sNmer, cE=sEffFam, lUnqEl=True)
     if dNmerNoCl is None:
         return dfrInp
-    # for sAAc, lNmer in dNmerNoCl.items():
-    #     for sNmer in lNmer:
-    #         if dITp['onlySglLbl']:
-    #         else:
-    #             GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
     for sAAc, lNmer in dNmerNoCl.items():
         for sNmer in lNmer:
             GF.addToDictL(dNmerEffF, cK=sNmer, cE=dITp['sNoFam'], lUnqEl=True)
-    serNmerSeq = GF.iniPdSer(list(dNmerNoCl), nameS=dITp['sCNmer'])
-    for sNmer in dNmerEffF:
-        lVA = [dITp['sNoEff'], sNmer, dITp['sNoFam']]
-        if (not dITp['onlySglLbl']) or (sNmer not in dCompl[dITp['sCNmer']]):
-            GF.appendToDictL(dCompl, itKeys=dfrInp.columns, lVApp=lVA)
-    dfrCompl = GF.iniPdDfr(dCompl)
-    return dfrCompl
-    # return GF.iniPdDfr(dCompl)
+    serNmerSeq = GF.iniPdSer(list(dNmerEffF), nameS=dITp['sCNmer'])
+    # dfrNmerEffF = GF.dictLUneqLen2Dfr(dNmerEffF)
+    # pTMP_serNmerSeq = GF.joinToPath(pF='Tests', nmF='serNmerSeq_' + dITp['sSglMltLbl'] + '_PreFilt.csv')
+    # pTMP_dfrNmerEffF = GF.joinToPath(pF='Tests', nmF='dfrNmerEffF_' + dITp['sSglMltLbl'] + '_PreFilt.csv')
+    # GF.saveCSV(serNmerSeq, pF=pTMP_serNmerSeq)
+    # GF.saveCSV(dfrNmerEffF, pF=pTMP_dfrNmerEffF)
+    dNmerEffF, serNmerSeq = filterNmerSeq(dITp, dNmerEffF, serNmerSeq)
+    # for sNmer in dNmerEffF:
+        # lVA = [dITp['sNoEff'], sNmer, dITp['sNoFam']]
+        # if (not dITp['onlySglLbl']) or (sNmer not in dIC[dITp['sCNmer']]):
+        #     GF.appendToDictL(dIC, itKeys=dfrInp.columns, lVApp=lVA)
+    # dfrNmerEffF = GF.dictLUneqLen2Dfr(dNmerEffF)
+    # pTMP_serNmerSeq = GF.joinToPath(pF='Tests', nmF='serNmerSeq_' + dITp['sSglMltLbl'] + '.csv')
+    # pTMP_dfrNmerEffF = GF.joinToPath(pF='Tests', nmF='dfrNmerEffF_' + dITp['sSglMltLbl'] + '.csv')
+    # GF.saveCSV(serNmerSeq, pF=pTMP_serNmerSeq)
+    # GF.saveCSV(dfrNmerEffF, pF=pTMP_dfrNmerEffF)
+    return filterNmerSeq(dITp, dNmerEffF, serNmerSeq)
+    # return dNmerEffF, serNmerSeq
+    # return GF.iniPdDfr(dIC)
 
-def loadInpData(dITp, dfrInp, sMd='Clf', iC=0):
+def loadInpData(dITp, dfrInp, sMd=GC.S_CLF, iC=0):
     serNmerSeq, lSCl, X, Y = None, None, None, None
     if dITp['sCNmer'] in dfrInp.columns:
         serNmerSeq = dfrInp[dITp['sCNmer']]
@@ -215,24 +225,12 @@ def getDClasses(dITp):
         print(len(dITp['lXCl']), 'different X classes. List of X classes:')
         print(dITp['lXCl'])
 
-def iniObj(dITp, dfrInp, pFDTmp):
-    sCNmer, sFam = dITp['sCNmer'], dITp['sEffFam']
+def iniObj(dITp, dNmerEffF):
     getDClasses(dITp)
-    dT, dX, dY = {}, {sI: [] for sI in dITp['lSCXClf']}, {dITp['sEffFam']: []}
+    dX, dY = {sI: [] for sI in dITp['lSCXClf']}, {dITp['sEffFam']: []}
     if not dITp['onlySglLbl']:
         dY = {sXCl: [] for sXCl in dITp['lXCl']}
-    serNmerSeq = GF.toSerUnique(dfrInp[sCNmer], sName=sCNmer)
-    serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
-    if GF.fileXist(pF=pFDTmp):
-        dT = GF.pickleLoadDict(pF=pFDTmp)
-    else:
-        for k, cSeq in enumerate(serNmerSeq):
-            lFam = dfrInp[dfrInp[sCNmer] == cSeq][sFam].to_list()
-            dT[cSeq] = GF.toListUnqViaSer(lFam)
-            if k % dITp['modDispIni'] == 0:
-                print('Processed', k, 'of', serNmerSeq.size)
-        GF.pickleSaveDict(cD=dT, pF=pFDTmp)
-    return dT, {}, dX, dY, serNmerSeq
+    return {}, dX, dY
 
 def fill_DProc_DX(dITp, dProc, dX, cSeq):
     GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
@@ -249,10 +247,10 @@ def fill_DX_DY_Mlt(dITp, dProc, dX, dY, cSeq, lXCl=[]):
         GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
     fill_DProc_DX(dITp, dProc=dProc, dX=dX, cSeq=cSeq)
 
-def fill_DProc_DX_DY(dITp, dT, dProc, dX, dY, cSeq):
+def fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq):
     assert len(cSeq) == len(dX)
     lXCl = []
-    for sCFam in dT[cSeq]:
+    for sCFam in dNmerEffF[cSeq]:
         if sCFam in dITp['dClasses']:
             GF.fillListUnique(cL=lXCl, cIt=[dITp['dClasses'][sCFam]])
     if dITp['onlySglLbl']:
@@ -261,21 +259,20 @@ def fill_DProc_DX_DY(dITp, dT, dProc, dX, dY, cSeq):
         fill_DX_DY_Mlt(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
     return lXCl
 
-def procClfInp(dITp, dfrInp, pFDTmp):
+def procInp(dITp, dNmerEffF):
     iCent, lIPosUsed = dITp['iCentNmer'], dITp['lIPosUsed']
-    dfrProc, X, Y, serNmerSeq, lSXCl = None, None, None, None, []
-    if dITp['sCNmer'] in dfrInp.columns:
-        dT, dProc, dX, dY, serNmerSeq = iniObj(dITp, dfrInp, pFDTmp=pFDTmp)
-        for cSeq in serNmerSeq:
-            cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
-            lXCl = fill_DProc_DX_DY(dITp, dT, dProc, dX, dY, cSeq=cSeqRed)
-            GF.fillListUnique(cL=lSXCl, cIt=lXCl)
-        for cD in [dX, dY]:
-            GF.complDict(cDFull=dProc, cDAdd=cD)
-        dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
-        if dITp['onlySglLbl']:
-            Y = GF.dictSglKey2Ser(dY)
-    return dfrProc, X, Y, serNmerSeq, sorted(lSXCl)
+    dfrProc, X, Y, lSXCl = None, None, None, []
+    dProc, dX, dY = iniObj(dITp, dNmerEffF)
+    for cSeq in dNmerEffF:
+        cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
+        lXCl = fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq=cSeqRed)
+        GF.fillListUnique(cL=lSXCl, cIt=lXCl)
+    for cD in [dX, dY]:
+        GF.complDict(cDFull=dProc, cDAdd=cD)
+    dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
+    if dITp['onlySglLbl']:
+        Y = GF.dictSglKey2Ser(dY)
+    return dfrProc, X, Y, sorted(lSXCl)
 
 def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
     dSnip, iCentNmer = {}, dITp['iCentNmer']

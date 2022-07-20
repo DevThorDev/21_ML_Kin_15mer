@@ -137,7 +137,7 @@ class BaseClass:
                 saveIdx = True
             GF.checkDupSaveCSV(GF.toDfr(cData), pF, cSep=self.dITp['cSep'],
                                saveIdx=saveIdx, iLbl=idxLbl, dropDup=dropDup)
-            print(GC.S_ARR_LR, 'Saved DataFrame as *.csv file to path ' + pF)
+            print(GC.S_ARR_LR, 'Saved Data as *.csv file to path ' + pF)
 
     def saveListAsSer(self, cL, pF, saveIdx=True, lSIdx=None, sName=None,
                       saveAnyway=True):

@@ -19,7 +19,7 @@ useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 
 useNmerNoCl = True                   # use "no class" Nmers from full seq.?
 
-onlySglLbl = True                    # perform single-label classifcation?
+onlySglLbl = True                    # perform single-label classification?
 
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
@@ -42,6 +42,8 @@ sFDictNmerEffF = 'DictNmerEffF'
 
 pResComb = GC.P_DIR_RES_COMB
 pBinData = GC.P_DIR_BIN_DATA
+pUnqNmer = GC.P_DIR_RES_UNQ_N_MER
+pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
 
 # --- names and paths of files and dirs (classifier) --------------------------
 # sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
@@ -161,6 +163,8 @@ dIO = {# --- general
        'sFDictNmerEffF': sFDictNmerEffF,
        'pResComb': pResComb,
        'pBinData': pBinData,
+       'pUnqNmer': pUnqNmer,
+       'pInpData': pInpData,
        # --- names and paths of files and dirs (classifier)
        'sFInpBaseClf': sFInpBaseClf,
        'sFInpClf': sFInpClf,
