@@ -117,9 +117,9 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_06__ClfDataLoader) -----------------------------------------
-def filterNmerSeq(dITp, dSeq, serSeq):
+def filterNmerSeq(dITp, dSeq={}, serSeq=None):
     dSeqFilt = dSeq
-    if dITp['dAAcPosRestr'] is not None:
+    if dITp['dAAcPosRestr'] is not None and serSeq is not None:
         assert min([len(sSeq) for sSeq in serSeq]) >= dITp['lenNmerDef']
         for iP, lAAc in dITp['dAAcPosRestr'].items():
             iSeq = iP + dITp['iCentNmer']
@@ -153,7 +153,7 @@ def getClassStr(dITp, lSCl=[], sMd=GC.S_CLF):
 def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd=GC.S_CLF):
     lSer, sCY = [], dITp['sCY' + sMd]
     serNmerSeq = GF.toSerUnique(serNmerSeq, sName=dITp['sCNmer'])
-    serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
+    _, serNmerSeq = filterNmerSeq(dITp, serSeq=serNmerSeq)
     for cSeq in serNmerSeq:
         cDfr = dfrInp[dfrInp[dITp['sCNmer']] == cSeq]
         lSC = GF.toListUnqViaSer(cDfr[sCY].to_list())
@@ -176,24 +176,7 @@ def preProcInp(dITp, dfrInp, dNmerNoCl):
         for sNmer in lNmer:
             GF.addToDictL(dNmerEffF, cK=sNmer, cE=dITp['sNoFam'], lUnqEl=True)
     serNmerSeq = GF.iniPdSer(list(dNmerEffF), nameS=dITp['sCNmer'])
-    # dfrNmerEffF = GF.dictLUneqLen2Dfr(dNmerEffF)
-    # pTMP_serNmerSeq = GF.joinToPath(pF='Tests', nmF='serNmerSeq_' + dITp['sSglMltLbl'] + '_PreFilt.csv')
-    # pTMP_dfrNmerEffF = GF.joinToPath(pF='Tests', nmF='dfrNmerEffF_' + dITp['sSglMltLbl'] + '_PreFilt.csv')
-    # GF.saveCSV(serNmerSeq, pF=pTMP_serNmerSeq)
-    # GF.saveCSV(dfrNmerEffF, pF=pTMP_dfrNmerEffF)
-    dNmerEffF, serNmerSeq = filterNmerSeq(dITp, dNmerEffF, serNmerSeq)
-    # for sNmer in dNmerEffF:
-        # lVA = [dITp['sNoEff'], sNmer, dITp['sNoFam']]
-        # if (not dITp['onlySglLbl']) or (sNmer not in dIC[dITp['sCNmer']]):
-        #     GF.appendToDictL(dIC, itKeys=dfrInp.columns, lVApp=lVA)
-    # dfrNmerEffF = GF.dictLUneqLen2Dfr(dNmerEffF)
-    # pTMP_serNmerSeq = GF.joinToPath(pF='Tests', nmF='serNmerSeq_' + dITp['sSglMltLbl'] + '.csv')
-    # pTMP_dfrNmerEffF = GF.joinToPath(pF='Tests', nmF='dfrNmerEffF_' + dITp['sSglMltLbl'] + '.csv')
-    # GF.saveCSV(serNmerSeq, pF=pTMP_serNmerSeq)
-    # GF.saveCSV(dfrNmerEffF, pF=pTMP_dfrNmerEffF)
-    return filterNmerSeq(dITp, dNmerEffF, serNmerSeq)
-    # return dNmerEffF, serNmerSeq
-    # return GF.iniPdDfr(dIC)
+    return filterNmerSeq(dITp, dSeq=dNmerEffF, serSeq=serNmerSeq)
 
 def loadInpData(dITp, dfrInp, sMd=GC.S_CLF, iC=0):
     serNmerSeq, lSCl, X, Y = None, None, None, None
@@ -232,6 +215,16 @@ def iniObj(dITp, dNmerEffF):
         dY = {sXCl: [] for sXCl in dITp['lXCl']}
     return {}, dX, dY
 
+def createLXClOfSeq(dITp, dNEF, cSeq):
+    # translation of effector families to XClasses
+    lXCl = []
+    lEFIncl = [sFam for sFam in dNEF[cSeq] if (sFam in dITp['dClasses'])]
+    lEFExcl = [sFam for sFam in dNEF[cSeq] if (sFam not in dITp['dClasses'])]
+    if ((dITp['noExclEffFam'] and len(lEFExcl) == 0 and len(lEFIncl) > 0) or
+        not dITp['noExclEffFam']):
+        lXCl = [dITp['dClasses'][sFam] for sFam in lEFIncl]
+    return lXCl
+
 def fill_DProc_DX(dITp, dProc, dX, cSeq):
     GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
     for sKeyX, sAAc in zip(dX, cSeq):
@@ -249,10 +242,8 @@ def fill_DX_DY_Mlt(dITp, dProc, dX, dY, cSeq, lXCl=[]):
 
 def fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq):
     assert len(cSeq) == len(dX)
-    lXCl = []
-    for sCFam in dNmerEffF[cSeq]:
-        if sCFam in dITp['dClasses']:
-            GF.fillListUnique(cL=lXCl, cIt=[dITp['dClasses'][sCFam]])
+    lXCl = createLXClOfSeq(dITp, dNEF=dNmerEffF, cSeq=cSeq)
+    # filling of data dictionaries
     if dITp['onlySglLbl']:
         fill_DX_DY_Sgl(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
     else:
@@ -290,6 +281,7 @@ def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
 # --- Functions (O_07__Classifier) --------------------------------------------
 # --- Functions converting between single- and multi-labels (imbalanced) ------
 def toMultiLbl(dITp, serY, lXCl):
+    assert type(serY) == pd.core.series.Series
     dY = {}
     for sLbl in serY:
         for sXCl in lXCl:

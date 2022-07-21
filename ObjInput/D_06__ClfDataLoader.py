@@ -17,6 +17,7 @@ sSet = GC.S_SET_06
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 
+noExclEffFam = True                  # do not use Nmers with excl. effFam?
 useNmerNoCl = True                   # use "no class" Nmers from full seq.?
 
 onlySglLbl = True                    # perform single-label classification?
@@ -116,7 +117,9 @@ if maxLenNmer not in setNmerLen:
     maxLenNmer = max(setNmerLen)
 
 # === derived values and input processing =====================================
-sSglMltLbl = GC.S_MLT_LBL
+sXclEffFam, sSglMltLbl = GC.S_WITH_EXCL_EFF_FAM, GC.S_MLT_LBL
+if noExclEffFam:
+    sXclEffFam = GC.S_NO_EXCL_EFF_FAM
 if onlySglLbl:
     sSglMltLbl = GC.S_SGL_LBL
 
@@ -147,6 +150,7 @@ dIO = {# --- general
        'sSet': sSet,
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
+       'noExclEffFam': noExclEffFam,
        'useNmerNoCl': useNmerNoCl,
        'onlySglLbl': onlySglLbl,
        'usedNmerSeqClf': usedNmerSeqClf,
@@ -200,6 +204,7 @@ dIO = {# --- general
        # === derived values and input processing
        'sSglLbl': GC.S_SGL_LBL,
        'sMltLbl': GC.S_MLT_LBL,
+       'sXclEffFam': sXclEffFam,
        'sSglMltLbl': sSglMltLbl,
        'maxPosNmer': maxPosNmer,
        'rngPosNmer': rngPosNmer,

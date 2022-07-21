@@ -11,7 +11,7 @@ from Core.O_07__Classifier import RndForestClf, NNMLPClf
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
 # --- initialisation of the class ---------------------------------------------
-    def __init__(self, inpDat, D, iTp=80, lITpUpd=[]):
+    def __init__(self, inpDat, D, iTp=80, lITpUpd=[6]):
         super().__init__(inpDat)
         self.idO = 'O_80'
         self.descO = 'Looper'
@@ -40,9 +40,9 @@ class Looper(BaseClass):
     def adapMthDPF(self, cClf, sMth):
         sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
         xtCSV, sSum = self.dITp['xtCSV'], self.dITp['sSummary']
-        sFE = GF.joinS([self.D.dITp['sMaxLenNmer'], self.D.dITp['sRestr'],
-                        cClf.dITp['sCLblsTrain'], cClf.D.dITp['sSglMltLbl']],
-                       sJoin=sJ1)
+        sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
+                        cClf.dITp['sCLblsTrain'], cClf.dITp['sSglMltLbl'],
+                        cClf.dITp['sXclEffFam']], sJoin=sJ1)
         sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), sJoin=sJ1)
         sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], sJoin=sJ1)
         sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth, sFE], sJoin=sJ1)

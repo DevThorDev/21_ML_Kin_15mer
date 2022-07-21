@@ -66,18 +66,12 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def getDPF(self):
-        xtCSV, dITp = self.dITp['xtCSV'], self.dITp
+        dITp = self.dITp
         sBClf, sBPrC = dITp['sFInpBaseClf'], dITp['sFInpBasePrC']
         dITp['sParClf'] = GF.joinS([sBClf], sJoin=dITp['sUSC'])
         dITp['sOutClf'] = GF.joinS([dITp['sSet'], sBClf], sJoin=dITp['sUSC'])
         dITp['sOutPrC'] = GF.joinS([dITp['sSet'], sBPrC], sJoin=dITp['sUSC'])
-        sFUSgl = (GF.joinS([dITp['sFInpClf'], dITp['sSet'], dITp['sUnique'],
-                            dITp['sRestr'], dITp['sSglLbl']]) + xtCSV)
-        sFUMlt = (GF.joinS([dITp['sFInpClf'], dITp['sSet'], dITp['sUnique'],
-                            dITp['sRestr'], dITp['sMltLbl']]) + xtCSV)
         self.dPF = self.D.yieldDPF()
-        self.dPF = {'DataClfUSgl': GF.joinToPath(dITp['pUnqNmer'], sFUSgl),
-                    'DataClfUMlt': GF.joinToPath(dITp['pUnqNmer'], sFUMlt)}
 
     # --- methods for getting and setting X and Y -----------------------------
     def getXY(self, getTrain=None):
@@ -261,20 +255,12 @@ class Classifier(BaseSmplClfPrC):
     def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Classifier for data classification'
-        self.saveDfrInpUnq()
         cSmp = ImbSampler(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.setData(cSmp.yieldData())
         if self.dITp['doImbSampling']:
             cSmp.fitResampleImbalanced()
             self.setData(cSmp.yieldData())
         print('Initiated "Classifier" base object.')
-
-    # --- method for saving the unique Nmer input DataFrame -------------------
-    def saveDfrInpUnq(self):
-        pFU = self.dPF['DataClfUMlt']
-        if self.dITp['onlySglLbl']:
-            pFU = self.dPF['DataClfUSgl']
-        self.saveData(self.dfrInp, pF=pFU, saveAnyway=False)
 
     # --- print methods -------------------------------------------------------
     def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
@@ -373,8 +359,8 @@ class Classifier(BaseSmplClfPrC):
                 self.YTest = SF.toMultiLbl(dITp, serY=self.YTest, lXCl=lSXCl)
             lSC, lSR = self.YTest.columns, self.YTest.index
             if self.dITp['onlySglLbl']:
-                YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred),
-                                    lSNmC=[dITp['sEffFam']], lSNmR=lSR)
+                YPred = GF.iniPdSer(self.Clf.predict(dat2Pred), lSNmI=lSR,
+                                    nameS=dITp['sEffFam'])
                 self.YPred = SF.toMultiLbl(dITp, serY=YPred, lXCl=lSXCl)
             else:
                 self.YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred), lSNmC=lSC,
@@ -475,7 +461,8 @@ class PropCalculator(BaseSmplClfPrC):
         # sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr']],
         #                sJoin=sJ1)
         sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
-                        self.dITp['sSglMltLbl']], sJoin=sJ1)
+                        self.dITp['sSglMltLbl'], self.dITp['sXclEffFam']],
+                       sJoin=sJ1)
         sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
         if sCl is not None:
             sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], sJoin=sJ1) + x

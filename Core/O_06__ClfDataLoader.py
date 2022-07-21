@@ -27,31 +27,31 @@ class DataLoader(BaseClass):
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPF(self):
         sJ, xtCSV = self.dITp['sUS02'], self.dITp['xtCSV']
-        sFInpClf = self.dITp['sFInpClf'] + xtCSV
-        sFInpPrC = self.dITp['sFInpPrC'] + xtCSV
+        sF1A, sF1B = self.dITp['sFInpClf'], self.dITp['sFInpPrC']
+        sFInpClf, sFInpPrC = sF1A + xtCSV, sF1B + xtCSV
         sFResComb = self.dITp['sFResComb'] + xtCSV
         lSF = [self.dITp['sFDictNmerSnips'], self.dITp['sFResComb']]
         sFDNS = GF.joinS(lSF, sJoin=sJ) + self.dITp['xtBIN']
         lSF = [self.dITp['sFDictNmerEffF'], self.dITp['sFResComb']]
         sFDNX = GF.joinS(lSF, sJoin=sJ) + self.dITp['xtBIN']
-        sFNmerEffF = (GF.joinS([self.dITp['sNmerEffF'], self.dITp['sFInpClf']],
-                               sJoin=sJ) + xtCSV)
-        sFNmerSeqU = (GF.joinS([self.dITp['sNmerSeqU'], self.dITp['sFInpClf']],
-                               sJoin=sJ) + xtCSV)
-        sFInpDat = (GF.joinS([self.dITp['sInpData'], self.dITp['sFInpClf'],
-                              self.dITp['sSglMltLbl']], sJoin=sJ) + xtCSV)
-        sFX = (GF.joinS([self.dITp['sX'], self.dITp['sFInpClf']], sJoin=sJ) +
-               xtCSV)
-        sFY = (GF.joinS([self.dITp['sY'], self.dITp['sFInpClf'],
-                         self.dITp['sSglMltLbl']], sJoin=sJ) + xtCSV)
+        sF3 = GF.joinS([self.dITp['sXclEffFam'], self.dITp['sSet'],
+                        self.dITp['sRestr']])
+        sF13 = GF.joinS([sF1A, sF3])
+        sF23 = GF.joinS([self.dITp['sSglMltLbl'], sF3])
+        sF123 = GF.joinS([sF1A, sF23])
+        sFNmerEF = (GF.joinS([self.dITp['sNmerEffF'], sF1A], sJoin=sJ) + xtCSV)
+        sFNmerSU = (GF.joinS([self.dITp['sNmerSeqU'], sF1A], sJoin=sJ) + xtCSV)
+        sFInpDat = (GF.joinS([self.dITp['sInpData'], sF123], sJoin=sJ) + xtCSV)
+        sFX = (GF.joinS([self.dITp['sX'], sF13], sJoin=sJ) + xtCSV)
+        sFY = (GF.joinS([self.dITp['sY'], sF123], sJoin=sJ) + xtCSV)
         self.dPF = {}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
         self.dPF['ResComb'] = GF.joinToPath(self.dITp['pResComb'], sFResComb)
         self.dPF['DictNmerSnips'] = GF.joinToPath(self.dITp['pBinData'], sFDNS)
         self.dPF['DictNmerEffF'] = GF.joinToPath(self.dITp['pBinData'], sFDNX)
-        self.dPF['NmerEffF'] = GF.joinToPath(self.dITp['pUnqNmer'], sFNmerEffF)
-        self.dPF['NmerSeqU'] = GF.joinToPath(self.dITp['pUnqNmer'], sFNmerSeqU)
+        self.dPF['NmerEffF'] = GF.joinToPath(self.dITp['pUnqNmer'], sFNmerEF)
+        self.dPF['NmerSeqU'] = GF.joinToPath(self.dITp['pUnqNmer'], sFNmerSU)
         self.dPF['InpData'] = GF.joinToPath(self.dITp['pInpData'], sFInpDat)
         self.dPF['X'] = GF.joinToPath(self.dITp['pInpData'], sFX)
         self.dPF['Y'] = GF.joinToPath(self.dITp['pInpData'], sFY)
@@ -83,21 +83,24 @@ class DataLoader(BaseClass):
             GF.pickleSaveDict(cD=self.dNmerNoCl, pF=self.dPF['DictNmerSnips'])
 
     # --- methods for loading input data --------------------------------------
+    def saveProcInpData(self, tData, lSKDPF, sMd=GC.S_CLF):
+        sJ = self.dITp['sUSC']
+        for cDat, s in zip(tData, lSKDPF):
+            pF = GF.modPF(self.dPF[s], sEnd=sMd, sJoin=sJ)
+            if s == 'NmerEffF':
+                itC = [GF.joinS([self.dITp['sEffFam'], str(k + 1)]) for k in
+                       range(max([0] + [len(cDat[cK]) for cK in cDat]))]
+                cDat = GF.dictLUneqLen2Dfr(cDat, itCol=itC, doTrans=True)
+            self.saveData(cDat, pF=pF)
+    
     def procInpData(self, dfrInp, saveData=None):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,
                                               dNmerNoCl=self.dNmerNoCl)
         dfrInp, X, Y, lSXCl = SF.procInp(self.dITp, dNmerEffF=dNmerEffF)
         if saveData is not None:
-            sJ = self.dITp['sUSC']
-            for cDat, s in zip([dNmerEffF, serNmerSeq, dfrInp, X, Y],
-                               ['NmerEffF', 'NmerSeqU', 'InpData', 'X', 'Y']):
-                pF = GF.modPF(self.dPF[s], sEnd=saveData, sJoin=sJ)
-                if s == 'NmerEffF':
-                    # nFam = max([0] + [len(cDat[cK]) for cK in cDat])
-                    itC = [GF.joinS([self.dITp['sEffFam'], str(k + 1)]) for k
-                           in range(max([0] + [len(cDat[cK]) for cK in cDat]))]
-                    cDat = GF.dictLUneqLen2Dfr(cDat, itCol=itC, doTrans=True)
-                self.saveData(cDat, pF=pF)
+            t2Save = (dNmerEffF, serNmerSeq, dfrInp, X, Y)
+            lSKeyDPF = 'NmerEffF', 'NmerSeqU', 'InpData', 'X', 'Y'
+            self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
         return dNmerEffF, serNmerSeq, dfrInp, X, Y, lSXCl
     
     def loadInpDataClf(self, iC=0):

@@ -494,6 +494,8 @@ def toDfr(cData, idxDfr=None, colDfr=None):
     cDfr = None
     if type(cData) == pd.core.frame.DataFrame:      # the standard case
         cDfr = cData
+    elif type(cData) == pd.core.series.Series:
+        cDfr = cData
     elif type(cData) == dict:
         cDfr = iniPdDfr(cData, lSNmC=colDfr, lSNmR=idxDfr)
     elif type(cData) == np.ndarray and len(cData.shape) <= 2:
