@@ -11,7 +11,7 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doImbSampling = False
+doImbSampling = True
 doRndForestClf = True
 doNNMLPClf = True
 doPropCalc = False
@@ -47,7 +47,7 @@ pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # === general over- and undersampler input ====================================
-sSampler = 'AllKNN'         # string matching the over/under-sampler
+sSampler = 'TomekLinks'         # string matching the over/under-sampler
                             # ClusterCentroids, AllKNN, TomekLinks
                             # NeighbourhoodCleaningRule, RandomUnderSampler,
 sStrat = 'majority'         # sampling strategy

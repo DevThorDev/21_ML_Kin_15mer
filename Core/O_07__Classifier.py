@@ -376,8 +376,9 @@ class Classifier(BaseSmplClfPrC):
     def calcConfMatrix(self):
         if self.dITp['calcConfMatrix']:
             YTest, YPred, lC = self.YTest, self.YPred, self.lSCl
-            if self.dITp['onlySglLbl']:
+            if len(YTest.shape) > 1:
                 YTest = SF.toSglLbl(self.dITp, dfrY=self.YTest)
+            if len(YPred.shape) > 1:
                 YPred = SF.toSglLbl(self.dITp, dfrY=self.YPred)
             self.confusMatrix = confusion_matrix(y_true=YTest, y_pred=YPred,
                                                  labels=lC)

@@ -287,17 +287,11 @@ def toMultiLbl(dITp, serY, lXCl):
         for sXCl in lXCl:
             GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
     return GF.iniPdDfr(dY, lSNmR=serY.index)
-
 def toSglLbl(dITp, dfrY):
-    serY = None
-    # check sanity
-    if GF.iniNpArr([(sum(serR) <= 1) for _, serR in dfrY.iterrows()]).all():
-        lY = [dITp['sNone']]*dfrY.shape[0]
-        lSer = [serR.index[serR == 1] for _, serR in dfrY.iterrows()]
-        for k, cI in enumerate(lSer):
-            if cI.size == 1:
-                lY[k] = cI.to_list()[0]
-        serY = GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
-    return serY
+    lY = [dITp['sNone']]*dfrY.shape[0]
+    for k, (_, serR) in enumerate(dfrY.iterrows()):
+        if sum(serR) == 1:
+            lY[k] = serR.index[serR == 1].to_list()[0]
+    return GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
 
 ###############################################################################
