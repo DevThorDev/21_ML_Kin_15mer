@@ -242,7 +242,7 @@ class ImbSampler(BaseSmplClfPrC):
         #     Y = SF.toSglLbl(self.dITp, dfrY=Y)
         print('Initial shape of Y:', Y.shape)
         X, YRes = self.getSampler().fit_resample(X, Y)
-        print('Final shape of YRes:', YRes.shape)
+        print('Final shape of YRes after resampling:', YRes.shape)
         for cY in YRes.unique():
             print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
         if not self.dITp['onlySglLbl']:
@@ -313,6 +313,8 @@ class Classifier(BaseSmplClfPrC):
         if cClf is not None and X is not None and Y is not None:
             try:
                 cClf.fit(X, Y)
+                if self.dITp['lvlOut'] > 0:
+                    print('Fitted classifier to data of shape', X.shape)
             except:
                 print('ERROR: Cannot fit classifier to data!')
                 if self.dITp['lvlOut'] > 1:
@@ -369,6 +371,9 @@ class Classifier(BaseSmplClfPrC):
             assert self.YProba.shape == self.YPred.shape
             self.calcResPredict(X2Pred=dat2Pred)
             if dITp['lvlOut'] > 0:
+                print('Predicted for data of shape', dat2Pred.shape)
+                print('Shape of predicted Y', self.YPred.shape)
+                print('Shape of probs of Y (classes)', self.YProba.shape)
                 self.printPredict(X2Pred=dat2Pred)
             self.calcConfMatrix()
 

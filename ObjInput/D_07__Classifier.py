@@ -47,7 +47,7 @@ pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # === general over- and undersampler input ====================================
-sSampler = 'TomekLinks'         # string matching the over/under-sampler
+sSampler = 'RandomUnderSampler'         # string matching the over/under-sampler
                             # ClusterCentroids, AllKNN, TomekLinks
                             # NeighbourhoodCleaningRule, RandomUnderSampler,
 sStrat = 'majority'         # sampling strategy
