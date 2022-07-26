@@ -6,7 +6,7 @@ import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
 
 from Core.O_00__BaseClass import BaseClass
-from Core.O_07__Classifier import RndForestClf, NNMLPClf
+from Core.O_07__Classifier import RFClf, MLPClf
 
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
@@ -68,11 +68,13 @@ class Looper(BaseClass):
         if sMth in self.dITp['lSMth']:
             cStT, iM = GF.showElapsedTime(startTime=stT), 0
             if sMth == self.dITp['sMthRF']:     # random forest classifier
-                d2Par, iM = self.dITp['d2Par_RF'], 15
-                cClf = RndForestClf(self.inpD, self.D, d2Par, sKPar=sKPar)
+                iM = 15
+                lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
+                cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar)
             elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
-                d2Par, iM = self.dITp['d2Par_NNMLP'], 17
-                cClf = NNMLPClf(self.inpD, self.D, d2Par, sKPar=sKPar)
+                iM = 17
+                lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
+                cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar)
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
             cStT = GF.showElapsedTime(startTime=stT)

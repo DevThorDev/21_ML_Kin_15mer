@@ -14,7 +14,7 @@ from Core.O_00__BaseClass import Timing
 # from Core.O_03__Validation import Validation
 # from Core.O_05__ViterbiLog import ViterbiLog
 from Core.O_06__ClfDataLoader import DataLoader
-# from Core.O_07__Classifier import RndForestClf, NNMLPClf, PropCalculator
+# from Core.O_07__Classifier import RFClf, MLPClf, PropCalculator
 from Core.O_07__Classifier import PropCalculator
 from Core.O_80__Looper import Looper
 
@@ -77,14 +77,14 @@ print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
 # END - Viterbi algorithm (Hidden Markov Model)
 
 # cStTime = GF.showElapsedTime(startTime)
-# cRFClf = RndForestClf(inpDatG)
+# cRFClf = RFClf(inpDatG)
 # print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
 # cRFClf.ClfPred()
 # cEndTime = GF.showElapsedTime(startTime)
 # cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
 
 # cStTime = GF.showElapsedTime(startTime)
-# cMLPClf = NNMLPClf(inpDatG)
+# cMLPClf = MLPClf(inpDatG)
 # print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
 # cMLPClf.ClfPred()
 # cEndTime = GF.showElapsedTime(startTime)
@@ -99,11 +99,11 @@ print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
 #     cClf.calcPrintResPredict(X2Pre=cClf.getXY(getTrain=False)[0])
 
 # Test parameter sets
-# for sKeyPar in inpDatG.dI['d2Par_NNMLP']:
+# for sKeyPar in inpDatG.dI['d2Par_MLP']:
 # for sKeyPar in list('ABC'):
 #     print(GC.S_ST80, GC.S_NEWL, GC.S_EQ20, ' Parameter set ', sKeyPar, sep='')
 #     cStTime = GF.showElapsedTime(startTime)
-#     cMLPClf = NNMLPClf(inpDatG, sKPar=sKeyPar)
+#     cMLPClf = MLPClf(inpDatG, sKPar=sKeyPar)
 #     cMLPClf.ClfPred()
 #     cMLPClf.printFitQuality()
 #     # cMLPClf.calcPrintResPredict(X2Pre=cMLPClf.getXY(getTrain=False)[0])

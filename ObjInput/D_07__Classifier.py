@@ -12,8 +12,8 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
 doImbSampling = True
-doRndForestClf = True
-doNNMLPClf = True
+doRFClf = True
+doMLPClf = True
 doPropCalc = False
 
 doTrainTestSplit = True
@@ -88,6 +88,7 @@ nJobs = None                # number of jobs to run in parallel (None: 1)
 vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
+nIterPartialFit = True      # number of iterations when doing a partial fit
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================
@@ -131,8 +132,8 @@ dIO = {# --- general
        'lvlOut': lvlOut,
        # --- flow control
        'doImbSampling': doImbSampling,
-       'doRndForestClf': doRndForestClf,
-       'doNNMLPClf': doNNMLPClf,
+       'doRFClf': doRFClf,
+       'doMLPClf': doMLPClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
        'saveDetailedClfRes': saveDetailedClfRes,
@@ -178,6 +179,7 @@ dIO = {# --- general
        'nJobs': nJobs,
        'vVerb': vVerb,
        # --- general input for neural network MLP classifier
+       'nIterPartialFit': nIterPartialFit,
        'bVerb': bVerb,
        # ======================================================================
        # --- numbers

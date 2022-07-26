@@ -11,7 +11,7 @@ import Core.F_01__SpcFunctions as SF
 from Core.O_00__BaseClass import BaseClass
 
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -306,7 +306,22 @@ class Classifier(BaseSmplClfPrC):
                 print('Confusion matrix:', GC.S_NEWL, self.confusMatrix,
                       sep='')
 
+    # --- method for obtaining an optimised Classifier from a grid search -----
+    def getOptClfGS(self):
+        self.optClf, retClf = None, self.Clf
+        if self.lParG is not None:
+            optClf = GridSearchCV(estimator=self.Clf, param_grid=self.lParG,
+                                  scoring='accuracy')
+            self.optClf, retClf = optClf, optClf
+        return retClf
+    
     # --- method for fitting a Classifier -------------------------------------
+    def fitOrPartialFitCClf(self, cClf):
+        for _ in range(self.dITp['nIterPartialFit']):
+            self.ClfPartialFit(cClf)
+        else:
+            self.ClfFit(cClf)
+
     def ClfFit(self, cClf):
         bTrain = (True if self.dITp['doTrainTestSplit'] else None)
         X, Y = self.getXY(getTrain=bTrain)
@@ -315,6 +330,38 @@ class Classifier(BaseSmplClfPrC):
                 cClf.fit(X, Y)
                 if self.dITp['lvlOut'] > 0:
                     print('Fitted classifier to data of shape', X.shape)
+                    if self.optClf is not None:
+                        nL, oC = GC.S_NEWL, self.optClf
+                        print(GC.S_DS80, 'Grid search results:', nL,
+                              'Best estimator:', nL, oC.best_estimator_, nL,
+                              'Best parameters:', nL, oC.best_params_, nL,
+                              'Best score: ', round(oC.best_score_,
+                                                    self.dIG['R04']), sep='')
+                        dfrCVRes = GF.iniPdDfr(oC.cv_results_)
+                        print('CV results:', nL, dfrCVRes, sep='')
+            except:
+                print('ERROR: Cannot fit classifier to data!')
+                if self.dITp['lvlOut'] > 1:
+                    self.printXY()
+    
+    def ClfPartialFit(self, cClf):
+        bTrain = (True if self.dITp['doTrainTestSplit'] else None)
+        X, Y = self.getXY(getTrain=bTrain)
+        if cClf is not None and X is not None and Y is not None:
+            try:
+                cClf.partial_fit(X, Y, classes=self.lSCl)
+                if self.dITp['lvlOut'] > 0:
+                    print('Partially fitted classifier to data of shape',
+                          X.shape)
+                    if self.optClf is not None:
+                        nL, oC = GC.S_NEWL, self.optClf
+                        print(GC.S_DS80, 'Grid search results:', nL,
+                              'Best estimator:', nL, oC.best_estimator_, nL,
+                              'Best parameters:', nL, oC.best_params_, nL,
+                              'Best score: ', round(oC.best_score_,
+                                                    self.dIG['R04']), sep='')
+                        dfrCVRes = GF.iniPdDfr(oC.cv_results_)
+                        print('CV results:', nL, dfrCVRes, sep='')
             except:
                 print('ERROR: Cannot fit classifier to data!')
                 if self.dITp['lvlOut'] > 1:
@@ -351,7 +398,8 @@ class Classifier(BaseSmplClfPrC):
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
-        if self.Clf is not None:
+        cClf = (self.Clf if self.optClf is None else self.optClf)
+        if cClf is not None:
             dITp, lSXCl = self.dITp, self.lSCl
             if dat2Pred is not None and dITp['encodeCatFtr']:
                 dat2Pred = self.cEnc.transform(dat2Pred).toarray()
@@ -361,13 +409,13 @@ class Classifier(BaseSmplClfPrC):
                 self.YTest = SF.toMultiLbl(dITp, serY=self.YTest, lXCl=lSXCl)
             lSC, lSR = self.YTest.columns, self.YTest.index
             if self.dITp['onlySglLbl']:
-                YPred = GF.iniPdSer(self.Clf.predict(dat2Pred), lSNmI=lSR,
+                YPred = GF.iniPdSer(cClf.predict(dat2Pred), lSNmI=lSR,
                                     nameS=dITp['sEffFam'])
                 self.YPred = SF.toMultiLbl(dITp, serY=YPred, lXCl=lSXCl)
             else:
-                self.YPred = GF.iniPdDfr(self.Clf.predict(dat2Pred), lSNmC=lSC,
+                self.YPred = GF.iniPdDfr(cClf.predict(dat2Pred), lSNmC=lSC,
                                          lSNmR=lSR)
-            self.YProba = GF.getYProba(self.Clf, dat2Pred, lSC=lSC, lSR=lSR)
+            self.YProba = GF.getYProba(cClf, dat2Pred, lSC=lSC, lSR=lSR)
             assert self.YProba.shape == self.YPred.shape
             self.calcResPredict(X2Pred=dat2Pred)
             if dITp['lvlOut'] > 0:
@@ -403,17 +451,18 @@ class Classifier(BaseSmplClfPrC):
             plt.show()
 
 # -----------------------------------------------------------------------------
-class RndForestClf(Classifier):
+class RFClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, d2Par, sKPar='A'):
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A'):
         super().__init__(inpDat, D=D, sKPar=sKPar)
         self.descO = 'Random Forest classifier'
         self.sMthL, self.sMth = self.dITp['sMthRF_L'], self.dITp['sMthRF']
+        self.lParG = lG
         self.d2Par = d2Par
-        if self.dITp['doRndForestClf']:
-            self.getClf()
-            self.ClfFit(self.Clf)
-        print('Initiated "RndForestClf" base object.')
+        if self.dITp['doRFClf']:
+            cClf = self.getClf()
+            self.ClfFit(cClf)
+        print('Initiated "RFClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
@@ -423,20 +472,22 @@ class RndForestClf(Classifier):
                                           n_jobs=self.dITp['nJobs'],
                                           verbose=self.dITp['vVerb'],
                                           **self.d2Par[self.sKPar])
+        return self.getOptClfGS()
 
 # -----------------------------------------------------------------------------
-class NNMLPClf(Classifier):
+class MLPClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, d2Par, sKPar='A'):
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A'):
         super().__init__(inpDat, D=D, sKPar=sKPar)
         self.descO = 'Neural Network MLP classifier'
         self.sMthL, self.sMth = self.dITp['sMthMLP_L'], self.dITp['sMthMLP']
+        self.lParG = lG
         self.d2Par = d2Par
-        if self.dITp['doNNMLPClf']:
-            self.getClf()
-            self.ClfFit(self.Clf)
-            self.getScoreClf()
-        print('Initiated "NNMLPClf" base object.')
+        if self.dITp['doMLPClf']:
+            cClf = self.getClf()
+            self.fitOrPartialFitCClf(cClf)
+            self.getScoreClf(cClf)
+        print('Initiated "MLPClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
@@ -444,11 +495,12 @@ class NNMLPClf(Classifier):
                                  warm_start=self.dITp['bWarmStart'],
                                  verbose=self.dITp['bVerb'],
                                  **self.d2Par[self.sKPar])
+        return self.getOptClfGS()
 
-    def getScoreClf(self):
+    def getScoreClf(self, cClf):
         if self.dITp['doTrainTestSplit']:
             XTest, YTest = self.getXY(getTrain=False)
-            self.scoreClf = self.Clf.score(XTest, YTest)
+            self.scoreClf = cClf.score(XTest, YTest)
 
 # -----------------------------------------------------------------------------
 class PropCalculator(BaseSmplClfPrC):

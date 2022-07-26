@@ -105,8 +105,8 @@ lLblTrain = [1]                  # number of labels used for training data
                                     # or None [use all labels]
 
 # === general input for any classifier ========================================
-sUsedClf = 'NNMLP'   # 'RandomForest' / 'BalancedRandomForest'
-                                    # 'NNMLP'
+sUsedClf = 'MLP'            # 'RandomForest' / 'BalancedRandomForest'
+                            # 'MLP'
 rndState = None             # None (random) or integer (reproducible)
 
 # --- input for (balanced) random forest classifier ---------------------------
@@ -566,16 +566,16 @@ def fitResampleImbalanced(dITp, cSampler, XTrain, YTrain):
 # --- Function fitting the selected classifier --------------------------------
 def getClf(dITp, X, Y):
     if dITp['sUsedClf'] == 'RandomForest':
-        return fitRndForestClf(dITp, X, Y)
-    elif dITp['sUsedClf'] == 'NNMLP':
-        return fitNNMLPClf(dITp, X, Y)
+        return fitRFClf(dITp, X, Y)
+    elif dITp['sUsedClf'] == 'MLP':
+        return fitMLPClf(dITp, X, Y)
     elif dITp['sUsedClf'] == 'BalancedRandomForest':
-        return fitBalancedRndForestClf(dITp, X, Y)
+        return fitBalancedRFClf(dITp, X, Y)
     else:
         return None
 
 # --- Function implementing and fitting the random forest classifier ----------
-def fitRndForestClf(dITp, X, Y):
+def fitRFClf(dITp, X, Y):
     cClf = RandomForestClassifier(random_state=dITp['rndState'],
                                   n_estimators=dITp['n_estimators'],
                                   criterion=dITp['criterion'])
@@ -583,7 +583,7 @@ def fitRndForestClf(dITp, X, Y):
     return cClf
 
 # --- Function implementing and fitting the neural network MLP classifier -----
-def fitNNMLPClf(dITp, X, Y):
+def fitMLPClf(dITp, X, Y):
     cClf = MLPClassifier(random_state=dITp['rndState'],
                          hidden_layer_sizes=dITp['hidden_layer_sizes'],
                          activation=dITp['activation'],
@@ -593,7 +593,7 @@ def fitNNMLPClf(dITp, X, Y):
     return cClf
 
 # --- Function implementing and fitting the balanced random forest classifier -
-def fitBalancedRndForestClf(dITp, X, Y):
+def fitBalancedRFClf(dITp, X, Y):
     cClf = BalancedRandomForestClassifier(sampling_strategy=dITp['sStrat'],
                                           random_state=dITp['rndState'],
                                           replacement=dITp['wReplacement'],

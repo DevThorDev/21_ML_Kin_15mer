@@ -338,7 +338,7 @@ class Fitted_RFClf:
         self.Xtrans = None
         self.encodeCatFeatures()
         self.transCatToNumpy()
-        self.RndForestClfFit()
+        self.RFClfFit()
         print('Initiated "Pred_RFClf" base object.')
 
     # --- method for encoding the categorical features ------------------------
@@ -360,7 +360,7 @@ class Fitted_RFClf:
               self.Xtrans.shape, sep='')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
-    def RndForestClfFit(self):
+    def RFClfFit(self):
         self.Clf = RandomForestClassifier(max_depth=self.dI['maxDepthClfMC'],
                                           random_state=self.dI['rndState'])
         if self.Xtrans is None:
@@ -368,7 +368,7 @@ class Fitted_RFClf:
         else:
             self.Clf.fit(self.Xtrans, self.y)
 
-    def RndForestClfPred(self):
+    def RFClfPred(self):
         ll = self.dI['llFeaturesMC']
         self.lPred = self.Clf.predict(self.cEnc.transform(ll).toarray())
         print('List of predictions:', S_NEWL, self.lPred, sep='')
@@ -414,7 +414,7 @@ if dInp['doRF_Clf']:
     cFittedRFClf = Fitted_RFClf(dInp=dInp, X=X, y=y)
     # cFittedRFClf.transCatToNumpy(llCat=[['A', 'C', 'D', 'A', 'D', 'A'],
     #                                     ['B', 'D', 'B', 'B', 'C', 'A']])
-    cFittedRFClf.RndForestClfPred()
+    cFittedRFClf.RFClfPred()
 
 print(S_DS80, S_NEWL, S_DS30, ' DONE ', S_DS44, sep='')
 

@@ -302,10 +302,10 @@ class Timing:
         self.elT_02_12_getProbSglPos = 0.
         self.elT_05_13_ViterbiAlgorithm = 0.
         self.elT_06_14_ClfDataLoader = 0.
-        self.elT_07_15_RndForestClf_Ini = 0.
-        self.elT_07_16_RndForestClf_Pred = 0.
-        self.elT_07_17_NNMLPClf_Ini = 0.
-        self.elT_07_18_NNMLPClf_Pred = 0.
+        self.elT_07_15_RFClf_Ini = 0.
+        self.elT_07_16_RFClf_Pred = 0.
+        self.elT_07_17_MLPClf_Ini = 0.
+        self.elT_07_18_MLPClf_Pred = 0.
         self.elT_07_19_PropCalculator = 0.
         self.elT_XX_99_Other = 0.
         self.elT_Sum = 0.
@@ -316,8 +316,8 @@ class Timing:
                       'calcProbTable', 'getD2TotalProbSnip',
                       'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
                       'getProbSglPos', 'ViterbiAlgorithm', 'ClfDataLoader',
-                      'RndForestClf_Ini', 'RndForestClf_Pred', 'NNMLPClf_Ini',
-                      'NNMLPClf_Pred', 'PropCalculator', 'Other']
+                      'RFClf_Ini', 'RFClf_Pred', 'MLPClf_Ini', 'MLPClf_Pred',
+                      'PropCalculator', 'Other']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -335,10 +335,10 @@ class Timing:
                      self.elT_02_12_getProbSglPos,
                      self.elT_05_13_ViterbiAlgorithm,
                      self.elT_06_14_ClfDataLoader,
-                     self.elT_07_15_RndForestClf_Ini,
-                     self.elT_07_16_RndForestClf_Pred,
-                     self.elT_07_17_NNMLPClf_Ini,
-                     self.elT_07_18_NNMLPClf_Pred,
+                     self.elT_07_15_RFClf_Ini,
+                     self.elT_07_16_RFClf_Pred,
+                     self.elT_07_17_MLPClf_Ini,
+                     self.elT_07_18_MLPClf_Pred,
                      self.elT_07_19_PropCalculator,
                      self.elT_XX_99_Other]
 
@@ -374,13 +374,13 @@ class Timing:
             elif iMth == 14:
                 self.elT_06_14_ClfDataLoader += elT
             elif iMth == 15:
-                self.elT_07_15_RndForestClf_Ini += elT
+                self.elT_07_15_RFClf_Ini += elT
             elif iMth == 16:
-                self.elT_07_16_RndForestClf_Pred += elT
+                self.elT_07_16_RFClf_Pred += elT
             elif iMth == 17:
-                self.elT_07_17_NNMLPClf_Ini += elT
+                self.elT_07_17_MLPClf_Ini += elT
             elif iMth == 18:
-                self.elT_07_18_NNMLPClf_Pred += elT
+                self.elT_07_18_MLPClf_Pred += elT
             elif iMth == 19:
                 self.elT_07_19_PropCalculator += elT
             elif iMth == 99:
@@ -419,14 +419,14 @@ class Timing:
                str(round(self.elT_05_13_ViterbiAlgorithm, self.rdDig)) +
                GC.S_NEWL + 'Method 14 | "ClfDataLoader":\t' +
                str(round(self.elT_06_14_ClfDataLoader, self.rdDig)) +
-               GC.S_NEWL + 'Method 15 | "RndForestClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_15_RndForestClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 16 | "RndForestClf_Predict":\t' +
-               str(round(self.elT_07_16_RndForestClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 17 | "NNMLPClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_17_NNMLPClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 18 | "NNMLPClf_Predict":\t' +
-               str(round(self.elT_07_18_NNMLPClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 15 | "RFClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_15_RFClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 16 | "RFClf_Predict":\t' +
+               str(round(self.elT_07_16_RFClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 17 | "MLPClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_17_MLPClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 18 | "MLPClf_Predict":\t' +
+               str(round(self.elT_07_18_MLPClf_Pred, self.rdDig)) +
                GC.S_NEWL + 'Method 19 | "PropCalculator":\t' +
                str(round(self.elT_07_19_PropCalculator, self.rdDig)) +
                GC.S_NEWL + 'Method 99 | "Other":\t' +
