@@ -88,7 +88,7 @@ nJobs = None                # number of jobs to run in parallel (None: 1)
 vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
-nIterPartialFit = True      # number of iterations when doing a partial fit
+nItPartialFit = 1000      # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================
@@ -179,7 +179,7 @@ dIO = {# --- general
        'nJobs': nJobs,
        'vVerb': vVerb,
        # --- general input for neural network MLP classifier
-       'nIterPartialFit': nIterPartialFit,
+       'nItPartialFit': nItPartialFit,
        'bVerb': bVerb,
        # ======================================================================
        # --- numbers
