@@ -10,13 +10,13 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
 dNumRep = {GC.S_MTH_RF: 0,
-           GC.S_MTH_MLP: 2}
+           GC.S_MTH_MLP: 5}
 
 # --- names and paths of files and dirs ---------------------------------------
 
 # --- list of parameter grids for random forest classifier grid search --------
 # or lParGrid_RF = None if no such search should be performed
-lParGrid_RF = [{'n_estimators': [10, 100],
+lParGrid_RF = [{'n_estimators': [100, 1000],
                 'criterion': ['gini', 'entropy', 'log_loss'],
                 'bootstrap': [True, False]},
                {'max_features': [None, 'sqrt'],
@@ -89,8 +89,11 @@ d2Par_RF = {'B': {'n_estimators': 100,
 # --- list of parameter grids for neural network MLP classifier grid search ---
 # or lParGrid_MLP = None if no such search should be performed
 lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
-                 'activation': ['relu', 'tanh']}]
-lParGrid_MLP = None
+                 'activation': ['relu', 'identity', 'logistic', 'tanh'],
+                 'solver': ['adam', 'lbfgs', 'sgd'],
+                 'learning_rate': ['constant', 'adaptive'],
+                 'momentum': [0.6, 0.9, 0.98]}]
+# lParGrid_MLP = None
 
 # --- parameter dictionary for neural network MLP classifier ------------------
 d2Par_MLP = {'AH': {'hidden_layer_sizes': (100,),

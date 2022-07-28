@@ -88,13 +88,6 @@ sNmerEffF = GC.S_N_MER_EFF_FAM
 sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 
-# --- file name extensions ----------------------------------------------------
-xtPY = GC.XT_PY
-xtCSV = GC.XT_CSV
-xtPDF = GC.XT_PDF
-xtPTH = GC.XT_PTH
-xtBIN = GC.XT_BIN
-
 # === create input dictionary =================================================
 dIO = {# --- general
        'sOType': sOType,
@@ -185,12 +178,6 @@ dIO = {# --- general
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],
-       'lSMth': [sMthRF, sMthMLP],
-       # --- file name extensions
-       'xtPY': xtPY,
-       'xtCSV': xtCSV,
-       'xtPDF': xtPDF,
-       'xtPTH': xtPTH,
-       'xtBIN': xtBIN}
+       'lSMth': [sMthRF, sMthMLP]}
 
 ###############################################################################

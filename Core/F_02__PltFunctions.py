@@ -64,7 +64,7 @@ def getSTxtAnnotBar(cVSl, cVMix, cY, sTxt, nTp, RD=None):
         cNum, cY = str(cVRd) + GC.S_PERC, max(0., cVMix/2.)
         if cVRd == 0:
             return cNum, cY
-    return GF.joinS([sTxt, cNum], sJoin=GC.S_SPACE), cY
+    return GF.joinS([sTxt, cNum], cJ=GC.S_SPACE), cY
 
 def annotBar(dPlt, dVSl, cX, cVMix, sBO, RD=None):
     for nTp, (cY, cCSysY, sTxt) in dPlt['dAnnot'][sBO].items():

@@ -26,18 +26,18 @@ class Validation(ExpData):
         sJ, sFlFE = self.dITp['sUS02'], self.dITp['sFull']
         pR, sFE = self.pDirResComb, GF.joinS(self.dITp['lSLenNmer'])
         if len(sFE) > 0:
-            sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
+            sFlFE = GF.joinS([sFlFE, sFE], cJ=sJ)
         pFCombInp = GF.joinToPath(pR, self.dITp['sFCombInp'])
         dPFTrain = {self.dITp['sCombinedInp']: pFCombInp}
         dPFTest = {self.dITp['sCombinedInp']: pFCombInp}
         for sTp, sFComb, cD in zip(['sTrain', 'sTest'],
                                    ['sFCombTrain', 'sFCombTest'],
                                    [dPFTrain, dPFTest]):
-            sE = GF.joinS([sFE, self.dITp[sTp]], sJoin=sJ)
-            sEFl = GF.joinS([sFlFE, self.dITp[sTp]], sJoin=sJ)
-            sFINmer = GF.modSF(self.dITp['sFResINmer'], sJoin=sJ, sEnd=sE)
-            sFIEff = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ, sEnd=sE)
-            sFIEffF = GF.modSF(self.dITp['sFResIEff'], sJoin=sJ, sEnd=sEFl)
+            sE = GF.joinS([sFE, self.dITp[sTp]], cJ=sJ)
+            sEFl = GF.joinS([sFlFE, self.dITp[sTp]], cJ=sJ)
+            sFINmer = GF.modSF(self.dITp['sFResINmer'], sEnd=sE, sJoin=sJ)
+            sFIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sE, sJoin=sJ)
+            sFIEffF = GF.modSF(self.dITp['sFResIEff'], sEnd=sEFl, sJoin=sJ)
             pFComb = GF.joinToPath(pR, self.dITp[sFComb])
             cD[self.dITp['sCombinedOut']] = pFComb
             cD[self.dITp['sImer']] = GF.joinToPath(pR, sFINmer)

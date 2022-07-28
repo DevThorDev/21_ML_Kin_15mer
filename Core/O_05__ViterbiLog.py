@@ -85,7 +85,7 @@ class ViterbiLog(SeqAnalysis):
     # --- methods for filling the result paths dictionary ---------------------
     def addValsToDPF(self):
         pPI, pVi = self.pDirProcInp, self.pDirResViterbi
-        sFE, sXt = self.dITp['sFESeqA'], self.dITp['xtCSV']
+        sFE, sXt = self.dITp['sFESeqA'], self.dIG['xtCSV']
         self.dPF['EmitProb'] = self.dPF['ResRFreqSP']
         p = pPI
         if self.dITp['useFullSeqFrom'] == GC.S_COMB_INP:

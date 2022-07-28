@@ -13,9 +13,11 @@ nDigObj = GC.N_DIG_OBJ_2    # number of digits reserved for all input objects
 sObjInp = GC.S_OBJINP
 sObjInpPre = GC.S_OBJINP_PRE
 
-sFXtCSV = GC.S_EXT_CSV
-sFXtPDF = GC.S_EXT_PDF
-sFXtPTH = GC.S_EXT_PTH
+xtPY = GC.XT_PY
+xtCSV = GC.XT_CSV
+xtPDF = GC.XT_PDF
+xtPTH = GC.XT_PTH
+xtBIN = GC.XT_BIN
 
 # --- predefined numbers ------------------------------------------------------
 R01 = GC.R01
@@ -26,6 +28,18 @@ R08 = GC.R08
 R24 = GC.R24
 maxDelta = GC.MAX_DELTA
 
+# --- predefined strings ------------------------------------------------------
+sPath = GC.S_PATH
+sLFCS = GC.S_L_F_S
+sLFCC = GC.S_L_F_C
+sLFCE = GC.S_L_F_E
+sLFCJS = GC.S_L_F_J + GC.S_CAP_S
+sLFCJC = GC.S_L_F_J + GC.S_CAP_C
+sLFCJE = GC.S_L_F_J + GC.S_CAP_E
+sLFCJSC = GC.S_L_F_J + GC.S_CAP_S + GC.S_CAP_C
+sLFCJCE = GC.S_L_F_J + GC.S_CAP_C + GC.S_CAP_E
+sFXt = GC.S_F_XT
+
 # === create input dictionary =================================================
 dictInpG = {# --- general
             'isTest': isTest,
@@ -34,9 +48,11 @@ dictInpG = {# --- general
             # --- file and folder names, extensions
             'sObjInp': sObjInp,
             'sObjInpPre': sObjInpPre,
-            'sFXtCSV': sFXtCSV,
-            'sFXtPDF': sFXtPDF,
-            'sFXtPTH': sFXtPTH,
+            'xtPY': xtPY,
+            'xtCSV': xtCSV,
+            'xtPDF': xtPDF,
+            'xtPTH': xtPTH,
+            'xtBIN': xtBIN,
             # --- predefined numbers
             'R01': R01,
             'R02': R02,
@@ -44,6 +60,17 @@ dictInpG = {# --- general
             'R04': R04,
             'R08': R08,
             'R24': R24,
-            'maxDelta': maxDelta}
+            'maxDelta': maxDelta,
+            # --- predefined strings
+            'sPath': sPath,
+            'sLFCS': sLFCS,
+            'sLFCC': sLFCC,
+            'sLFCE': sLFCE,
+            'sLFCJS': sLFCJS,
+            'sLFCJC': sLFCJC,
+            'sLFCJE': sLFCJE,
+            'sLFCJSC': sLFCJSC,
+            'sLFCJCE': sLFCJCE,
+            'sFXt': sFXt}
 
 ###############################################################################

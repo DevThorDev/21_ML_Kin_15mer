@@ -68,9 +68,9 @@ class BaseSmplClfPrC(BaseClass):
     def getDPF(self):
         dITp = self.dITp
         sBClf, sBPrC = dITp['sFInpBaseClf'], dITp['sFInpBasePrC']
-        dITp['sParClf'] = GF.joinS([sBClf], sJoin=dITp['sUSC'])
-        dITp['sOutClf'] = GF.joinS([dITp['sSet'], sBClf], sJoin=dITp['sUSC'])
-        dITp['sOutPrC'] = GF.joinS([dITp['sSet'], sBPrC], sJoin=dITp['sUSC'])
+        dITp['sParClf'] = GF.joinS([sBClf], cJ=dITp['sUSC'])
+        dITp['sOutClf'] = GF.joinS([dITp['sSet'], sBClf], cJ=dITp['sUSC'])
+        dITp['sOutPrC'] = GF.joinS([dITp['sSet'], sBPrC], cJ=dITp['sUSC'])
         self.dPF = self.D.yieldDPF()
 
     # --- methods for getting and setting X and Y -----------------------------
@@ -265,6 +265,27 @@ class Classifier(BaseSmplClfPrC):
         print('Initiated "Classifier" base object.')
 
     # --- print methods -------------------------------------------------------
+    def printClfFitRes(self, X):
+        if self.dITp['lvlOut'] > 0:
+            print('Fitted classifier to data of shape', X.shape)
+            if self.optClf is not None:
+                nL, oC, R04 = GC.S_NEWL, self.optClf, self.dIG['R04']
+                print(GC.S_DS80, 'Grid search results:', nL,
+                      'Best estimator:', nL, oC.best_estimator_, nL,
+                      'Best parameters:', nL, oC.best_params_, nL,
+                      'Best score: ', round(oC.best_score_, R04), sep='')
+                dfrCVRes = GF.iniPdDfr(oC.cv_results_)
+                print('CV results:', nL, dfrCVRes, sep='')
+
+    def printClfFitError(self):
+        print('ERROR: Cannot fit classifier to data!')
+        if self.dITp['lvlOut'] > 1:
+            self.printXY()
+
+    def printClfPartialFit(self, X):
+        if self.dITp['lvlOut'] > 0:
+            print('Partially fitted classifier to data of shape', X.shape)
+
     def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
         if self.dITp['lvlOut'] > 0 and cSect in ['A2']:
             s1, s2 = (str(nCr) + ' out of ' + str(nPr) + ' correctly' +
@@ -324,29 +345,16 @@ class Classifier(BaseSmplClfPrC):
         if cClf is not None and X is not None and Y is not None:
             try:
                 cClf.fit(X, Y)
-                if self.dITp['lvlOut'] > 0:
-                    print('Fitted classifier to data of shape', X.shape)
-                    if self.optClf is not None:
-                        nL, oC = GC.S_NEWL, self.optClf
-                        print(GC.S_DS80, 'Grid search results:', nL,
-                              'Best estimator:', nL, oC.best_estimator_, nL,
-                              'Best parameters:', nL, oC.best_params_, nL,
-                              'Best score: ', round(oC.best_score_,
-                                                    self.dIG['R04']), sep='')
-                        dfrCVRes = GF.iniPdDfr(oC.cv_results_)
-                        print('CV results:', nL, dfrCVRes, sep='')
+                self.printClfFitRes(X)
             except:
-                print('ERROR: Cannot fit classifier to data!')
-                if self.dITp['lvlOut'] > 1:
-                    self.printXY()
+                self.printClfFitError()
 
     def ClfPartialFit(self, cClf, XInp, YInp):
         X, Y = XInp, YInp
         if cClf is not None and XInp is not None and YInp is not None:
             X, Y = self.Smp.imbSmp.fit_resample(XInp, YInp)
             cClf.partial_fit(X, Y, classes=self.lSCl)
-            if self.dITp['lvlOut'] > 0:
-                print('Partially fitted classifier to data of shape', X.shape)
+            self.printClfPartialFit(X)
         return X, Y
 
     def fitOrPartialFitClf(self, cClf):
@@ -384,9 +392,9 @@ class Classifier(BaseSmplClfPrC):
                 GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
             # create dfrPred/dfrProba, containing YTest and YPred/YProba
             sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
-            lSCTP = [GF.joinS([s, sTCl], sJoin=self.dITp['sUSC'])
+            lSCTP = [GF.joinS([s, sTCl], cJ=self.dITp['sUSC'])
                      for s in self.YTest.columns]
-            lSCTP += [GF.joinS([s, sPCl], sJoin=self.dITp['sUSC'])
+            lSCTP += [GF.joinS([s, sPCl], cJ=self.dITp['sUSC'])
                       for s in self.YPred.columns]
             self.assembleDfrPredProba(lSCTP=lSCTP)
 
@@ -507,17 +515,17 @@ class PropCalculator(BaseSmplClfPrC):
 
     # --- method for adapting a key of the result paths dictionary ------------
     def setPathOutDataPrC(self, sCl=None):
-        sJ1, sJ2, x = self.dITp['sUSC'], self.dITp['sUS02'], self.dITp['xtCSV']
+        sJ1, sJ2, xt = self.dITp['sUSC'], self.dITp['sUS02'], self.dIG['xtCSV']
         sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
-                             sJoin=sJ2)
+                             cJ=sJ2)
         # sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr']],
-        #                sJoin=sJ1)
+        #                cJ=sJ1)
         sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
                         self.dITp['sSglMltLbl'], self.dITp['sXclEffFam']],
-                       sJoin=sJ1)
-        sFOutPrC = GF.joinS([sFOutBase, sFE], sJoin=sJ1) + x
+                       cJ=sJ1)
+        sFOutPrC = GF.joinS([sFOutBase, sFE], cJ=sJ1) + xt
         if sCl is not None:
-            sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], sJoin=sJ1) + x
+            sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], cJ=sJ1) + xt
         self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
 
     # --- methods calculating the proportions of AAc at all Nmer positions ----

@@ -26,24 +26,24 @@ class DataLoader(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def fillDPF(self):
-        sJ, xtCSV = self.dITp['sUS02'], self.dITp['xtCSV']
+        sJ, xtCSV = self.dITp['sUS02'], self.dIG['xtCSV']
         sF1A, sF1B = self.dITp['sFInpClf'], self.dITp['sFInpPrC']
         sFInpClf, sFInpPrC = sF1A + xtCSV, sF1B + xtCSV
         sFResComb = self.dITp['sFResComb'] + xtCSV
         lSF = [self.dITp['sFDictNmerSnips'], self.dITp['sFResComb']]
-        sFDNS = GF.joinS(lSF, sJoin=sJ) + self.dITp['xtBIN']
+        sFDNS = GF.joinS(lSF, cJ=sJ) + self.dIG['xtBIN']
         lSF = [self.dITp['sFDictNmerEffF'], self.dITp['sFResComb']]
-        sFDNX = GF.joinS(lSF, sJoin=sJ) + self.dITp['xtBIN']
+        sFDNX = GF.joinS(lSF, cJ=sJ) + self.dIG['xtBIN']
         sF3 = GF.joinS([self.dITp['sXclEffFam'], self.dITp['sSet'],
                         self.dITp['sRestr']])
         sF13 = GF.joinS([sF1A, sF3])
         sF23 = GF.joinS([self.dITp['sSglMltLbl'], sF3])
         sF123 = GF.joinS([sF1A, sF23])
-        sFNmerEF = (GF.joinS([self.dITp['sNmerEffF'], sF1A], sJoin=sJ) + xtCSV)
-        sFNmerSU = (GF.joinS([self.dITp['sNmerSeqU'], sF1A], sJoin=sJ) + xtCSV)
-        sFInpDat = (GF.joinS([self.dITp['sInpData'], sF123], sJoin=sJ) + xtCSV)
-        sFX = (GF.joinS([self.dITp['sX'], sF13], sJoin=sJ) + xtCSV)
-        sFY = (GF.joinS([self.dITp['sY'], sF123], sJoin=sJ) + xtCSV)
+        sFNmerEF = (GF.joinS([self.dITp['sNmerEffF'], sF1A], cJ=sJ) + xtCSV)
+        sFNmerSU = (GF.joinS([self.dITp['sNmerSeqU'], sF1A], cJ=sJ) + xtCSV)
+        sFInpDat = (GF.joinS([self.dITp['sInpData'], sF123], cJ=sJ) + xtCSV)
+        sFX = (GF.joinS([self.dITp['sX'], sF13], cJ=sJ) + xtCSV)
+        sFY = (GF.joinS([self.dITp['sY'], sF123], cJ=sJ) + xtCSV)
         self.dPF = {}
         self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
         self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)

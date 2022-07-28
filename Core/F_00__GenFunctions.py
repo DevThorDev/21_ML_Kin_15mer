@@ -41,7 +41,7 @@ def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
 def modSF(sF, sStart='', sEnd='', sJoin=''):
     if GC.S_DOT in sF:
         lSSpl = sF.split(GC.S_DOT)
-        sFMod = joinS(lSSpl[:-1], sJoin=GC.S_DOT)
+        sFMod = joinS(lSSpl[:-1], cJ=GC.S_DOT)
         sFMod = addSStartSEnd(sFMod, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
         return sFMod + GC.S_DOT + lSSpl[-1]
     else:
@@ -50,7 +50,7 @@ def modSF(sF, sStart='', sEnd='', sJoin=''):
 def modPF(pF, sStart='', sEnd='', sJoin='', sJoinP=GC.S_DBLBACKSL):
     lSSpl = pF.split(sJoinP)
     sFMod = modSF(sF=lSSpl[-1], sStart=sStart, sEnd=sEnd, sJoin=sJoin)
-    return joinS(lSSpl[:-1] + [sFMod], sJoin=sJoinP)
+    return joinS(lSSpl[:-1] + [sFMod], cJ=sJoinP)
 
 def fileXist(pF):
     return os.path.isfile(pF)
@@ -104,26 +104,44 @@ def Xist(cDat):
     return False
 
 # --- String selection and manipulation functions -----------------------------
-def joinS(itS, sJoin=GC.S_USC):
-    lSJoin = [str(s) for s in itS if s is not None and len(str(s)) > 0]
-    return sJoin.join(lSJoin).strip()
+def joinS(itS, cJ=GC.S_USC):
+    if len(itS) == 0:
+        return ''
+    elif len(itS) == 1:
+        return str(itS[0])
+    lS2J = [str(s) for s in itS if (s is not None and len(str(s)) > 0)]
+    if type(cJ) == str:
+        return cJ.join(lS2J).strip()
+    elif type(cJ) in [tuple, list, range]:
+        sRet = str(itS[0])
+        if len(cJ) == 0:
+            cJ = [GC.S_USC]*(len(itS) - 1)
+        else:
+            cJ = [str(j) for j in cJ]
+        if len(cJ) >= len(itS) - 1:
+            for k, sJ in zip(range(1, len(itS)), cJ[:(len(itS) - 1)]):
+                sRet = joinS([sRet, str(itS[k])], cJ=sJ)
+        else:
+            # cJ too short --> only use first element of cJ
+            sRet = cJ[0].join(lS2J).strip()
+        return sRet
 
 def getPartStr(s, iStart=None, iEnd=None, sSpl=GC.S_USC):
     if iStart is None:
         if iEnd is None:
-            return joinS(s.split(sSpl), sJoin=sSpl)
+            return joinS(s.split(sSpl), cJ=sSpl)
         else:
-            return joinS(s.split(sSpl)[:iEnd], sJoin=sSpl)
+            return joinS(s.split(sSpl)[:iEnd], cJ=sSpl)
     else:
         if iEnd is None:
-            return joinS(s.split(sSpl)[iStart:], sJoin=sSpl)
+            return joinS(s.split(sSpl)[iStart:], cJ=sSpl)
         else:
-            return joinS(s.split(sSpl)[iStart:iEnd], sJoin=sSpl)
+            return joinS(s.split(sSpl)[iStart:iEnd], cJ=sSpl)
 
 def getPartSF(sF, iStart=None, iEnd=None, sDot=GC.S_DOT, sSpl=GC.S_USC):
     sFNoXt = sF
     if sDot in sF:
-        sFNoXt = joinS(sF.split(sDot)[:-1], sJoin=sDot)
+        sFNoXt = joinS(sF.split(sDot)[:-1], cJ=sDot)
     return getPartStr(s=sFNoXt, iStart=iStart, iEnd=iEnd, sSpl=sSpl)
 
 def extS(s, sXt='', sSep=GC.S_USC):
@@ -147,7 +165,7 @@ def getSF(sMid, iStart=None, iEnd=None, sPre='', sPost='', sSpl=GC.S_USC):
 
 def getSFEnd(sF, nCharEnd):
     if GC.S_DOT in sF:
-        sF = joinS(sF.split(GC.S_DOT)[:-1], sJoin=GC.S_DOT)[-nCharEnd:]
+        sF = joinS(sF.split(GC.S_DOT)[:-1], cJ=GC.S_DOT)[-nCharEnd:]
     return sF[-nCharEnd:]
 
 def addSCentNmerToDict(dNum, dENmer, iCNmer):

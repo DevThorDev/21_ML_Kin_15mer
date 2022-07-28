@@ -49,7 +49,7 @@ class ExpData(BaseClass):
         sFResINmer = GF.modSF(self.dITp['sFResINmer'], sEnd=sFE, sJoin=sJ)
         sFResIEff = GF.modSF(self.dITp['sFResIEff'], sEnd=sFE, sJoin=sJ)
         if len(sFE) > 0:
-            sFlFE = GF.joinS([sFlFE, sFE], sJoin=sJ)
+            sFlFE = GF.joinS([sFlFE, sFE], cJ=sJ)
         sFResIEffF = GF.modSF(self.dITp['sFResIEff'], sEnd=sFlFE, sJoin=sJ)
         pFResIGen = GF.joinToPath(pRInf, self.dITp['sFResIGen'])
         dPFBase = {self.dITp['sCombined']: dPFComb,

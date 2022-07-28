@@ -39,18 +39,18 @@ class Looper(BaseClass):
 # --- loop methods ------------------------------------------------------------
     def adapMthDPF(self, cClf, sMth):
         sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
-        xtCSV, sSum = self.dITp['xtCSV'], self.dITp['sSummary']
+        xtCSV, sSum = self.dIG['xtCSV'], self.dITp['sSummary']
         sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
                         cClf.dITp['sCLblsTrain'], cClf.dITp['sSglMltLbl'],
-                        cClf.dITp['sXclEffFam']], sJoin=sJ1)
-        sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), sJoin=sJ1)
-        sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], sJoin=sJ1)
-        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth, sFE], sJoin=sJ1)
-        sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCPar], sJoin=sJ2) + xtCSV
-        sFSum = GF.joinS([sSum, sLKP, sFCore], sJoin=sJ2) + xtCSV
-        sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], sJoin=sJ2) + xtCSV
-        sFDet = GF.joinS([self.dITp['sDetailed'], sFCore], sJoin=sJ2) + xtCSV
-        sFProba = GF.joinS([self.dITp['sProba'], sFCore], sJoin=sJ2) + xtCSV
+                        cClf.dITp['sXclEffFam']], cJ=sJ1)
+        sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), cJ=sJ1)
+        sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], cJ=sJ1)
+        sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth, sFE], cJ=sJ1)
+        sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCPar], cJ=sJ2) + xtCSV
+        sFSum = GF.joinS([sSum, sLKP, sFCore], cJ=sJ2) + xtCSV
+        sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], cJ=sJ2) + xtCSV
+        sFDet = GF.joinS([self.dITp['sDetailed'], sFCore], cJ=sJ2) + xtCSV
+        sFProba = GF.joinS([self.dITp['sProba'], sFCore], cJ=sJ2) + xtCSV
         self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutPar'], sFPar)
         self.dPF['OutSumClf'] = GF.joinToPath(cClf.dITp['pOutSum'], sFSum)
         self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfM)
@@ -58,7 +58,7 @@ class Looper(BaseClass):
         self.dPF['OutProbaClfB'] = GF.joinToPath(cClf.dITp['pOutDet'], sFProba)
 
     def adaptKParRpDPF(self, cClf, sMth, sKP, cRp):
-        sKPR = GF.joinS([sKP, str(cRp + 1)], sJoin=self.dITp['sUSC'])
+        sKPR = GF.joinS([sKP, str(cRp + 1)], cJ=self.dITp['sUSC'])
         self.dPF['OutDetClf'] = GF.modPF(self.dPF['OutDetClfB'], sEnd=sKPR,
                                          sJoin=self.dITp['sUSC'])
         self.dPF['OutProbaClf'] = GF.modPF(self.dPF['OutProbaClfB'], sEnd=sKPR,

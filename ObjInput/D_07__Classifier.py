@@ -11,19 +11,22 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doImbSampling = True
-doRFClf = True
-doMLPClf = True
-doPropCalc = False
+doImbSampling = True                # do imbalanced sampling before classific.?
 
-doTrainTestSplit = True
+doRFClf = True                      # do random forest classification?
+doMLPClf = True                     # do neural network MLP classification?
+doPropCalc = False                  # do calculation of AAc proportions/class?
 
-saveDetailedClfRes = True
+doTrainTestSplit = True             # split data into train and test sets?
 
-calcConfMatrix = True
-plotConfMatrix = False
+doMultiSteps = True                 # do a multi-step classification approach?
 
-encodeCatFtr = True
+saveDetailedClfRes = True           # save the detailed classification results?
+
+calcConfMatrix = True               # calculate the confusion matrix?
+plotConfMatrix = False              # plot the confusion matrix?
+
+encodeCatFtr = True                 # encode categorical features?
 
 lLblTrain = [1]                     # number of labels used for training data
 # lLblTrain = None                    # number of labels used for training data
@@ -88,7 +91,7 @@ nJobs = None                # number of jobs to run in parallel (None: 1)
 vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
-nItPartialFit = 1000      # number of iterations / partial fit (or None)
+nItPartialFit = None      # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================

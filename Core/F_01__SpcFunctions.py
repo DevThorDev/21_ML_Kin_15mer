@@ -194,7 +194,7 @@ def loadInpData(dITp, dfrInp, sMd=GC.S_CLF, iC=0):
 
 def getDClasses(dITp):
     dITp['dClasses'], dITp['lXCl'] = {}, []
-    pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClClf'] + dITp['xtCSV'])
+    pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClClf'] + dIG['xtCSV'])
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
     for _, cRow in dfrClMap.iterrows():
         [sK, sV] = cRow.to_list()
