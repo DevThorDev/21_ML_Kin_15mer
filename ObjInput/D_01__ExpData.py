@@ -24,8 +24,8 @@ lLenNmer = None             # None: all lengths considered
 # lLenNmer = [1, 3, 5, 7]     # None: all lengths considered
 
 # --- names and paths of files and dirs ---------------------------------------
-sFRawInpKin = GC.S_F_RAW_INP_KIN + GC.XT_CSV
-sFRawInpNmer = GC.S_F_RAW_INP_N_MER + GC.XT_CSV
+sFRawInpKin = GC.S_F_RAW_INP_KIN
+sFRawInpNmer = GC.S_F_RAW_INP_N_MER
 
 sFProcInpKin = GC.S_F_PROC_INP_KIN
 sFProcInpNmer = GC.S_F_PROC_INP_N_MER
@@ -114,11 +114,15 @@ lRowsResIGen = [sRowRaw, sTotalRaw, sNaNRaw,
                 sRowCombM, sTotalCombM, sNaNCombM,
                 sRowCombS, sTotalCombS, sNaNCombS,
                 sRowCombXS, sTotalCombXS, sNaNCombXS]
+lKCmb = [GC.S_X_SHORT, GC.S_SHORT, GC.S_MED, GC.S_LONG]
+lVCmb = [GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L]
+
+# === assertions ==============================================================
+assert len(lKCmb) == len(lVCmb)
 
 # --- dictionaries ------------------------------------------------------------
 dMer = GC.D_MER
-
-# === assertions ==============================================================
+dCmb = {cKCmb: cVCmb for cKCmb, cVCmb in zip(lKCmb, lVCmb)}
 
 # === derived values and input processing =====================================
 if lLenNmer is None:
@@ -158,15 +162,15 @@ dIO = {# --- general
        'lSCMerPr': lSCMerPr,
        'lSCMerAll': lSCMerAll,
        # --- names and paths of files and dirs
-       'sFProcInpKin': sFProcInpKin + GC.XT_CSV,
-       'sFProcInpNmer': sFProcInpNmer + GC.XT_CSV,
-       'sFResCombXS': sFResCombXS + GC.XT_CSV,
-       'sFResCombS': sFResCombS + GC.XT_CSV,
-       'sFResCombM': sFResCombM + GC.XT_CSV,
-       'sFResCombL': sFResCombL + GC.XT_CSV,
-       'sFResIGen': sFResIGen + GC.XT_CSV,
-       'sFResINmer': sFResINmer + GC.XT_CSV,
-       'sFResIEff': sFResIEff + GC.XT_CSV,
+       'sFProcInpKin': sFProcInpKin,
+       'sFProcInpNmer': sFProcInpNmer,
+       'sFResCombXS': sFResCombXS,
+       'sFResCombS': sFResCombS,
+       'sFResCombM': sFResCombM,
+       'sFResCombL': sFResCombL,
+       'sFResIGen': sFResIGen,
+       'sFResINmer': sFResINmer,
+       'sFResIEff': sFResIEff,
        'pFRawInpKin': GF.joinToPath(pDirRawInp, sFRawInpKin),
        'pFRawInpKin_T': GF.joinToPath(pDirRawInp_Test, sFRawInpKin),
        'pFRawInpNmer': GF.joinToPath(pDirRawInp, sFRawInpNmer),
@@ -218,8 +222,11 @@ dIO = {# --- general
        'lSortCDfrNmer': lSortCDfrNmer,
        'lSortDirAscDfrNmer': lSortDirAscDfrNmer,
        'lRResIG': lRowsResIGen,
+       'lKCmb': lKCmb,
+       'lVCmb': lVCmb,
        # --- dictionaries
        'dMer': dMer,
+       'dCmb': dCmb,
        'dSCMerAll': dSCMerAll,
        # === derived values and input processing
        'iStXS': iStXS,

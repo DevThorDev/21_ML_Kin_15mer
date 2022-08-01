@@ -35,7 +35,7 @@ def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
     if len(sStart) > 0:
         sF = sStart + sJoin + sF
     if len(sEnd) > 0:
-        sF = sF + sJoin + sEnd
+        sF = sF + sJoin + str(sEnd)
     return sF
 
 def modSF(sF, sStart='', sEnd='', sJoin=''):
@@ -105,6 +105,8 @@ def Xist(cDat):
 
 # --- String selection and manipulation functions -----------------------------
 def joinS(itS, cJ=GC.S_USC):
+    if type(itS) in [str, int, float]:    # convert to 1-element list
+        itS = [str(itS)]
     if len(itS) == 0:
         return ''
     elif len(itS) == 1:

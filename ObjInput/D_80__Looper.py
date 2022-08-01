@@ -10,7 +10,7 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
 dNumRep = {GC.S_MTH_RF: 0,
-           GC.S_MTH_MLP: 5}
+           GC.S_MTH_MLP: 2}
 
 # --- names and paths of files and dirs ---------------------------------------
 
@@ -93,7 +93,7 @@ lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
                  'solver': ['adam', 'lbfgs', 'sgd'],
                  'learning_rate': ['constant', 'adaptive'],
                  'momentum': [0.6, 0.9, 0.98]}]
-# lParGrid_MLP = None
+lParGrid_MLP = None
 
 # --- parameter dictionary for neural network MLP classifier ------------------
 d2Par_MLP = {'AH': {'hidden_layer_sizes': (100,),

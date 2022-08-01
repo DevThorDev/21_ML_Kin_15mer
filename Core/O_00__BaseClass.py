@@ -8,12 +8,93 @@ import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
 
 # -----------------------------------------------------------------------------
+class FilePath:
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, dInp, dPI={}, xt=GC.S_EXT_CSV):
+        self.dI = dInp
+        self.dPInfo = dPI
+        self.getFileXt(xt=xt)
+        self.createPath(sJ=GC.S_USC)
+
+    def getFileXt(self, xt=GC.S_EXT_CSV):
+        self.sFXt = xt
+        if self.dI['sFXt'] in self.dPInfo:
+            self.sFXt = self.dPInfo[self.dI['sFXt']]
+
+    def createPath(self, sJ=GC.S_USC):
+        pF, sFS, sFC, sFE = GC.S_DOT, '', GC.S_0, ''
+        cJS, cJC, cJE, cJSC, cJCE = sJ, sJ, sJ, sJ, sJ
+        if self.dI['sLFJS'] in self.dPInfo:
+            cJS = self.dPInfo[self.dI['sLFJS']]
+        if self.dI['sLFJC'] in self.dPInfo:
+            cJC = self.dPInfo[self.dI['sLFJC']]
+        if self.dI['sLFJE'] in self.dPInfo:
+            cJE = self.dPInfo[self.dI['sLFJE']]
+        if self.dI['sLFJSC'] in self.dPInfo:
+            cJSC = self.dPInfo[self.dI['sLFJSC']]
+        if self.dI['sLFJCE'] in self.dPInfo:
+            cJCE = self.dPInfo[self.dI['sLFJCE']]
+        if self.dI['sPath'] in self.dPInfo:
+           pF = self.dPInfo[self.dI['sPath']]
+        if self.dI['sLFS'] in self.dPInfo:
+            sFS = GF.joinS(self.dPInfo[self.dI['sLFS']], cJ=cJS)
+        if self.dI['sLFC'] in self.dPInfo:
+            sFC = GF.joinS(self.dPInfo[self.dI['sLFC']], cJ=cJC)
+        if self.dI['sLFE'] in self.dPInfo:
+            sFE = GF.joinS(self.dPInfo[self.dI['sLFE']], cJ=cJE)
+        sF = GF.joinS([sFS, sFC, sFE], cJ=[cJSC, cJCE]) + self.sFXt
+        self.pF = GF.joinToPath(pF=pF, nmF=sF)
+        print('Initiated "FilePath" base object.')
+
+    # --- method checking whether the file path exists ------------------------
+    def checkXist(self):
+        return GF.fileXist(pF=self.pF)
+
+    # --- method for modifying the file path ----------------------------------
+    def modPath(self, sS='', sE='', sJ=GC.S_USC):
+        self.pF = GF.modPF(pF=self.pF, sStart=sS, sEnd=sE, sJoin=sJ)
+
+    # --- method for modifying the file path ----------------------------------
+    def modFP(self, sS='', sE='', sJ=GC.S_USC):
+        self.pF = GF.modPF(pF=self.pF, sStart=sS, sEnd=sE, sJoin=sJ)
+
+# -----------------------------------------------------------------------------
+class FilePaths:
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, dInp):
+        self.dI = dInp
+        self.dPF = {}
+        print('Initiated "FilePaths" base object.')
+
+    # --- method for adding file paths to the paths dictionary ----------------
+    def addFPs(self, d2PI={}):
+        for sK, dPI in d2PI.items():
+            self.dPF[sK] = FilePath(dInp=self.dI, dPI=dPI).pF
+
+    # --- method for modifying a file path of the paths dictionary ------------
+    # def modFP(self, cKMn, lKSub=[]):
+    #     for cKSub in lKSub:
+    #         self.dPF[cKMn] = FilePath(dInp=self.dI, dPI=dPI).pF
+
+    # --- method for getting a file path from the paths dictionary ------------
+    def getFP(self, sK):
+        return self.dPF[sK]
+
+    # --- method for printing the file paths of the paths dictionary ----------
+    def printFPs(self, sK):
+        print(GC.S_DS04, 'File paths dictionary:')
+        for sK, pF in self.dPF.items():
+            print(sK, ':\t', pF)
+        print(GC.S_DS80)
+
+# -----------------------------------------------------------------------------
 class BaseClass:
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat):
         self.idO = 'O_00'
         self.descO = 'Base class'
         self.dIG = inpDat.dI
+        self.FPs = FilePaths(dInp=self.dIG)
         self.getDITp()
         self.iniDicts()
         self.iniDfrs()
@@ -86,9 +167,9 @@ class BaseClass:
         self.dTpDfr[self.dITp['sBase']][sDfrC] = self.dfrComb
         self.dTpDfr[self.dITp['sTrain']][sDfrC] = self.dfrTrain
         self.dTpDfr[self.dITp['sTest']][sDfrC] = self.dfrTest
-        self.dTpDfr[self.dITp['sBase']][sNmer] = self.dITp['sImer']
-        self.dTpDfr[self.dITp['sTrain']][sNmer] = self.dITp['sImerTrain']
-        self.dTpDfr[self.dITp['sTest']][sNmer] = self.dITp['sImerTest']
+        self.dTpDfr[self.dITp['sBase']][sNmer] = self.dITp['sINmer']
+        self.dTpDfr[self.dITp['sTrain']][sNmer] = self.dITp['sINmerTrain']
+        self.dTpDfr[self.dITp['sTest']][sNmer] = self.dITp['sINmerTest']
         self.dTpDfr[self.dITp['sBase']][sEff] = self.dITp['sIEff']
         self.dTpDfr[self.dITp['sTrain']][sEff] = self.dITp['sIEffTrain']
         self.dTpDfr[self.dITp['sTest']][sEff] = self.dITp['sIEffTest']
@@ -145,72 +226,6 @@ class BaseClass:
             print('Saving list as pandas Series *.csv file to path ' + pF)
             cSer = GF.iniPdSer(cL, lSNmI=lSIdx, nameS=sName)
             GF.saveCSV(cSer, pF=pF, cSep=self.dITp['cSep'], saveIdx=saveIdx)
-
-# -----------------------------------------------------------------------------
-class FilePath:
-    # --- initialisation of the class -----------------------------------------
-    def __init__(self, dInp, dPI={}, xt=GC.S_EXT_CSV):
-        self.dI = dInp
-        self.dPInfo = dPI
-        self.getFileXt(xt=xt)
-        self.createPath(sJ=GC.S_USC)
-
-    def getFileXt(self, xt=GC.S_EXT_CSV):
-        self.sFXt = xt
-        if self.dI['sFXt'] in self.dPInfo:
-            self.sFXt = self.dPInfo[self.dI['sFXt']]
-
-    def createPath(self, sJ=GC.S_USC):
-        pF, sFS, sFC, sFE = GC.S_DOT, '', GC.S_0, ''
-        cJS, cJC, cJE, cJSC, cJCE = sJ, sJ, sJ, sJ, sJ
-        if self.dI['sLFCJS'] in self.dPInfo:
-            cJS = self.dPInfo[self.dI['sLFCJS']]
-        if self.dI['sLFCJC'] in self.dPInfo:
-            cJC = self.dPInfo[self.dI['sLFCJC']]
-        if self.dI['sLFCJE'] in self.dPInfo:
-            cJE = self.dPInfo[self.dI['sLFCJE']]
-        if self.dI['sLFCJSC'] in self.dPInfo:
-            cJSC = self.dPInfo[self.dI['sLFCJSC']]
-        if self.dI['sLFCJCE'] in self.dPInfo:
-            cJCE = self.dPInfo[self.dI['sLFCJCE']]
-        if self.dI['sPath'] in self.dPInfo:
-           pF = self.dPInfo[self.dI['sPath']]
-        if self.dI['sLFCS'] in self.dPInfo:
-            sFS = GF.joinS(self.dPInfo[self.dI['sLFCS']], cJ=cJS)
-        if self.dI['sLFCC'] in self.dPInfo:
-            sFC = GF.joinS(self.dPInfo[self.dI['sLFCC']], cJ=cJC)
-        if self.dI['sLFCE'] in self.dPInfo:
-            sFE = GF.joinS(self.dPInfo[self.dI['sLFCE']], cJ=cJE)
-        sF = GF.joinS([sFS, sFC, sFE], cJ=[cJSC, cJCE]) + self.sFXt
-        self.pF = GF.joinToPath(pF=pF, nmF=sF)
-        print('Initiated "FilePath" base object.')
-
-    # --- method checking whether the file path exists ------------------------
-    def checkXist(self):
-        return GF.fileXist(pF=self.pF)
-
-    # --- method for modifying the file path ----------------------------------
-    def modPath(self, sS='', sE='', sJ=GC.S_USC):
-        self.pF = GF.modPF(pF=self.pF, sStart=sS, sEnd=sE, sJoin=sJ)
-
-# -----------------------------------------------------------------------------
-class FilePaths:
-    # --- initialisation of the class -----------------------------------------
-    def __init__(self, dInp):
-        self.dI = dInp
-        self.dPF = {}
-        print('Initiated "FilePaths" base object.')
-    
-    # --- method for adding a (list of) file path(s) to the paths dictionary --
-    def addPath(self, cK, cP=None, dPI={}):
-        if cP is None:
-            cP = FilePath(dInp=self.dI, dPI=dPI).pF
-        lTp = [str, tuple, list]
-        assert type(cK) in lTp and type(cP) in lTp and type(cK) == type(cP)
-        if type(cK) == str and type(cP) == str:
-            cK, cP = [cK], [cP]
-        for sK, sP in zip(cK, cP):
-            self.dPF[sK] = sP
 
 # -----------------------------------------------------------------------------
 class Seq:

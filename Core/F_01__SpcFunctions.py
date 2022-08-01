@@ -192,7 +192,7 @@ def loadInpData(dITp, dfrInp, sMd=GC.S_CLF, iC=0):
     lSCl = sorted(GF.toListUnqViaSer(dfrInp[dITp['sCY' + sMd]]))
     return dfrInp, X, Y, serNmerSeq, lSCl
 
-def getDClasses(dITp):
+def getDClasses(dIG, dITp):
     dITp['dClasses'], dITp['lXCl'] = {}, []
     pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClClf'] + dIG['xtCSV'])
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
@@ -208,8 +208,8 @@ def getDClasses(dITp):
         print(len(dITp['lXCl']), 'different X classes. List of X classes:')
         print(dITp['lXCl'])
 
-def iniObj(dITp, dNmerEffF):
-    getDClasses(dITp)
+def iniObj(dIG, dITp, dNmerEffF):
+    getDClasses(dIG, dITp)
     dX, dY = {sI: [] for sI in dITp['lSCXClf']}, {dITp['sEffFam']: []}
     if not dITp['onlySglLbl']:
         dY = {sXCl: [] for sXCl in dITp['lXCl']}
@@ -250,10 +250,10 @@ def fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq):
         fill_DX_DY_Mlt(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
     return lXCl
 
-def procInp(dITp, dNmerEffF):
+def procInp(dIG, dITp, dNmerEffF):
     iCent, lIPosUsed = dITp['iCentNmer'], dITp['lIPosUsed']
     dfrProc, X, Y, lSXCl = None, None, None, []
-    dProc, dX, dY = iniObj(dITp, dNmerEffF)
+    dProc, dX, dY = iniObj(dIG, dITp, dNmerEffF)
     for cSeq in dNmerEffF:
         cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
         lXCl = fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq=cSeqRed)

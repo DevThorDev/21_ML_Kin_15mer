@@ -108,16 +108,16 @@ S_TRAIN = 'Train'
 S_TEST = 'Test'
 S_C_DFR_COMB = 'cDfr' + S_COMB
 S_I_GEN = S_INFO + S_GEN
-S_I_MER = S_INFO + S_N_MER
+S_I_N_MER = S_INFO + S_N_MER
 S_I_EFF = S_INFO + S_EFF
-S_I_MER_TRAIN = S_USC.join([S_I_MER, S_TRAIN])
-S_I_MER_TEST = S_USC.join([S_I_MER, S_TEST])
+S_I_N_MER_TRAIN = S_USC.join([S_I_N_MER, S_TRAIN])
+S_I_N_MER_TEST = S_USC.join([S_I_N_MER, S_TEST])
 S_I_EFF_TRAIN = S_USC.join([S_I_EFF, S_TRAIN])
 S_I_EFF_TEST = S_USC.join([S_I_EFF, S_TEST])
 S_I_EFF_F = S_I_EFF + S_FULL
 S_I_EFF_F_TRAIN = S_USC.join([S_I_EFF_F, S_TRAIN])
 S_I_EFF_F_TEST = S_USC.join([S_I_EFF_F, S_TEST])
-S_B_GEN_INFO_N_MER = 'b' + S_GEN + S_I_MER
+S_B_GEN_INFO_N_MER = 'b' + S_GEN + S_I_N_MER
 S_B_GEN_INFO_EFF = 'b' + S_GEN + S_I_EFF
 
 # --- file names, paths and extensions ----------------------------------------
@@ -267,12 +267,13 @@ S_RESTR = 'restr'
 S_I_POS = 'iPos'
 S_WITH_EXCL_EFF_FAM = 'withXcl' + S_EFF_FAM
 S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM
-S_LBL = 'Lbl'
+S_LBL, S_STEP = 'Lbl', 'Step'
 S_SGL_LBL = S_SGL + S_LBL
 S_MLT_LBL = S_MLT + S_LBL
 S_N_MER_EFF_FAM = S_N_MER + S_EFF_FAM
 S_N_MER_SEQ_UNQ = S_N_MER + S_SEQ + S_UNQ
 S_INP_DATA = S_INP + S_DATA
+S_MLT_STEP = S_MLT + S_STEP
 
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'

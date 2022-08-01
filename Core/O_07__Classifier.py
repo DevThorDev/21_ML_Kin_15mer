@@ -31,7 +31,7 @@ class BaseSmplClfPrC(BaseClass):
         self.D = D
         self.complDITp()
         self.iniAttr(sKPar=sKPar)
-        self.getDPF()
+        self.fillFPs()
         print('Initiated "BaseSmplClfPrC" base object.')
 
     # --- method for complementing the type input dictionary ------------------
@@ -64,14 +64,33 @@ class BaseSmplClfPrC(BaseClass):
         (self.dfrInp, self.X, self.Y, self.serNmerSeq,
          self.lSCl) = self.D.yieldData(sMd=sMd)
 
-    # --- methods for filling the result paths dictionary ---------------------
-    def getDPF(self):
-        dITp = self.dITp
-        sBClf, sBPrC = dITp['sFInpBaseClf'], dITp['sFInpBasePrC']
-        dITp['sParClf'] = GF.joinS([sBClf], cJ=dITp['sUSC'])
-        dITp['sOutClf'] = GF.joinS([dITp['sSet'], sBClf], cJ=dITp['sUSC'])
-        dITp['sOutPrC'] = GF.joinS([dITp['sSet'], sBPrC], cJ=dITp['sUSC'])
-        self.dPF = self.D.yieldDPF()
+    # --- methods for filling the file paths ----------------------------------
+    def fillFPs(self):
+        self.FPs = self.D.yieldFPs()
+        d2PI, dIG, dITp = {}, self.dIG, self.dITp
+        lSFC = [dITp['sProp'], dITp['sSet'], dITp['sFInpBasePrC']]
+        lSFE = [dITp['sMaxLenNmer'], dITp['sRestr'], dITp['sSglMltLbl'],
+                dITp['sXclEffFam']]
+        d2PI['OutDataPrC'] = {dIG['sPath']: dITp['pOutPrC'],
+                              dIG['sLFC']: lSFC,
+                              dIG['sLFE']: lSFE,
+                              dIG['sFXt']: dIG['xtCSV']}
+        # d2PI['OutParClf'] = {dIG['sPath']: dITp['pOutPar'],
+        #                      dIG['sLFS']: dITp['sPar'],
+        #                      dIG['sFXt']: dIG['xtCSV']}
+        # d2PI['OutSumClf'] = {dIG['sPath']: dITp['pOutSum'],
+        #                      dIG['sLFS']: dITp['sSummary'],
+        #                      dIG['sFXt']: dIG['xtCSV']}
+        # d2PI['ConfMat'] = {dIG['sPath']: dITp['pConfMat'],
+        #                    dIG['sLFS']: dITp['sConfMat'],
+        #                    dIG['sFXt']: dIG['xtCSV']}
+        # d2PI['OutDetClfB'] = {dIG['sPath']: dITp['pOutDet'],
+        #                       dIG['sLFS']: dITp['sDetailed'],
+        #                       dIG['sFXt']: dIG['xtCSV']}
+        # d2PI['OutProbaClfB'] = {dIG['sPath']: dITp['pOutDet'],
+        #                         dIG['sLFS']: dITp['sProba'],
+        #                         dIG['sFXt']: dIG['xtCSV']}
+        self.FPs.addFPs(d2PI)
 
     # --- methods for getting and setting X and Y -----------------------------
     def getXY(self, getTrain=None):
@@ -283,7 +302,7 @@ class Classifier(BaseSmplClfPrC):
             self.printXY()
 
     def printClfPartialFit(self, X):
-        if self.dITp['lvlOut'] > 0:
+        if self.dITp['lvlOut'] > 1:
             print('Partially fitted classifier to data of shape', X.shape)
 
     def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
@@ -514,19 +533,11 @@ class PropCalculator(BaseSmplClfPrC):
         print('Initiated "PropCalculator" base object.')
 
     # --- method for adapting a key of the result paths dictionary ------------
-    def setPathOutDataPrC(self, sCl=None):
-        sJ1, sJ2, xt = self.dITp['sUSC'], self.dITp['sUS02'], self.dIG['xtCSV']
-        sFOutBase = GF.joinS([self.dITp['sProp'], self.dITp['sOutPrC']],
-                             cJ=sJ2)
-        # sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr']],
-        #                cJ=sJ1)
-        sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
-                        self.dITp['sSglMltLbl'], self.dITp['sXclEffFam']],
-                       cJ=sJ1)
-        sFOutPrC = GF.joinS([sFOutBase, sFE], cJ=sJ1) + xt
+    def modPathOutDataPrC(self, sCl=None):
         if sCl is not None:
-            sFOutPrC = GF.joinS([sFOutBase, sFE, sCl], cJ=sJ1) + xt
-        self.dPF['OutDataPrC'] = GF.joinToPath(self.dITp['pOutPrC'], sFOutPrC)
+            sJ = self.dITp['sUSC']
+            self.FPs.dPF['OutDataPrC'] = GF.modPF(self.FPs.dPF['OutDataPrC'],
+                                                  sEnd=sCl, sJoin=sJ)
 
     # --- methods calculating the proportions of AAc at all Nmer positions ----
     def calcPropCDfr(self, cDfrI, sCl):
@@ -538,8 +549,8 @@ class PropCalculator(BaseSmplClfPrC):
                 GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
                               cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
         self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
-        self.setPathOutDataPrC(sCl=sCl)
-        self.saveData(self.dPropAAc[sCl], pF=self.dPF['OutDataPrC'])
+        self.modPathOutDataPrC(sCl=sCl)
+        self.saveData(self.dPropAAc[sCl], pF=self.FPs.dPF['OutDataPrC'])
 
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:

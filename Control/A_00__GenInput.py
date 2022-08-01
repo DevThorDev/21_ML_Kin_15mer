@@ -63,14 +63,14 @@ dictInpG = {# --- general
             'maxDelta': maxDelta,
             # --- predefined strings
             'sPath': sPath,
-            'sLFCS': sLFCS,
-            'sLFCC': sLFCC,
-            'sLFCE': sLFCE,
-            'sLFCJS': sLFCJS,
-            'sLFCJC': sLFCJC,
-            'sLFCJE': sLFCJE,
-            'sLFCJSC': sLFCJSC,
-            'sLFCJCE': sLFCJCE,
+            'sLFS': sLFCS,
+            'sLFC': sLFCC,
+            'sLFE': sLFCE,
+            'sLFJS': sLFCJS,
+            'sLFJC': sLFCJC,
+            'sLFJE': sLFCJE,
+            'sLFJSC': sLFCJSC,
+            'sLFJCE': sLFCJCE,
             'sFXt': sFXt}
 
 ###############################################################################

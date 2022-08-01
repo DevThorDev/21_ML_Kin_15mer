@@ -50,7 +50,7 @@ pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # === general over- and undersampler input ====================================
-sSampler = 'RandomUnderSampler'         # string matching the over/under-sampler
+sSampler = 'RandomUnderSampler'    # string matching the over/under-sampler
                             # ClusterCentroids, AllKNN, TomekLinks
                             # NeighbourhoodCleaningRule, RandomUnderSampler,
 sStrat = 'majority'         # sampling strategy
@@ -91,7 +91,8 @@ nJobs = None                # number of jobs to run in parallel (None: 1)
 vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
-nItPartialFit = None      # number of iterations / partial fit (or None)
+# nItPartialFit = None      # number of iterations / partial fit (or None)
+nItPartialFit = 20      # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================
@@ -139,6 +140,7 @@ dIO = {# --- general
        'doMLPClf': doMLPClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
+       'doMultiSteps': doMultiSteps,
        'saveDetailedClfRes': saveDetailedClfRes,
        'calcConfMatrix': calcConfMatrix,
        'plotConfMatrix': plotConfMatrix,

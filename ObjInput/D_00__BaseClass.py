@@ -45,9 +45,9 @@ sEffF = GC.S_EFF_F
 sNoEff = GC.S_NO_EFF
 sNoFam = GC.S_NO_FAM
 sNmer = GC.S_N_MER
-sImer = GC.S_I_MER
-sImerTrain = GC.S_I_MER_TRAIN
-sImerTest = GC.S_I_MER_TEST
+sINmer = GC.S_I_N_MER
+sINmerTrain = GC.S_I_N_MER_TRAIN
+sINmerTest = GC.S_I_N_MER_TEST
 sIEff = GC.S_I_EFF
 sIEffTrain = GC.S_I_EFF_TRAIN
 sIEffTest = GC.S_I_EFF_TEST
@@ -87,6 +87,7 @@ sLbl = GC.S_LBL
 sNmerEffF = GC.S_N_MER_EFF_FAM
 sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
+sMltStep = GC.S_MLT_STEP
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -129,9 +130,9 @@ dIO = {# --- general
        'sNoEff': sNoEff,
        'sNoFam': sNoFam,
        'sNmer': sNmer,
-       'sImer': sImer,
-       'sImerTrain': sImerTrain,
-       'sImerTest': sImerTest,
+       'sINmer': sINmer,
+       'sINmerTrain': sINmerTrain,
+       'sINmerTest': sINmerTest,
        'sIEff': sIEff,
        'sIEffTrain': sIEffTrain,
        'sIEffTest': sIEffTest,
@@ -175,6 +176,7 @@ dIO = {# --- general
        'sNmerEffF': sNmerEffF,
        'sNmerSeqU': sNmerSeqU,
        'sInpData': sInpData,
+       'sMltStep': sMltStep,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

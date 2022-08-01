@@ -16,7 +16,7 @@ class DataLoader(BaseClass):
         self.idO = 'O_06'
         self.descO = 'Loader of the classification input data'
         self.getDITp(iTp=iTp)
-        self.fillDPF()
+        self.fillFPs()
         self.iniAttr()
         if self.dITp['useNmerNoCl']:
             self.getDictNmerNoCl()
@@ -24,37 +24,38 @@ class DataLoader(BaseClass):
         self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
         print('Initiated "DataLoader" base object.')
 
-    # --- methods for filling the result paths dictionary ---------------------
-    def fillDPF(self):
-        sJ, xtCSV = self.dITp['sUS02'], self.dIG['xtCSV']
-        sF1A, sF1B = self.dITp['sFInpClf'], self.dITp['sFInpPrC']
-        sFInpClf, sFInpPrC = sF1A + xtCSV, sF1B + xtCSV
-        sFResComb = self.dITp['sFResComb'] + xtCSV
-        lSF = [self.dITp['sFDictNmerSnips'], self.dITp['sFResComb']]
-        sFDNS = GF.joinS(lSF, cJ=sJ) + self.dIG['xtBIN']
-        lSF = [self.dITp['sFDictNmerEffF'], self.dITp['sFResComb']]
-        sFDNX = GF.joinS(lSF, cJ=sJ) + self.dIG['xtBIN']
-        sF3 = GF.joinS([self.dITp['sXclEffFam'], self.dITp['sSet'],
-                        self.dITp['sRestr']])
-        sF13 = GF.joinS([sF1A, sF3])
-        sF23 = GF.joinS([self.dITp['sSglMltLbl'], sF3])
-        sF123 = GF.joinS([sF1A, sF23])
-        sFNmerEF = (GF.joinS([self.dITp['sNmerEffF'], sF1A], cJ=sJ) + xtCSV)
-        sFNmerSU = (GF.joinS([self.dITp['sNmerSeqU'], sF1A], cJ=sJ) + xtCSV)
-        sFInpDat = (GF.joinS([self.dITp['sInpData'], sF123], cJ=sJ) + xtCSV)
-        sFX = (GF.joinS([self.dITp['sX'], sF13], cJ=sJ) + xtCSV)
-        sFY = (GF.joinS([self.dITp['sY'], sF123], cJ=sJ) + xtCSV)
-        self.dPF = {}
-        self.dPF['InpDataClf'] = GF.joinToPath(self.dITp['pInpClf'], sFInpClf)
-        self.dPF['InpDataPrC'] = GF.joinToPath(self.dITp['pInpPrC'], sFInpPrC)
-        self.dPF['ResComb'] = GF.joinToPath(self.dITp['pResComb'], sFResComb)
-        self.dPF['DictNmerSnips'] = GF.joinToPath(self.dITp['pBinData'], sFDNS)
-        self.dPF['DictNmerEffF'] = GF.joinToPath(self.dITp['pBinData'], sFDNX)
-        self.dPF['NmerEffF'] = GF.joinToPath(self.dITp['pUnqNmer'], sFNmerEF)
-        self.dPF['NmerSeqU'] = GF.joinToPath(self.dITp['pUnqNmer'], sFNmerSU)
-        self.dPF['InpData'] = GF.joinToPath(self.dITp['pInpData'], sFInpDat)
-        self.dPF['X'] = GF.joinToPath(self.dITp['pInpData'], sFX)
-        self.dPF['Y'] = GF.joinToPath(self.dITp['pInpData'], sFY)
+    # --- methods for filling the file paths ----------------------------------
+    def fillFPs(self):
+        d2PI, dIG, dITp = {}, self.dIG, self.dITp
+        for sTp in ['Clf', 'PrC']:
+            d2PI['InpData' + sTp] = {dIG['sPath']: dITp['pInp' + sTp],
+                                     dIG['sLFC']: dITp['sFInp' + sTp],
+                                     dIG['sFXt']: dIG['xtCSV']}
+        d2PI['ResComb'] = {dIG['sPath']: dITp['pResComb'],
+                           dIG['sLFC']: dITp['sFResComb'],
+                           dIG['sFXt']: dIG['xtCSV']}
+        for sTp in ['Snips', 'EffF']:
+            d2PI['DictNmer' + sTp] = {dIG['sPath']: dITp['pBinData'],
+                                      dIG['sLFC']: dITp['sFDictNmer' + sTp],
+                                      dIG['sLFE']: dITp['sFResComb'],
+                                      dIG['sLFJCE']: dITp['sUS02'],
+                                      dIG['sFXt']: dIG['xtBIN']}
+        for sTp in ['EffF', 'SeqU']:
+            d2PI['Nmer' + sTp] = {dIG['sPath']: dITp['pUnqNmer'],
+                                  dIG['sLFC']: dITp['sNmer' + sTp],
+                                  dIG['sLFE']: dITp['sFInpClf'],
+                                  dIG['sLFJCE']: dITp['sUS02'],
+                                  dIG['sFXt']: dIG['xtCSV']}
+        lSFE = ['sSglMltLbl', 'sXclEffFam', 'sSet', 'sRestr']
+        for sTp in ['InpData', 'X', 'Y']:
+            d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],
+                         dIG['sLFS']: dITp['s' + sTp],
+                         dIG['sLFC']: dITp['sFInpClf'],
+                         dIG['sLFE']: [dITp[s] for s in lSFE],
+                         dIG['sLFJSC']: dITp['sUS02'],
+                         dIG['sFXt']: dIG['xtCSV']}
+        d2PI['X'][dIG['sLFE']] = lSFE[1:]
+        self.FPs.addFPs(d2PI)
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
@@ -68,59 +69,60 @@ class DataLoader(BaseClass):
 
     # --- method for generating the "no class" Nmer dictionary ----------------
     def getDictNmerNoCl(self):
-        if GF.fileXist(pF=self.dPF['DictNmerSnips']):
-            self.dNmerNoCl = GF.pickleLoadDict(pF=self.dPF['DictNmerSnips'])
+        sDSn, sCCS, sCNmer = 'DictNmerSnips', 'sCCodeSeq', 'sCNmer'
+        if GF.fileXist(pF=self.FPs.dPF[sDSn]):
+            self.dNmerNoCl = GF.pickleLoadDict(pF=self.FPs.dPF[sDSn])
         else:
-            dfrComb = GF.readCSV(pF=self.dPF['ResComb'], iCol=0)
-            assert self.dITp['sCCodeSeq'] in dfrComb.columns
-            serFullUnq = GF.toSerUnique(pdSer=dfrComb[self.dITp['sCCodeSeq']])
+            dfrComb = GF.readCSV(pF=self.FPs.dPF['ResComb'], iCol=0)
+            assert self.dITp[sCCS] in dfrComb.columns
+            serFullUnq = GF.toSerUnique(pdSer=dfrComb[self.dITp[sCCS]])
             serNmerUnq = None
-            if self.dITp['sCNmer'] in dfrComb.columns:
-                serNmerUnq = GF.toSerUnique(dfrComb[self.dITp['sCNmer']])
+            if self.dITp[sCNmer] in dfrComb.columns:
+                serNmerUnq = GF.toSerUnique(dfrComb[self.dITp[sCNmer]])
             lNmerUnq = GF.toListUnqViaSer(serNmerUnq)
             self.dNmerNoCl = SF.getDSqNoCl(self.dITp, serFullSeqUnq=serFullUnq,
                                            lNmerSeqUnq=lNmerUnq)
-            GF.pickleSaveDict(cD=self.dNmerNoCl, pF=self.dPF['DictNmerSnips'])
+            GF.pickleSaveDict(cD=self.dNmerNoCl, pF=self.FPs.dPF[sDSn])
 
     # --- methods for loading input data --------------------------------------
     def saveProcInpData(self, tData, lSKDPF, sMd=GC.S_CLF):
         sJ = self.dITp['sUSC']
         for cDat, s in zip(tData, lSKDPF):
-            pF = GF.modPF(self.dPF[s], sEnd=sMd, sJoin=sJ)
+            pF = GF.modPF(self.FPs.dPF[s], sEnd=sMd, sJoin=sJ)
             if s == 'NmerEffF':
                 itC = [GF.joinS([self.dITp['sEffFam'], str(k + 1)]) for k in
                        range(max([0] + [len(cDat[cK]) for cK in cDat]))]
                 cDat = GF.dictLUneqLen2Dfr(cDat, itCol=itC, doTrans=True)
             self.saveData(cDat, pF=pF)
-    
+
     def procInpData(self, dfrInp, saveData=None):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,
                                               dNmerNoCl=self.dNmerNoCl)
-        dfrInp, X, Y, lSXCl = SF.procInp(self.dITp, dNmerEffF=dNmerEffF)
+        dfrInp, X, Y, lSXCl = SF.procInp(self.dIG, self.dITp, dNmerEffF)
         if saveData is not None:
             t2Save = (dNmerEffF, serNmerSeq, dfrInp, X, Y)
             lSKeyDPF = 'NmerEffF', 'NmerSeqU', 'InpData', 'X', 'Y'
             self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
         return dNmerEffF, serNmerSeq, dfrInp, X, Y, lSXCl
-    
+
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
-            self.dfrInpClf = self.loadData(self.dPF['InpDataClf'], iC=iC)
+            self.dfrInpClf = self.loadData(self.FPs.dPF['InpDataClf'], iC=iC)
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
         (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XClf,
          self.YClf, self.lSXClClf) = t
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
-            self.dPF['InpDataPrC'] == self.dPF['InpDataClf']):
+            self.FPs.dPF['InpDataPrC'] == self.FPs.dPF['InpDataClf']):
             t = (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf,
                  self.XClf, self.YClf, self.lSXClClf)
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC,
              self.XPrC, self.YPrC, self.lSXClPrC) = t
         elif ((self.dfrInpPrC is None and self.dfrInpClf is not None and
-               self.dPF['InpDataPrC'] != self.dPF['InpDataClf']) or
+               self.FPs.dPF['InpDataPrC'] != self.FPs.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
-            self.dfrInpPrC = self.loadData(self.dPF['InpDataPrC'], iC=iC)
+            self.dfrInpPrC = self.loadData(self.FPs.dPF['InpDataPrC'], iC=iC)
             t = self.procInpData(dfrInp=self.dfrInpPrC)
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC, self.XPrC,
              self.YPrC, self.lSXClPrC) = t
@@ -235,8 +237,8 @@ class DataLoader(BaseClass):
         self.printY(sMd=sMd)
 
     # --- methods for yielding data -------------------------------------------
-    def yieldDPF(self):
-        return self.dPF
+    def yieldFPs(self):
+        return self.FPs
 
     def yieldSerNmerSeqClf(self):
         return self.serNmerSeqClf
