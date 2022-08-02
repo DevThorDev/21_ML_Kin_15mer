@@ -34,6 +34,7 @@ class DataLoader(BaseClass):
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
         self.lIFE = [self.dITp[s] for s in self.dITp['lSIFEnd']]
+        self.lIFEX = [self.dITp[s] for s in self.dITp['lSIFEndX']]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -66,7 +67,7 @@ class DataLoader(BaseClass):
                          dIG['sLFJSC']: dITp['sUS02'],
                          dIG['sLFJCE']: dITp['sUS02'],
                          dIG['sFXt']: dIG['xtCSV']}
-        d2PI['X'][dIG['sLFE']] = self.lIFE[1:]
+        d2PI['X'][dIG['sLFE']] = self.lIFEX
         self.FPs.addFPs(d2PI)
         self.d2PInf = d2PI
 

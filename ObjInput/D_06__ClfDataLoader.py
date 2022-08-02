@@ -108,6 +108,7 @@ lIPosUsed = None                # None or list of positions used for classific.
 
 lSIFEnd = ['sSet', 'sMaxLenNmer', 'sRestr', 'sSglMltLbl', 'sXclEffFam']
                                 # list of keys for file name end strings
+lSIFEndX = ['sMaxLenNmer', 'sRestr', 'sXclEffFam']
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -207,6 +208,7 @@ dIO = {# --- general
        # --- lists
        'lIPosUsed': lIPosUsed,
        'lSIFEnd': lSIFEnd,
+       'lSIFEndX': lSIFEndX,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
