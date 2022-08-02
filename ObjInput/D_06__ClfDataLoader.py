@@ -47,28 +47,30 @@ pUnqNmer = GC.P_DIR_RES_UNQ_N_MER
 pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
 
 # --- names and paths of files and dirs (classifier) --------------------------
-# sFInpStartClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
+# sFInpSClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
 # sFResCombSClf = 'Combined_S_KinasesPho15mer_202202'
-sFInpStartClf = 'InpClf'
-sFInpBaseClf = 'Combined_XS_KinasesPho15mer_202202'
+sFInpSClf = 'InpClf'
+sFInpBClf = 'Combined_XS_KinasesPho15mer_202202'
 
 sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
-    # sFInpClf = GF.joinS([sFInpStartClf, usedAAcTypeClf, sFResCombSClf])
-    sFInpClf = GF.joinS([sFInpStartClf, sFInpBaseClf])
-sFInpDClClf = GF.joinS([sFInpStartClf, GC.S_CL_MAPPING, sSet])
+    # sFInpClf = GF.joinS([sFInpSClf, usedAAcTypeClf, sFResCombSClf])
+    sFInpClf = GF.joinS([sFInpSClf, sFInpBClf])
+sFInpDClMpClf = GF.joinS([sFInpSClf, GC.S_CL_MAPPING, sSet])
+sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sSet])
 
 pInpClf = GC.P_DIR_INP_CLF
 
 # --- names and paths of files and dirs (proportion calculator) ---------------
-sFInpStartPrC = sFInpStartClf
-sFInpBasePrC = sFInpBaseClf
+sFInpSPrC = sFInpSClf
+sFInpBPrC = sFInpBClf
 
 sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
-    # sFInpPrC = GF.joinS([sFInpStartPrC, usedAAcTypePrC, sFResCombSPrC])
-    sFInpPrC = GF.joinS([sFInpStartPrC, sFInpBasePrC])
-sFInpDClPrC = sFInpDClClf
+    # sFInpPrC = GF.joinS([sFInpSPrC, usedAAcTypePrC, sFResCombSPrC])
+    sFInpPrC = GF.joinS([sFInpSPrC, sFInpBPrC])
+sFInpDClMpPrC = sFInpDClMpClf
+sFInpDClStPrC = sFInpDClStClf
 
 pInpPrC = pInpClf
 
@@ -103,6 +105,9 @@ setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 # --- lists -------------------------------------------------------------------
 lIPosUsed = None                # None or list of positions used for classific.
 # lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]                # None or list of positions used for classific.
+
+lSIFEnd = ['sSet', 'sMaxLenNmer', 'sRestr', 'sSglMltLbl', 'sXclEffFam']
+                                # list of keys for file name end strings
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -170,14 +175,16 @@ dIO = {# --- general
        'pUnqNmer': pUnqNmer,
        'pInpData': pInpData,
        # --- names and paths of files and dirs (classifier)
-       'sFInpBaseClf': sFInpBaseClf,
+       'sFInpBClf': sFInpBClf,
        'sFInpClf': sFInpClf,
-       'sFInpDClClf': sFInpDClClf,
-       'sFInpBasePrC': sFInpBasePrC,
+       'sFInpDClMpClf': sFInpDClMpClf,
+       'sFInpDClStClf': sFInpDClStClf,
+       'sFInpBPrC': sFInpBPrC,
        'pInpClf': pInpClf,
        # --- names and paths of files and dirs (proportion calculator)
        'sFInpPrC': sFInpPrC,
-       'sFInpDClPrC': sFInpDClPrC,
+       'sFInpDClMpPrC': sFInpDClMpPrC,
+       'sFInpDClStPrC': sFInpDClStPrC,
        'pInpPrC': pInpPrC,
        # --- boolean values (general)
        'printDClasses': printDClasses,
@@ -199,6 +206,7 @@ dIO = {# --- general
        # --- sets
        # --- lists
        'lIPosUsed': lIPosUsed,
+       'lSIFEnd': lSIFEnd,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing

@@ -50,14 +50,6 @@ class FilePath:
     def checkXist(self):
         return GF.fileXist(pF=self.pF)
 
-    # --- method for modifying the file path ----------------------------------
-    def modPath(self, sS='', sE='', sJ=GC.S_USC):
-        self.pF = GF.modPF(pF=self.pF, sStart=sS, sEnd=sE, sJoin=sJ)
-
-    # --- method for modifying the file path ----------------------------------
-    def modFP(self, sS='', sE='', sJ=GC.S_USC):
-        self.pF = GF.modPF(pF=self.pF, sStart=sS, sEnd=sE, sJoin=sJ)
-
 # -----------------------------------------------------------------------------
 class FilePaths:
     # --- initialisation of the class -----------------------------------------
@@ -72,19 +64,34 @@ class FilePaths:
             self.dPF[sK] = FilePath(dInp=self.dI, dPI=dPI).pF
 
     # --- method for modifying a file path of the paths dictionary ------------
-    # def modFP(self, cKMn, lKSub=[]):
-    #     for cKSub in lKSub:
-    #         self.dPF[cKMn] = FilePath(dInp=self.dI, dPI=dPI).pF
+    def modFP(self, d2PI, kMn, kPos, cS=None, sPos=GC.S_CAP_E):
+        if cS is not None and len(cS) > 0:
+            d2 = {kMn: {sK: cV for sK, cV in d2PI[kMn].items()}}
+            d2[kMn][self.dI[kPos]] = GF.insStartOrEnd(d2[kMn][self.dI[kPos]],
+                                                      cEl=cS, sPos=sPos)
+            self.dPF[kMn] = FilePath(dInp=self.dI, dPI=d2[kMn]).pF
+
+    # --- method for modifying file paths of the paths dictionary -------------
+    def modFPs(self, d2PI, lKPI=[]):
+        if type(lKPI) in [str, int, float]:    # convert to 1-element list
+            lKPI = [str(lKPI)]
+        for cKPI in lKPI:
+            if cKPI in d2PI:
+                self.dPF[cKPI] = FilePath(dInp=self.dI, dPI=d2PI[cKPI]).pF
 
     # --- method for getting a file path from the paths dictionary ------------
     def getFP(self, sK):
         return self.dPF[sK]
 
     # --- method for printing the file paths of the paths dictionary ----------
-    def printFPs(self, sK):
+    def printFP(self, sK):
+        print(GC.S_DS04, 'File path of key ', sK, GC.S_COL)
+        print(sK, GC.S_COL, GC.S_TAB, self.dPF[sK], sep='')
+
+    def printAllFPs(self):
         print(GC.S_DS04, 'File paths dictionary:')
         for sK, pF in self.dPF.items():
-            print(sK, ':\t', pF)
+            print(sK, GC.S_COL, GC.S_TAB, pF, sep='')
         print(GC.S_DS80)
 
 # -----------------------------------------------------------------------------

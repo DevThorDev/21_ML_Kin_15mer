@@ -50,7 +50,7 @@ class BaseSmplClfPrC(BaseClass):
                       'Y', 'YTrain', 'YTest', 'YPred', 'YProba',
                       'Clf', 'sMth', 'sMthL', 'scoreClf', 'confusMatrix',
                       'dfrPred', 'dfrProba']
-        lAttrDict = ['d2ResClf', 'dConfMat', 'dPropAAc']
+        lAttrDict = ['d2ResClf', 'dCnfMat', 'dPropAAc']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
@@ -58,6 +58,7 @@ class BaseSmplClfPrC(BaseClass):
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {})
         self.sKPar = sKPar
+        self.lIFE = self.D.lIFE + [self.dITp['sCLblsTrain']]
 
     # --- methods for getting input data --------------------------------------
     def getInpData(self, sMd=None):
@@ -68,29 +69,17 @@ class BaseSmplClfPrC(BaseClass):
     def fillFPs(self):
         self.FPs = self.D.yieldFPs()
         d2PI, dIG, dITp = {}, self.dIG, self.dITp
-        lSFC = [dITp['sProp'], dITp['sSet'], dITp['sFInpBasePrC']]
-        lSFE = [dITp['sMaxLenNmer'], dITp['sRestr'], dITp['sSglMltLbl'],
-                dITp['sXclEffFam']]
+        lSFS = dITp['sProp']
+        lSFC = dITp['sFInpBPrC']
         d2PI['OutDataPrC'] = {dIG['sPath']: dITp['pOutPrC'],
+                              dIG['sLFS']: lSFS,
                               dIG['sLFC']: lSFC,
-                              dIG['sLFE']: lSFE,
+                              dIG['sLFE']: self.lIFE,
+                              dIG['sLFJSC']: dITp['sUS02'],
+                              dIG['sLFJCE']: dITp['sUS02'],
                               dIG['sFXt']: dIG['xtCSV']}
-        # d2PI['OutParClf'] = {dIG['sPath']: dITp['pOutPar'],
-        #                      dIG['sLFS']: dITp['sPar'],
-        #                      dIG['sFXt']: dIG['xtCSV']}
-        # d2PI['OutSumClf'] = {dIG['sPath']: dITp['pOutSum'],
-        #                      dIG['sLFS']: dITp['sSummary'],
-        #                      dIG['sFXt']: dIG['xtCSV']}
-        # d2PI['ConfMat'] = {dIG['sPath']: dITp['pConfMat'],
-        #                    dIG['sLFS']: dITp['sConfMat'],
-        #                    dIG['sFXt']: dIG['xtCSV']}
-        # d2PI['OutDetClfB'] = {dIG['sPath']: dITp['pOutDet'],
-        #                       dIG['sLFS']: dITp['sDetailed'],
-        #                       dIG['sFXt']: dIG['xtCSV']}
-        # d2PI['OutProbaClfB'] = {dIG['sPath']: dITp['pOutDet'],
-        #                         dIG['sLFS']: dITp['sProba'],
-        #                         dIG['sFXt']: dIG['xtCSV']}
         self.FPs.addFPs(d2PI)
+        self.d2PInf = d2PI
 
     # --- methods for getting and setting X and Y -----------------------------
     def getXY(self, getTrain=None):
@@ -258,8 +247,6 @@ class ImbSampler(BaseSmplClfPrC):
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
         bTrain = (True if self.dITp['doTrainTestSplit'] else None)
         X, Y = self.getXY(getTrain=bTrain)
-        # if not self.dITp['onlySglLbl']:
-        #     Y = SF.toSglLbl(self.dITp, dfrY=Y)
         print('Initial shape of Y:', Y.shape)
         X, YRes = self.imbSmp.fit_resample(X, Y)
         print('Final shape of YRes after resampling:', YRes.shape)
@@ -277,8 +264,9 @@ class Classifier(BaseSmplClfPrC):
         self.descO = 'Classifier for data classification'
         self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
-        if self.dITp['doImbSampling'] and (self.sMth == self.dITp['sMthRF'] or
-                                           self.dITp['nItPartialFit'] is None):
+        # if self.dITp['doImbSampling'] and (self.sMth == self.dITp['sMthRF'] or
+        #                                    self.dITp['nItPartialFit'] is None):
+        if self.dITp['doImbSampling']:
             self.Smp.fitResampleImbalanced()
             self.setData(self.Smp.yieldData())
         print('Initiated "Classifier" base object.')
@@ -444,11 +432,11 @@ class Classifier(BaseSmplClfPrC):
                 print('Shape of predicted Y', self.YPred.shape)
                 print('Shape of probs of Y (classes)', self.YProba.shape)
                 self.printPredict(X2Pred=dat2Pred)
-            self.calcConfMatrix()
+            self.calcCnfMatrix()
 
     # --- method for calculating the confusion matrix -------------------------
-    def calcConfMatrix(self):
-        if self.dITp['calcConfMatrix']:
+    def calcCnfMatrix(self):
+        if self.dITp['calcCnfMatrix']:
             YTest, YPred, lC = self.YTest, self.YPred, self.lSCl
             if len(YTest.shape) > 1:
                 YTest = SF.toSglLbl(self.dITp, dfrY=self.YTest)
@@ -457,11 +445,11 @@ class Classifier(BaseSmplClfPrC):
             self.confusMatrix = confusion_matrix(y_true=YTest, y_pred=YPred,
                                                  labels=lC)
             dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
-            self.dConfMat[self.sKPar] = dfrCM
+            self.dCnfMat[self.sKPar] = dfrCM
 
     # --- method for plotting the confusion matrix ----------------------------
-    def plotConfMatrix(self):
-        if self.dITp['plotConfMatrix'] and self.confusMatrix is not None:
+    def plotCnfMatrix(self):
+        if self.dITp['plotCnfMatrix'] and self.confusMatrix is not None:
             CM, lCl = self.confusMatrix, self.lSCl
             D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
             D.plot()
@@ -532,15 +520,8 @@ class PropCalculator(BaseSmplClfPrC):
         self.getInpData(sMd=self.dITp['sPrC'])
         print('Initiated "PropCalculator" base object.')
 
-    # --- method for adapting a key of the result paths dictionary ------------
-    def modPathOutDataPrC(self, sCl=None):
-        if sCl is not None:
-            sJ = self.dITp['sUSC']
-            self.FPs.dPF['OutDataPrC'] = GF.modPF(self.FPs.dPF['OutDataPrC'],
-                                                  sEnd=sCl, sJoin=sJ)
-
     # --- methods calculating the proportions of AAc at all Nmer positions ----
-    def calcPropCDfr(self, cDfrI, sCl):
+    def calcPropCDfr(self, cDfrI, sCl=None):
         cD2Out, nTtl = {}, cDfrI.shape[0]
         for sPos in self.dITp['lSCXPrC']:
             serCPos = cDfrI[sPos]
@@ -549,7 +530,7 @@ class PropCalculator(BaseSmplClfPrC):
                 GF.addToDictD(cD2Out, cKMain=sPos, cKSub=sAAc,
                               cVSub=(0. if nTtl == 0 else nCAAc/nTtl))
         self.dPropAAc[sCl] = GF.iniPdDfr(cD2Out)
-        self.modPathOutDataPrC(sCl=sCl)
+        self.FPs.modFP(d2PI=self.d2PInf, kMn='OutDataPrC', kPos='sLFE', cS=sCl)
         self.saveData(self.dPropAAc[sCl], pF=self.FPs.dPF['OutDataPrC'])
 
     def calcPropAAc(self):

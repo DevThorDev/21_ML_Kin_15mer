@@ -55,6 +55,7 @@ class ExpData(BaseClass):
                                dIG['sLFC']: dITp['sFResIGen'],
                                dIG['sFXt']: dIG['xtCSV']}
         self.FPs.addFPs(d2PI)
+        self.d2PInf = d2PI
 
     # --- methods for filling the DataFrame type dictionary -------------------
     def fillDTpDfrExp(self):

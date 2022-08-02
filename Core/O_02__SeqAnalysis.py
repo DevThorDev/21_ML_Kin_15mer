@@ -100,7 +100,7 @@ class SeqAnalysis(BaseClass):
 
     # --- methods for filling the result paths dictionary ---------------------
     def getPDirRes(self, pDirR=None):
-        sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sCapS']])
+        sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sS']])
         setSTT = {self.dITp['sTest'], self.dITp['sTrain']}
         if self.dITp['sFSeqCheck'] == self.dITp['sFProcInpNmer']:
             pDirR = self.pDirProcInp
@@ -146,7 +146,7 @@ class SeqAnalysis(BaseClass):
     # --- methods for modifying file names ------------------------------------
     def getSFResEnd(self):
         sFResEnd, sTest, sTrain = '', self.dITp['sTest'], self.dITp['sTrain']
-        sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sCapS']])
+        sCombS = GF.joinS([self.dITp['sCombined'], self.dITp['sS']])
         if self.dITp['sFSeqCheck'] == self.dITp['sFProcInp']:
             sFResEnd = self.dITp['sAllSeqNmer']
         elif GF.getPartSF(sF=self.dITp['sFSeqCheck'], iEnd=2) == sCombS:

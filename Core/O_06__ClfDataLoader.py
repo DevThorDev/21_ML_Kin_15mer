@@ -16,24 +16,35 @@ class DataLoader(BaseClass):
         self.idO = 'O_06'
         self.descO = 'Loader of the classification input data'
         self.getDITp(iTp=iTp)
-        self.fillFPs()
         self.iniAttr()
+        self.fillFPs()
         if self.dITp['useNmerNoCl']:
             self.getDictNmerNoCl()
         self.loadInpDataClf(iC=self.dITp['iCInpDataClf'])
         self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])
         print('Initiated "DataLoader" base object.')
 
+    # --- methods for initialising class attributes and loading input data ----
+    def iniAttr(self):
+        lBase, lAttr2None = ['serNmerSeq', 'dfrInp', 'X', 'Y', 'lSCl'], []
+        for sTp in [self.dITp['sClf'], self.dITp['sPrC']]:
+            lAttr2None += [s + sTp for s in lBase]
+        lAttr2None += ['dNmerNoCl', 'lI']
+        for cAttr in lAttr2None:
+            if not hasattr(self, cAttr):
+                setattr(self, cAttr, None)
+        self.lIFE = [self.dITp[s] for s in self.dITp['lSIFEnd']]
+
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
         d2PI, dIG, dITp = {}, self.dIG, self.dITp
+        d2PI['ResComb'] = {dIG['sPath']: dITp['pResComb'],
+                           dIG['sLFC']: dITp['sFResComb'],
+                           dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['Clf', 'PrC']:
             d2PI['InpData' + sTp] = {dIG['sPath']: dITp['pInp' + sTp],
                                      dIG['sLFC']: dITp['sFInp' + sTp],
                                      dIG['sFXt']: dIG['xtCSV']}
-        d2PI['ResComb'] = {dIG['sPath']: dITp['pResComb'],
-                           dIG['sLFC']: dITp['sFResComb'],
-                           dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['Snips', 'EffF']:
             d2PI['DictNmer' + sTp] = {dIG['sPath']: dITp['pBinData'],
                                       dIG['sLFC']: dITp['sFDictNmer' + sTp],
@@ -44,28 +55,20 @@ class DataLoader(BaseClass):
             d2PI['Nmer' + sTp] = {dIG['sPath']: dITp['pUnqNmer'],
                                   dIG['sLFC']: dITp['sNmer' + sTp],
                                   dIG['sLFE']: dITp['sFInpClf'],
+                                  dIG['sLFJE']: dITp['sUS02'],
                                   dIG['sLFJCE']: dITp['sUS02'],
                                   dIG['sFXt']: dIG['xtCSV']}
-        lSFE = ['sSglMltLbl', 'sXclEffFam', 'sSet', 'sRestr']
         for sTp in ['InpData', 'X', 'Y']:
             d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],
                          dIG['sLFS']: dITp['s' + sTp],
                          dIG['sLFC']: dITp['sFInpClf'],
-                         dIG['sLFE']: [dITp[s] for s in lSFE],
+                         dIG['sLFE']: self.lIFE,
                          dIG['sLFJSC']: dITp['sUS02'],
+                         dIG['sLFJCE']: dITp['sUS02'],
                          dIG['sFXt']: dIG['xtCSV']}
-        d2PI['X'][dIG['sLFE']] = lSFE[1:]
+        d2PI['X'][dIG['sLFE']] = self.lIFE[1:]
         self.FPs.addFPs(d2PI)
-
-    # --- methods for initialising class attributes and loading input data ----
-    def iniAttr(self):
-        lBase, lAttr2None = ['serNmerSeq', 'dfrInp', 'X', 'Y', 'lSCl'], []
-        for sTp in [self.dITp['sClf'], self.dITp['sPrC']]:
-            lAttr2None += [s + sTp for s in lBase]
-        lAttr2None += ['dNmerNoCl']
-        for cAttr in lAttr2None:
-            if not hasattr(self, cAttr):
-                setattr(self, cAttr, None)
+        self.d2PInf = d2PI
 
     # --- method for generating the "no class" Nmer dictionary ----------------
     def getDictNmerNoCl(self):
@@ -86,14 +89,13 @@ class DataLoader(BaseClass):
 
     # --- methods for loading input data --------------------------------------
     def saveProcInpData(self, tData, lSKDPF, sMd=GC.S_CLF):
-        sJ = self.dITp['sUSC']
         for cDat, s in zip(tData, lSKDPF):
-            pF = GF.modPF(self.FPs.dPF[s], sEnd=sMd, sJoin=sJ)
+            self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sMd)
             if s == 'NmerEffF':
                 itC = [GF.joinS([self.dITp['sEffFam'], str(k + 1)]) for k in
                        range(max([0] + [len(cDat[cK]) for cK in cDat]))]
                 cDat = GF.dictLUneqLen2Dfr(cDat, itCol=itC, doTrans=True)
-            self.saveData(cDat, pF=pF)
+            self.saveData(cDat, pF=self.FPs.dPF[s])
 
     def procInpData(self, dfrInp, saveData=None):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,

@@ -246,6 +246,16 @@ def tryRoundX(x, RD=None):
     return x
 
 # --- Functions handling lists ------------------------------------------------
+def insStartOrEnd(itS, cEl, sPos=GC.S_CAP_E):
+    if type(itS) in [str, int, float]:    # convert to 1-element list
+        itS = [str(itS)]
+    if sPos == GC.S_CAP_S:
+        return [str(cEl)] + [s for s in itS]
+    elif sPos == GC.S_CAP_E:
+        return [s for s in itS] + [str(cEl)]
+    else:
+        return [s for s in itS]
+
 def fillCondList(elCond, lToFill=[], lLoop=[], lUnqEl=True):
     for elCheckContain in lLoop:
         if elCond in elCheckContain:

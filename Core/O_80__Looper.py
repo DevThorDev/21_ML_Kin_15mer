@@ -10,7 +10,7 @@ from Core.O_07__Classifier import RFClf, MLPClf
 
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
-# --- initialisation of the class ---------------------------------------------
+    # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, iTp=80, lITpUpd=[6, 7]):
         super().__init__(inpDat)
         self.idO = 'O_80'
@@ -24,10 +24,8 @@ class Looper(BaseClass):
     def iniDicts(self):
         self.d3ResClf, self.d2MnSEMResClf = {}, {}
         self.d2CnfMat, self.dMnSEMCnfMat = {}, {}
-        # self.dPF = {'OutParClf': None, 'OutSumClf': None, 'ConfMat': None,
-        #             'OutDetClf': None, 'OutProbaClf': None}
 
-# --- print methods -----------------------------------------------------------
+    # --- print methods -------------------------------------------------------
     def printD2MnSEMResClf(self, sMth):
         if GF.Xist(self.d2MnSEMResClf):
             print(GC.S_DS04, ' Dictionary of results (means and SEMs) for ',
@@ -36,68 +34,56 @@ class Looper(BaseClass):
             for k in range(len(self.d2MnSEMResClf)//2):
                 print(GC.S_NEWL, dfrMnSEM.iloc[:, (k*2):(k*2 + 2)], sep='')
 
-# --- loop methods ------------------------------------------------------------
-    # def changePFMth(self, cClf, sMth):
-    #     sJ1, sJ2 = self.dITp['sUSC'], self.dITp['sUS02']
-    #     xtCSV, sSum = self.dIG['xtCSV'], self.dITp['sSummary']
-    #     sFE = GF.joinS([self.dITp['sMaxLenNmer'], self.dITp['sRestr'],
-    #                     cClf.dITp['sCLblsTrain'], cClf.dITp['sSglMltLbl'],
-    #                     cClf.dITp['sXclEffFam']], cJ=sJ1)
-    #     sLKP = GF.joinS(list(self.dITp['d3Par'][sMth]), cJ=sJ1)
-    #     sFCPar = GF.joinS([cClf.dITp['sParClf'], sMth], cJ=sJ1)
-    #     sFCore = GF.joinS([cClf.dITp['sOutClf'], sMth, sFE], cJ=sJ1)
-    #     sFPar = GF.joinS([self.dITp['sPar'], sLKP, sFCPar], cJ=sJ2) + xtCSV
-    #     sFSum = GF.joinS([sSum, sLKP, sFCore], cJ=sJ2) + xtCSV
-    #     sFConfM = GF.joinS([self.dITp['sConfMat'], sFCore], cJ=sJ2) + xtCSV
-    #     sFDet = GF.joinS([self.dITp['sDetailed'], sFCore], cJ=sJ2) + xtCSV
-    #     sFProba = GF.joinS([self.dITp['sProba'], sFCore], cJ=sJ2) + xtCSV
-    #     self.dPF['OutParClf'] = GF.joinToPath(cClf.dITp['pOutPar'], sFPar)
-    #     self.dPF['OutSumClf'] = GF.joinToPath(cClf.dITp['pOutSum'], sFSum)
-    #     self.dPF['ConfMat'] = GF.joinToPath(cClf.dITp['pConfMat'], sFConfM)
-    #     self.dPF['OutDetClfB'] = GF.joinToPath(cClf.dITp['pOutDet'], sFDet)
-    #     self.dPF['OutProbaClfB'] = GF.joinToPath(cClf.dITp['pOutDet'], sFProba)
-
-    # --- methods for filling the file paths ----------------------------------
+    # --- loop methods --------------------------------------------------------
+    # --- method for updating the type dictionary -----------------------------
+    def updateDITpAttr(self, cClf):
+        self.dITp['sCLblsTrain'] = cClf.dITp['sCLblsTrain']
+        self.lIFE = self.D.lIFE + [self.dITp['sCLblsTrain']]
+    
+    # --- methods for filling and changing the file paths ---------------------
     def fillFPsMth(self, sMth):
         self.FPs = self.D.yieldFPs()
-        d2PI, dIG, dITp = {}, self.dIG, self.dITp
+        d2PI, dIG, dITp, sFIB = {}, self.dIG, self.dITp, self.dITp['sFInpBClf']
         d2PI['OutParClf'] = {dIG['sPath']: dITp['pOutPar'],
-                             dIG['sLFS']: dITp['sPar'],
-                             dIG['sLFC']: list(dITp['d3Par'][sMth]),
-                             dIG['sLFE']: sMth,
+                             dIG['sLFS']: [dITp['sPar'], sFIB],
+                             dIG['sLFC']: [sMth] + list(dITp['d3Par'][sMth]),
+                             dIG['sLFJS']: dITp['sUS02'],
                              dIG['sLFJSC']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
-        lSE = [dITp['sMaxLenNmer'], dITp['sRestr'], dITp['sCLblsTrain'],
-               dITp['sSglMltLbl'], dITp['sXclEffFam']]
         d2PI['OutSumClf'] = {dIG['sPath']: dITp['pOutSum'],
-                             dIG['sLFS']: dITp['sSummary'],
-                             dIG['sLFC']: list(dITp['d3Par'][sMth]),
-                             dIG['sLFE']: [sMth] + lSE,
+                             dIG['sLFS']: [dITp['sSummary'], sFIB],
+                             dIG['sLFC']: self.lIFE,
+                             dIG['sLFE']: [sMth] + list(dITp['d3Par'][sMth]),
+                             dIG['sLFJS']: dITp['sUS02'],
                              dIG['sLFJSC']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
-        d2PI['ConfMat'] = {dIG['sPath']: dITp['pConfMat'],
-                           dIG['sLFC']: dITp['sConfMat'],
-                           dIG['sLFE']: [sMth] + lSE,
-                           dIG['sLFJCE']: dITp['sUS02'],
-                           dIG['sFXt']: dIG['xtCSV']}
+        d2PI['CnfMat'] = {dIG['sPath']: dITp['pCnfMat'],
+                          dIG['sLFC']: [dITp['sCnfMat'], sFIB],
+                          dIG['sLFE']: self.lIFE + [sMth],
+                          dIG['sLFJC']: dITp['sUS02'],
+                          dIG['sLFJCE']: dITp['sUS02'],
+                          dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutDetClf'] = {dIG['sPath']: dITp['pOutDet'],
-                             dIG['sLFC']: dITp['sDetailed'],
-                             dIG['sLFE']: [sMth] + lSE,
+                             dIG['sLFC']: [dITp['sDetailed'], sFIB],
+                             dIG['sLFE']: self.lIFE + [sMth],
+                             dIG['sLFJC']: dITp['sUS02'],
                              dIG['sLFJCE']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutProbaClf'] = {dIG['sPath']: dITp['pOutDet'],
-                               dIG['sLFC']: dITp['sProba'],
-                               dIG['sLFE']: [sMth] + lSE,
+                               dIG['sLFC']: [dITp['sProba'], sFIB],
+                               dIG['sLFE']: self.lIFE + [sMth],
+                               dIG['sLFJC']: dITp['sUS02'],
                                dIG['sLFJCE']: dITp['sUS02'],
                                dIG['sFXt']: dIG['xtCSV']}
         self.FPs.addFPs(d2PI)
+        self.d2PInf = d2PI
 
     def changePFKParRp(self, sMth, sKP, cRp):
-        sJ = self.dITp['sUSC']
-        sKPR = GF.joinS([sKP, str(cRp + 1)], cJ=sJ)
+        sKPR = GF.joinS([sKP, str(cRp + 1)], cJ=self.dITp['sUSC'])
         for s in ['OutDetClf', 'OutProbaClf']:
-            self.FPs.dPF[s] = GF.modPF(self.FPs.dPF[s], sEnd=sKPR, sJoin=sJ)
+            self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
 
+    # --- method for performing the calculations of the current repetition ----
     def doCRep(self, sMth, k, sKPar, cRp, cTim, stT=None):
         if sMth in self.dITp['lSMth']:
             cStT, iM = GF.showElapsedTime(startTime=stT), 0
@@ -112,11 +98,11 @@ class Looper(BaseClass):
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
             cStT = GF.showElapsedTime(startTime=stT)
-            self.dITp['sCLblsTrain'] = cClf.dITp['sCLblsTrain']
+            self.updateDITpAttr(cClf)
             cClf.ClfPred()
             cClf.printFitQuality()
             GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
-            GF.updateDict(self.d2CnfMat, cDUp=cClf.dConfMat, cK=cRp)
+            GF.updateDict(self.d2CnfMat, cDUp=cClf.dCnfMat, cK=cRp)
             if k == 0 and cRp == 0:
                 self.fillFPsMth(sMth=sMth)
             self.changePFKParRp(sMth=sMth, sKP=sKPar, cRp=cRp)
@@ -126,8 +112,8 @@ class Looper(BaseClass):
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
 
+    # --- method for saving the results ---------------------------------------
     def saveCombRes(self, sMth, d2Par, nRep=0):
-        sJ = self.dITp['sUSC']
         if nRep > 0:
             self.saveData(GF.iniPdDfr(d2Par), pF=self.FPs.dPF['OutParClf'],
                           saveAnyway=False)
@@ -135,10 +121,12 @@ class Looper(BaseClass):
             self.dMnSEMCnfMat = GF.calcMnSEMFromD2Dfr(self.d2CnfMat)
             self.saveData(self.d2MnSEMResClf, pF=self.FPs.dPF['OutSumClf'])
             for sK in self.dMnSEMCnfMat:
-                pFMod = GF.modPF(self.FPs.dPF['ConfMat'], sEnd=sK, sJoin=sJ)
-                self.saveData(self.dMnSEMCnfMat[sK], pF=pFMod)
+                self.FPs.modFP(d2PI=self.d2PInf, kMn='CnfMat', kPos='sLFE',
+                               cS=sK)
+                self.saveData(self.dMnSEMCnfMat[sK], pF=self.FPs.dPF['CnfMat'])
             self.printD2MnSEMResClf(sMth=sMth)
 
+    # --- method for performing the outer loop --------------------------------
     def doDoubleLoop(self, cTim, stT=None):
         for sMth in self.dITp['lSMth']:
             self.d3ResClf, self.d2CnfMat = {}, {}

@@ -92,7 +92,7 @@ print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
 
 # for cClf in [cRFClf, cMLPClf]:
 #     cClf.printFitQuality()
-#     cClf.plotConfMatrix()
+#     cClf.plotCnfMatrix()
 
 # for cClf in [cRFClf, cMLPClf]:
 #     print(cClf.descO, GC.S_VBAR, cClf.sMth)

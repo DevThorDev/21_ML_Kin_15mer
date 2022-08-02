@@ -15,7 +15,7 @@ doImbSampling = True                # do imbalanced sampling before classific.?
 
 doRFClf = True                      # do random forest classification?
 doMLPClf = True                     # do neural network MLP classification?
-doPropCalc = False                  # do calculation of AAc proportions/class?
+doPropCalc = True                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
@@ -23,8 +23,8 @@ doMultiSteps = True                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 
-calcConfMatrix = True               # calculate the confusion matrix?
-plotConfMatrix = False              # plot the confusion matrix?
+calcCnfMatrix = True                # calculate the confusion matrix?
+plotCnfMatrix = False               # plot the confusion matrix?
 
 encodeCatFtr = True                 # encode categorical features?
 
@@ -45,7 +45,7 @@ pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
 pOutPar = GC.P_DIR_RES_CLF_PARS
 pOutSum = GC.P_DIR_RES_CLF_SUMMARIES
-pConfMat = GC.P_DIR_RES_CLF_CONF_MAT
+pCnfMat = GC.P_DIR_RES_CLF_CNF_MAT
 pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
@@ -91,8 +91,8 @@ nJobs = None                # number of jobs to run in parallel (None: 1)
 vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
-# nItPartialFit = None      # number of iterations / partial fit (or None)
-nItPartialFit = 20      # number of iterations / partial fit (or None)
+# nItPartialFit = None        # number of iterations / partial fit (or None)
+nItPartialFit = 500        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================
@@ -142,8 +142,8 @@ dIO = {# --- general
        'doTrainTestSplit': doTrainTestSplit,
        'doMultiSteps': doMultiSteps,
        'saveDetailedClfRes': saveDetailedClfRes,
-       'calcConfMatrix': calcConfMatrix,
-       'plotConfMatrix': plotConfMatrix,
+       'calcCnfMatrix': calcCnfMatrix,
+       'plotCnfMatrix': plotCnfMatrix,
        'encodeCatFtr': encodeCatFtr,
        'lLblTrain': lLblTrain,
        'useFullSeqFrom': useFullSeqFrom,
@@ -155,7 +155,7 @@ dIO = {# --- general
        'pInpPrC': pInpPrC,
        'pOutPar': pOutPar,
        'pOutSum': pOutSum,
-       'pConfMat': pConfMat,
+       'pCnfMat': pCnfMat,
        'pOutDet': pOutDet,
        'pOutPrC': pOutPrC,
        # === general over- and undersampler input =============================

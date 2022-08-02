@@ -30,7 +30,8 @@ sUS02 = GC.S_US02
 sTab = GC.S_TAB
 sNewl = GC.S_NEWL
 sNULL = GC.S_NULL
-s0, sC, sX, sY = GC.S_0, GC.S_CAP_C, GC.S_CAP_X, GC.S_CAP_Y
+s0, sC, sE, sX, sY = GC.S_0, GC.S_CAP_C, GC.S_CAP_E, GC.S_CAP_X, GC.S_CAP_Y
+sXS, sS, sM, sL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sBase = GC.S_BASE
 sTrain = GC.S_TRAIN
 sTest = GC.S_TEST
@@ -63,7 +64,6 @@ sEffFam = GC.S_EFF_FAMILY
 sTrueCl = GC.S_TRUE_CL
 sPredCl = GC.S_PRED_CL
 sIGen = GC.S_I_GEN
-sCapXS, sCapS, sCapM, sCapL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
 sCNmer = GC.S_C_N_MER
 sAllSeq = GC.S_ALL_SEQ
 sNmerSeq = GC.S_N_MER_SEQ
@@ -75,11 +75,12 @@ sMthMLP_L = GC.S_MTH_MLP_L
 sMthMLP = GC.S_MTH_MLP
 sPar = GC.S_PAR
 sSummary = GC.S_SUMMARY
-sConfMat = GC.S_CONF_MAT
+sCnfMat = GC.S_CNF_MAT
 sDetailed = GC.S_DETAILED
 sProba = GC.S_PROB
 sProp = GC.S_PROP
 sClMapping = GC.S_CL_MAPPING
+sClSteps = GC.S_CL_STEPS
 sMaxLenS = GC.S_MAX_LEN_S
 sRestr = GC.S_RESTR
 sIPos = GC.S_I_POS
@@ -114,8 +115,13 @@ dIO = {# --- general
        'sNULL': sNULL,
        's0': s0,
        'sC': sC,
+       'sE': sE,
        'sX': sX,
        'sY': sY,
+       'sXS': sXS,
+       'sS': sS,
+       'sM': sM,
+       'sL': sL,
        'sBase': sBase,
        'sTrain': sTrain,
        'sTest': sTest,
@@ -149,10 +155,6 @@ dIO = {# --- general
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sIGen': sIGen,
-       'sCapXS': sCapXS,
-       'sCapS': sCapS,
-       'sCapM': sCapM,
-       'sCapL': sCapL,
        'sCNmer': sCNmer,
        'sAllSeq': sAllSeq,
        'sNmerSeq': sNmerSeq,
@@ -164,11 +166,12 @@ dIO = {# --- general
        'sMthMLP': sMthMLP,
        'sPar': sPar,
        'sSummary': sSummary,
-       'sConfMat': sConfMat,
+       'sCnfMat': sCnfMat,
        'sDetailed': sDetailed,
        'sProba': sProba,
        'sProp': sProp,
        'sClMapping': sClMapping,
+       'sClSteps': sClSteps,
        'sMaxLenS': sMaxLenS,
        'sRestr': sRestr,
        'sIPos': sIPos,
