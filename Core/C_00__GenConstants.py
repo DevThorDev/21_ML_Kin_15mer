@@ -275,6 +275,7 @@ S_N_MER_EFF_FAM = S_N_MER + S_EFF_FAM
 S_N_MER_SEQ_UNQ = S_N_MER + S_SEQ + S_UNQ
 S_INP_DATA = S_INP + S_DATA
 S_MLT_STEP = S_MLT + S_STEP
+S_STRAT_REAL_MAJO = 'RealMajo'
 
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'

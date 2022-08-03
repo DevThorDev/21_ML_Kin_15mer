@@ -15,7 +15,7 @@ doImbSampling = True                # do imbalanced sampling before classific.?
 
 doRFClf = True                      # do random forest classification?
 doMLPClf = True                     # do neural network MLP classification?
-doPropCalc = True                   # do calculation of AAc proportions/class?
+doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
@@ -53,13 +53,15 @@ pOutPrC = GC.P_DIR_RES_CLF_PROP
 sSampler = 'RandomUnderSampler'    # string matching the over/under-sampler
                             # ClusterCentroids, AllKNN, TomekLinks
                             # NeighbourhoodCleaningRule, RandomUnderSampler,
-sStrat = 'majority'         # sampling strategy
+sStrat =  GC.S_STRAT_REAL_MAJO         # sampling strategy
                         # 'all' / 'majority' / 'not majority' / 'not minority'
-# sStrat = {'X_AGC': 50,
-#           'X_CDPK': 50,
-#           'X_CK_II': 50,
-#           'X_MAPK': 50,
-#           'X_SnRK2': 50}
+                        # [custom: GC.S_STRAT_REAL_MAJO]
+# sStrat = {'NoCl': 1000,
+#           'X_AGC': 100,
+#           'X_CDK': 100,
+#           'X_CK_II': 100,
+#           'X_SnRK2': 100,
+#           'X_soluble': 100}
 
 # --- ClusterCentroids input --------------------------------------------------
 estimator = None                # a KMeans estimator (None --> default est.)
@@ -92,7 +94,7 @@ vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
 # nItPartialFit = None        # number of iterations / partial fit (or None)
-nItPartialFit = 500        # number of iterations / partial fit (or None)
+nItPartialFit = 1000        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================

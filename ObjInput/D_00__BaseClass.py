@@ -89,6 +89,7 @@ sNmerEffF = GC.S_N_MER_EFF_FAM
 sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 sMltStep = GC.S_MLT_STEP
+sStratRealMajo = GC.S_STRAT_REAL_MAJO
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -180,6 +181,7 @@ dIO = {# --- general
        'sNmerSeqU': sNmerSeqU,
        'sInpData': sInpData,
        'sMltStep': sMltStep,
+       'sStratRealMajo': sStratRealMajo,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthRF_L, sMthMLP_L],

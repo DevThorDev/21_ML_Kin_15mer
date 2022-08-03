@@ -190,6 +190,10 @@ def getLCentPosSSub(sFull, sSub, overLap=True):
     return [startPosToCentPos(iSt, sSub)
             for iSt in findAllSSubInStr(sFull, sSub, overLap=overLap)]
 
+# --- Functions yielding boolean values ---------------------------------------
+def isTrain(doSplit):
+    return (True if doSplit else None)
+
 # --- Functions performing calculations with scalars --------------------------
 def isEq(x, xCmp, maxDlt=GC.MAX_DELTA):
     return abs(x - xCmp) < maxDlt
@@ -880,6 +884,19 @@ def drawFromNorm(cMn=0., cSD=1., tPar=None, arrShape=None):
     else:
         cSD = max(cSD, 0)
     return RNG().normal(loc=cMn, scale=cSD, size=arrShape)
+
+# --- Functions implementing custom imbalanced sampling strategies ------------
+def smplStratRealMajo(Y):
+    sStrat = {cCl: (Y[Y == cCl].size) for cCl in Y.unique()}
+    lVSrtDsc, n1, n2 = sorted(sStrat.values(), reverse=True), 0, 0
+    if len(lVSrtDsc) >= 2:
+        n1, n2 = lVSrtDsc[0], lVSrtDsc[1]
+    elif len(lVSrtDsc) == 1:
+        n1, n2 = lVSrtDsc[0], lVSrtDsc[0]
+    for cCl, nEl in sStrat.items():
+        if nEl == n1:
+            sStrat[cCl] = n2
+    return sStrat
 
 # --- Helper functions for the Viterbi algorithm handling ">", exp and ln -----
 def X_exp(x=None):

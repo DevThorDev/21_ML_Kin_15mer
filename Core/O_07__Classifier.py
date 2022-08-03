@@ -215,38 +215,47 @@ class ImbSampler(BaseSmplClfPrC):
         print('Initiated "ImbSampler" base object.')
 
     # --- Function obtaining the imbalanced sampler ("imblearn") --------------
+    def getStrat(self):
+        sStrat = self.dITp['sStrat']
+        # implement the "RealMajo" strategy
+        if sStrat == self.dITp['sStratRealMajo']:
+            doSpl = self.dITp['doTrainTestSplit']
+            _, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
+            sStrat = GF.smplStratRealMajo(Y=Y)
+        return sStrat
+
     def getSampler(self):
-        self.imbSmp, dITp = None, self.dITp
+        self.imbSmp, dITp, sStrat = None, self.dITp, self.getStrat()
         if dITp['sSampler'] == 'ClusterCentroids':
-            self.imbSmp = ClusterCentroids(sampling_strategy=dITp['sStrat'],
+            self.imbSmp = ClusterCentroids(sampling_strategy=sStrat,
                                            random_state=dITp['rndState'],
                                            estimator=dITp['estimator'],
                                            voting=dITp['voting'])
         elif dITp['sSampler'] == 'AllKNN':
-            self.imbSmp = AllKNN(sampling_strategy=dITp['sStrat'],
+            self.imbSmp = AllKNN(sampling_strategy=sStrat,
                                  n_neighbors=dITp['n_neighbors_AllKNN'],
                                  kind_sel=dITp['kind_sel_AllKNN'],
                                  allow_minority=dITp['allow_minority'])
         elif dITp['sSampler'] == 'NeighbourhoodCleaningRule':
-            sStrat, nNbr = dITp['sStrat'], dITp['n_neighbors_NCR']
+            nNbr = dITp['n_neighbors_NCR']
             kindSel, thrCln = dITp['kind_sel_NCR'], dITp['threshold_cleaning']
             self.imbSmp = NeighbourhoodCleaningRule(sampling_strategy=sStrat,
                                                     n_neighbors=nNbr,
                                                     kind_sel=kindSel,
                                                     threshold_cleaning=thrCln)
         elif dITp['sSampler'] == 'RandomUnderSampler':
-            self.imbSmp = RandomUnderSampler(sampling_strategy=dITp['sStrat'],
+            self.imbSmp = RandomUnderSampler(sampling_strategy=sStrat,
                                              random_state=dITp['rndState'],
                                              replacement=dITp['wReplacement'])
         elif dITp['sSampler'] == 'TomekLinks':
-            self.imbSmp = TomekLinks(sampling_strategy=dITp['sStrat'])
+            self.imbSmp = TomekLinks(sampling_strategy=sStrat)
 
     # --- Function performing the random sampling ("imblearn") ----------------
     def fitResampleImbalanced(self):
         print('Resampling data using resampler "', self.dITp['sSampler'],
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
-        bTrain = (True if self.dITp['doTrainTestSplit'] else None)
-        X, Y = self.getXY(getTrain=bTrain)
+        doSpl = self.dITp['doTrainTestSplit']
+        X, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
         print('Initial shape of Y:', Y.shape)
         X, YRes = self.imbSmp.fit_resample(X, Y)
         print('Final shape of YRes after resampling:', YRes.shape)
@@ -254,7 +263,7 @@ class ImbSampler(BaseSmplClfPrC):
             print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
         if not self.dITp['onlySglLbl']:
             YRes = SF.toMultiLbl(self.dITp, serY=YRes, lXCl=self.lSCl)
-        self.setXY(X=X, Y=YRes, setTrain=bTrain)
+        self.setXY(X=X, Y=YRes, setTrain=GF.isTrain(doSplit=doSpl))
 
 # -----------------------------------------------------------------------------
 class Classifier(BaseSmplClfPrC):
@@ -347,8 +356,7 @@ class Classifier(BaseSmplClfPrC):
 
     # --- method for fitting a Classifier -------------------------------------
     def ClfFit(self, cClf):
-        bTrain = (True if self.dITp['doTrainTestSplit'] else None)
-        X, Y = self.getXY(getTrain=bTrain)
+        X, Y = self.getXY(getTrain=GF.isTrain(self.dITp['doTrainTestSplit']))
         if cClf is not None and X is not None and Y is not None:
             try:
                 cClf.fit(X, Y)
@@ -367,12 +375,12 @@ class Classifier(BaseSmplClfPrC):
     def fitOrPartialFitClf(self, cClf):
         if self.dITp['nItPartialFit'] is not None:
             assert type(self.dITp['nItPartialFit']) in [int, float]
-            bTrain = (True if self.dITp['doTrainTestSplit'] else None)
-            XIni, YIni = self.getXY(getTrain=bTrain)
+            doSpl = self.dITp['doTrainTestSplit']
+            XIni, YIni = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
             # repeat resampling and partial fit nItPartialFit times
             for _ in range(round(abs(self.dITp['nItPartialFit']))):
                 X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni)
-            self.setXY(X=X, Y=Y, setTrain=bTrain)
+            self.setXY(X=X, Y=Y, setTrain=GF.isTrain(doSplit=doSpl))
         else:
             self.ClfFit(cClf)
 
