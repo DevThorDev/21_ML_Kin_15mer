@@ -29,22 +29,21 @@ class BaseSmplClfPrC(BaseClass):
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.D = D
-        self.complDITp()
         self.iniAttr(sKPar=sKPar)
         self.fillFPs()
         print('Initiated "BaseSmplClfPrC" base object.')
 
     # --- method for complementing the type input dictionary ------------------
-    def complDITp(self):
-        lLblTrain, sCLblsTrain = self.dITp['lLblTrain'], ''
+    def getCLblsTrain(self):
+        sLbl, sTrain = self.dITp['sLbl'], self.dITp['sTrain']
+        lLblTrain, self.CLblsTrain = self.dITp['lLblTrain'], ''
         if not (lLblTrain is None or self.dITp['onlySglLbl']):
-            sCLblsTrain = GC.S_USC.join([str(nLbl) for nLbl in lLblTrain])
-            sCLblsTrain = GC.S_USC.join([GC.S_LBL, sCLblsTrain, GC.S_TRAIN])
-        self.dITp['sCLblsTrain'] = sCLblsTrain
+            self.CLblsTrain = GF.joinS([str(nLbl) for nLbl in lLblTrain])
+            self.CLblsTrain = GF.joinS([sLbl, self.CLblsTrain, sTrain])
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar='A'):
-        lAttr2None = ['serNmerSeq', 'dfrInp', 'lSCl',
+        lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'dMltSt', 'lSXCl',
                       'X', 'XTrans', 'XTrain', 'XTest',
                       'XTransTrain', 'XTransTest',
                       'Y', 'YTrain', 'YTest', 'YPred', 'YProba',
@@ -58,12 +57,8 @@ class BaseSmplClfPrC(BaseClass):
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {})
         self.sKPar = sKPar
-        self.lIFE = self.D.lIFE + [self.dITp['sCLblsTrain']]
-
-    # --- methods for getting input data --------------------------------------
-    def getInpData(self, sMd=None):
-        (self.dfrInp, self.X, self.Y, self.serNmerSeq,
-         self.lSCl) = self.D.yieldData(sMd=sMd)
+        self.getCLblsTrain()
+        self.lIFE = self.D.lIFE + [self.CLblsTrain]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -80,6 +75,19 @@ class BaseSmplClfPrC(BaseClass):
                               dIG['sFXt']: dIG['xtCSV']}
         self.FPs.addFPs(d2PI)
         self.d2PInf = d2PI
+
+    # --- methods for getting (and possibly modifying) input data -------------
+    def modInpDataMltSt(self, iSt=None):
+        if self.dITp['doMultiSteps'] and iSt is not None:
+            for cI in self.Y.index:
+                sXClSt = self.dMltSt['dXCl'][self.Y.at[cI]][iSt]
+                self.Y.at[cI] = sXClSt
+            self.dfrInp[self.dITp['sEffFam']] = self.Y
+
+    def getInpData(self, sMd=None, iSt=None):
+        (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
+         self.dMltSt, self.lSXCl) = self.D.yieldData(sMd=sMd)
+        self.modInpDataMltSt(iSt=iSt)
 
     # --- methods for getting and setting X and Y -----------------------------
     def getXY(self, getTrain=None):
@@ -120,9 +128,9 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- methods for setting data --------------------------------------------
     def setData(self, tData):
-        lSAttr = ['dfrInp', 'serNmerSeq', 'lSCl', 'X', 'XTrans', 'XTrain',
-                  'XTest', 'XTransTrain', 'XTransTest', 'Y', 'YTrain', 'YTest',
-                  'YPred', 'YProba']
+        lSAttr = ['dfrInp', 'serNmerSeq', 'dClMap', 'dMltSt', 'lSXCl', 'X',
+                  'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
+                  'Y', 'YTrain', 'YTest', 'YPred', 'YProba']
         assert len(tData) == len(lSAttr)
         for sAttr, cV in zip(lSAttr, tData):
             if cV is not None:
@@ -130,8 +138,8 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- methods for yielding data -------------------------------------------
     def yieldData(self):
-        return (self.dfrInp, self.serNmerSeq, self.lSCl,
-                self.X, self.XTrans, self.XTrain, self.XTest,
+        return (self.dfrInp, self.serNmerSeq, self.dClMap, self.dMltSt,
+                self.lSXCl, self.X, self.XTrans, self.XTrain, self.XTest,
                 self.XTransTrain, self.XTransTest,
                 self.Y, self.YTrain, self.YTest, self.YPred, self.YProba)
 
@@ -206,10 +214,11 @@ class BaseSmplClfPrC(BaseClass):
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
+    def __init__(self, inpDat, D, sKPar='A', iSt=None, iTp=7,
+                 lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Sampler for imbalanced learning'
-        self.getInpData(sMd=GC.S_CLF)
+        self.getInpData(sMd=self.dITp['sClf'], iSt=iSt)
         self.encodeSplitData()
         self.getSampler()
         print('Initiated "ImbSampler" base object.')
@@ -262,19 +271,19 @@ class ImbSampler(BaseSmplClfPrC):
         for cY in YRes.unique():
             print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
         if not self.dITp['onlySglLbl']:
-            YRes = SF.toMultiLbl(self.dITp, serY=YRes, lXCl=self.lSCl)
+            YRes = SF.toMultiLbl(self.dITp, serY=YRes, lXCl=self.lSXCl)
         self.setXY(X=X, Y=YRes, setTrain=GF.isTrain(doSplit=doSpl))
 
 # -----------------------------------------------------------------------------
 class Classifier(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
+    def __init__(self, inpDat, D, sKPar='A', iSt=None, iTp=7,
+                 lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Classifier for data classification'
-        self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
+        self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iSt=iSt, iTp=iTp,
+                              lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
-        # if self.dITp['doImbSampling'] and (self.sMth == self.dITp['sMthRF'] or
-        #                                    self.dITp['nItPartialFit'] is None):
         if self.dITp['doImbSampling']:
             self.Smp.fitResampleImbalanced()
             self.setData(self.Smp.yieldData())
@@ -346,7 +355,7 @@ class Classifier(BaseSmplClfPrC):
                       sep='')
 
     # --- method for obtaining an optimised Classifier from a grid search -----
-    def getOptClfGS(self):
+    def getOptClfGridSearch(self):
         self.optClf, retClf = None, self.Clf
         if self.lParG is not None:
             optClf = GridSearchCV(estimator=self.Clf, param_grid=self.lParG,
@@ -354,6 +363,10 @@ class Classifier(BaseSmplClfPrC):
             self.optClf, retClf = optClf, optClf
         return retClf
 
+    # --- method for selecting the desired Classifier -------------------------
+    def selClf(self):
+        return (self.Clf if self.optClf is None else self.optClf)
+    
     # --- method for fitting a Classifier -------------------------------------
     def ClfFit(self, cClf):
         X, Y = self.getXY(getTrain=GF.isTrain(self.dITp['doTrainTestSplit']))
@@ -368,12 +381,13 @@ class Classifier(BaseSmplClfPrC):
         X, Y = XInp, YInp
         if cClf is not None and XInp is not None and YInp is not None:
             X, Y = self.Smp.imbSmp.fit_resample(XInp, YInp)
-            cClf.partial_fit(X, Y, classes=self.lSCl)
+            cClf.partial_fit(X, Y, classes=self.lSXCl)
             self.printClfPartialFit(X)
         return X, Y
 
     def fitOrPartialFitClf(self, cClf):
-        if self.dITp['nItPartialFit'] is not None:
+        if (self.sMth == self.dITp['sMthMLP'] and
+            self.dITp['nItPartialFit'] is not None):
             assert type(self.dITp['nItPartialFit']) in [int, float]
             doSpl = self.dITp['doTrainTestSplit']
             XIni, YIni = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
@@ -383,6 +397,10 @@ class Classifier(BaseSmplClfPrC):
             self.setXY(X=X, Y=Y, setTrain=GF.isTrain(doSplit=doSpl))
         else:
             self.ClfFit(cClf)
+        # calculate the mean accuracy on the given test data and labels
+        if self.dITp['doTrainTestSplit']:
+            XTest, YTest = self.getXY(getTrain=False)
+            self.scoreClf = cClf.score(XTest, YTest)
 
     # --- method for calculating values of the classifier results dictionary --
     def assembleDfrPredProba(self, lSCTP):
@@ -415,9 +433,9 @@ class Classifier(BaseSmplClfPrC):
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
-        cClf = (self.Clf if self.optClf is None else self.optClf)
+        cClf = self.selClf()
         if cClf is not None:
-            dITp, lSXCl = self.dITp, self.lSCl
+            dITp, lSXCl = self.dITp, self.lSXCl
             if dat2Pred is not None and dITp['encodeCatFtr']:
                 dat2Pred = self.cEnc.transform(dat2Pred).toarray()
             if dat2Pred is None:
@@ -445,7 +463,7 @@ class Classifier(BaseSmplClfPrC):
     # --- method for calculating the confusion matrix -------------------------
     def calcCnfMatrix(self):
         if self.dITp['calcCnfMatrix']:
-            YTest, YPred, lC = self.YTest, self.YPred, self.lSCl
+            YTest, YPred, lC = self.YTest, self.YPred, self.lSXCl
             if len(YTest.shape) > 1:
                 YTest = SF.toSglLbl(self.dITp, dfrY=self.YTest)
             if len(YPred.shape) > 1:
@@ -458,7 +476,7 @@ class Classifier(BaseSmplClfPrC):
     # --- method for plotting the confusion matrix ----------------------------
     def plotCnfMatrix(self):
         if self.dITp['plotCnfMatrix'] and self.confusMatrix is not None:
-            CM, lCl = self.confusMatrix, self.lSCl
+            CM, lCl = self.confusMatrix, self.lSXCl
             D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
             D.plot()
             supTtl = self.dITp['sSupTtlPlt']
@@ -470,15 +488,15 @@ class Classifier(BaseSmplClfPrC):
 # -----------------------------------------------------------------------------
 class RFClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A'):
-        super().__init__(inpDat, D=D, sKPar=sKPar)
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
         self.descO = 'Random Forest classifier'
         self.sMthL, self.sMth = self.dITp['sMthRF_L'], self.dITp['sMthRF']
         self.lParG = lG
         self.d2Par = d2Par
         if self.dITp['doRFClf']:
             cClf = self.getClf()
-            self.ClfFit(cClf)
+            self.fitOrPartialFitClf(cClf)
         print('Initiated "RFClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
@@ -489,13 +507,13 @@ class RFClf(Classifier):
                                           n_jobs=self.dITp['nJobs'],
                                           verbose=self.dITp['vVerb'],
                                           **self.d2Par[self.sKPar])
-        return self.getOptClfGS()
+        return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class MLPClf(Classifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A'):
-        super().__init__(inpDat, D=D, sKPar=sKPar)
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
         self.descO = 'Neural Network MLP classifier'
         self.sMthL, self.sMth = self.dITp['sMthMLP_L'], self.dITp['sMthMLP']
         self.lParG = lG
@@ -503,7 +521,6 @@ class MLPClf(Classifier):
         if self.dITp['doMLPClf']:
             cClf = self.getClf()
             self.fitOrPartialFitClf(cClf)
-            self.getScoreClf(cClf)
         print('Initiated "MLPClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
@@ -512,12 +529,7 @@ class MLPClf(Classifier):
                                  warm_start=self.dITp['bWarmStart'],
                                  verbose=self.dITp['bVerb'],
                                  **self.d2Par[self.sKPar])
-        return self.getOptClfGS()
-
-    def getScoreClf(self, cClf):
-        if self.dITp['doTrainTestSplit']:
-            XTest, YTest = self.getXY(getTrain=False)
-            self.scoreClf = cClf.score(XTest, YTest)
+        return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class PropCalculator(BaseSmplClfPrC):
@@ -544,7 +556,7 @@ class PropCalculator(BaseSmplClfPrC):
     def calcPropAAc(self):
         if self.dITp['doPropCalc']:
             dfrInp, dITp = self.dfrInp, self.dITp
-            for sCl in self.lSCl:
+            for sCl in self.lSXCl:
                 if self.dITp['onlySglLbl']:
                     cDfrI = dfrInp[dfrInp[dITp['sEffFam']] == sCl]
                 else:
@@ -552,9 +564,9 @@ class PropCalculator(BaseSmplClfPrC):
                 self.calcPropCDfr(cDfrI, sCl=sCl)
             # any XCl
             if self.dITp['onlySglLbl']:
-                cDfrI = dfrInp[dfrInp[dITp['sEffFam']].isin(self.lSCl)]
+                cDfrI = dfrInp[dfrInp[dITp['sEffFam']].isin(self.lSXCl)]
             else:
-                cDfrI = dfrInp[(dfrInp[self.lSCl] > 0).any(axis=1)]
+                cDfrI = dfrInp[(dfrInp[self.lSXCl] > 0).any(axis=1)]
             self.calcPropCDfr(cDfrI, sCl=dITp['sX'])
             # entire dataset
             self.calcPropCDfr(dfrInp, sCl=dITp['sAllSeq'])

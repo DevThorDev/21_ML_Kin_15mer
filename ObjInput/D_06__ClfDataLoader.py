@@ -75,7 +75,7 @@ sFInpDClStPrC = sFInpDClStClf
 pInpPrC = pInpClf
 
 # --- boolean values (general) ------------------------------------------------
-printDClasses = True
+printDClMap = True
 
 # --- numbers (general) -------------------------------------------------------
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
@@ -188,7 +188,7 @@ dIO = {# --- general
        'sFInpDClStPrC': sFInpDClStPrC,
        'pInpPrC': pInpPrC,
        # --- boolean values (general)
-       'printDClasses': printDClasses,
+       'printDClMap': printDClMap,
        # --- numbers (general)
        'maxLenNmer': maxLenNmer,
        # --- numbers (classifier)

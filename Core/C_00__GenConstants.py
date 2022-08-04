@@ -261,13 +261,6 @@ S_SUMMARY = 'Summary'
 S_CNF_MAT = 'CnfMat'
 S_DETAILED = 'Detailed'
 S_PROP = 'Prop'
-S_CL_MAPPING = S_CL + 'Mapping'
-S_CL_STEPS = S_CL + 'Steps'
-S_MAX_LEN_S = 'mxL'
-S_RESTR = 'restr'
-S_I_POS = 'iPos'
-S_WITH_EXCL_EFF_FAM = 'withXcl' + S_EFF_FAM
-S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM
 S_LBL, S_STEP = 'Lbl', 'Step'
 S_SGL_LBL = S_SGL + S_LBL
 S_MLT_LBL = S_MLT + S_LBL
@@ -275,6 +268,13 @@ S_N_MER_EFF_FAM = S_N_MER + S_EFF_FAM
 S_N_MER_SEQ_UNQ = S_N_MER + S_SEQ + S_UNQ
 S_INP_DATA = S_INP + S_DATA
 S_MLT_STEP = S_MLT + S_STEP
+S_CL_MAPPING = S_CL + 'Mapping'
+S_CL_STEPS = S_CL + S_STEP + 's'
+S_MAX_LEN_S = 'mxL'
+S_RESTR = 'restr'
+S_I_POS = 'iPos'
+S_WITH_EXCL_EFF_FAM = 'withXcl' + S_EFF_FAM
+S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM
 S_STRAT_REAL_MAJO = 'RealMajo'
 
 # --- sets for X class mapping ------------------------------------------------

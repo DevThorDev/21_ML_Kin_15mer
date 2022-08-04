@@ -79,6 +79,7 @@ sCnfMat = GC.S_CNF_MAT
 sDetailed = GC.S_DETAILED
 sProba = GC.S_PROB
 sProp = GC.S_PROP
+sLbl, sStep = GC.S_LBL, GC.S_STEP
 sClMapping = GC.S_CL_MAPPING
 sClSteps = GC.S_CL_STEPS
 sMaxLenS = GC.S_MAX_LEN_S
@@ -171,6 +172,8 @@ dIO = {# --- general
        'sDetailed': sDetailed,
        'sProba': sProba,
        'sProp': sProp,
+       'sLbl': sLbl,
+       'sStep': sStep,
        'sClMapping': sClMapping,
        'sClSteps': sClSteps,
        'sMaxLenS': sMaxLenS,

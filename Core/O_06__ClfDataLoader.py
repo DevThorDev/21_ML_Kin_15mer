@@ -26,7 +26,8 @@ class DataLoader(BaseClass):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
-        lBase, lAttr2None = ['serNmerSeq', 'dfrInp', 'X', 'Y', 'lSCl'], []
+        lBase = ['serNmerSeq', 'dfrInp', 'X', 'Y', 'dClMap', 'dMltSt', 'lSXCl']
+        lAttr2None = []
         for sTp in [self.dITp['sClf'], self.dITp['sPrC']]:
             lAttr2None += [s + sTp for s in lBase]
         lAttr2None += ['dNmerNoCl', 'lI']
@@ -101,34 +102,37 @@ class DataLoader(BaseClass):
     def procInpData(self, dfrInp, saveData=None):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,
                                               dNmerNoCl=self.dNmerNoCl)
-        dfrInp, X, Y, lSXCl = SF.procInp(self.dIG, self.dITp, dNmerEffF)
+        dfrInp, X, Y, dClMp, lSXCl = SF.procInp(self.dIG, self.dITp, dNmerEffF)
+        dMltSt = SF.getIMltSt(self.dIG, self.dITp)
         if saveData is not None:
             t2Save = (dNmerEffF, serNmerSeq, dfrInp, X, Y)
             lSKeyDPF = 'NmerEffF', 'NmerSeqU', 'InpData', 'X', 'Y'
             self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
-        return dNmerEffF, serNmerSeq, dfrInp, X, Y, lSXCl
+        return dNmerEffF, serNmerSeq, dfrInp, X, Y, dClMp, dMltSt, lSXCl
 
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.FPs.dPF['InpDataClf'], iC=iC)
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
         (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XClf,
-         self.YClf, self.lSXClClf) = t
+         self.YClf, self.dClMapClf, self.dMltStClf, self.lSXClClf) = t
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
             self.FPs.dPF['InpDataPrC'] == self.FPs.dPF['InpDataClf']):
             t = (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf,
-                 self.XClf, self.YClf, self.lSXClClf)
+                 self.XClf, self.YClf, self.dClMapClf, self.dMltStClf,
+                 self.lSXClClf)
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC,
-             self.XPrC, self.YPrC, self.lSXClPrC) = t
+             self.XPrC, self.YPrC, self.dClMapPrC, self.dMltStPrC,
+             self.lSXClPrC) = t
         elif ((self.dfrInpPrC is None and self.dfrInpClf is not None and
                self.FPs.dPF['InpDataPrC'] != self.FPs.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
             self.dfrInpPrC = self.loadData(self.FPs.dPF['InpDataPrC'], iC=iC)
             t = self.procInpData(dfrInp=self.dfrInpPrC)
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC, self.XPrC,
-             self.YPrC, self.lSXClPrC) = t
+             self.YPrC, self.dClMapPrC, self.dMltStPrC, self.lSXClPrC) = t
 
     # --- print methods -------------------------------------------------------
     def printSerNmerSeqClf(self):
@@ -186,12 +190,12 @@ class DataLoader(BaseClass):
                                            cK, cL in self.dNmerNoCl.items()})
         print(GC.S_DS80)
 
-    def printLSClClf(self):
+    def printlSXClClf(self):
         print(GC.S_DS80, GC.S_NEWL, 'List of class strings for mode "Clf": ',
               self.lSXClClf, GC.S_NEWL, '(length = ', len(self.lSXClClf), ')',
               GC.S_NEWL, GC.S_DS80, sep='')
 
-    def printLSClPrC(self):
+    def printlSXClPrC(self):
         print(GC.S_DS80, GC.S_NEWL, 'List of class strings for mode "PrC": ',
               self.lSXClPrC, GC.S_NEWL, '(length = ', len(self.lSXClPrC), ')',
               GC.S_NEWL, GC.S_DS80, sep='')
@@ -258,10 +262,10 @@ class DataLoader(BaseClass):
     def yieldData(self, sMd=None):
         if sMd == self.dITp['sClf']:
             return (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
-                    self.lSXClClf)
+                    self.dClMapClf, self.dMltStClf, self.lSXClClf)
         elif sMd == self.dITp['sPrC']:
             return (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
-                    self.lSXClPrC)
-        else: return tuple([None]*5)
+                    self.dClMapPrC, self.dMltStPrC, self.lSXClPrC)
+        else: return tuple([None]*7)
 
 ###############################################################################

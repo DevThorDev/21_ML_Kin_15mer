@@ -192,37 +192,37 @@ def loadInpData(dITp, dfrInp, sMd=GC.S_CLF, iC=0):
     lSCl = sorted(GF.toListUnqViaSer(dfrInp[dITp['sCY' + sMd]]))
     return dfrInp, X, Y, serNmerSeq, lSCl
 
-def getDClasses(dIG, dITp):
-    dITp['dClasses'], dITp['lXCl'] = {}, []
+def getDClMap(dIG, dITp):
+    dClMap, dITp['lXCl'] = {}, []
     pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClMpClf'] + dIG['xtCSV'])
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
     for _, cRow in dfrClMap.iterrows():
         [sK, sV] = cRow.to_list()
         if sV != dITp['sNone']:
-            dITp['dClasses'][sK] = sV
+            dClMap[sK] = sV
             GF.addToListUnq(dITp['lXCl'], cEl=sV)
     print('Calculated class dictionary.')
-    if dITp['printDClasses']:
-        for sK, sV in dITp['dClasses'].items():
+    if dITp['printDClMap']:
+        for sK, sV in dClMap.items():
             print(sK, dITp['sColon'], dITp['sTab'], sV, sep='')
-        print(len(dITp['lXCl']), 'different X classes. List of X classes:')
+        print(len(dITp['lXCl']), 'different X-classes. List of X-classes:')
         print(dITp['lXCl'])
+    return dClMap
 
 def iniObj(dIG, dITp, dNmerEffF):
-    getDClasses(dIG, dITp)
     dX, dY = {sI: [] for sI in dITp['lSCXClf']}, {dITp['sEffFam']: []}
     if not dITp['onlySglLbl']:
         dY = {sXCl: [] for sXCl in dITp['lXCl']}
     return {}, dX, dY
 
-def createLXClOfSeq(dITp, dNEF, cSeq):
+def getLXCl(dIG, dITp, dNEF, dClMap, cSeq):
     # translation of effector families to XClasses
     lXCl = []
-    lEFIncl = [sFam for sFam in dNEF[cSeq] if (sFam in dITp['dClasses'])]
-    lEFExcl = [sFam for sFam in dNEF[cSeq] if (sFam not in dITp['dClasses'])]
+    lEFIncl = [sFam for sFam in dNEF[cSeq] if (sFam in dClMap)]
+    lEFExcl = [sFam for sFam in dNEF[cSeq] if (sFam not in dClMap)]
     if ((dITp['noExclEffFam'] and len(lEFExcl) == 0 and len(lEFIncl) > 0) or
         not dITp['noExclEffFam']):
-        lXCl = [dITp['dClasses'][sFam] for sFam in lEFIncl]
+        lXCl = [dClMap[sFam] for sFam in lEFIncl]
     return lXCl
 
 def fill_DProc_DX(dITp, dProc, dX, cSeq):
@@ -240,9 +240,9 @@ def fill_DX_DY_Mlt(dITp, dProc, dX, dY, cSeq, lXCl=[]):
         GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
     fill_DProc_DX(dITp, dProc=dProc, dX=dX, cSeq=cSeq)
 
-def fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq):
+def fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap, cSeq):
     assert len(cSeq) == len(dX)
-    lXCl = createLXClOfSeq(dITp, dNEF=dNmerEffF, cSeq=cSeq)
+    lXCl = getLXCl(dIG, dITp, dNEF=dNmerEffF, dClMap=dClMap, cSeq=cSeq)
     # filling of data dictionaries
     if dITp['onlySglLbl']:
         fill_DX_DY_Sgl(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
@@ -252,18 +252,33 @@ def fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq):
 
 def procInp(dIG, dITp, dNmerEffF):
     iCent, lIPosUsed = dITp['iCentNmer'], dITp['lIPosUsed']
-    dfrProc, X, Y, lSXCl = None, None, None, []
+    dfrProc, X, Y, dClMap, lSXCl = None, None, None, getDClMap(dIG, dITp), []
     dProc, dX, dY = iniObj(dIG, dITp, dNmerEffF)
     for cSeq in dNmerEffF:
         cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
-        lXCl = fill_DProc_DX_DY(dITp, dNmerEffF, dProc, dX, dY, cSeq=cSeqRed)
+        lXCl = fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap,
+                                cSeq=cSeqRed)
         GF.fillListUnique(cL=lSXCl, cIt=lXCl)
     for cD in [dX, dY]:
         GF.complDict(cDFull=dProc, cDAdd=cD)
     dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
     if dITp['onlySglLbl']:
         Y = GF.dictSglKey2Ser(dY)
-    return dfrProc, X, Y, sorted(lSXCl)
+    return dfrProc, X, Y, dClMap, sorted(lSXCl)
+
+def getIMltSt(dIG, dITp):
+    pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'] + dIG['xtCSV'])
+    dfrMltSt, dMltSt, sSt = GF.readCSV(pF=pDMS, iCol=0), {}, dITp['sStep']
+    if dfrMltSt is not None:
+        # check DataFrame columns
+        assert dITp['sXCl'] in dfrMltSt.columns
+        for sC in dfrMltSt.columns:
+            assert (sC == dITp['sXCl']) or (sC.startswith(sSt))
+        nSt = len([sC for sC in dfrMltSt.columns if sC.startswith(sSt)])
+        for _, serR in dfrMltSt.iterrows():
+            lCl = [serR.at[cI] for cI in serR.index if cI != dITp['sXCl']]
+            dMltSt[serR.at[dITp['sXCl']]] = lCl
+        return {'dfrInp': dfrMltSt, 'dXCl': dMltSt, 'nSteps': nSt}
 
 def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
     dSnip, iCentNmer = {}, dITp['iCentNmer']
@@ -287,11 +302,14 @@ def toMultiLbl(dITp, serY, lXCl):
         for sXCl in lXCl:
             GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
     return GF.iniPdDfr(dY, lSNmR=serY.index)
+
 def toSglLbl(dITp, dfrY):
     lY = [dITp['sNone']]*dfrY.shape[0]
     for k, (_, serR) in enumerate(dfrY.iterrows()):
         if sum(serR) == 1:
             lY[k] = serR.index[serR == 1].to_list()[0]
     return GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
+
+# --- Functions (O_80__Looper) ------------------------------------------------
 
 ###############################################################################

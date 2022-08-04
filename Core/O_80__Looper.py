@@ -36,9 +36,9 @@ class Looper(BaseClass):
 
     # --- loop methods --------------------------------------------------------
     # --- method for updating the type dictionary -----------------------------
-    def updateDITpAttr(self, cClf):
-        self.dITp['sCLblsTrain'] = cClf.dITp['sCLblsTrain']
-        self.lIFE = self.D.lIFE + [self.dITp['sCLblsTrain']]
+    def updateAttr(self, cClf):
+        self.CLblsTrain = cClf.CLblsTrain
+        self.lIFE = self.D.lIFE + [self.CLblsTrain]
     
     # --- methods for filling and changing the file paths ---------------------
     def fillFPsMth(self, sMth):
@@ -86,31 +86,34 @@ class Looper(BaseClass):
     # --- method for performing the calculations of the current repetition ----
     def doCRep(self, sMth, k, sKPar, cRp, cTim, stT=None):
         if sMth in self.dITp['lSMth']:
-            cStT, iM = GF.showElapsedTime(startTime=stT), 0
-            if sMth == self.dITp['sMthRF']:     # random forest classifier
-                iM = 15
-                lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
-                cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar)
-            elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
-                iM = 17
-                lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
-                cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar)
-            cEndT = GF.showElapsedTime(startTime=stT)
-            cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
-            cStT = GF.showElapsedTime(startTime=stT)
-            self.updateDITpAttr(cClf)
-            cClf.ClfPred()
-            cClf.printFitQuality()
-            GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
-            GF.updateDict(self.d2CnfMat, cDUp=cClf.dCnfMat, cK=cRp)
-            if k == 0 and cRp == 0:
-                self.fillFPsMth(sMth=sMth)
-            self.changePFKParRp(sMth=sMth, sKP=sKPar, cRp=cRp)
-            if self.dITp['saveDetailedClfRes']:
-                self.saveData(cClf.dfrPred, pF=self.FPs.dPF['OutDetClf'])
-                self.saveData(cClf.dfrProba, pF=self.FPs.dPF['OutProbaClf'])
-            cEndT = GF.showElapsedTime(startTime=stT)
-            cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
+            cStT, iM, itISt = GF.showElapsedTime(startTime=stT), 0, [None]
+            if self.dITp['doMultiSteps']:
+                itISt = range(self.D.dMltStClf['nSteps'])
+            for iSt in itISt:
+                if sMth == self.dITp['sMthRF']:     # random forest classifier
+                    iM = 15
+                    lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
+                    cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+                elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
+                    iM = 17
+                    lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
+                    cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+                cEndT = GF.showElapsedTime(startTime=stT)
+                cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
+                cStT = GF.showElapsedTime(startTime=stT)
+                self.updateAttr(cClf)
+                cClf.ClfPred()
+                cClf.printFitQuality()
+                GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
+                GF.updateDict(self.d2CnfMat, cDUp=cClf.dCnfMat, cK=cRp)
+                if k == 0 and cRp == 0:
+                    self.fillFPsMth(sMth=sMth)
+                self.changePFKParRp(sMth=sMth, sKP=sKPar, cRp=cRp)
+                if self.dITp['saveDetailedClfRes']:
+                    self.saveData(cClf.dfrPred, pF=self.FPs.dPF['OutDetClf'])
+                    self.saveData(cClf.dfrProba, pF=self.FPs.dPF['OutProbaClf'])
+                cEndT = GF.showElapsedTime(startTime=stT)
+                cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
 
     # --- method for saving the results ---------------------------------------
     def saveCombRes(self, sMth, d2Par, nRep=0):
@@ -126,7 +129,7 @@ class Looper(BaseClass):
                 self.saveData(self.dMnSEMCnfMat[sK], pF=self.FPs.dPF['CnfMat'])
             self.printD2MnSEMResClf(sMth=sMth)
 
-    # --- method for performing the outer loop --------------------------------
+    # --- method for performing the outer loops -------------------------------
     def doDoubleLoop(self, cTim, stT=None):
         for sMth in self.dITp['lSMth']:
             self.d3ResClf, self.d2CnfMat = {}, {}

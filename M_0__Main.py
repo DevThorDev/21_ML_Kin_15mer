@@ -76,40 +76,6 @@ print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
 # cViterbiAlg.runViterbiAlgorithm(cTim=cTiming, stT=startTime)
 # END - Viterbi algorithm (Hidden Markov Model)
 
-# cStTime = GF.showElapsedTime(startTime)
-# cRFClf = RFClf(inpDatG)
-# print(GC.S_EQ20, 'Fit quality of Random Forest Classifier:')
-# cRFClf.ClfPred()
-# cEndTime = GF.showElapsedTime(startTime)
-# cTiming.updateTimes(iMth=15, stTMth=cStTime, endTMth=cEndTime)
-
-# cStTime = GF.showElapsedTime(startTime)
-# cMLPClf = MLPClf(inpDatG)
-# print(GC.S_EQ20, 'Fit quality of NN MLP Classifier:')
-# cMLPClf.ClfPred()
-# cEndTime = GF.showElapsedTime(startTime)
-# cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
-
-# for cClf in [cRFClf, cMLPClf]:
-#     cClf.printFitQuality()
-#     cClf.plotCnfMatrix()
-
-# for cClf in [cRFClf, cMLPClf]:
-#     print(cClf.descO, GC.S_VBAR, cClf.sMth)
-#     cClf.calcPrintResPredict(X2Pre=cClf.getXY(getTrain=False)[0])
-
-# Test parameter sets
-# for sKeyPar in inpDatG.dI['d2Par_MLP']:
-# for sKeyPar in list('ABC'):
-#     print(GC.S_ST80, GC.S_NEWL, GC.S_EQ20, ' Parameter set ', sKeyPar, sep='')
-#     cStTime = GF.showElapsedTime(startTime)
-#     cMLPClf = MLPClf(inpDatG, sKPar=sKeyPar)
-#     cMLPClf.ClfPred()
-#     cMLPClf.printFitQuality()
-#     # cMLPClf.calcPrintResPredict(X2Pre=cMLPClf.getXY(getTrain=False)[0])
-#     cEndTime = GF.showElapsedTime(startTime)
-#     cTiming.updateTimes(iMth=16, stTMth=cStTime, endTMth=cEndTime)
-
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=99, stTMth=cStTime, endTMth=cEndTime)
 
@@ -122,8 +88,8 @@ cDataLoader.printDictNmerNoCl()
 # cDataLoader.printSerNmerSeqPrC()
 # cDataLoader.printDfrInpClf()
 # cDataLoader.printDfrInpPrC()
-# cDataLoader.printLSClClf()
-# cDataLoader.printLSClPrC()
+# cDataLoader.printlSXClClf()
+# cDataLoader.printlSXClPrC()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
 
