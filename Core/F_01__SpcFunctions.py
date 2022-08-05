@@ -266,7 +266,7 @@ def procInp(dIG, dITp, dNmerEffF):
         Y = GF.dictSglKey2Ser(dY)
     return dfrProc, X, Y, dClMap, sorted(lSXCl)
 
-def getIMltSt(dIG, dITp):
+def getIMltSt(dIG, dITp, Y):
     pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'] + dIG['xtCSV'])
     dfrMltSt, dMltSt, sSt = GF.readCSV(pF=pDMS, iCol=0), {}, dITp['sStep']
     if dfrMltSt is not None:
@@ -278,7 +278,16 @@ def getIMltSt(dIG, dITp):
         for _, serR in dfrMltSt.iterrows():
             lCl = [serR.at[cI] for cI in serR.index if cI != dITp['sXCl']]
             dMltSt[serR.at[dITp['sXCl']]] = lCl
-        return {'dfrInp': dfrMltSt, 'dXCl': dMltSt, 'nSteps': nSt}
+        # dYSt contains the Y for each step (iSt == 0: initial Y)
+        dYSt = {iSt: None for iSt in range(nSt + 1)}
+        dYSt[0] = Y
+        for iSt in range(1, nSt + 1):
+            YSt = Y.copy(deep=True)
+            for sCl, lCl in dMltSt.items():
+                YSt.replace(sCl, lCl[iSt - 1], inplace=True)
+                YSt = YSt[YSt != dITp['sNone']]
+            dYSt[iSt] = YSt
+        return {'dXCl': dMltSt, 'dYSt': dYSt, 'nSteps': nSt}
 
 def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
     dSnip, iCentNmer = {}, dITp['iCentNmer']

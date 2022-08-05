@@ -79,10 +79,11 @@ class BaseSmplClfPrC(BaseClass):
     # --- methods for getting (and possibly modifying) input data -------------
     def modInpDataMltSt(self, iSt=None):
         if self.dITp['doMultiSteps'] and iSt is not None:
-            for cI in self.Y.index:
-                sXClSt = self.dMltSt['dXCl'][self.Y.at[cI]][iSt]
-                self.Y.at[cI] = sXClSt
+            self.Y = self.dMltSt['dYSt'][iSt]
+            self.X = self.X.loc[self.Y.index, :]
+            self.dfrInp = self.dfrInp.loc[self.Y.index, :]
             self.dfrInp[self.dITp['sEffFam']] = self.Y
+            self.lSXCl = sorted(list(self.Y.unique()))
 
     def getInpData(self, sMd=None, iSt=None):
         (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
@@ -140,8 +141,8 @@ class BaseSmplClfPrC(BaseClass):
     def yieldData(self):
         return (self.dfrInp, self.serNmerSeq, self.dClMap, self.dMltSt,
                 self.lSXCl, self.X, self.XTrans, self.XTrain, self.XTest,
-                self.XTransTrain, self.XTransTest,
-                self.Y, self.YTrain, self.YTest, self.YPred, self.YProba)
+                self.XTransTrain, self.XTransTest, self.Y, self.YTrain,
+                self.YTest, self.YPred, self.YProba)
 
     # --- method for encoding and transforming the categorical features -------
     def encodeCatFeatures(self, catData=None):
@@ -366,7 +367,7 @@ class Classifier(BaseSmplClfPrC):
     # --- method for selecting the desired Classifier -------------------------
     def selClf(self):
         return (self.Clf if self.optClf is None else self.optClf)
-    
+
     # --- method for fitting a Classifier -------------------------------------
     def ClfFit(self, cClf):
         X, Y = self.getXY(getTrain=GF.isTrain(self.dITp['doTrainTestSplit']))

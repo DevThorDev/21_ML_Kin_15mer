@@ -39,7 +39,7 @@ class Looper(BaseClass):
     def updateAttr(self, cClf):
         self.CLblsTrain = cClf.CLblsTrain
         self.lIFE = self.D.lIFE + [self.CLblsTrain]
-    
+
     # --- methods for filling and changing the file paths ---------------------
     def fillFPsMth(self, sMth):
         self.FPs = self.D.yieldFPs()
@@ -78,67 +78,74 @@ class Looper(BaseClass):
         self.FPs.addFPs(d2PI)
         self.d2PInf = d2PI
 
-    def changePFKParRp(self, sMth, sKP, cRp):
-        sKPR = GF.joinS([sKP, str(cRp + 1)], cJ=self.dITp['sUSC'])
+    def adaptFPs(self, sMth, sKP, cRp, iSt):
+        sSt = self.dITp['sStep'] + str(iSt)
+        sKPR = GF.joinS([sKP, str(cRp + 1), sSt], cJ=self.dITp['sUSC'])
         for s in ['OutDetClf', 'OutProbaClf']:
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
 
     # --- method for performing the calculations of the current repetition ----
-    def doCRep(self, sMth, k, sKPar, cRp, cTim, stT=None):
+    def doCRep(self, sMth, iSt, k, sKPar, cRp, cTim, stT=None):
         if sMth in self.dITp['lSMth']:
-            cStT, iM, itISt = GF.showElapsedTime(startTime=stT), 0, [None]
-            if self.dITp['doMultiSteps']:
-                itISt = range(self.D.dMltStClf['nSteps'])
-            for iSt in itISt:
-                if sMth == self.dITp['sMthRF']:     # random forest classifier
-                    iM = 15
-                    lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
-                    cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-                elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
-                    iM = 17
-                    lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
-                    cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-                cEndT = GF.showElapsedTime(startTime=stT)
-                cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
-                cStT = GF.showElapsedTime(startTime=stT)
-                self.updateAttr(cClf)
-                cClf.ClfPred()
-                cClf.printFitQuality()
-                GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
-                GF.updateDict(self.d2CnfMat, cDUp=cClf.dCnfMat, cK=cRp)
-                if k == 0 and cRp == 0:
-                    self.fillFPsMth(sMth=sMth)
-                self.changePFKParRp(sMth=sMth, sKP=sKPar, cRp=cRp)
-                if self.dITp['saveDetailedClfRes']:
-                    self.saveData(cClf.dfrPred, pF=self.FPs.dPF['OutDetClf'])
-                    self.saveData(cClf.dfrProba, pF=self.FPs.dPF['OutProbaClf'])
-                cEndT = GF.showElapsedTime(startTime=stT)
-                cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
+            cStT, iM = GF.showElapsedTime(startTime=stT), 0
+            if sMth == self.dITp['sMthRF']:     # random forest classifier
+                iM = 15
+                lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
+                cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+            elif sMth == self.dITp['sMthMLP']:  # NN MLP classifier
+                iM = 17
+                lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
+                cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+            cEndT = GF.showElapsedTime(startTime=stT)
+            cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
+            cStT = GF.showElapsedTime(startTime=stT)
+            self.updateAttr(cClf)
+            cClf.ClfPred()
+            cClf.printFitQuality()
+            GF.updateDict(self.d3ResClf, cDUp=cClf.d2ResClf, cK=cRp)
+            GF.updateDict(self.d2CnfMat, cDUp=cClf.dCnfMat, cK=cRp)
+            if k == 0 and cRp == 0:
+                self.fillFPsMth(sMth=sMth)
+            if iSt is not None:
+                self.adaptFPs(sMth=sMth, sKP=sKPar, cRp=cRp, iSt=iSt)
+            if self.dITp['saveDetailedClfRes']:
+                self.saveData(cClf.dfrPred, pF=self.FPs.dPF['OutDetClf'])
+                self.saveData(cClf.dfrProba, pF=self.FPs.dPF['OutProbaClf'])
+            cEndT = GF.showElapsedTime(startTime=stT)
+            cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
 
     # --- method for saving the results ---------------------------------------
-    def saveCombRes(self, sMth, d2Par, nRep=0):
+    def saveCombRes(self, sMth, iSt, d2Par, nRep=0):
         if nRep > 0:
             self.saveData(GF.iniPdDfr(d2Par), pF=self.FPs.dPF['OutParClf'],
                           saveAnyway=False)
             self.d2MnSEMResClf = GF.calcMnSEMFromD3Val(self.d3ResClf)
             self.dMnSEMCnfMat = GF.calcMnSEMFromD2Dfr(self.d2CnfMat)
-            self.saveData(self.d2MnSEMResClf, pF=self.FPs.dPF['OutSumClf'])
+            sSt = None
+            if iSt is not None:
+                sSt, sKMn = self.dITp['sStep'] + str(iSt), 'OutSumClf'
+                self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos='sLFE', cS=sSt)
+            self.saveData(self.d2MnSEMResClf, pF=self.FPs.dPF[sKMn])
             for sK in self.dMnSEMCnfMat:
-                self.FPs.modFP(d2PI=self.d2PInf, kMn='CnfMat', kPos='sLFE',
-                               cS=sK)
-                self.saveData(self.dMnSEMCnfMat[sK], pF=self.FPs.dPF['CnfMat'])
+                sKS, sKMn = GF.joinS([sK, sSt]), 'CnfMat'
+                self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos='sLFE', cS=sKS)
+                self.saveData(self.dMnSEMCnfMat[sK], pF=self.FPs.dPF[sKMn])
             self.printD2MnSEMResClf(sMth=sMth)
 
     # --- method for performing the outer loops -------------------------------
     def doDoubleLoop(self, cTim, stT=None):
+        itISt = [None]
+        if self.dITp['doMultiSteps']:
+            itISt = range(1, self.D.dMltStClf['nSteps'] + 1)
         for sMth in self.dITp['lSMth']:
             self.d3ResClf, self.d2CnfMat = {}, {}
             d2Par, nRep = self.dITp['d3Par'][sMth], self.dITp['dNumRep'][sMth]
-            for k, sKPar in enumerate(d2Par):
-                for cRep in range(nRep):
-                    print(GC.S_EQ20, 'Method:', sMth, GC.S_VBAR, 'Parameter',
-                          'set:', sKPar, GC.S_VBAR, 'Repetition:', cRep + 1)
-                    self.doCRep(sMth, k, sKPar, cRp=cRep, cTim=cTim, stT=stT)
-            self.saveCombRes(sMth=sMth, d2Par=d2Par, nRep=nRep)
+            for iSt in itISt:
+                for k, sKPar in enumerate(d2Par):
+                    for cRep in range(nRep):
+                        print(GC.S_EQ20, 'Method:', sMth, GC.S_VBAR, 'Parameter',
+                              'set:', sKPar, GC.S_VBAR, 'Repetition:', cRep + 1)
+                        self.doCRep(sMth, iSt, k, sKPar, cRp=cRep, cTim=cTim, stT=stT)
+                self.saveCombRes(sMth=sMth, iSt=iSt, d2Par=d2Par, nRep=nRep)
 
 ###############################################################################
