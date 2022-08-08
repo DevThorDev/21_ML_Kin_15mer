@@ -70,6 +70,7 @@ S_EQ80 = S_EQ*80
 S_ST80 = S_STAR*80
 S_WV80 = S_WAVE*80
 
+S_VBAR_SEP = S_SPACE + S_VBAR + S_SPACE
 S_ARR_LR = '-->'
 S_ARR_RL = '<--'
 S_MER = 'mer'

@@ -47,14 +47,11 @@ pUnqNmer = GC.P_DIR_RES_UNQ_N_MER
 pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
 
 # --- names and paths of files and dirs (classifier) --------------------------
-# sFInpSClf = usedClTypeClf + 'Orig70'     # '' / 'AllCl' / 'NewClOrig70'
-# sFResCombSClf = 'Combined_S_KinasesPho15mer_202202'
 sFInpSClf = 'InpClf'
 sFInpBClf = 'Combined_XS_KinasesPho15mer_202202'
 
 sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
-    # sFInpClf = GF.joinS([sFInpSClf, usedAAcTypeClf, sFResCombSClf])
     sFInpClf = GF.joinS([sFInpSClf, sFInpBClf])
 sFInpDClMpClf = GF.joinS([sFInpSClf, GC.S_CL_MAPPING, sSet])
 sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sSet])
@@ -67,7 +64,6 @@ sFInpBPrC = sFInpBClf
 
 sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
-    # sFInpPrC = GF.joinS([sFInpSPrC, usedAAcTypePrC, sFResCombSPrC])
     sFInpPrC = GF.joinS([sFInpSPrC, sFInpBPrC])
 sFInpDClMpPrC = sFInpDClMpClf
 sFInpDClStPrC = sFInpDClStClf

@@ -94,7 +94,7 @@ cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
 
 cLooper = Looper(inpDatG, D=cDataLoader)
-cLooper.doDoubleLoop(cTim=cTiming, stT=startTime)
+cLooper.doQuadLoop(cTim=cTiming, stT=startTime)
 
 cStTime = GF.showElapsedTime(startTime)
 cPropCalc = PropCalculator(inpDatG, D=cDataLoader)

@@ -10,7 +10,7 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
 dNumRep = {GC.S_MTH_RF: 2,
-           GC.S_MTH_MLP: 0}
+           GC.S_MTH_MLP: 2}
 
 # --- names and paths of files and dirs ---------------------------------------
 
@@ -106,7 +106,7 @@ d2Par_MLP = {'AH': {'hidden_layer_sizes': (100,),
                     'power_t': 0.5,
                     'max_iter': 50000,
                     'shuffle': True,
-                    'tol': 1e-4,
+                    'tol': 1e-6,
                     'momentum': 0.8,
                     'nesterovs_momentum': True,
                     'early_stopping': False,

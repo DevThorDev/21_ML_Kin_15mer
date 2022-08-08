@@ -212,6 +212,17 @@ class BaseSmplClfPrC(BaseClass):
         print('Transformed array:', GC.S_NEWL, XTrans, GC.S_NEWL,
               'Shape: ', XTrans.shape, sep='')
 
+    def printResResampleImb(self, X, Y, YRes):
+        print(GC.S_DS04, ' Size of Y:', GC.S_NEWL, 'Initial: ', Y.size,
+              GC.S_VBAR_SEP, 'after resampling: ', YRes.size, sep='')
+        YUnq, YResUnq = Y.unique(), YRes.unique()
+        print('Y.unique():', YUnq, '| YRes.unique():', YResUnq)
+        assert set(YUnq) == set(YResUnq)
+        print('Sizes of classes before and after resampling:')
+        for cY in YUnq:
+            print(cY, self.dITp['sColon'], self.dITp['sTab'], Y[Y == cY].size,
+                  self.dITp['sVBarSep'], YRes[YRes == cY].size, sep='')
+
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
@@ -266,14 +277,11 @@ class ImbSampler(BaseSmplClfPrC):
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
         doSpl = self.dITp['doTrainTestSplit']
         X, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
-        print('Initial shape of Y:', Y.shape)
-        X, YRes = self.imbSmp.fit_resample(X, Y)
-        print('Final shape of YRes after resampling:', YRes.shape)
-        for cY in YRes.unique():
-            print(cY, self.dITp['sTab'], YRes[YRes == cY].size, sep='')
+        X, YResImb = self.imbSmp.fit_resample(X, Y)
+        self.printResResampleImb(X=X, Y=Y, YRes=YResImb)
         if not self.dITp['onlySglLbl']:
-            YRes = SF.toMultiLbl(self.dITp, serY=YRes, lXCl=self.lSXCl)
-        self.setXY(X=X, Y=YRes, setTrain=GF.isTrain(doSplit=doSpl))
+            YResImb = SF.toMultiLbl(self.dITp, serY=YResImb, lXCl=self.lSXCl)
+        self.setXY(X=X, Y=YResImb, setTrain=GF.isTrain(doSplit=doSpl))
 
 # -----------------------------------------------------------------------------
 class Classifier(BaseSmplClfPrC):
@@ -334,15 +342,19 @@ class Classifier(BaseSmplClfPrC):
                 print(self.YPred)
 
     def printPredict(self, X2Pred=None):
-        nPred, nOK, _ = tuple(self.d2ResClf[self.sKPar].values())
-        if X2Pred is not None and X2Pred.shape[0] == self.YPred.shape[0]:
-            if self.YTest is not None:
-                self.printDetailedPredict(X2Pred, cSect='A1')
-                self.printDetailedPredict(X2Pred, nPred, nOK, cSect='A2')
+        if self.dITp['lvlOut'] > 0:
+            print('Predicted for data of shape', X2Pred.shape)
+            print('Shape of predicted Y', self.YPred.shape)
+            print('Shape of probs of Y (classes)', self.YProba.shape)
+            nPred, nOK, _ = tuple(self.d2ResClf[self.sKPar].values())
+            if X2Pred is not None and X2Pred.shape[0] == self.YPred.shape[0]:
+                if self.YTest is not None:
+                    self.printDetailedPredict(X2Pred, cSect='A1')
+                    self.printDetailedPredict(X2Pred, nPred, nOK, cSect='A2')
+                else:
+                    self.printDetailedPredict(X2Pred, cSect='B')
             else:
-                self.printDetailedPredict(X2Pred, cSect='B')
-        else:
-            self.printDetailedPredict(cSect='C')
+                self.printDetailedPredict(cSect='C')
 
     def printFitQuality(self):
         print(GC.S_DS04, ' Fit quality for the "', self.sMthL, '" method ',
@@ -403,6 +415,30 @@ class Classifier(BaseSmplClfPrC):
             XTest, YTest = self.getXY(getTrain=False)
             self.scoreClf = cClf.score(XTest, YTest)
 
+    # --- method for selecting the appropriate XTest and YTest vlues ----------
+    def getXYTest(self, dat2Pred=None):
+        if dat2Pred is not None and self.dITp['encodeCatFtr']:
+            dat2Pred = self.cEnc.transform(dat2Pred).toarray()
+        if dat2Pred is None:
+            dat2Pred, self.YTest = self.getXY(getTrain=False)
+        if self.dITp['onlySglLbl']:
+            self.YTest = SF.toMultiLbl(self.dITp, serY=self.YTest,
+                                       lXCl=self.lSXCl)
+        return dat2Pred
+
+    # --- method for calculating the predicted y classes, and their probs -----
+    def getYPredProba(self, cClf, X2Pred=None):
+        lSC, lSR = self.YTest.columns, self.YTest.index
+        if self.dITp['onlySglLbl']:
+            YPred = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
+                                nameS=self.dITp['sEffFam'])
+            self.YPred = SF.toMultiLbl(self.dITp, serY=YPred, lXCl=self.lSXCl)
+        else:
+            self.YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC,
+                                     lSNmR=lSR)
+        self.YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
+        assert self.YProba.shape == self.YPred.shape
+
     # --- method for calculating values of the classifier results dictionary --
     def assembleDfrPredProba(self, lSCTP):
         lDfr = [self.dfrPred, self.dfrProba]
@@ -436,29 +472,10 @@ class Classifier(BaseSmplClfPrC):
     def ClfPred(self, dat2Pred=None):
         cClf = self.selClf()
         if cClf is not None:
-            dITp, lSXCl = self.dITp, self.lSXCl
-            if dat2Pred is not None and dITp['encodeCatFtr']:
-                dat2Pred = self.cEnc.transform(dat2Pred).toarray()
-            if dat2Pred is None:
-                dat2Pred, self.YTest = self.getXY(getTrain=False)
-            if self.dITp['onlySglLbl']:
-                self.YTest = SF.toMultiLbl(dITp, serY=self.YTest, lXCl=lSXCl)
-            lSC, lSR = self.YTest.columns, self.YTest.index
-            if self.dITp['onlySglLbl']:
-                YPred = GF.iniPdSer(cClf.predict(dat2Pred), lSNmI=lSR,
-                                    nameS=dITp['sEffFam'])
-                self.YPred = SF.toMultiLbl(dITp, serY=YPred, lXCl=lSXCl)
-            else:
-                self.YPred = GF.iniPdDfr(cClf.predict(dat2Pred), lSNmC=lSC,
-                                         lSNmR=lSR)
-            self.YProba = GF.getYProba(cClf, dat2Pred, lSC=lSC, lSR=lSR)
-            assert self.YProba.shape == self.YPred.shape
-            self.calcResPredict(X2Pred=dat2Pred)
-            if dITp['lvlOut'] > 0:
-                print('Predicted for data of shape', dat2Pred.shape)
-                print('Shape of predicted Y', self.YPred.shape)
-                print('Shape of probs of Y (classes)', self.YProba.shape)
-                self.printPredict(X2Pred=dat2Pred)
+            XTest = self.getXYTest(dat2Pred=dat2Pred)
+            self.getYPredProba(cClf, X2Pred=XTest)
+            self.calcResPredict(X2Pred=XTest)
+            self.printPredict(X2Pred=XTest)
             self.calcCnfMatrix()
 
     # --- method for calculating the confusion matrix -------------------------

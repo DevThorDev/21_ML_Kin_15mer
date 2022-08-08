@@ -32,6 +32,7 @@ sNewl = GC.S_NEWL
 sNULL = GC.S_NULL
 s0, sC, sE, sX, sY = GC.S_0, GC.S_CAP_C, GC.S_CAP_E, GC.S_CAP_X, GC.S_CAP_Y
 sXS, sS, sM, sL = GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L
+sVBarSep = GC.S_VBAR_SEP
 sBase = GC.S_BASE
 sTrain = GC.S_TRAIN
 sTest = GC.S_TEST
@@ -124,6 +125,7 @@ dIO = {# --- general
        'sS': sS,
        'sM': sM,
        'sL': sL,
+       'sVBarSep': sVBarSep,
        'sBase': sBase,
        'sTrain': sTrain,
        'sTest': sTest,

@@ -19,7 +19,7 @@ doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
-doMultiSteps = True                 # do a multi-step classification approach?
+doMultiSteps = False                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 
