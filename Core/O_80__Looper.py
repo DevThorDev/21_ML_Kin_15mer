@@ -87,7 +87,7 @@ class Looper(BaseClass):
         self.d2PInf = d2PI
 
     def adaptFPs(self, sMth, sKP, cRep, iSt):
-        sSt = self.dITp['sStep'] + str(iSt)
+        sSt = ('' if (iSt is None) else (self.dITp['sStep'] + str(iSt)))
         sKPR = GF.joinS([sKP, str(cRep + 1), sSt], cJ=self.dITp['sUSC'])
         for s in ['OutDetClf', 'OutProbaClf']:
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
@@ -119,8 +119,7 @@ class Looper(BaseClass):
             GF.updateDict(self.d2CnfMat, cDUp=cClf.dCnfMat, cK=cRep)
             if k == 0 and cRep == 0:
                 self.fillFPsMth(sMth=sMth)
-            if iSt is not None:
-                self.adaptFPs(sMth=sMth, sKP=sKPar, cRep=cRep, iSt=iSt)
+            self.adaptFPs(sMth=sMth, sKP=sKPar, cRep=cRep, iSt=iSt)
             if self.dITp['saveDetailedClfRes']:
                 self.saveData(cClf.dfrPred, pF=self.FPs.dPF['OutDetClf'])
                 self.saveData(cClf.dfrProba, pF=self.FPs.dPF['OutProbaClf'])

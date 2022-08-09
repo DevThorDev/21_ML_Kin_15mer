@@ -19,7 +19,7 @@ doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
-doMultiSteps = False                 # do a multi-step classification approach?
+doMultiSteps = True                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 
@@ -94,7 +94,7 @@ vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for neural network MLP classifier -------------------------
 # nItPartialFit = None        # number of iterations / partial fit (or None)
-nItPartialFit = 1000        # number of iterations / partial fit (or None)
+nItPartialFit = 100        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================

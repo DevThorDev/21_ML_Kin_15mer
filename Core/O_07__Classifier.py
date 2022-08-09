@@ -56,6 +56,8 @@ class BaseSmplClfPrC(BaseClass):
         for cAttr in lAttrDict:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {})
+        self.doPartFit = (self.sMth == self.dITp['sMthMLP'] and
+                          self.dITp['nItPartialFit'] is not None)
         self.sKPar = sKPar
         self.getCLblsTrain()
         self.lIFE = self.D.lIFE + [self.CLblsTrain]
@@ -293,7 +295,7 @@ class Classifier(BaseSmplClfPrC):
         self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iSt=iSt, iTp=iTp,
                               lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
-        if self.dITp['doImbSampling']:
+        if self.dITp['doImbSampling'] and not self.doPartFit:
             self.Smp.fitResampleImbalanced()
             self.setData(self.Smp.yieldData())
         print('Initiated "Classifier" base object.')
@@ -399,8 +401,7 @@ class Classifier(BaseSmplClfPrC):
         return X, Y
 
     def fitOrPartialFitClf(self, cClf):
-        if (self.sMth == self.dITp['sMthMLP'] and
-            self.dITp['nItPartialFit'] is not None):
+        if self.doPartFit:
             assert type(self.dITp['nItPartialFit']) in [int, float]
             doSpl = self.dITp['doTrainTestSplit']
             XIni, YIni = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
@@ -507,9 +508,11 @@ class Classifier(BaseSmplClfPrC):
 class RFClf(Classifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        # classifier method is needed before "super" is initialised
+        dITp0 = inpDat.dI[0]
+        self.sMthL, self.sMth = dITp0['sMthRF_L'], dITp0['sMthRF']
         super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
         self.descO = 'Random Forest classifier'
-        self.sMthL, self.sMth = self.dITp['sMthRF_L'], self.dITp['sMthRF']
         self.lParG = lG
         self.d2Par = d2Par
         if self.dITp['doRFClf']:
@@ -531,9 +534,11 @@ class RFClf(Classifier):
 class MLPClf(Classifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        # classifier method is needed before "super" is initialised
+        dITp0 = inpDat.dI[0]
+        self.sMthL, self.sMth = dITp0['sMthMLP_L'], dITp0['sMthMLP']
         super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
         self.descO = 'Neural Network MLP classifier'
-        self.sMthL, self.sMth = self.dITp['sMthMLP_L'], self.dITp['sMthMLP']
         self.lParG = lG
         self.d2Par = d2Par
         if self.dITp['doMLPClf']:
