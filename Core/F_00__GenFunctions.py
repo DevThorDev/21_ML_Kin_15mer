@@ -898,6 +898,16 @@ def smplStratRealMajo(Y):
             sStrat[cCl] = n2
     return sStrat
 
+def smplStratShareMino(Y, dI):
+    shMino = (dI['shareMino'] if 'shareMino' in dI else 1)
+    sStrat = {cCl: (Y[Y == cCl].size) for cCl in Y.unique()}
+    lVSrtAsc, n = sorted(sStrat.values()), 0
+    if len(lVSrtAsc) >= 1:
+        n = round(lVSrtAsc[0]*shMino)
+    for cCl, nEl in sStrat.items():
+        sStrat[cCl] = max(1, n)
+    return sStrat
+
 # --- Helper functions for the Viterbi algorithm handling ">", exp and ln -----
 def X_exp(x=None):
     if x is None:

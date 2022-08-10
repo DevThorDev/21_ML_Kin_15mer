@@ -157,11 +157,11 @@ class DataLoader(BaseClass):
         dfrClf, dfrPrC = self.dfrInpClf, self.dfrInpPrC
         print(dfrPrC)
         if dfrClf is None and dfrPrC is None:
-            print('Input data for proportion calculation and classifier input',
+            print('Input data for proportion calculation and Classifier input',
                   ' data are both "', dfrPrC, '"!', sep='')
         elif dfrClf is not None and dfrPrC is None:
             print('Input data for proportion calculation is "', dfrPrC, '", ',
-                  'while classifier input data is', GC.S_NEWL, dfrClf, '!',
+                  'while Classifier input data is', GC.S_NEWL, dfrClf, '!',
                   sep='')
         elif dfrClf is None and dfrPrC is not None:
             print('Classifier input is "', dfrClf, '", therefore unequal to ',
@@ -169,7 +169,7 @@ class DataLoader(BaseClass):
         else:
             if dfrPrC.equals(dfrClf):
                 print('Input data for proportion calculation is EQUAL to ',
-                      'classifier input data!', sep='')
+                      'Classifier input data!', sep='')
             else:
                 print('Classifier input data is', GC.S_NEWL, dfrClf, ', there',
                       'fore unequal to input data for proportion calculation!',

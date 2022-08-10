@@ -12,7 +12,9 @@ from Core.O_00__BaseClass import BaseClass
 
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.dummy import DummyClassifier
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
@@ -214,16 +216,25 @@ class BaseSmplClfPrC(BaseClass):
         print('Transformed array:', GC.S_NEWL, XTrans, GC.S_NEWL,
               'Shape: ', XTrans.shape, sep='')
 
-    def printResResampleImb(self, X, Y, YRes):
-        print(GC.S_DS04, ' Size of Y:', GC.S_NEWL, 'Initial: ', Y.size,
-              GC.S_VBAR_SEP, 'after resampling: ', YRes.size, sep='')
-        YUnq, YResUnq = Y.unique(), YRes.unique()
-        print('Y.unique():', YUnq, '| YRes.unique():', YResUnq)
-        assert set(YUnq) == set(YResUnq)
-        print('Sizes of classes before and after resampling:')
-        for cY in YUnq:
-            print(cY, self.dITp['sColon'], self.dITp['sTab'], Y[Y == cY].size,
-                  self.dITp['sVBarSep'], YRes[YRes == cY].size, sep='')
+    def printStrat(self, iSt=None):
+        if self.dITp['lvlOut'] > 0:
+            if iSt is not None:
+                print(GC.S_DS04, 'Current step index:', iSt)
+            print(GC.S_DS04, 'Sampling strategy:', self.sStrat)
+
+    def printResResampleImb(self, YIni, YRes, doPrt=True):
+        if doPrt:
+            print(GC.S_DS04, ' Size of Y:', GC.S_NEWL, 'Initial: ', YIni.size,
+                  GC.S_VBAR_SEP, 'after resampling: ', YRes.size, sep='')
+            YIniUnq, YResUnq = YIni.unique(), YRes.unique()
+            print('Unique values of initial Y:', YIniUnq)
+            print('Unique values of resampled Y:', YResUnq)
+            assert set(YIniUnq) == set(YResUnq)
+            print('Sizes of classes before and after resampling:')
+            for cY in YResUnq:
+                print(cY, self.dITp['sColon'], self.dITp['sTab'],
+                      YIni[YIni == cY].size, self.dITp['sVBarSep'],
+                      YRes[YRes == cY].size, sep='')
 
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseSmplClfPrC):
@@ -234,21 +245,31 @@ class ImbSampler(BaseSmplClfPrC):
         self.descO = 'Sampler for imbalanced learning'
         self.getInpData(sMd=self.dITp['sClf'], iSt=iSt)
         self.encodeSplitData()
-        self.getSampler()
+        self.getSampler(iSt=iSt)
         print('Initiated "ImbSampler" base object.')
 
-    # --- Function obtaining the imbalanced sampler ("imblearn") --------------
-    def getStrat(self):
-        sStrat = self.dITp['sStrat']
-        # implement the "RealMajo" strategy
-        if sStrat == self.dITp['sStratRealMajo']:
+    # --- Function obtaining a custom (imbalanced) sampling strategy ----------
+    def getStrat(self, iSt=None):
+        # get default sStrat, or sStrat of the current step index (MultiSteps)
+        self.sStrat = self.dITp['sStrat']
+        if self.dITp['doMultiSteps'] and iSt in self.dITp['dSStrat']:
+            self.sStrat = self.dITp['dSStrat'][iSt]
+        self.printStrat(iSt=iSt)
+        # in case of a custom sampling strategy, calculate the dictionary
+        if self.sStrat in self.dITp['lSmplStratCustom']:
             doSpl = self.dITp['doTrainTestSplit']
             _, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
-            sStrat = GF.smplStratRealMajo(Y=Y)
-        return sStrat
+            if self.sStrat == self.dITp['sStratRealMajo']:
+                # implement the "RealMajo" strategy
+                self.sStrat = GF.smplStratRealMajo(Y=Y)
+            elif self.sStrat == self.dITp['sStratShareMino']:
+                # implement the "ShareMino" strategy
+                self.sStrat = GF.smplStratShareMino(Y, dI=self.dITp['dIStrat'])
 
-    def getSampler(self):
-        self.imbSmp, dITp, sStrat = None, self.dITp, self.getStrat()
+    # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
+    def getSampler(self, iSt=None):
+        self.getStrat(iSt=iSt)
+        self.imbSmp, dITp, sStrat = None, self.dITp, self.sStrat
         if dITp['sSampler'] == 'ClusterCentroids':
             self.imbSmp = ClusterCentroids(sampling_strategy=sStrat,
                                            random_state=dITp['rndState'],
@@ -280,30 +301,30 @@ class ImbSampler(BaseSmplClfPrC):
         doSpl = self.dITp['doTrainTestSplit']
         X, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
         X, YResImb = self.imbSmp.fit_resample(X, Y)
-        self.printResResampleImb(X=X, Y=Y, YRes=YResImb)
+        self.printResResampleImb(YIni=Y, YRes=YResImb)
         if not self.dITp['onlySglLbl']:
             YResImb = SF.toMultiLbl(self.dITp, serY=YResImb, lXCl=self.lSXCl)
         self.setXY(X=X, Y=YResImb, setTrain=GF.isTrain(doSplit=doSpl))
 
 # -----------------------------------------------------------------------------
-class Classifier(BaseSmplClfPrC):
+class GeneralClassifier(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, sKPar='A', iSt=None, iTp=7,
                  lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
-        self.descO = 'Classifier for data classification'
+        self.descO = 'General Classifier for data classification'
         self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iSt=iSt, iTp=iTp,
                               lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
         if self.dITp['doImbSampling'] and not self.doPartFit:
             self.Smp.fitResampleImbalanced()
             self.setData(self.Smp.yieldData())
-        print('Initiated "Classifier" base object.')
+        print('Initiated "GeneralClassifier" base object.')
 
     # --- print methods -------------------------------------------------------
     def printClfFitRes(self, X):
         if self.dITp['lvlOut'] > 0:
-            print('Fitted classifier to data of shape', X.shape)
+            print('Fitted Classifier to data of shape', X.shape)
             if self.optClf is not None:
                 nL, oC, R04 = GC.S_NEWL, self.optClf, self.dIG['R04']
                 print(GC.S_DS80, 'Grid search results:', nL,
@@ -314,13 +335,13 @@ class Classifier(BaseSmplClfPrC):
                 print('CV results:', nL, dfrCVRes, sep='')
 
     def printClfFitError(self):
-        print('ERROR: Cannot fit classifier to data!')
+        print('ERROR: Cannot fit Classifier to data!')
         if self.dITp['lvlOut'] > 1:
             self.printXY()
 
     def printClfPartialFit(self, X):
         if self.dITp['lvlOut'] > 1:
-            print('Partially fitted classifier to data of shape', X.shape)
+            print('Partially fitted Classifier to data of shape', X.shape)
 
     def printDetailedPredict(self, X2Pr=None, nPr=None, nCr=None, cSect='C'):
         if self.dITp['lvlOut'] > 0 and cSect in ['A2']:
@@ -392,10 +413,11 @@ class Classifier(BaseSmplClfPrC):
             except:
                 self.printClfFitError()
 
-    def ClfPartialFit(self, cClf, XInp, YInp):
+    def ClfPartialFit(self, cClf, XInp, YInp, k=0):
         X, Y = XInp, YInp
         if cClf is not None and XInp is not None and YInp is not None:
             X, Y = self.Smp.imbSmp.fit_resample(XInp, YInp)
+            self.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
             cClf.partial_fit(X, Y, classes=self.lSXCl)
             self.printClfPartialFit(X)
         return X, Y
@@ -406,8 +428,8 @@ class Classifier(BaseSmplClfPrC):
             doSpl = self.dITp['doTrainTestSplit']
             XIni, YIni = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
             # repeat resampling and partial fit nItPartialFit times
-            for _ in range(round(abs(self.dITp['nItPartialFit']))):
-                X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni)
+            for k in range(round(abs(self.dITp['nItPartialFit']))):
+                X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni, k=k)
             self.setXY(X=X, Y=Y, setTrain=GF.isTrain(doSplit=doSpl))
         else:
             self.ClfFit(cClf)
@@ -440,7 +462,7 @@ class Classifier(BaseSmplClfPrC):
         self.YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
         assert self.YProba.shape == self.YPred.shape
 
-    # --- method for calculating values of the classifier results dictionary --
+    # --- method for calculating values of the Classifier results dictionary --
     def assembleDfrPredProba(self, lSCTP):
         lDfr = [self.dfrPred, self.dfrProba]
         for k, cYP in enumerate([self.YPred, self.YProba]):
@@ -505,19 +527,61 @@ class Classifier(BaseSmplClfPrC):
             plt.show()
 
 # -----------------------------------------------------------------------------
-class RFClf(Classifier):
+class SpecificClassifier(GeneralClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
-        # classifier method is needed before "super" is initialised
-        dITp0 = inpDat.dI[0]
-        self.sMthL, self.sMth = dITp0['sMthRF_L'], dITp0['sMthRF']
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', sDesc=GC.S_DESC_NONE,
+                 sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iSt=None):
+        # Classifier method is needed before "super" is initialised
+        self.sMthL, self.sMth = sMthL, sMth
         super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
-        self.descO = 'Random Forest classifier'
+        self.descO = sDesc
         self.lParG = lG
         self.d2Par = d2Par
+        print('Initiated "SpecificClassifier" base object.')
+
+# -----------------------------------------------------------------------------
+class DummyClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        sDDy, sMDyL, sMDy = GC.S_DESC_DUMMY, GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDDy, sMthL=sMDyL, sMth=sMDy, iSt=iSt)
+        if self.dITp['doDummyClf']:
+            self.fitOrPartialFitClf(self.getClf())
+        print('Initiated "DummyClf" base object.')
+
+    # --- methods for fitting and predicting with a Random Forest Classifier --
+    def getClf(self):
+        self.Clf = DummyClassifier(random_state=self.dITp['rndState'],
+                                   **self.d2Par[self.sKPar])
+        return self.getOptClfGridSearch()
+
+# -----------------------------------------------------------------------------
+class AdaClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        sDAda, sMAdaL, sMAda = GC.S_DESC_ADA, GC.S_MTH_ADA_L, GC.S_MTH_ADA
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDAda, sMthL=sMAdaL, sMth=sMAda, iSt=iSt)
+        if self.dITp['doAdaClf']:
+            self.fitOrPartialFitClf(self.getClf())
+        print('Initiated "AdaClf" base object.')
+
+    # --- methods for fitting and predicting with a AdaBoost Classifier -------
+    def getClf(self):
+        self.Clf = AdaBoostClassifier(random_state=self.dITp['rndState'],
+                                      **self.d2Par[self.sKPar])
+        return self.getOptClfGridSearch()
+
+# -----------------------------------------------------------------------------
+class RFClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        sDRF, sMRFL, sMRF = GC.S_DESC_RF, GC.S_MTH_RF_L, GC.S_MTH_RF
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDRF, sMthL=sMRFL, sMth=sMRF, iSt=iSt)
         if self.dITp['doRFClf']:
-            cClf = self.getClf()
-            self.fitOrPartialFitClf(cClf)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "RFClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
@@ -531,19 +595,35 @@ class RFClf(Classifier):
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
-class MLPClf(Classifier):
+class GPClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
-        # classifier method is needed before "super" is initialised
-        dITp0 = inpDat.dI[0]
-        self.sMthL, self.sMth = dITp0['sMthMLP_L'], dITp0['sMthMLP']
-        super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
-        self.descO = 'Neural Network MLP classifier'
-        self.lParG = lG
-        self.d2Par = d2Par
+        sDGP, sMGPL, sMGP = GC.S_DESC_GP, GC.S_MTH_GP_L, GC.S_MTH_GP
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDGP, sMthL=sMGPL, sMth=sMGP, iSt=iSt)
+        if self.dITp['doGPClf']:
+            self.fitOrPartialFitClf(self.getClf())
+        print('Initiated "GPClf" base object.')
+
+    # --- methods for fitting and predicting with a Random Forest Classifier --
+    def getClf(self):
+        dITp = self.dITp
+        self.Clf = GaussianProcessClassifier(random_state=dITp['rndState'],
+                                             warm_start=dITp['bWarmStart'],
+                                             n_jobs=dITp['nJobs'],
+                                             **self.d2Par[self.sKPar])
+        return self.getOptClfGridSearch()
+
+# -----------------------------------------------------------------------------
+class MLPClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        # Classifier method is needed before "super" is initialised
+        sDMLP, sMMLPL, sMMLP = GC.S_DESC_MLP, GC.S_MTH_MLP_L, GC.S_MTH_MLP
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDMLP, sMthL=sMMLPL, sMth=sMMLP, iSt=iSt)
         if self.dITp['doMLPClf']:
-            cClf = self.getClf()
-            self.fitOrPartialFitClf(cClf)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "MLPClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --

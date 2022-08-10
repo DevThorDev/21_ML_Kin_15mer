@@ -70,10 +70,18 @@ sAllSeq = GC.S_ALL_SEQ
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sUnique = GC.S_UNIQUE
-sMthRF_L = GC.S_MTH_RF_L
-sMthRF = GC.S_MTH_RF
-sMthMLP_L = GC.S_MTH_MLP_L
-sMthMLP = GC.S_MTH_MLP
+sDescNone = GC.S_DESC_NONE
+sDescDummy = GC.S_DESC_DUMMY
+sDescAda = GC.S_DESC_ADA
+sDescRF = GC.S_DESC_RF
+sDescGP = GC.S_DESC_GP
+sDescMLP = GC.S_DESC_MLP
+sMthNoneL, sMthNone = GC.S_MTH_NONE_L, GC.S_MTH_NONE
+sMthDummyL, sMthDummy = GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
+sMthAdaL, sMthAda = GC.S_MTH_ADA_L, GC.S_MTH_ADA
+sMthRFL, sMthRF = GC.S_MTH_RF_L, GC.S_MTH_RF
+sMthGPL, sMthGP = GC.S_MTH_GP_L, GC.S_MTH_GP
+sMthMLPL, sMthMLP = GC.S_MTH_MLP_L, GC.S_MTH_MLP
 sPar = GC.S_PAR
 sSummary = GC.S_SUMMARY
 sCnfMat = GC.S_CNF_MAT
@@ -92,6 +100,7 @@ sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 sMltStep = GC.S_MLT_STEP
 sStratRealMajo = GC.S_STRAT_REAL_MAJO
+sStratShareMino = GC.S_STRAT_SHARE_MINO
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -164,9 +173,23 @@ dIO = {# --- general
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
        'sUnique': sUnique,
-       'sMthRF_L': sMthRF_L,
+       'sDescNone': sDescNone,
+       'sDescDummy': sDescDummy,
+       'sDescAda': sDescAda,
+       'sDescRF': sDescRF,
+       'sDescGP': sDescGP,
+       'sDescMLP': sDescMLP,
+       'sMthNoneL': sMthNoneL,
+       'sMthNone': sMthNone,
+       'sMthDummyL': sMthDummyL,
+       'sMthDummy': sMthDummy,
+       'sMthAdaL': sMthAdaL,
+       'sMthAda': sMthAda,
+       'sMthRFL': sMthRFL,
        'sMthRF': sMthRF,
-       'sMthMLP_L': sMthMLP_L,
+       'sMthGPL': sMthGPL,
+       'sMthGP': sMthGP,
+       'sMthMLPL': sMthMLPL,
        'sMthMLP': sMthMLP,
        'sPar': sPar,
        'sSummary': sSummary,
@@ -187,9 +210,10 @@ dIO = {# --- general
        'sInpData': sInpData,
        'sMltStep': sMltStep,
        'sStratRealMajo': sStratRealMajo,
+       'sStratShareMino': sStratShareMino,
        # --- numbers
        # --- lists
-       'lSMth_L': [sMthRF_L, sMthMLP_L],
-       'lSMth': [sMthRF, sMthMLP]}
+       'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthGPL, sMthMLPL],
+       'lSMth': [sMthDummy, sMthAda, sMthRF, sMthGP, sMthMLP]}
 
 ###############################################################################

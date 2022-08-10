@@ -13,13 +13,16 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 # --- flow control ------------------------------------------------------------
 doImbSampling = True                # do imbalanced sampling before classific.?
 
+doDummyClf = True                   # do dummy classification?
+doAdaClf = True                     # do AdaBoost classification?
 doRFClf = True                      # do random forest classification?
+doGPClf = True                      # do Gaussian Process classification?
 doMLPClf = True                     # do neural network MLP classification?
 doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
-doMultiSteps = True                 # do a multi-step classification approach?
+doMultiSteps = False                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 
@@ -55,7 +58,13 @@ sSampler = 'RandomUnderSampler'    # string matching the over/under-sampler
                             # NeighbourhoodCleaningRule, RandomUnderSampler,
 sStrat =  GC.S_STRAT_REAL_MAJO         # sampling strategy
                         # 'all' / 'majority' / 'not majority' / 'not minority'
-                        # [custom: GC.S_STRAT_REAL_MAJO]
+                        # [custom: GC.S_STRAT_REAL_MAJO/GC.S_STRAT_SHARE_MINO]
+dSStrat = {1: GC.S_STRAT_REAL_MAJO,
+           2: GC.S_STRAT_SHARE_MINO}
+                        # dictionary for modifying the strategy for specific
+                        # step indices (in case of doMultiSteps)
+dIStrat = {'shareMino': 0.75}
+                        # additional data as required by the custom strategy
 # sStrat = {'NoCl': 1000,
 #           'X_AGC': 100,
 #           'X_CDK': 100,
@@ -83,18 +92,24 @@ wReplacement = False            # is sample with or without replacement?
 # --- TomekLinks input --------------------------------------------------------
 # =============================================================================
 
-# === general input for any classifier ========================================
+# === general input for any Classifier (that might use it) ====================
 rndState = None             # None (random) or integer (reproducible)
 bWarmStart = True           # warm start (True: use warm start)
-
-# --- general input for random forest classifier ------------------------------
-estOobScore = False         # estimate the generalization score
 nJobs = None                # number of jobs to run in parallel (None: 1)
+
+# --- general input for Dummy Classifier --------------------------------------
+
+# --- general input for AdaBoost Classifier -----------------------------------
+
+# --- general input for random forest Classifier ------------------------------
+estOobScore = False         # estimate the generalization score
 vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
 
-# --- general input for neural network MLP classifier -------------------------
-# nItPartialFit = None        # number of iterations / partial fit (or None)
-nItPartialFit = 100        # number of iterations / partial fit (or None)
+# --- general input for Gaussian Process Classifier ---------------------------
+
+# --- general input for neural network MLP Classifier -------------------------
+nItPartialFit = None        # number of iterations / partial fit (or None)
+# nItPartialFit = 1000        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================
@@ -130,6 +145,7 @@ lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
+lSmplStratCustom = [GC.S_STRAT_REAL_MAJO, GC.S_STRAT_SHARE_MINO]
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -138,7 +154,10 @@ dIO = {# --- general
        'lvlOut': lvlOut,
        # --- flow control
        'doImbSampling': doImbSampling,
+       'doDummyClf': doDummyClf,
+       'doAdaClf': doAdaClf,
        'doRFClf': doRFClf,
+       'doGPClf': doGPClf,
        'doMLPClf': doMLPClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
@@ -163,6 +182,8 @@ dIO = {# --- general
        # === general over- and undersampler input =============================
        'sSampler': sSampler,
        'sStrat': sStrat,
+       'dSStrat': dSStrat,
+       'dIStrat': dIStrat,
        # --- ClusterCentroids input
        'estimator': estimator,
        'voting': voting,
@@ -178,14 +199,17 @@ dIO = {# --- general
        'wReplacement': wReplacement,
        # --- TomekLinks input
        # ======================================================================
-       # === general input for any classifier =================================
+       # === general input for any Classifier (that might use it) =============
        'rndState': rndState,
        'bWarmStart': bWarmStart,
-       # --- general input for random forest classifier
-       'estOobScore': estOobScore,
        'nJobs': nJobs,
+       # --- general input for Dummy Classifier
+       # --- general input for AdaBoost Classifier
+       # --- general input for random forest Classifier
+       'estOobScore': estOobScore,
        'vVerb': vVerb,
-       # --- general input for neural network MLP classifier
+       # --- general input for Gaussian Process Classifier
+       # --- general input for neural network MLP Classifier
        'nItPartialFit': nItPartialFit,
        'bVerb': bVerb,
        # ======================================================================
@@ -202,6 +226,8 @@ dIO = {# --- general
        # --- lists
        'lFeatSrt': lFeatSrt,
        'lOldClPlt': lOldClPlt,
-       'lSResClf': lSResClf}
+       'lSResClf': lSResClf,
+       # === derived values and input processing ==============================
+       'lSmplStratCustom': lSmplStratCustom}
 
 ###############################################################################

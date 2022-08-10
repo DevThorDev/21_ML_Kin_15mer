@@ -390,11 +390,17 @@ class Timing:
         self.elT_02_12_getProbSglPos = 0.
         self.elT_05_13_ViterbiAlgorithm = 0.
         self.elT_06_14_ClfDataLoader = 0.
-        self.elT_07_15_RFClf_Ini = 0.
-        self.elT_07_16_RFClf_Pred = 0.
-        self.elT_07_17_MLPClf_Ini = 0.
-        self.elT_07_18_MLPClf_Pred = 0.
-        self.elT_07_19_PropCalculator = 0.
+        self.elT_07_15_DummyClf_Ini = 0.
+        self.elT_07_16_DummyClf_Pred = 0.
+        self.elT_07_17_AdaClf_Ini = 0.
+        self.elT_07_18_AdaClf_Pred = 0.
+        self.elT_07_19_RFClf_Ini = 0.
+        self.elT_07_20_RFClf_Pred = 0.
+        self.elT_07_21_GPClf_Ini = 0.
+        self.elT_07_22_GPClf_Pred = 0.
+        self.elT_07_23_MLPClf_Ini = 0.
+        self.elT_07_24_MLPClf_Pred = 0.
+        self.elT_07_50_PropCalculator = 0.
         self.elT_XX_99_Other = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
@@ -404,7 +410,9 @@ class Timing:
                       'calcProbTable', 'getD2TotalProbSnip',
                       'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
                       'getProbSglPos', 'ViterbiAlgorithm', 'ClfDataLoader',
-                      'RFClf_Ini', 'RFClf_Pred', 'MLPClf_Ini', 'MLPClf_Pred',
+                      'DummyClf_Ini', 'DummyClf_Pred', 'AdaClf_Ini',
+                      'AdaClf_Pred', 'RFClf_Ini', 'RFClf_Pred', 'GPClf_Ini',
+                      'GPClf_Pred', 'MLPClf_Ini', 'MLPClf_Pred',
                       'PropCalculator', 'Other']
         assert len(self.lSMth) == len(self.lElT)
 
@@ -423,11 +431,17 @@ class Timing:
                      self.elT_02_12_getProbSglPos,
                      self.elT_05_13_ViterbiAlgorithm,
                      self.elT_06_14_ClfDataLoader,
-                     self.elT_07_15_RFClf_Ini,
-                     self.elT_07_16_RFClf_Pred,
-                     self.elT_07_17_MLPClf_Ini,
-                     self.elT_07_18_MLPClf_Pred,
-                     self.elT_07_19_PropCalculator,
+                     self.elT_07_15_DummyClf_Ini,
+                     self.elT_07_16_DummyClf_Pred,
+                     self.elT_07_17_AdaClf_Ini,
+                     self.elT_07_18_AdaClf_Pred,
+                     self.elT_07_19_RFClf_Ini,
+                     self.elT_07_20_RFClf_Pred,
+                     self.elT_07_21_GPClf_Ini,
+                     self.elT_07_22_GPClf_Pred,
+                     self.elT_07_23_MLPClf_Ini,
+                     self.elT_07_24_MLPClf_Pred,
+                     self.elT_07_50_PropCalculator,
                      self.elT_XX_99_Other]
 
     def updateTimes(self, iMth=None, stTMth=None, endTMth=None):
@@ -462,15 +476,27 @@ class Timing:
             elif iMth == 14:
                 self.elT_06_14_ClfDataLoader += elT
             elif iMth == 15:
-                self.elT_07_15_RFClf_Ini += elT
+                self.elT_07_15_DummyClf_Ini += elT
             elif iMth == 16:
-                self.elT_07_16_RFClf_Pred += elT
+                self.elT_07_16_DummyClf_Pred += elT
             elif iMth == 17:
-                self.elT_07_17_MLPClf_Ini += elT
+                self.elT_07_17_AdaClf_Ini += elT
             elif iMth == 18:
-                self.elT_07_18_MLPClf_Pred += elT
+                self.elT_07_18_AdaClf_Pred += elT
             elif iMth == 19:
-                self.elT_07_19_PropCalculator += elT
+                self.elT_07_19_RFClf_Ini += elT
+            elif iMth == 20:
+                self.elT_07_20_RFClf_Pred += elT
+            elif iMth == 21:
+                self.elT_07_21_GPClf_Ini += elT
+            elif iMth == 22:
+                self.elT_07_22_GPClf_Pred += elT
+            elif iMth == 23:
+                self.elT_07_23_MLPClf_Ini += elT
+            elif iMth == 24:
+                self.elT_07_24_MLPClf_Pred += elT
+            elif iMth == 50:
+                self.elT_07_50_PropCalculator += elT
             elif iMth == 99:
                 self.elT_XX_99_Other += elT
             self.elT_Sum += elT
@@ -507,29 +533,43 @@ class Timing:
                str(round(self.elT_05_13_ViterbiAlgorithm, self.rdDig)) +
                GC.S_NEWL + 'Method 14 | "ClfDataLoader":\t' +
                str(round(self.elT_06_14_ClfDataLoader, self.rdDig)) +
-               GC.S_NEWL + 'Method 15 | "RFClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_15_RFClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 16 | "RFClf_Predict":\t' +
-               str(round(self.elT_07_16_RFClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 17 | "MLPClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_17_MLPClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 18 | "MLPClf_Predict":\t' +
-               str(round(self.elT_07_18_MLPClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 19 | "PropCalculator":\t' +
-               str(round(self.elT_07_19_PropCalculator, self.rdDig)) +
+               GC.S_NEWL + 'Method 15 | "DummyClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_15_DummyClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 16 | "DummyClf_Predict":\t' +
+               str(round(self.elT_07_16_DummyClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 17 | "AdaClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_17_AdaClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 18 | "AdaClf_Predict":\t' +
+               str(round(self.elT_07_18_AdaClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 19 | "RFClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_19_RFClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 20 | "RFClf_Predict":\t' +
+               str(round(self.elT_07_20_RFClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 21 | "GPClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_21_GPClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 22 | "GPClf_Predict":\t' +
+               str(round(self.elT_07_22_GPClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 23 | "MLPClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_23_MLPClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 24 | "MLPClf_Predict":\t' +
+               str(round(self.elT_07_24_MLPClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 50 | "PropCalculator":\t' +
+               str(round(self.elT_07_50_PropCalculator, self.rdDig)) +
                GC.S_NEWL + 'Method 99 | "Other":\t' +
                str(round(self.elT_XX_99_Other, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)
         return sIn
 
     def printRelTimes(self):
-        assert len(self.lSMth) == len(self.lElT)
         if self.elT_Sum > 0:
             print(GC.S_WV80)
             for k, (sMth, cElT) in enumerate(zip(self.lSMth, self.lElT)):
                 sX = str(round(cElT/self.elT_Sum*100., self.rdDig)) + '%'
                 sWS = GC.S_SPACE*(6 - len(sX))
-                if k == len(self.lElT) - 1:
+                # two special cases of k
+                if k == len(self.lElT) - 2:
+                    k = 50 - 1
+                elif k == len(self.lElT) - 1:
                     k = 99 - 1
                 print(GC.S_SP04 + sWS + sX + '\t(share of time in Method ' +
                       str(k + 1) + ' | "' + sMth + '")')
