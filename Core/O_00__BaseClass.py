@@ -396,10 +396,16 @@ class Timing:
         self.elT_07_18_AdaClf_Pred = 0.
         self.elT_07_19_RFClf_Ini = 0.
         self.elT_07_20_RFClf_Pred = 0.
-        self.elT_07_21_GPClf_Ini = 0.
-        self.elT_07_22_GPClf_Pred = 0.
-        self.elT_07_23_MLPClf_Ini = 0.
-        self.elT_07_24_MLPClf_Pred = 0.
+        self.elT_07_21_XTrClf_Ini = 0.
+        self.elT_07_22_XTrClf_Pred = 0.
+        self.elT_07_23_GrBClf_Ini = 0.
+        self.elT_07_24_GrBClf_Pred = 0.
+        self.elT_07_25_HGrBClf_Ini = 0.
+        self.elT_07_26_HGrBClf_Pred = 0.
+        self.elT_07_27_GPClf_Ini = 0.
+        self.elT_07_28_GPClf_Pred = 0.
+        self.elT_07_29_MLPClf_Ini = 0.
+        self.elT_07_30_MLPClf_Pred = 0.
         self.elT_07_50_PropCalculator = 0.
         self.elT_XX_99_Other = 0.
         self.elT_Sum = 0.
@@ -411,9 +417,10 @@ class Timing:
                       'getD2CondProbSnip', 'saveD2TCProbSnipAsDfr',
                       'getProbSglPos', 'ViterbiAlgorithm', 'ClfDataLoader',
                       'DummyClf_Ini', 'DummyClf_Pred', 'AdaClf_Ini',
-                      'AdaClf_Pred', 'RFClf_Ini', 'RFClf_Pred', 'GPClf_Ini',
-                      'GPClf_Pred', 'MLPClf_Ini', 'MLPClf_Pred',
-                      'PropCalculator', 'Other']
+                      'AdaClf_Pred', 'RFClf_Ini', 'RFClf_Pred', 'XTrClf_Ini',
+                      'XTrClf_Pred', 'GrBClf_Ini', 'GrBClf_Pred',
+                      'HGrBClf_Ini', 'HGrBClf_Pred', 'GPClf_Ini', 'GPClf_Pred',
+                      'MLPClf_Ini', 'MLPClf_Pred', 'PropCalculator', 'Other']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -437,10 +444,16 @@ class Timing:
                      self.elT_07_18_AdaClf_Pred,
                      self.elT_07_19_RFClf_Ini,
                      self.elT_07_20_RFClf_Pred,
-                     self.elT_07_21_GPClf_Ini,
-                     self.elT_07_22_GPClf_Pred,
-                     self.elT_07_23_MLPClf_Ini,
-                     self.elT_07_24_MLPClf_Pred,
+                     self.elT_07_21_XTrClf_Ini,
+                     self.elT_07_22_XTrClf_Pred,
+                     self.elT_07_23_GrBClf_Ini,
+                     self.elT_07_24_GrBClf_Pred,
+                     self.elT_07_25_HGrBClf_Ini,
+                     self.elT_07_26_HGrBClf_Pred,
+                     self.elT_07_27_GPClf_Ini,
+                     self.elT_07_28_GPClf_Pred,
+                     self.elT_07_29_MLPClf_Ini,
+                     self.elT_07_30_MLPClf_Pred,
                      self.elT_07_50_PropCalculator,
                      self.elT_XX_99_Other]
 
@@ -488,13 +501,25 @@ class Timing:
             elif iMth == 20:
                 self.elT_07_20_RFClf_Pred += elT
             elif iMth == 21:
-                self.elT_07_21_GPClf_Ini += elT
+                self.elT_07_21_XTrClf_Ini += elT
             elif iMth == 22:
-                self.elT_07_22_GPClf_Pred += elT
+                self.elT_07_22_XTrClf_Pred += elT
             elif iMth == 23:
-                self.elT_07_23_MLPClf_Ini += elT
+                self.elT_07_23_GrBClf_Ini += elT
             elif iMth == 24:
-                self.elT_07_24_MLPClf_Pred += elT
+                self.elT_07_24_GrBClf_Pred += elT
+            elif iMth == 25:
+                self.elT_07_25_HGrBClf_Ini += elT
+            elif iMth == 26:
+                self.elT_07_26_HGrBClf_Pred += elT
+            elif iMth == 27:
+                self.elT_07_27_GPClf_Ini += elT
+            elif iMth == 28:
+                self.elT_07_28_GPClf_Pred += elT
+            elif iMth == 29:
+                self.elT_07_29_MLPClf_Ini += elT
+            elif iMth == 30:
+                self.elT_07_30_MLPClf_Pred += elT
             elif iMth == 50:
                 self.elT_07_50_PropCalculator += elT
             elif iMth == 99:
@@ -545,14 +570,26 @@ class Timing:
                str(round(self.elT_07_19_RFClf_Ini, self.rdDig)) +
                GC.S_NEWL + 'Method 20 | "RFClf_Predict":\t' +
                str(round(self.elT_07_20_RFClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 21 | "GPClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_21_GPClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 22 | "GPClf_Predict":\t' +
-               str(round(self.elT_07_22_GPClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 23 | "MLPClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_23_MLPClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 24 | "MLPClf_Predict":\t' +
-               str(round(self.elT_07_24_MLPClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 21 | "RFClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_21_XTrClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 22 | "RFClf_Predict":\t' +
+               str(round(self.elT_07_22_XTrClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 23 | "RFClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_23_GrBClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 24 | "RFClf_Predict":\t' +
+               str(round(self.elT_07_24_GrBClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 25 | "RFClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_25_HGrBClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 26 | "RFClf_Predict":\t' +
+               str(round(self.elT_07_26_HGrBClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 27 | "GPClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_27_GPClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 28 | "GPClf_Predict":\t' +
+               str(round(self.elT_07_28_GPClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 29 | "MLPClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_29_MLPClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 30 | "MLPClf_Predict":\t' +
+               str(round(self.elT_07_30_MLPClf_Pred, self.rdDig)) +
                GC.S_NEWL + 'Method 50 | "PropCalculator":\t' +
                str(round(self.elT_07_50_PropCalculator, self.rdDig)) +
                GC.S_NEWL + 'Method 99 | "Other":\t' +

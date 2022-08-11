@@ -13,7 +13,9 @@ from Core.O_00__BaseClass import BaseClass
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
+from sklearn.ensemble import (AdaBoostClassifier, RandomForestClassifier,
+                              ExtraTreesClassifier, GradientBoostingClassifier,
+                              HistGradientBoostingClassifier)
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -550,7 +552,7 @@ class DummyClf(SpecificClassifier):
             self.fitOrPartialFitClf(self.getClf())
         print('Initiated "DummyClf" base object.')
 
-    # --- methods for fitting and predicting with a Random Forest Classifier --
+    # --- methods for fitting and predicting with a Dummy Classifier ----------
     def getClf(self):
         self.Clf = DummyClassifier(random_state=self.dITp['rndState'],
                                    **self.d2Par[self.sKPar])
@@ -567,7 +569,7 @@ class AdaClf(SpecificClassifier):
             self.fitOrPartialFitClf(self.getClf())
         print('Initiated "AdaClf" base object.')
 
-    # --- methods for fitting and predicting with a AdaBoost Classifier -------
+    # --- methods for fitting and predicting with an AdaBoost Classifier ------
     def getClf(self):
         self.Clf = AdaBoostClassifier(random_state=self.dITp['rndState'],
                                       **self.d2Par[self.sKPar])
@@ -590,8 +592,70 @@ class RFClf(SpecificClassifier):
                                           warm_start=self.dITp['bWarmStart'],
                                           oob_score=self.dITp['estOobScore'],
                                           n_jobs=self.dITp['nJobs'],
-                                          verbose=self.dITp['vVerb'],
+                                          verbose=self.dITp['vVerbRF'],
                                           **self.d2Par[self.sKPar])
+        return self.getOptClfGridSearch()
+
+# -----------------------------------------------------------------------------
+class XTrClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        sDXTr, sMXTrL, sMXTr = GC.S_DESC_X_TR, GC.S_MTH_X_TR_L, GC.S_MTH_X_TR
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDXTr, sMthL=sMXTrL, sMth=sMXTr, iSt=iSt)
+        if self.dITp['doXTrClf']:
+            self.fitOrPartialFitClf(self.getClf())
+        print('Initiated "XTrClf" base object.')
+
+    # --- methods for fitting and predicting with an Extra Trees Classifier ---
+    def getClf(self):
+        self.Clf = ExtraTreesClassifier(random_state=self.dITp['rndState'],
+                                        warm_start=self.dITp['bWarmStart'],
+                                        oob_score=self.dITp['estOobScore'],
+                                        n_jobs=self.dITp['nJobs'],
+                                        verbose=self.dITp['vVerbXTr'],
+                                        **self.d2Par[self.sKPar])
+        return self.getOptClfGridSearch()
+
+# -----------------------------------------------------------------------------
+class GrBClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        sDGrB, sMGrBL, sMGrB = GC.S_DESC_GR_B, GC.S_MTH_GR_B_L, GC.S_MTH_GR_B
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDGrB, sMthL=sMGrBL, sMth=sMGrB, iSt=iSt)
+        if self.dITp['doGrBClf']:
+            self.fitOrPartialFitClf(self.getClf())
+        print('Initiated "GrBClf" base object.')
+
+    # --- methods for fitting and predicting with a Gradient Boosting Classif.
+    def getClf(self):
+        dITp = self.dITp
+        self.Clf = GradientBoostingClassifier(random_state=dITp['rndState'],
+                                              warm_start=dITp['bWarmStart'],
+                                              verbose=dITp['vVerbGrB'],
+                                              **self.d2Par[self.sKPar])
+        return self.getOptClfGridSearch()
+
+# -----------------------------------------------------------------------------
+class HGrBClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+        sDH, sMHL, sMH = GC.S_DESC_H_GR_B, GC.S_MTH_H_GR_B_L, GC.S_MTH_H_GR_B
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
+                         sDesc=sDH, sMthL=sMHL, sMth=sMH, iSt=iSt)
+        if self.dITp['doHGrBClf']:
+            self.fitOrPartialFitClf(self.getClf())
+        print('Initiated "HGrBClf" base object.')
+
+    # --- methods for fitting and predicting with a Hist Gradient Boosting Clf.
+    def getClf(self):
+        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
+        vVerb = self.dITp['vVerbHGrB']
+        self.Clf = HistGradientBoostingClassifier(random_state=rndSt,
+                                                  warm_start=bWarmStart,
+                                                  verbose=vVerb,
+                                                  **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
@@ -605,7 +669,7 @@ class GPClf(SpecificClassifier):
             self.fitOrPartialFitClf(self.getClf())
         print('Initiated "GPClf" base object.')
 
-    # --- methods for fitting and predicting with a Random Forest Classifier --
+    # --- methods for fitting and predicting with a Gaussian Process Classifier
     def getClf(self):
         dITp = self.dITp
         self.Clf = GaussianProcessClassifier(random_state=dITp['rndState'],
@@ -626,7 +690,7 @@ class MLPClf(SpecificClassifier):
             self.fitOrPartialFitClf(self.getClf())
         print('Initiated "MLPClf" base object.')
 
-    # --- methods for fitting and predicting with a Random Forest Classifier --
+    # --- methods for fitting and predicting with a neural network MLP Classif.
     def getClf(self):
         self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
                                  warm_start=self.dITp['bWarmStart'],

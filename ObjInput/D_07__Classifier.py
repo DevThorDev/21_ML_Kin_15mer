@@ -15,14 +15,18 @@ doImbSampling = True                # do imbalanced sampling before classific.?
 
 doDummyClf = True                   # do dummy classification?
 doAdaClf = True                     # do AdaBoost classification?
-doRFClf = True                      # do random forest classification?
+doRFClf = True                      # do Random Forest classification?
+doXTrClf = True                     # do Extra Trees classification?
+doGrBClf = True                     # do Gradient Boosting classification?
+doHGrBClf = True                    # do HistGradientBoosting classification?
 doGPClf = True                      # do Gaussian Process classification?
 doMLPClf = True                     # do neural network MLP classification?
+
 doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
-doMultiSteps = False                 # do a multi-step classification approach?
+doMultiSteps = True                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 
@@ -101,9 +105,18 @@ nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # --- general input for AdaBoost Classifier -----------------------------------
 
-# --- general input for random forest Classifier ------------------------------
+# --- general input for Random Forest Classifier ------------------------------
 estOobScore = False         # estimate the generalization score
-vVerb = 1                   # state of verbosity ([0], 1, 2, 3...)
+vVerbRF = 1                 # state of verbosity ([0], 1, 2, 3...)
+
+# --- general input for Extra Trees Classifier --------------------------------
+vVerbXTr = 1                # state of verbosity ([0], 1, 2, 3...)
+
+# --- general input for Gradient Boosting Classifier --------------------------
+vVerbGrB = 1                # state of verbosity ([0], 1, 2, 3...)
+
+# --- general input for Hist Gradient Boosting Classifier ---------------------
+vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Gaussian Process Classifier ---------------------------
 
@@ -157,6 +170,9 @@ dIO = {# --- general
        'doDummyClf': doDummyClf,
        'doAdaClf': doAdaClf,
        'doRFClf': doRFClf,
+       'doXTrClf': doXTrClf,
+       'doGrBClf': doGrBClf,
+       'doHGrBClf': doHGrBClf,
        'doGPClf': doGPClf,
        'doMLPClf': doMLPClf,
        'doPropCalc': doPropCalc,
@@ -205,9 +221,15 @@ dIO = {# --- general
        'nJobs': nJobs,
        # --- general input for Dummy Classifier
        # --- general input for AdaBoost Classifier
-       # --- general input for random forest Classifier
+       # --- general input for Random Forest Classifier
        'estOobScore': estOobScore,
-       'vVerb': vVerb,
+       'vVerbRF': vVerbRF,
+       # --- general input for Extra Trees Classifier
+       'vVerbXTr': vVerbXTr,
+       # --- general input for Gradient Boosting Classifier
+       'vVerbGrB': vVerbGrB,
+       # --- general input for Hist Gradient Boosting Classifier
+       'vVerbHGrB': vVerbHGrB,
        # --- general input for Gaussian Process Classifier
        # --- general input for neural network MLP Classifier
        'nItPartialFit': nItPartialFit,

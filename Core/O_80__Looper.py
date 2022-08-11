@@ -6,7 +6,8 @@ import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
 
 from Core.O_00__BaseClass import BaseClass
-from Core.O_07__Classifier import DummyClf, AdaClf, RFClf, GPClf, MLPClf
+from Core.O_07__Classifier import (DummyClf, AdaClf, RFClf, XTrClf, GrBClf,
+                                   HGrBClf, GPClf, MLPClf)
 
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
@@ -51,34 +52,34 @@ class Looper(BaseClass):
     # --- methods for filling and changing the file paths ---------------------
     def fillFPsMth(self, sMth):
         self.FPs = self.D.yieldFPs()
-        d2PI, dIG, dITp, sFIB = {}, self.dIG, self.dITp, self.dITp['sFInpBClf']
+        d2PI, dIG, dITp, sSz = {}, self.dIG, self.dITp, self.dITp['sFInpSzClf']
         d2PI['OutParClf'] = {dIG['sPath']: dITp['pOutPar'],
-                             dIG['sLFS']: [dITp['sPar'], sFIB],
+                             dIG['sLFS']: [dITp['sPar'], sSz],
                              dIG['sLFC']: [sMth] + list(dITp['d3Par'][sMth]),
                              dIG['sLFJS']: dITp['sUS02'],
                              dIG['sLFJSC']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutSumClf'] = {dIG['sPath']: dITp['pOutSum'],
-                             dIG['sLFS']: [dITp['sSummary'], sFIB],
+                             dIG['sLFS']: [dITp['sSummary'], sSz],
                              dIG['sLFC']: self.lIFE,
                              dIG['sLFE']: [sMth] + list(dITp['d3Par'][sMth]),
                              dIG['sLFJS']: dITp['sUS02'],
                              dIG['sLFJSC']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['CnfMat'] = {dIG['sPath']: dITp['pCnfMat'],
-                          dIG['sLFC']: [dITp['sCnfMat'], sFIB],
+                          dIG['sLFC']: [dITp['sCnfMat'], sSz],
                           dIG['sLFE']: self.lIFE + [sMth],
                           dIG['sLFJC']: dITp['sUS02'],
                           dIG['sLFJCE']: dITp['sUS02'],
                           dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutDetClf'] = {dIG['sPath']: dITp['pOutDet'],
-                             dIG['sLFC']: [dITp['sDetailed'], sFIB],
+                             dIG['sLFC']: [dITp['sDetailed'], sSz],
                              dIG['sLFE']: self.lIFE + [sMth],
                              dIG['sLFJC']: dITp['sUS02'],
                              dIG['sLFJCE']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutProbaClf'] = {dIG['sPath']: dITp['pOutDet'],
-                               dIG['sLFC']: [dITp['sProba'], sFIB],
+                               dIG['sLFC']: [dITp['sProba'], sSz],
                                dIG['sLFE']: self.lIFE + [sMth],
                                dIG['sLFJC']: dITp['sUS02'],
                                dIG['sLFJCE']: dITp['sUS02'],
@@ -87,8 +88,7 @@ class Looper(BaseClass):
         self.d2PInf = d2PI
 
     def adaptFPs(self, sMth, sKP, cRep, iSt):
-        sSt = ('' if (iSt is None) else (self.dITp['sStep'] + str(iSt)))
-        sKPR = GF.joinS([sKP, str(cRep + 1), sSt], cJ=self.dITp['sUSC'])
+        sKPR = GF.joinS([sKP, str(cRep + 1), self.sSt], cJ=self.dITp['sUSC'])
         for s in ['OutDetClf', 'OutProbaClf']:
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
 
@@ -103,16 +103,28 @@ class Looper(BaseClass):
             iM = 17
             lG, d2Par = self.dITp['lParGrid_Ada'], self.dITp['d2Par_Ada']
             cClf = AdaClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthRF']:   # random forest Classifier
+        elif sMth == self.dITp['sMthRF']:   # Random Forest Classifier
             iM = 19
             lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
             cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthGP']:   # Gaussian Process Classifier
+        elif sMth == self.dITp['sMthXTr']:   # Extra Trees Classifier
             iM = 21
+            lG, d2Par = self.dITp['lParGrid_XTr'], self.dITp['d2Par_XTr']
+            cClf = XTrClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthGrB']:   # Gradient Boosting Classifier
+            iM = 23
+            lG, d2Par = self.dITp['lParGrid_GrB'], self.dITp['d2Par_GrB']
+            cClf = GrBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthHGrB']:   # Hist Gradient Boosting Classifier
+            iM = 25
+            lG, d2Par = self.dITp['lParGrid_HGrB'], self.dITp['d2Par_HGrB']
+            cClf = HGrBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthGP']:   # Gaussian Process Classifier
+            iM = 27
             lG, d2Par = self.dITp['lParGrid_GP'], self.dITp['d2Par_GP']
             cClf = GPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
         elif sMth == self.dITp['sMthMLP']:  # NN MLP Classifier
-            iM = 23
+            iM = 29
             lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
             cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
         return cClf, iM
@@ -145,10 +157,8 @@ class Looper(BaseClass):
                           saveAnyway=False)
             self.d2MnSEMResClf = GF.calcMnSEMFromD3Val(self.d3ResClf)
             self.dMnSEMCnfMat = GF.calcMnSEMFromD2Dfr(self.d2CnfMat)
-            sSt, sKSC, sKCM = None, 'OutSumClf', 'CnfMat'
-            if iSt is not None:
-                sSt = self.dITp['sStep'] + str(iSt)
-                self.FPs.modFP(d2PI=self.d2PInf, kMn=sKSC, kPos='sLFE', cS=sSt)
+            sKSC, sKCM, sSt = 'OutSumClf', 'CnfMat', self.sSt
+            self.FPs.modFP(d2PI=self.d2PInf, kMn=sKSC, kPos='sLFE', cS=sSt)
             self.saveData(self.d2MnSEMResClf, pF=self.FPs.dPF[sKSC])
             for sK in self.dMnSEMCnfMat:
                 sKS = GF.joinS([sK, sSt])
@@ -159,9 +169,11 @@ class Looper(BaseClass):
     # --- method for performing the outer loops -------------------------------
     def doQuadLoop(self, cTim, stT=None):
         for sMth in self.dITp['lSMth']:
-            self.d3ResClf, self.d2CnfMat = {}, {}
+            self.d3ResClf, self.d2CnfMat, sStep = {}, {}, self.dITp['sStep']
             d2Par, nRep = self.dITp['d3Par'][sMth], self.dITp['dNumRep'][sMth]
             for iSt in self.itISt:
+                sStI = GF.joinS([self.dITp['sFInpStIClf'], sStep + str(iSt)])
+                self.sSt = ('' if (iSt is None) else sStI)
                 for k, sKPar in enumerate(d2Par):
                     for cRep in range(nRep):
                         self.printSettingCRep(sMth, sKPar, iSt, cRep)

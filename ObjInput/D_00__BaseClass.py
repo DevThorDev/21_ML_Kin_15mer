@@ -74,12 +74,18 @@ sDescNone = GC.S_DESC_NONE
 sDescDummy = GC.S_DESC_DUMMY
 sDescAda = GC.S_DESC_ADA
 sDescRF = GC.S_DESC_RF
+sDescXTr = GC.S_DESC_X_TR
+sDescGrB = GC.S_DESC_GR_B
+sDescHGrB = GC.S_DESC_H_GR_B
 sDescGP = GC.S_DESC_GP
 sDescMLP = GC.S_DESC_MLP
 sMthNoneL, sMthNone = GC.S_MTH_NONE_L, GC.S_MTH_NONE
 sMthDummyL, sMthDummy = GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
 sMthAdaL, sMthAda = GC.S_MTH_ADA_L, GC.S_MTH_ADA
 sMthRFL, sMthRF = GC.S_MTH_RF_L, GC.S_MTH_RF
+sMthXTrL, sMthXTr = GC.S_MTH_X_TR_L, GC.S_MTH_X_TR
+sMthGrBL, sMthGrB = GC.S_MTH_GR_B_L, GC.S_MTH_GR_B
+sMthHGrBL, sMthHGrB = GC.S_MTH_H_GR_B_L, GC.S_MTH_H_GR_B
 sMthGPL, sMthGP = GC.S_MTH_GP_L, GC.S_MTH_GP
 sMthMLPL, sMthMLP = GC.S_MTH_MLP_L, GC.S_MTH_MLP
 sPar = GC.S_PAR
@@ -177,6 +183,9 @@ dIO = {# --- general
        'sDescDummy': sDescDummy,
        'sDescAda': sDescAda,
        'sDescRF': sDescRF,
+       'sDescXTr': sDescXTr,
+       'sDescGrB': sDescGrB,
+       'sDescHGrB': sDescHGrB,
        'sDescGP': sDescGP,
        'sDescMLP': sDescMLP,
        'sMthNoneL': sMthNoneL,
@@ -187,6 +196,12 @@ dIO = {# --- general
        'sMthAda': sMthAda,
        'sMthRFL': sMthRFL,
        'sMthRF': sMthRF,
+       'sMthXTrL': sMthXTrL,
+       'sMthXTr': sMthXTr,
+       'sMthGrBL': sMthGrBL,
+       'sMthGrB': sMthGrB,
+       'sMthHGrBL': sMthHGrBL,
+       'sMthHGrB': sMthHGrB,
        'sMthGPL': sMthGPL,
        'sMthGP': sMthGP,
        'sMthMLPL': sMthMLPL,
@@ -213,7 +228,9 @@ dIO = {# --- general
        'sStratShareMino': sStratShareMino,
        # --- numbers
        # --- lists
-       'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthGPL, sMthMLPL],
-       'lSMth': [sMthDummy, sMthAda, sMthRF, sMthGP, sMthMLP]}
+       'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL,
+                   sMthHGrBL, sMthGPL, sMthMLPL],
+       'lSMth': [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB,
+                 sMthGP, sMthMLP]}
 
 ###############################################################################

@@ -12,7 +12,7 @@ sNmSpec = 'Input data for the data loader class in O_06__ClfDataLoader'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control (general) --------------------------------------------------
-sSet = GC.S_SET_06
+sSet = GC.S_SET_07
 
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
@@ -49,18 +49,20 @@ pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
 # --- names and paths of files and dirs (classifier) --------------------------
 sFInpSClf = 'InpClf'
 sFInpBClf = 'Combined_XS_KinasesPho15mer_202202'
+sFInpStIClf = '2StA'
 
 sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
     sFInpClf = GF.joinS([sFInpSClf, sFInpBClf])
 sFInpDClMpClf = GF.joinS([sFInpSClf, GC.S_CL_MAPPING, sSet])
-sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sSet])
+sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sFInpStIClf, sSet])
 
 pInpClf = GC.P_DIR_INP_CLF
 
 # --- names and paths of files and dirs (proportion calculator) ---------------
 sFInpSPrC = sFInpSClf
 sFInpBPrC = sFInpBClf
+sFInpStIPrC = sFInpStIClf
 
 sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
@@ -119,6 +121,9 @@ if maxLenNmer not in setNmerLen:
     maxLenNmer = max(setNmerLen)
 
 # === derived values and input processing =====================================
+sFInpSzClf = sFInpBClf.split(GC.S_USC)[1]
+sFInpSzPrC = sFInpSzClf
+
 sXclEffFam, sSglMltLbl = GC.S_WITH_EXCL_EFF_FAM, GC.S_MLT_LBL
 if noExclEffFam:
     sXclEffFam = GC.S_NO_EXCL_EFF_FAM
@@ -173,6 +178,7 @@ dIO = {# --- general
        'pInpData': pInpData,
        # --- names and paths of files and dirs (classifier)
        'sFInpBClf': sFInpBClf,
+       'sFInpStIClf': sFInpStIClf,
        'sFInpClf': sFInpClf,
        'sFInpDClMpClf': sFInpDClMpClf,
        'sFInpDClStClf': sFInpDClStClf,
@@ -208,6 +214,8 @@ dIO = {# --- general
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
+       'sFInpSzClf': sFInpSzClf,
+       'sFInpSzPrC': sFInpSzPrC,
        'sSglLbl': GC.S_SGL_LBL,
        'sMltLbl': GC.S_MLT_LBL,
        'sXclEffFam': sXclEffFam,

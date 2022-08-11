@@ -12,6 +12,9 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 dNumRep = {GC.S_MTH_DUMMY: 2,
            GC.S_MTH_ADA: 2,
            GC.S_MTH_RF: 2,
+           GC.S_MTH_X_TR: 2,
+           GC.S_MTH_GR_B: 2,
+           GC.S_MTH_H_GR_B: 0,
            GC.S_MTH_GP: 2,
            GC.S_MTH_MLP: 2}
 
@@ -44,8 +47,8 @@ d2Par_Ada = {'A': {'n_estimators': 100,
              #       'algorithm': 'SAMME.R'}
              }
 
-# === random forest Classifier ================================================
-# --- list of parameter grids for random forest Classifier grid search --------
+# === Random Forest Classifier ================================================
+# --- list of parameter grids for Random Forest Classifier grid search --------
 # or lParGrid_RF = None if no such search should be performed
 lParGrid_RF = [{'n_estimators': [100, 1000],
                 'criterion': ['gini', 'entropy', 'log_loss'],
@@ -54,7 +57,7 @@ lParGrid_RF = [{'n_estimators': [100, 1000],
                 'ccp_alpha': [0.0, 0.1]}]
 lParGrid_RF = None
 
-# --- parameter dictionary for random forest Classifier -----------------------
+# --- parameter dictionary for Random Forest Classifier -----------------------
 d2Par_RF = {'B': {'n_estimators': 100,
                   'criterion': 'entropy',
                   'max_depth': None,
@@ -81,9 +84,93 @@ d2Par_RF = {'B': {'n_estimators': 100,
             #       'max_samples': None}
             }
 
+# === Extra Trees Classifier ==================================================
+# --- list of parameter grids for Extra Trees Classifier grid search ----------
+# or lParGrid_XTr = None if no such search should be performed
+lParGrid_XTr = [{'n_estimators': [100, 1000],
+                 'criterion': ['gini', 'entropy', 'log_loss'],
+                 'bootstrap': [True, False]},
+                {'max_features': [None, 'sqrt'],
+                 'ccp_alpha': [0.0, 0.1]}]
+lParGrid_XTr = None
+
+# --- parameter dictionary for Extra Trees Classifier -------------------------
+d2Par_XTr = {'A': {'n_estimators': 100,
+                   'criterion': 'entropy',
+                   'max_depth': None,
+                   'min_samples_split': 2,
+                   'min_samples_leaf': 1,
+                   'min_weight_fraction_leaf': 0.0,
+                   'max_features': 'sqrt',
+                   'max_leaf_nodes': None,
+                   'min_impurity_decrease': 0.0,
+                   'bootstrap': True,
+                   'ccp_alpha': 0.0,
+                   'max_samples': None}
+             }
+
+# === Gradient Boosting Classifier ============================================
+# --- list of parameter grids for Gradient Boosting Classifier grid search ----
+# or lParGrid_GrB = None if no such search should be performed
+lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
+                 'learning_rate': [0.1, 0.5],
+                 'n_estimators': [100, 1000],
+                 'subsample': [0.5, 1.0],
+                 'criterion': ['friedman_mse', 'squared_error', 'mse']},
+                {'max_features': [None, 'sqrt'],
+                 'ccp_alpha': [0.0, 0.1]}]
+lParGrid_GrB = None
+
+# --- parameter dictionary for Gradient Boosting Classifier -------------------
+d2Par_GrB = {'A': {'loss': 'log_loss',
+                   'learning_rate': 0.1,
+                   'n_estimators': 100,
+                   'subsample': 1.0,
+                   'criterion': 'friedman_mse',
+                   'max_depth': 3,
+                   'min_samples_split': 2,
+                   'min_samples_leaf': 1,
+                   'min_weight_fraction_leaf': 0.0,
+                   'max_features': None,
+                   'max_leaf_nodes': None,
+                   'min_impurity_decrease': 0.0,
+                   'ccp_alpha': 0.0}
+             }
+
+# === Hist Gradient Boosting Classifier =======================================
+# --- list of parameter grids for Hist Gradient Boosting Classifier grid search
+# or lParGrid_HGrB = None if no such search should be performed
+lParGrid_HGrB = [{'loss': ['log_loss', 'auto'],
+                  'learning_rate': [0.1, 0.5],
+                  'max_iter': [100, 500],
+                  'max_leaf_nodes': [10, 31, None],
+                  'max_depth': [5, None],
+                  'min_samples_leaf': [5, 20],
+                  'l2_regularization': [0, 0.5],
+                  'max_bins': [63, 255]}]
+lParGrid_HGrB = None
+
+# --- parameter dictionary for Hist Gradient Boosting Classifier --------------
+d2Par_HGrB = {'A': {'loss': 'log_loss',
+                    'learning_rate': 0.1,
+                    'max_iter': 100,
+                    'max_leaf_nodes': None,
+                    'max_depth': None,
+                    'min_samples_leaf': 1,
+                    'l2_regularization': 0,
+                    'max_bins': 255,
+                    'categorical_features': [1],
+                    'monotonic_cst': None,
+                    'early_stopping': False,
+                    'scoring': None,
+                    'validation_fraction': 0.1,
+                    'n_iter_no_change': 10,
+                    'tol': 1.0e-7}
+              }
+
 # === Gaussian Process Classifier =============================================
 # --- list of parameter grids for Gaussian Process Classifier grid search -----
-# or lParGrid_RF = None if no such search should be performed
+# or lParGrid_GP = None if no such search should be performed
 lParGrid_GP = [{'n_restarts_optimizer': [0, 1, 10],
                 'max_iter_predict': [10, 100, 1000],
                 'multi_class': ['one_vs_rest', 'one_vs_one']}]
@@ -193,11 +280,23 @@ dIO = {# --- general
        'lParGrid_Ada': lParGrid_Ada,
        # --- parameter dictionary for AdaBoost Classifier
        'd2Par_Ada': d2Par_Ada,
-       # === random forest Classifier
-       # --- parameter grid for optimising the random forest Classifier
+       # === Random Forest Classifier
+       # --- parameter grid for optimising the Random Forest Classifier
        'lParGrid_RF': lParGrid_RF,
-       # --- parameter dictionary for random forest Classifier
+       # --- parameter dictionary for Random Forest Classifier
        'd2Par_RF': d2Par_RF,
+       # --- parameter grid for optimising the Extra Trees Classifier
+       'lParGrid_XTr': lParGrid_XTr,
+       # --- parameter dictionary for Extra Trees Classifier
+       'd2Par_XTr': d2Par_XTr,
+       # --- parameter grid for optimising the Gradient Boosting Classifier
+       'lParGrid_GrB': lParGrid_GrB,
+       # --- parameter dictionary for Gradient Boosting Classifier
+       'd2Par_GrB': d2Par_GrB,
+       # --- parameter grid for optimising the Hist Gradient Boosting Classif.
+       'lParGrid_HGrB': lParGrid_HGrB,
+       # --- parameter dictionary for Hist Gradient Boosting Classifier
+       'd2Par_HGrB': d2Par_HGrB,
        # === Gaussian Process Classifier
        # --- parameter grid for optimising the Gaussian Process Classifier
        'lParGrid_GP': lParGrid_GP,
@@ -212,6 +311,9 @@ dIO = {# --- general
        'd3Par': {GC.S_MTH_DUMMY: d2Par_Dy,
                  GC.S_MTH_ADA: d2Par_Ada,
                  GC.S_MTH_RF: d2Par_RF,
+                 GC.S_MTH_X_TR: d2Par_XTr,
+                 GC.S_MTH_GR_B: d2Par_GrB,
+                 GC.S_MTH_H_GR_B: d2Par_HGrB,
                  GC.S_MTH_GP: d2Par_GP,
                  GC.S_MTH_MLP: d2Par_MLP},
        # === other input
