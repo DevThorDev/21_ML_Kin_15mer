@@ -9,14 +9,14 @@ sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
-dNumRep = {GC.S_MTH_DUMMY: 2,
-           GC.S_MTH_ADA: 2,
-           GC.S_MTH_RF: 2,
-           GC.S_MTH_X_TR: 2,
-           GC.S_MTH_GR_B: 2,
+dNumRep = {GC.S_MTH_DUMMY: 0,
+           GC.S_MTH_ADA: 0,
+           GC.S_MTH_RF: 0,
+           GC.S_MTH_X_TR: 0,
+           GC.S_MTH_GR_B: 0,
            GC.S_MTH_H_GR_B: 0,
-           GC.S_MTH_GP: 2,
-           GC.S_MTH_MLP: 2}
+           GC.S_MTH_GP: 0,
+           GC.S_MTH_MLP: 5}
 
 # === Dummy Classifier ========================================================
 # --- list of parameter grids for Dummy Classifier grid search ----------------

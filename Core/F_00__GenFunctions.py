@@ -899,7 +899,7 @@ def smplStratRealMajo(Y):
     return sStrat
 
 def smplStratShareMino(Y, dI):
-    shMino = (dI['shareMino'] if 'shareMino' in dI else 1)
+    shMino = (dI[GC.S_STRAT_SHARE_MINO] if GC.S_STRAT_SHARE_MINO in dI else 1)
     sStrat = {cCl: (Y[Y == cCl].size) for cCl in Y.unique()}
     lVSrtAsc, n = sorted(sStrat.values()), 0
     if len(lVSrtAsc) >= 1:

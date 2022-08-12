@@ -67,7 +67,7 @@ dSStrat = {1: GC.S_STRAT_REAL_MAJO,
            2: GC.S_STRAT_SHARE_MINO}
                         # dictionary for modifying the strategy for specific
                         # step indices (in case of doMultiSteps)
-dIStrat = {'shareMino': 0.75}
+dIStrat = {GC.S_STRAT_SHARE_MINO: 1.0}
                         # additional data as required by the custom strategy
 # sStrat = {'NoCl': 1000,
 #           'X_AGC': 100,
@@ -121,8 +121,8 @@ vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 # --- general input for Gaussian Process Classifier ---------------------------
 
 # --- general input for neural network MLP Classifier -------------------------
-nItPartialFit = None        # number of iterations / partial fit (or None)
-# nItPartialFit = 1000        # number of iterations / partial fit (or None)
+# nItPartialFit = None        # number of iterations / partial fit (or None)
+nItPartialFit = 1000        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================

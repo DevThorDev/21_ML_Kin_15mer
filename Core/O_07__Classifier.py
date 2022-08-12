@@ -222,7 +222,8 @@ class BaseSmplClfPrC(BaseClass):
         if self.dITp['lvlOut'] > 0:
             if iSt is not None:
                 print(GC.S_DS04, 'Current step index:', iSt)
-            print(GC.S_DS04, 'Sampling strategy:', self.sStrat)
+            if self.dITp['doImbSampling']:
+                print(GC.S_DS04, 'Sampling strategy:', self.sStrat)
 
     def printResResampleImb(self, YIni, YRes, doPrt=True):
         if doPrt:
