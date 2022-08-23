@@ -11,7 +11,7 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control ------------------------------------------------------------
-doImbSampling = True                # do imbalanced sampling before classific.?
+doImbSampling = False                # do imbalanced sampling before classific.?
 
 doDummyClf = True                   # do dummy classification?
 doAdaClf = True                     # do AdaBoost classification?
@@ -26,7 +26,7 @@ doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 
-doMultiSteps = True                 # do a multi-step classification approach?
+doMultiSteps = False                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 

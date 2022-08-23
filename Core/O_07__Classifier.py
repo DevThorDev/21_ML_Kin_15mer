@@ -60,7 +60,7 @@ class BaseSmplClfPrC(BaseClass):
         for cAttr in lAttrDict:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {})
-        self.doPartFit = (self.sMth == self.dITp['sMthMLP'] and
+        self.doPartFit = (self.sMth in self.dITp['lSMthPartFit'] and
                           self.dITp['nItPartialFit'] is not None)
         self.sKPar = sKPar
         self.getCLblsTrain()
@@ -111,6 +111,10 @@ class BaseSmplClfPrC(BaseClass):
                 if self.dITp['encodeCatFtr']:
                     X = self.XTransTest
         return X, Y
+
+    def getXYIfSpl(self):
+        doSpl = self.dITp['doTrainTestSplit']
+        return self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
 
     def setXY(self, X, Y, setTrain=None):
         if setTrain is not None and self.dITp['doTrainTestSplit']:
@@ -224,6 +228,19 @@ class BaseSmplClfPrC(BaseClass):
                 print(GC.S_DS04, 'Current step index:', iSt)
             if self.dITp['doImbSampling']:
                 print(GC.S_DS04, 'Sampling strategy:', self.sStrat)
+            else:
+                print(GC.S_DS04, 'No imbalanced sampling.')
+
+
+    def printResNoResample(self, Y, doPrt=True):
+        if doPrt:
+            print(GC.S_DS04, ' Size of Y:', Y.size)
+            YUnq = Y.unique()
+            print('Unique values of Y:', YUnq)
+            print('Sizes of classes:')
+            for cY in YUnq:
+                print(cY, self.dITp['sColon'], self.dITp['sTab'],
+                      Y[Y == cY].size, sep='')
 
     def printResResampleImb(self, YIni, YRes, doPrt=True):
         if doPrt:
@@ -260,11 +277,10 @@ class ImbSampler(BaseSmplClfPrC):
         self.printStrat(iSt=iSt)
         # in case of a custom sampling strategy, calculate the dictionary
         if self.sStrat in self.dITp['lSmplStratCustom']:
-            doSpl = self.dITp['doTrainTestSplit']
-            _, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
+            _, Y = self.getXYIfSpl()
             if self.sStrat == self.dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
-                self.sStrat = GF.smplStratRealMajo(Y=Y)
+                self.sStrat = GF.smplStratRealMajo(Y)
             elif self.sStrat == self.dITp['sStratShareMino']:
                 # implement the "ShareMino" strategy
                 self.sStrat = GF.smplStratShareMino(Y, dI=self.dITp['dIStrat'])
@@ -301,13 +317,13 @@ class ImbSampler(BaseSmplClfPrC):
     def fitResampleImbalanced(self):
         print('Resampling data using resampler "', self.dITp['sSampler'],
               '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
-        doSpl = self.dITp['doTrainTestSplit']
-        X, Y = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
+        X, Y = self.getXYIfSpl()
         X, YResImb = self.imbSmp.fit_resample(X, Y)
         self.printResResampleImb(YIni=Y, YRes=YResImb)
         if not self.dITp['onlySglLbl']:
             YResImb = SF.toMultiLbl(self.dITp, serY=YResImb, lXCl=self.lSXCl)
-        self.setXY(X=X, Y=YResImb, setTrain=GF.isTrain(doSplit=doSpl))
+        setTr = GF.isTrain(doSplit=self.dITp['doTrainTestSplit'])
+        self.setXY(X=X, Y=YResImb, setTrain=setTr)
 
 # -----------------------------------------------------------------------------
 class GeneralClassifier(BaseSmplClfPrC):
@@ -319,9 +335,12 @@ class GeneralClassifier(BaseSmplClfPrC):
         self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iSt=iSt, iTp=iTp,
                               lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
-        if self.dITp['doImbSampling'] and not self.doPartFit:
-            self.Smp.fitResampleImbalanced()
-            self.setData(self.Smp.yieldData())
+        if not self.doPartFit:
+            if self.dITp['doImbSampling']:
+                self.Smp.fitResampleImbalanced()
+                self.setData(self.Smp.yieldData())
+            else:
+                self.printResNoResample(Y=self.getXYIfSpl()[1])
         print('Initiated "GeneralClassifier" base object.')
 
     # --- print methods -------------------------------------------------------
@@ -419,8 +438,11 @@ class GeneralClassifier(BaseSmplClfPrC):
     def ClfPartialFit(self, cClf, XInp, YInp, k=0):
         X, Y = XInp, YInp
         if cClf is not None and XInp is not None and YInp is not None:
-            X, Y = self.Smp.imbSmp.fit_resample(XInp, YInp)
-            self.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
+            if self.dITp['doImbSampling']:
+                X, Y = self.Smp.imbSmp.fit_resample(XInp, YInp)
+                self.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
+            else:
+                self.printResNoResample(Y=Y, doPrt=(k==0))
             cClf.partial_fit(X, Y, classes=self.lSXCl)
             self.printClfPartialFit(X)
         return X, Y
@@ -428,12 +450,12 @@ class GeneralClassifier(BaseSmplClfPrC):
     def fitOrPartialFitClf(self, cClf):
         if self.doPartFit:
             assert type(self.dITp['nItPartialFit']) in [int, float]
-            doSpl = self.dITp['doTrainTestSplit']
-            XIni, YIni = self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
+            XIni, YIni = self.getXYIfSpl()
             # repeat resampling and partial fit nItPartialFit times
             for k in range(round(abs(self.dITp['nItPartialFit']))):
                 X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni, k=k)
-            self.setXY(X=X, Y=Y, setTrain=GF.isTrain(doSplit=doSpl))
+            setTr = GF.isTrain(doSplit=self.dITp['doTrainTestSplit'])
+            self.setXY(X=X, Y=Y, setTrain=setTr)
         else:
             self.ClfFit(cClf)
         # calculate the mean accuracy on the given test data and labels
@@ -441,7 +463,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             XTest, YTest = self.getXY(getTrain=False)
             self.scoreClf = cClf.score(XTest, YTest)
 
-    # --- method for selecting the appropriate XTest and YTest vlues ----------
+    # --- method for selecting the appropriate XTest and YTest values ---------
     def getXYTest(self, dat2Pred=None):
         if dat2Pred is not None and self.dITp['encodeCatFtr']:
             dat2Pred = self.cEnc.transform(dat2Pred).toarray()

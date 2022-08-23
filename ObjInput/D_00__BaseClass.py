@@ -231,6 +231,7 @@ dIO = {# --- general
        'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL,
                    sMthHGrBL, sMthGPL, sMthMLPL],
        'lSMth': [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB,
-                 sMthGP, sMthMLP]}
+                 sMthGP, sMthMLP],
+       'lSMthPartFit': [sMthMLP]}
 
 ###############################################################################
