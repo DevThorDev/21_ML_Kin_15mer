@@ -168,7 +168,8 @@ class BaseSmplClfPrC(BaseClass):
     # --- method for splitting data into training and test data ---------------
     def getTrainTestDS(self, X, Y):
         tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
-                                 test_size=self.dITp['propTestData'])
+                                 test_size=self.dITp['propTestData'],
+                                 stratify=self.dITp['stratData'])
         XTrain, XTest, YTrain, YTest = tTrTe
         if not (self.dITp['onlySglLbl'] or self.dITp['lLblTrain'] is None):
             lB = [(serR.sum() in self.dITp['lLblTrain']) for _, serR in

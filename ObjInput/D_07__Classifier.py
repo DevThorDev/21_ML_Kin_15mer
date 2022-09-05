@@ -25,8 +25,9 @@ doMLPClf = True                     # do neural network MLP classification?
 doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
+stratData = None                    # split data stratified way? [None / True]
 
-doMultiSteps = True                 # do a multi-step classification approach?
+doMultiSteps = False                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
 
@@ -177,6 +178,7 @@ dIO = {# --- general
        'doMLPClf': doMLPClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
+       'stratData': stratData,
        'doMultiSteps': doMultiSteps,
        'saveDetailedClfRes': saveDetailedClfRes,
        'calcCnfMatrix': calcCnfMatrix,
