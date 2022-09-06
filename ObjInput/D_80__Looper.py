@@ -10,11 +10,11 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
 dNumRep = {GC.S_MTH_DUMMY: 0,
-           GC.S_MTH_ADA: 2,
+           GC.S_MTH_ADA: 0,
            GC.S_MTH_RF: 0,
            GC.S_MTH_X_TR: 0,
            GC.S_MTH_GR_B: 0,
-           GC.S_MTH_H_GR_B: 0,
+           GC.S_MTH_H_GR_B: 2,
            GC.S_MTH_GP: 0,
            GC.S_MTH_MLP: 0}
 
@@ -140,15 +140,19 @@ d2Par_GrB = {'A': {'loss': 'log_loss',
 # === Hist Gradient Boosting Classifier =======================================
 # --- list of parameter grids for Hist Gradient Boosting Classifier grid search
 # or lParGrid_HGrB = None if no such search should be performed
-lParGrid_HGrB = [{'loss': ['log_loss', 'auto'],
-                  'learning_rate': [0.1, 0.5],
-                  'max_iter': [100, 500],
+lParGrid_HGrB = [{'learning_rate': [0.1, 0.5],
                   'max_leaf_nodes': [10, 31, None],
-                  'max_depth': [5, None],
                   'min_samples_leaf': [5, 20],
-                  'l2_regularization': [0, 0.5],
                   'max_bins': [63, 255]}]
-lParGrid_HGrB = None
+# lParGrid_HGrB = [{'loss': ['log_loss', 'auto'],
+#                   'learning_rate': [0.1, 0.5],
+#                   'max_iter': [100, 500],
+#                   'max_leaf_nodes': [10, 31, None],
+#                   'max_depth': [5, None],
+#                   'min_samples_leaf': [5, 20],
+#                   'l2_regularization': [0, 0.5],
+#                   'max_bins': [63, 255]}]
+# lParGrid_HGrB = None
 
 # --- parameter dictionary for Hist Gradient Boosting Classifier --------------
 d2Par_HGrB = {'A': {'loss': 'log_loss',
