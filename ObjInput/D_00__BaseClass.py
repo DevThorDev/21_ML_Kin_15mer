@@ -101,12 +101,13 @@ sMaxLenS = GC.S_MAX_LEN_S
 sRestr = GC.S_RESTR
 sIPos = GC.S_I_POS
 sLbl = GC.S_LBL
-sNmerEffF = GC.S_N_MER_EFF_FAM
+sNmerEffFam = GC.S_N_MER_EFF_FAM
 sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 sMltStep = GC.S_MLT_STEP
 sStratRealMajo = GC.S_STRAT_REAL_MAJO
 sStratShareMino = GC.S_STRAT_SHARE_MINO
+sPartFit, sPartFitS = GC.S_PART_FIT, GC.S_PART_FIT_S
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -220,12 +221,14 @@ dIO = {# --- general
        'sRestr': sRestr,
        'sIPos': sIPos,
        'sLbl': sLbl,
-       'sNmerEffF': sNmerEffF,
+       'sNmerEffFam': sNmerEffFam,
        'sNmerSeqU': sNmerSeqU,
        'sInpData': sInpData,
        'sMltStep': sMltStep,
        'sStratRealMajo': sStratRealMajo,
        'sStratShareMino': sStratShareMino,
+       'sPartFit': sPartFit,
+       'sPartFitS': sPartFitS,
        # --- numbers
        # --- lists
        'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL,

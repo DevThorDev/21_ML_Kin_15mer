@@ -320,5 +320,22 @@ def toSglLbl(dITp, dfrY):
     return GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
 
 # --- Functions (O_80__Looper) ------------------------------------------------
+def getLSE(dITp, sMth, lIFE):
+    lSEPar = [sMth] + list(dITp['d3Par'][sMth])
+    lSESum = [sMth] + list(dITp['d3Par'][sMth])
+    lSEDet = lIFE + [sMth]
+    l2Add = []
+    if sMth in dITp['lSMthPartFit']:
+        if dITp['nItPartialFit'] is None:
+            l2Add += [dITp['sPartFitS'] + dITp['sNone']]
+        else:
+            assert type(dITp['nItPartialFit']) in [int, float]
+            sNIt = str(round(dITp['nItPartialFit']))
+            l2Add += [dITp['sPartFitS'] + sNIt]
+    if dITp['doImbSampling'] and dITp['sSmplS'] is not None:
+        l2Add += [dITp['sSmplS']]
+    lSESum += l2Add
+    lSEDet += l2Add
+    return lSEPar, lSESum, lSEDet
 
 ###############################################################################

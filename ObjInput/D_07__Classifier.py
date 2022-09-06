@@ -58,9 +58,10 @@ pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # === general over- and undersampler input ====================================
-sSampler = 'RandomUnderSampler'    # string matching the over/under-sampler
-                            # ClusterCentroids, AllKNN, TomekLinks
-                            # NeighbourhoodCleaningRule, RandomUnderSampler,
+sSampler = GC.S_SMPL_RND_U  # string matching the over/under-sampler
+                            # GC.S_SMPL_CL_CTR, GC.S_SMPL_ALL_KNN,
+                            # GC.S_SMPL_NBH_CL_R, GC.S_SMPL_RND_U,
+                            # GC.S_SMPL_TOM_LKS
 sStrat =  GC.S_STRAT_REAL_MAJO         # sampling strategy
                         # 'all' / 'majority' / 'not majority' / 'not minority'
                         # [custom: GC.S_STRAT_REAL_MAJO/GC.S_STRAT_SHARE_MINO]
@@ -122,8 +123,8 @@ vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 # --- general input for Gaussian Process Classifier ---------------------------
 
 # --- general input for neural network MLP Classifier -------------------------
-# nItPartialFit = None        # number of iterations / partial fit (or None)
-nItPartialFit = 1000        # number of iterations / partial fit (or None)
+nItPartialFit = None        # number of iterations / partial fit (or None)
+# nItPartialFit = 1000        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
 
 # =============================================================================
@@ -159,6 +160,7 @@ lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 # === assertions ==============================================================
 
 # === derived values and input processing =====================================
+sSmplS = (GC.D_S_SMPL[sSampler] if (sSampler in GC.D_S_SMPL) else None)
 lSmplStratCustom = [GC.S_STRAT_REAL_MAJO, GC.S_STRAT_SHARE_MINO]
 
 # === create input dictionary =================================================
@@ -252,6 +254,7 @@ dIO = {# --- general
        'lOldClPlt': lOldClPlt,
        'lSResClf': lSResClf,
        # === derived values and input processing ==============================
+       'sSmplS': sSmplS,
        'lSmplStratCustom': lSmplStratCustom}
 
 ###############################################################################

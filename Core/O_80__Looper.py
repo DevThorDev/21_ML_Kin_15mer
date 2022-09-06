@@ -4,6 +4,7 @@
 ###############################################################################
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
+import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 from Core.O_07__Classifier import (DummyClf, AdaClf, RFClf, XTrClf, GrBClf,
@@ -53,34 +54,35 @@ class Looper(BaseClass):
     def fillFPsMth(self, sMth):
         self.FPs = self.D.yieldFPs()
         d2PI, dIG, dITp, sSz = {}, self.dIG, self.dITp, self.dITp['sFInpSzClf']
+        lSEPar, lSESum, lSEDet = SF.getLSE(dITp, sMth, self.lIFE)
         d2PI['OutParClf'] = {dIG['sPath']: dITp['pOutPar'],
                              dIG['sLFS']: [dITp['sPar'], sSz],
-                             dIG['sLFC']: [sMth] + list(dITp['d3Par'][sMth]),
+                             dIG['sLFC']: lSEPar,
                              dIG['sLFJS']: dITp['sUS02'],
                              dIG['sLFJSC']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutSumClf'] = {dIG['sPath']: dITp['pOutSum'],
                              dIG['sLFS']: [dITp['sSummary'], sSz],
                              dIG['sLFC']: self.lIFE,
-                             dIG['sLFE']: [sMth] + list(dITp['d3Par'][sMth]),
+                             dIG['sLFE']: lSESum,
                              dIG['sLFJS']: dITp['sUS02'],
                              dIG['sLFJSC']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['CnfMat'] = {dIG['sPath']: dITp['pCnfMat'],
                           dIG['sLFC']: [dITp['sCnfMat'], sSz],
-                          dIG['sLFE']: self.lIFE + [sMth],
+                          dIG['sLFE']: lSEDet,
                           dIG['sLFJC']: dITp['sUS02'],
                           dIG['sLFJCE']: dITp['sUS02'],
                           dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutDetClf'] = {dIG['sPath']: dITp['pOutDet'],
                              dIG['sLFC']: [dITp['sDetailed'], sSz],
-                             dIG['sLFE']: self.lIFE + [sMth],
+                             dIG['sLFE']: lSEDet,
                              dIG['sLFJC']: dITp['sUS02'],
                              dIG['sLFJCE']: dITp['sUS02'],
                              dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutProbaClf'] = {dIG['sPath']: dITp['pOutDet'],
                                dIG['sLFC']: [dITp['sProba'], sSz],
-                               dIG['sLFE']: self.lIFE + [sMth],
+                               dIG['sLFE']: lSEDet,
                                dIG['sLFJC']: dITp['sUS02'],
                                dIG['sLFJCE']: dITp['sUS02'],
                                dIG['sFXt']: dIG['xtCSV']}

@@ -97,12 +97,12 @@ S_COND_PROB = S_COND + S_PROB
 S_LN_PROB = 'ln(' + S_PROB + ')'
 S_N_MER = 'N' + S_MER
 S_NO = 'No'
-S_EFF = 'Eff'
+S_EFF, S_EFF_S = 'Eff', 'E'
 S_EFF_F = S_EFF + S_FULL
 S_NO_EFF = S_NO + S_EFF
-S_FAM = 'Fam'
+S_FAM, S_FAM_S = 'Fam', 'F'
 S_FAMILY = S_FAM + 'ily'
-S_EFF_FAM = S_EFF + S_FAM
+S_EFF_FAM, S_EFF_FAM_S = S_EFF + S_FAM, S_EFF_S + S_FAM_S
 S_NO_FAM = S_NO + S_FAM
 S_BASE = 'Base'
 S_TRAIN = 'Train'
@@ -262,7 +262,7 @@ S_DESC_GR_B = 'Gradient Boosting Classifier'
 S_DESC_H_GR_B = 'Hist Gradient Boosting Classifier'
 S_DESC_GP = 'Gaussian Process Classifier'
 S_DESC_MLP = 'Neural Network MLP Classifier'
-S_MTH_NONE_L, S_MTH_NONE = 'NoMethod', 'No'
+S_MTH_NONE_L, S_MTH_NONE = S_NO + 'Method', S_NO
 S_MTH_DUMMY_L, S_MTH_DUMMY = 'DummyMethod', 'Dummy'
 S_MTH_ADA_L, S_MTH_ADA = 'AdaBoost', 'Ada'
 S_MTH_RF_L, S_MTH_RF = 'RandomForest', 'RF'
@@ -286,12 +286,20 @@ S_MLT_STEP = S_MLT + S_STEP
 S_CL_MAPPING = S_CL + 'Mapping'
 S_CL_STEPS = S_CL + S_STEP + 's'
 S_MAX_LEN_S = 'mxL'
-S_RESTR = 'restr'
+S_RESTR = 'rst'
 S_I_POS = 'iPos'
-S_WITH_EXCL_EFF_FAM = 'withXcl' + S_EFF_FAM
-S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM
+S_WITH_EXCL_EFF_FAM = 'wXcl' + S_EFF_FAM_S
+S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM_S
+S_SAMPLER, S_SAMPLER_S = 'Sampler', 'Smpl'
+S_SMPL_CL_CTR, S_SMPL_CL_CTR_S = ('ClusterCentroids', 'ClCtr' + S_SAMPLER_S)
+S_SMPL_ALL_KNN, S_SMPL_ALL_KNN_S = ('AllKNN', 'KNN' + S_SAMPLER_S)
+S_SMPL_NBH_CL_R, S_SMPL_NBH_CL_R_S = ('NeighbourhoodCleaningRule',
+                                      'NbhClR' + S_SAMPLER_S)
+S_SMPL_RND_U, S_SMPL_RND_U_S = ('RandomUnderSampler', 'RndU' + S_SAMPLER_S)
+S_SMPL_TOM_LKS, S_SMPL_TOM_LKS_S = ('TomekLinks', 'TomLks' + S_SAMPLER_S)
 S_STRAT_REAL_MAJO = 'RealMajo'
 S_STRAT_SHARE_MINO = 'ShareMino'
+S_PART_FIT, S_PART_FIT_S = 'PartFit', 'PF'
 
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'
@@ -328,5 +336,12 @@ D_MER = {n: str(n) + S_MER for n in L_MER}
 CLR_TAB_RED = 'tab:red'
 CLR_TAB_GREEN = 'tab:green'
 CLR_TAB_BLUE = 'tab:blue'
+
+# === derived values and input processing =====================================
+D_S_SMPL = {S_SMPL_CL_CTR: S_SMPL_CL_CTR_S,
+            S_SMPL_ALL_KNN: S_SMPL_ALL_KNN_S,
+            S_SMPL_NBH_CL_R: S_SMPL_NBH_CL_R_S,
+            S_SMPL_RND_U: S_SMPL_RND_U_S,
+            S_SMPL_TOM_LKS: S_SMPL_TOM_LKS_S}
 
 ###############################################################################

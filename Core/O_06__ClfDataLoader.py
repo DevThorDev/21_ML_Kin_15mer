@@ -53,12 +53,12 @@ class DataLoader(BaseClass):
                                       dIG['sLFE']: dITp['sFResComb'],
                                       dIG['sLFJCE']: dITp['sUS02'],
                                       dIG['sFXt']: dIG['xtBIN']}
-        for sTp in ['EffF', 'SeqU']:
+        for sTp in ['EffFam', 'SeqU']:
             d2PI['Nmer' + sTp] = {dIG['sPath']: dITp['pUnqNmer'],
                                   dIG['sLFC']: dITp['sNmer' + sTp],
                                   dIG['sLFE']: dITp['sFInpClf'],
                                   dIG['sLFJE']: dITp['sUS02'],
-                                  dIG['sLFJCE']: dITp['sUS02'],
+                                  dIG['sLFJCE']: dITp['sUSC'],
                                   dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['InpData', 'X', 'Y']:
             d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],
@@ -93,7 +93,7 @@ class DataLoader(BaseClass):
     def saveProcInpData(self, tData, lSKDPF, sMd=GC.S_CLF):
         for cDat, s in zip(tData, lSKDPF):
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sMd)
-            if s == 'NmerEffF':
+            if s == GC.S_N_MER_EFF_FAM:
                 itC = [GF.joinS([self.dITp['sEffFam'], str(k + 1)]) for k in
                        range(max([0] + [len(cDat[cK]) for cK in cDat]))]
                 cDat = GF.dictLUneqLen2Dfr(cDat, itCol=itC, doTrans=True)
@@ -106,7 +106,7 @@ class DataLoader(BaseClass):
         dMltSt = SF.getIMltSt(self.dIG, self.dITp, Y)
         if saveData is not None:
             t2Save = (dNmerEffF, serNmerSeq, dfrInp, X, Y)
-            lSKeyDPF = 'NmerEffF', 'NmerSeqU', 'InpData', 'X', 'Y'
+            lSKeyDPF = GC.S_N_MER_EFF_FAM, 'NmerSeqU', 'InpData', 'X', 'Y'
             self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
         return dNmerEffF, serNmerSeq, dfrInp, X, Y, dClMp, dMltSt, lSXCl
 

@@ -350,7 +350,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             print('Fitted Classifier to data of shape', X.shape)
             if self.optClf is not None:
                 nL, oC, R04 = GC.S_NEWL, self.optClf, self.dIG['R04']
-                print(GC.S_DS80, 'Grid search results:', nL,
+                print(GC.S_DS80, nL, 'Grid search results:', nL,
                       'Best estimator:', nL, oC.best_estimator_, nL,
                       'Best parameters:', nL, oC.best_params_, nL,
                       'Best score: ', round(oC.best_score_, R04), sep='')

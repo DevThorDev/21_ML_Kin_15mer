@@ -9,14 +9,14 @@ sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
-dNumRep = {GC.S_MTH_DUMMY: 5,
-           GC.S_MTH_ADA: 5,
-           GC.S_MTH_RF: 5,
-           GC.S_MTH_X_TR: 5,
-           GC.S_MTH_GR_B: 5,
-           GC.S_MTH_H_GR_B: 5,
-           GC.S_MTH_GP: 5,
-           GC.S_MTH_MLP: 5}
+dNumRep = {GC.S_MTH_DUMMY: 0,
+           GC.S_MTH_ADA: 2,
+           GC.S_MTH_RF: 0,
+           GC.S_MTH_X_TR: 0,
+           GC.S_MTH_GR_B: 0,
+           GC.S_MTH_H_GR_B: 0,
+           GC.S_MTH_GP: 0,
+           GC.S_MTH_MLP: 0}
 
 # === Dummy Classifier ========================================================
 # --- list of parameter grids for Dummy Classifier grid search ----------------
@@ -36,7 +36,7 @@ d2Par_Dy = {'A': {'strategy': 'uniform',
 lParGrid_Ada = [{'n_estimators': [100, 1000],
                  'learning_rate': [0.5, 1.0, 2.0],
                  'algorithm': ['SAMME', 'SAMME.R']}]
-lParGrid_Ada = None
+# lParGrid_Ada = None
 
 # --- parameter dictionary for AdaBoost Classifier ----------------------------
 d2Par_Ada = {'A': {'n_estimators': 100,
