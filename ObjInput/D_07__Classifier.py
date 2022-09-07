@@ -103,6 +103,25 @@ rndState = None             # None (random) or integer (reproducible)
 bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
+# --- selection of grid search or randomised search; and halving --------------
+typeS = 'RandomizedSearchCV'        # 'GridSearchCV' / 'RandomizedSearchCV'
+halvingS = False                     # should halving search be performed?
+# --- general grid search / randomised search input ---------------------------
+scoringS = 'balanced_accuracy'      # scoring par. string for grid searches
+verboseS = 2                        # verbosity (higher --> more messages)
+retTrScoreS = False                 # should result include training scores?
+# --- general halving grid search / halving randomised search input -----------
+factorHvS = 2                       # 1/(prop. of candidates selected)
+aggrElimHvS = False                 # aggressive elimination of candidates?
+# --- randomised search input -------------------------------------------------
+nIterRS = 100                        # number of parameter settings sampled
+# --- halving randomised search input -----------------------------------------
+nCandidatesHvRS = 'exhaust'         # number of candidate parameters to sample
+
+# --- cross validation of grid search / randomised search input ---------------
+nSplitsCV = 5                       # number of folds (rep. strat. k-fold CV)
+nRepeatsCV = 10                     # number of repeats (rep. strat. k-fold CV)
+
 # --- general input for Dummy Classifier --------------------------------------
 
 # --- general input for AdaBoost Classifier -----------------------------------
@@ -158,6 +177,7 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # === assertions ==============================================================
+assert typeS in ['GridSearchCV', 'RandomizedSearchCV']
 
 # === derived values and input processing =====================================
 sSmplS = (GC.D_S_SMPL[sSampler] if (sSampler in GC.D_S_SMPL) else None)
@@ -223,6 +243,23 @@ dIO = {# --- general
        'rndState': rndState,
        'bWarmStart': bWarmStart,
        'nJobs': nJobs,
+       # --- selection of grid search or randomised search; and halving
+       'typeS': typeS,
+       'halvingS': halvingS,
+       # --- general grid search / randomised search input
+       'scoringS': scoringS,
+       'verboseS': verboseS,
+       'retTrScoreS': retTrScoreS,
+       # --- general halving grid search / halving randomised search input
+       'factorHvS': factorHvS,
+       'aggrElimHvS': aggrElimHvS,
+       # --- randomised search input
+       'nIterRS': nIterRS,
+       # --- halving randomised search input
+       'nCandidatesHvRS': nCandidatesHvRS,
+       # --- cross validation of grid search / randomised search input
+       'nSplitsCV': nSplitsCV,
+       'nRepeatsCV': nRepeatsCV,
        # --- general input for Dummy Classifier
        # --- general input for AdaBoost Classifier
        # --- general input for Random Forest Classifier

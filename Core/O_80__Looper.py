@@ -117,7 +117,7 @@ class Looper(BaseClass):
             iM = 23
             lG, d2Par = self.dITp['lParGrid_GrB'], self.dITp['d2Par_GrB']
             cClf = GrBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthHGrB']:   # Hist Gradient Boosting Classifier
+        elif sMth == self.dITp['sMthHGrB']:   # Hist. Gradient Boosting Clf.
             iM = 25
             lG, d2Par = self.dITp['lParGrid_HGrB'], self.dITp['d2Par_HGrB']
             cClf = HGrBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)

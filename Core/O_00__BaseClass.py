@@ -570,17 +570,17 @@ class Timing:
                str(round(self.elT_07_19_RFClf_Ini, self.rdDig)) +
                GC.S_NEWL + 'Method 20 | "RFClf_Predict":\t' +
                str(round(self.elT_07_20_RFClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 21 | "RFClf_Ini_ImbSmpl":\t' +
+               GC.S_NEWL + 'Method 21 | "XTrClf_Ini_ImbSmpl":\t' +
                str(round(self.elT_07_21_XTrClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 22 | "RFClf_Predict":\t' +
+               GC.S_NEWL + 'Method 22 | "XTrClf_Predict":\t' +
                str(round(self.elT_07_22_XTrClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 23 | "RFClf_Ini_ImbSmpl":\t' +
+               GC.S_NEWL + 'Method 23 | "GrBClf_Ini_ImbSmpl":\t' +
                str(round(self.elT_07_23_GrBClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 24 | "RFClf_Predict":\t' +
+               GC.S_NEWL + 'Method 24 | "GrBClf_Predict":\t' +
                str(round(self.elT_07_24_GrBClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 25 | "RFClf_Ini_ImbSmpl":\t' +
+               GC.S_NEWL + 'Method 25 | "HGrBClf_Ini_ImbSmpl":\t' +
                str(round(self.elT_07_25_HGrBClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 26 | "RFClf_Predict":\t' +
+               GC.S_NEWL + 'Method 26 | "HGrBClf_Predict":\t' +
                str(round(self.elT_07_26_HGrBClf_Pred, self.rdDig)) +
                GC.S_NEWL + 'Method 27 | "GPClf_Ini_ImbSmpl":\t' +
                str(round(self.elT_07_27_GPClf_Ini, self.rdDig)) +

@@ -11,7 +11,11 @@ import Core.F_01__SpcFunctions as SF
 from Core.O_00__BaseClass import BaseClass
 
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import (train_test_split, GridSearchCV,
+                                     HalvingGridSearchCV, RandomizedSearchCV,
+                                     HalvingRandomSearchCV,
+                                     RepeatedStratifiedKFold)
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import (AdaBoostClassifier, RandomForestClassifier,
                               ExtraTreesClassifier, GradientBoostingClassifier,
@@ -70,11 +74,16 @@ class BaseSmplClfPrC(BaseClass):
     def fillFPs(self):
         self.FPs = self.D.yieldFPs()
         d2PI, dIG, dITp = {}, self.dIG, self.dITp
-        lSFS = dITp['sProp']
-        lSFC = dITp['sFInpBPrC']
+        d2PI['OutGSRS'] = {dIG['sPath']: dITp['pOutPar'],
+                           dIG['sLFS']: dITp['sGSRS'],
+                           dIG['sLFC']: dITp['sFInpSzClf'],
+                           dIG['sLFE']: self.lIFE,
+                           dIG['sLFJSC']: dITp['sUS02'],
+                           dIG['sLFJCE']: dITp['sUS02'],
+                           dIG['sFXt']: dIG['xtCSV']}
         d2PI['OutDataPrC'] = {dIG['sPath']: dITp['pOutPrC'],
-                              dIG['sLFS']: lSFS,
-                              dIG['sLFC']: lSFC,
+                              dIG['sLFS']: dITp['sProp'],
+                              dIG['sLFC']: dITp['sFInpBPrC'],
                               dIG['sLFE']: self.lIFE,
                               dIG['sLFJSC']: dITp['sUS02'],
                               dIG['sLFJCE']: dITp['sUS02'],
@@ -345,17 +354,15 @@ class GeneralClassifier(BaseSmplClfPrC):
         print('Initiated "GeneralClassifier" base object.')
 
     # --- print methods -------------------------------------------------------
-    def printClfFitRes(self, X):
+    def printClfFitRes(self, X, sMth=None):
         if self.dITp['lvlOut'] > 0:
             print('Fitted Classifier to data of shape', X.shape)
             if self.optClf is not None:
-                nL, oC, R04 = GC.S_NEWL, self.optClf, self.dIG['R04']
-                print(GC.S_DS80, nL, 'Grid search results:', nL,
-                      'Best estimator:', nL, oC.best_estimator_, nL,
-                      'Best parameters:', nL, oC.best_params_, nL,
-                      'Best score: ', round(oC.best_score_, R04), sep='')
-                dfrCVRes = GF.iniPdDfr(oC.cv_results_)
-                print('CV results:', nL, dfrCVRes, sep='')
+                dfrRes = SF.formatDfrCVRes(self.dIG, self.dITp, self.optClf)
+                if sMth is not None:
+                    self.FPs.modFP(d2PI=self.d2PInf, kMn='OutGSRS',
+                                   kPos='sLFE', cS=sMth, sPos=GC.S_CAP_S)
+                self.saveData(dfrRes, pF=self.FPs.dPF['OutGSRS'])
 
     def printClfFitError(self):
         print('ERROR: Cannot fit Classifier to data!')
@@ -414,11 +421,46 @@ class GeneralClassifier(BaseSmplClfPrC):
                       sep='')
 
     # --- method for obtaining an optimised Classifier from a grid search -----
+    def getOptClf(self, cCV):
+        dITp, cClf = self.dITp, self.Clf
+        aggrElim, retTrScore = dITp['aggrElimHvS'], dITp['retTrScoreS']
+        if dITp['typeS'] == 'GridSearchCV' and not dITp['halvingS']:
+            oClf = GridSearchCV(estimator=cClf, param_grid=self.lParG,
+                                scoring=dITp['scoringS'],
+                                verbose=dITp['verboseS'],
+                                return_train_score=retTrScore, cv=cCV)
+        elif dITp['typeS'] == 'GridSearchCV' and dITp['halvingS']:
+            oClf = HalvingGridSearchCV(estimator=cClf, param_grid=self.lParG,
+                                       factor=dITp['factorHvS'],
+                                       aggressive_elimination=aggrElim,
+                                       scoring=dITp['scoringS'],
+                                       verbose=dITp['verboseS'],
+                                       return_train_score=retTrScore, cv=cCV)
+        elif dITp['typeS'] == 'RandomizedSearchCV' and not dITp['halvingS']:
+            oClf = RandomizedSearchCV(estimator=cClf,
+                                      param_distributions=self.lParG,
+                                      n_iter=dITp['nIterRS'],
+                                      scoring=dITp['scoringS'],
+                                      verbose=dITp['verboseS'],
+                                      return_train_score=retTrScore, cv=cCV)
+        elif dITp['typeS'] == 'RandomizedSearchCV' and dITp['halvingS']:
+            oClf = HalvingRandomSearchCV(estimator=cClf,
+                                         param_distributions=self.lParG,
+                                         n_candidates=dITp['nCandidatesHvRS'],
+                                         factor=dITp['factorHvS'],
+                                         aggressive_elimination=aggrElim,
+                                         scoring=dITp['scoringS'],
+                                         verbose=dITp['verboseS'],
+                                         return_train_score=retTrScore, cv=cCV)
+        return oClf
+    
     def getOptClfGridSearch(self):
-        self.optClf, retClf = None, self.Clf
+        dITp, self.optClf, retClf = self.dITp, None, self.Clf
         if self.lParG is not None:
-            optClf = GridSearchCV(estimator=self.Clf, param_grid=self.lParG,
-                                  scoring='accuracy')
+            cCV = RepeatedStratifiedKFold(n_splits=dITp['nSplitsCV'],
+                                          n_repeats=dITp['nRepeatsCV'],
+                                          random_state=dITp['rndState'])
+            optClf = self.getOptClf(cCV)
             self.optClf, retClf = optClf, optClf
         return retClf
 
@@ -427,12 +469,12 @@ class GeneralClassifier(BaseSmplClfPrC):
         return (self.Clf if self.optClf is None else self.optClf)
 
     # --- method for fitting a Classifier -------------------------------------
-    def ClfFit(self, cClf):
+    def ClfFit(self, cClf, sMth=None):
         X, Y = self.getXY(getTrain=GF.isTrain(self.dITp['doTrainTestSplit']))
         if cClf is not None and X is not None and Y is not None:
             try:
                 cClf.fit(X, Y)
-                self.printClfFitRes(X)
+                self.printClfFitRes(X, sMth=sMth)
             except:
                 self.printClfFitError()
 
@@ -448,7 +490,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             self.printClfPartialFit(X)
         return X, Y
 
-    def fitOrPartialFitClf(self, cClf):
+    def fitOrPartialFitClf(self, cClf, sMth=None):
         if self.doPartFit:
             assert type(self.dITp['nItPartialFit']) in [int, float]
             XIni, YIni = self.getXYIfSpl()
@@ -458,7 +500,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             setTr = GF.isTrain(doSplit=self.dITp['doTrainTestSplit'])
             self.setXY(X=X, Y=Y, setTrain=setTr)
         else:
-            self.ClfFit(cClf)
+            self.ClfFit(cClf, sMth=sMth)
         # calculate the mean accuracy on the given test data and labels
         if self.dITp['doTrainTestSplit']:
             XTest, YTest = self.getXY(getTrain=False)
@@ -573,7 +615,7 @@ class DummyClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDDy, sMthL=sMDyL, sMth=sMDy, iSt=iSt)
         if self.dITp['doDummyClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "DummyClf" base object.')
 
     # --- methods for fitting and predicting with a Dummy Classifier ----------
@@ -590,7 +632,7 @@ class AdaClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDAda, sMthL=sMAdaL, sMth=sMAda, iSt=iSt)
         if self.dITp['doAdaClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "AdaClf" base object.')
 
     # --- methods for fitting and predicting with an AdaBoost Classifier ------
@@ -607,7 +649,7 @@ class RFClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDRF, sMthL=sMRFL, sMth=sMRF, iSt=iSt)
         if self.dITp['doRFClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "RFClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
@@ -628,7 +670,7 @@ class XTrClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDXTr, sMthL=sMXTrL, sMth=sMXTr, iSt=iSt)
         if self.dITp['doXTrClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "XTrClf" base object.')
 
     # --- methods for fitting and predicting with an Extra Trees Classifier ---
@@ -649,7 +691,7 @@ class GrBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDGrB, sMthL=sMGrBL, sMth=sMGrB, iSt=iSt)
         if self.dITp['doGrBClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "GrBClf" base object.')
 
     # --- methods for fitting and predicting with a Gradient Boosting Classif.
@@ -669,7 +711,7 @@ class HGrBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDH, sMthL=sMHL, sMth=sMH, iSt=iSt)
         if self.dITp['doHGrBClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "HGrBClf" base object.')
 
     # --- methods for fitting and predicting with a Hist Gradient Boosting Clf.
@@ -690,7 +732,7 @@ class GPClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDGP, sMthL=sMGPL, sMth=sMGP, iSt=iSt)
         if self.dITp['doGPClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "GPClf" base object.')
 
     # --- methods for fitting and predicting with a Gaussian Process Classifier
@@ -711,7 +753,7 @@ class MLPClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDMLP, sMthL=sMMLPL, sMth=sMMLP, iSt=iSt)
         if self.dITp['doMLPClf']:
-            self.fitOrPartialFitClf(self.getClf())
+            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "MLPClf" base object.')
 
     # --- methods for fitting and predicting with a neural network MLP Classif.

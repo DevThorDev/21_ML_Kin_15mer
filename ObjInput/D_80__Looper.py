@@ -2,6 +2,8 @@
 ###############################################################################
 # --- D_80__Looper.py ---------------------------------------------------------
 ###############################################################################
+from scipy import stats
+
 import Core.C_00__GenConstants as GC
 
 # --- general -----------------------------------------------------------------
@@ -9,14 +11,14 @@ sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
-dNumRep = {GC.S_MTH_DUMMY: 0,
-           GC.S_MTH_ADA: 0,
-           GC.S_MTH_RF: 0,
-           GC.S_MTH_X_TR: 0,
-           GC.S_MTH_GR_B: 0,
-           GC.S_MTH_H_GR_B: 2,
-           GC.S_MTH_GP: 0,
-           GC.S_MTH_MLP: 0}
+dNumRep = {GC.S_MTH_DUMMY: 1,
+           GC.S_MTH_ADA: 1,
+           GC.S_MTH_RF: 1,
+           GC.S_MTH_X_TR: 1,
+           GC.S_MTH_GR_B: 1,
+           GC.S_MTH_H_GR_B: 1,
+           GC.S_MTH_GP: 1,
+           GC.S_MTH_MLP: 1}
 
 # === Dummy Classifier ========================================================
 # --- list of parameter grids for Dummy Classifier grid search ----------------
@@ -33,8 +35,12 @@ d2Par_Dy = {'A': {'strategy': 'uniform',
 # === AdaBoost Classifier =====================================================
 # --- list of parameter grids for AdaBoost Classifier grid search -------------
 # or lParGrid_Ada = None if no such search should be performed
-lParGrid_Ada = [{'n_estimators': [100, 1000],
-                 'learning_rate': [0.5, 1.0, 2.0],
+# lParGrid_Ada = [{'n_estimators': [100, 1000],
+#                  'learning_rate': [0.5, 1.0, 2.0],
+#                  'algorithm': ['SAMME', 'SAMME.R']}]
+lParGrid_Ada = [{'learning_rate': [0.5, 1.0, 2.0],
+                 'algorithm': ['SAMME', 'SAMME.R']}]
+lParGrid_Ada = [{'learning_rate': stats.uniform(0.0, 2.0),
                  'algorithm': ['SAMME', 'SAMME.R']}]
 # lParGrid_Ada = None
 
@@ -50,12 +56,19 @@ d2Par_Ada = {'A': {'n_estimators': 100,
 # === Random Forest Classifier ================================================
 # --- list of parameter grids for Random Forest Classifier grid search --------
 # or lParGrid_RF = None if no such search should be performed
-lParGrid_RF = [{'n_estimators': [100, 1000],
-                'criterion': ['gini', 'entropy', 'log_loss'],
-                'bootstrap': [True, False]},
-               {'max_features': [None, 'sqrt'],
-                'ccp_alpha': [0.0, 0.1]}]
-lParGrid_RF = None
+# lParGrid_RF = [{'n_estimators': [100, 1000],
+#                 'criterion': ['gini', 'entropy', 'log_loss'],
+#                 'bootstrap': [True, False]},
+#                {'max_features': [None, 'sqrt'],
+#                 'ccp_alpha': [0.0, 0.1]}]
+lParGrid_RF = [{'criterion': ['gini', 'entropy', 'log_loss'],
+                'ccp_alpha': [0.0, 0.1]},
+               {'max_features': [None, 'sqrt']}]
+lParGrid_RF = [{'criterion': ['gini', 'entropy', 'log_loss'],
+                'bootstrap': [True, False],
+                'ccp_alpha': stats.uniform(0.0, 0.5)},
+               {'max_features': [None, 'sqrt']}]
+# lParGrid_RF = None
 
 # --- parameter dictionary for Random Forest Classifier -----------------------
 d2Par_RF = {'B': {'n_estimators': 100,
@@ -87,12 +100,19 @@ d2Par_RF = {'B': {'n_estimators': 100,
 # === Extra Trees Classifier ==================================================
 # --- list of parameter grids for Extra Trees Classifier grid search ----------
 # or lParGrid_XTr = None if no such search should be performed
-lParGrid_XTr = [{'n_estimators': [100, 1000],
-                 'criterion': ['gini', 'entropy', 'log_loss'],
-                 'bootstrap': [True, False]},
-                {'max_features': [None, 'sqrt'],
-                 'ccp_alpha': [0.0, 0.1]}]
-lParGrid_XTr = None
+# lParGrid_XTr = [{'n_estimators': [100, 1000],
+#                  'criterion': ['gini', 'entropy', 'log_loss'],
+#                  'bootstrap': [True, False]},
+#                 {'max_features': [None, 'sqrt'],
+#                  'ccp_alpha': [0.0, 0.1]}]
+lParGrid_XTr = [{'criterion': ['gini', 'entropy', 'log_loss'],
+                 'ccp_alpha': [0.0, 0.1]},
+                {'max_features': [None, 'sqrt']}]
+lParGrid_XTr = [{'criterion': ['gini', 'entropy', 'log_loss'],
+                 'bootstrap': [True, False],
+                 'ccp_alpha': stats.uniform(0.0, 0.5)},
+                {'max_features': [None, 'sqrt']}]
+# lParGrid_XTr = None
 
 # --- parameter dictionary for Extra Trees Classifier -------------------------
 d2Par_XTr = {'A': {'n_estimators': 100,
@@ -119,6 +139,12 @@ lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
                  'criterion': ['friedman_mse', 'squared_error', 'mse']},
                 {'max_features': [None, 'sqrt'],
                  'ccp_alpha': [0.0, 0.1]}]
+lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
+                 'learning_rate': stats.uniform(0.0, 1.0),
+                 'ccp_alpha': stats.uniform(0.0, 0.5),
+                 'n_estimators': [100, 1000],
+                 'subsample': stats.uniform(0.1, 1.0),
+                 'criterion': ['friedman_mse', 'squared_error', 'mse']}]
 lParGrid_GrB = None
 
 # --- parameter dictionary for Gradient Boosting Classifier -------------------
@@ -152,6 +178,14 @@ lParGrid_HGrB = [{'learning_rate': [0.1, 0.5],
 #                   'min_samples_leaf': [5, 20],
 #                   'l2_regularization': [0, 0.5],
 #                   'max_bins': [63, 255]}]
+lParGrid_HGrB = [{'loss': ['log_loss', 'auto'],
+                  'learning_rate': stats.uniform(0.0, 1.0),
+                  'max_iter': stats.randint(10, 1000 + 1),
+                  'max_leaf_nodes': [10, 31, None],
+                  'max_depth': [5, None],
+                  'min_samples_leaf': stats.randint(5, 20 + 1),
+                  'l2_regularization': stats.uniform(0.0, 1.0),
+                  'max_bins': [63, 255]}]
 # lParGrid_HGrB = None
 
 # --- parameter dictionary for Hist Gradient Boosting Classifier --------------
@@ -178,6 +212,9 @@ d2Par_HGrB = {'A': {'loss': 'log_loss',
 lParGrid_GP = [{'n_restarts_optimizer': [0, 1, 10],
                 'max_iter_predict': [10, 100, 1000],
                 'multi_class': ['one_vs_rest', 'one_vs_one']}]
+lParGrid_GP = [{'n_restarts_optimizer': stats.randint(0, 10 + 1),
+                'max_iter_predict': stats.randint(10, 1000 + 1),
+                'multi_class': ['one_vs_rest', 'one_vs_one']}]
 lParGrid_GP = None
 
 # --- parameter dictionary for Gaussian Process Classifier -----------------------
@@ -203,6 +240,11 @@ lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
                  'solver': ['adam', 'lbfgs', 'sgd'],
                  'learning_rate': ['constant', 'adaptive'],
                  'momentum': [0.6, 0.9, 0.98]}]
+lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
+                 'activation': ['relu', 'identity', 'logistic', 'tanh'],
+                 'solver': ['adam', 'lbfgs', 'sgd'],
+                 'learning_rate': ['constant', 'adaptive'],
+                 'momentum': stats.uniform(0.1, 0.99)}]
 lParGrid_MLP = None
 
 # --- parameter dictionary for neural network MLP Classifier ------------------

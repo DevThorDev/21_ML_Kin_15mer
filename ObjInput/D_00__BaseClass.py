@@ -88,7 +88,7 @@ sMthGrBL, sMthGrB = GC.S_MTH_GR_B_L, GC.S_MTH_GR_B
 sMthHGrBL, sMthHGrB = GC.S_MTH_H_GR_B_L, GC.S_MTH_H_GR_B
 sMthGPL, sMthGP = GC.S_MTH_GP_L, GC.S_MTH_GP
 sMthMLPL, sMthMLP = GC.S_MTH_MLP_L, GC.S_MTH_MLP
-sPar = GC.S_PAR
+sPar, sGSRS = GC.S_PAR, GC.S_GSRS
 sSummary = GC.S_SUMMARY
 sCnfMat = GC.S_CNF_MAT
 sDetailed = GC.S_DETAILED
@@ -208,6 +208,7 @@ dIO = {# --- general
        'sMthMLPL': sMthMLPL,
        'sMthMLP': sMthMLP,
        'sPar': sPar,
+       'sGSRS': sGSRS,
        'sSummary': sSummary,
        'sCnfMat': sCnfMat,
        'sDetailed': sDetailed,

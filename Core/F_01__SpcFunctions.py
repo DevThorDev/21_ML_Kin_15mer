@@ -319,6 +319,18 @@ def toSglLbl(dITp, dfrY):
             lY[k] = serR.index[serR == 1].to_list()[0]
     return GF.iniPdSer(lY, lSNmI=dfrY.index, nameS=dITp['sEffFam'])
 
+def formatDfrCVRes(dIG, dITp, cClf):
+    nL, R04 = dITp['sNewl'], dIG['R04']
+    print(GC.S_DS80, nL, 'Grid search results:', nL,
+          'Best estimator:', nL, cClf.best_estimator_, nL,
+          'Best parameters:', nL, cClf.best_params_, nL,
+          'Best score: ', round(cClf.best_score_, R04), sep='')
+    dfrCVRes = GF.iniPdDfr(cClf.cv_results_)
+    dfrCVRes = dfrCVRes.sort_values(by=['rank_test_score'])
+    dfrCVRes = dfrCVRes.set_index(dfrCVRes['params'].apply(GF.joinS))
+    print('CV results:', nL, dfrCVRes, sep='')
+    return dfrCVRes
+
 # --- Functions (O_80__Looper) ------------------------------------------------
 def getLSE(dITp, sMth, lIFE):
     lSEPar = [sMth] + list(dITp['d3Par'][sMth])
