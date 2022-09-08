@@ -8,7 +8,7 @@ import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 from Core.O_07__Classifier import (DummyClf, AdaClf, RFClf, XTrClf, GrBClf,
-                                   HGrBClf, GPClf, MLPClf)
+                                   HGrBClf, GPClf, PassAggrClf, MLPClf)
 
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
@@ -125,6 +125,11 @@ class Looper(BaseClass):
             iM = 27
             lG, d2Par = self.dITp['lParGrid_GP'], self.dITp['d2Par_GP']
             cClf = GPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthPaA']:   # Gaussian Process Classifier
+            iM = 27
+            lG, d2Par = self.dITp['lParGrid_PaA'], self.dITp['d2Par_PaA']
+            cClf = PassAggrClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar,
+                               iSt=iSt)
         elif sMth == self.dITp['sMthMLP']:  # NN MLP Classifier
             iM = 29
             lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']

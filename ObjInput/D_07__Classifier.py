@@ -20,7 +20,15 @@ doXTrClf = True                     # do Extra Trees classification?
 doGrBClf = True                     # do Gradient Boosting classification?
 doHGrBClf = True                    # do HistGradientBoosting classification?
 doGPClf = True                      # do Gaussian Process classification?
+doPassAggrClf = True                # do Passive Aggressive classification?
+doPerceptrClf = True                # do Perceptron classification?
+doSGDClf = True                     # do SGD classification?
+doCatNB = True                      # do Categorical NB classification?
+doComplNB = True                    # do Complement NB classification?
+doGaussNB = True                    # do Gaussian NB classification?
 doMLPClf = True                     # do neural network MLP classification?
+doLinSVClf = True                   # do Linear SV classification?
+doNuSVClf = True                    # do Nu-Support SV classification?
 
 doPropCalc = False                   # do calculation of AAc proportions/class?
 
@@ -114,13 +122,13 @@ retTrScoreS = False                 # should result include training scores?
 factorHvS = 2                       # 1/(prop. of candidates selected)
 aggrElimHvS = False                 # aggressive elimination of candidates?
 # --- randomised search input -------------------------------------------------
-nIterRS = 100                        # number of parameter settings sampled
+nIterRS = 3                        # number of parameter settings sampled
 # --- halving randomised search input -----------------------------------------
 nCandidatesHvRS = 'exhaust'         # number of candidate parameters to sample
 
 # --- cross validation of grid search / randomised search input ---------------
 nSplitsCV = 5                       # number of folds (rep. strat. k-fold CV)
-nRepeatsCV = 10                     # number of repeats (rep. strat. k-fold CV)
+nRepeatsCV = 3                     # number of repeats (rep. strat. k-fold CV)
 
 # --- general input for Dummy Classifier --------------------------------------
 
@@ -141,10 +149,27 @@ vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Gaussian Process Classifier ---------------------------
 
+# --- general input for Passive Aggressive Classifier -------------------------
+vVerbPaA = 1                # state of verbosity ([0], 1, 2, 3...)
+
+# --- general input for Perceptron Classifier ---------------------------------
+
+# --- general input for SGD Classifier ----------------------------------------
+
+# --- general input for Categorical NB Classifier -----------------------------
+
+# --- general input for Complement NB Classifier ------------------------------
+
+# --- general input for Gaussian NB Classifier --------------------------------
+
 # --- general input for neural network MLP Classifier -------------------------
 nItPartialFit = None        # number of iterations / partial fit (or None)
 # nItPartialFit = 1000        # number of iterations / partial fit (or None)
 bVerb = True                # state of verbosity (True: progress messages)
+
+# --- general input for Linear SV Classifier ----------------------------------
+
+# --- general input for Nu-Support SV Classifier ------------------------------
 
 # =============================================================================
 # --- numbers -----------------------------------------------------------------
@@ -197,7 +222,15 @@ dIO = {# --- general
        'doGrBClf': doGrBClf,
        'doHGrBClf': doHGrBClf,
        'doGPClf': doGPClf,
+       'doPassAggrClf': doPassAggrClf,
+       'doPerceptrClf': doPerceptrClf,
+       'doSGDClf': doSGDClf,
+       'doCatNB': doCatNB,
+       'doComplNB': doComplNB,
+       'doGaussNB': doGaussNB,
        'doMLPClf': doMLPClf,
+       'doLinSVClf': doLinSVClf,
+       'doNuSVClf': doNuSVClf,
        'doPropCalc': doPropCalc,
        'doTrainTestSplit': doTrainTestSplit,
        'stratData': stratData,
@@ -272,7 +305,16 @@ dIO = {# --- general
        # --- general input for Hist Gradient Boosting Classifier
        'vVerbHGrB': vVerbHGrB,
        # --- general input for Gaussian Process Classifier
+       # --- general input for Passive Aggressive Classifier
+       'vVerbPaA': vVerbPaA,
+       # --- general input for Perceptron Classifier
+       # --- general input for SGD Classifier
+       # --- general input for Categorical NB Classifier
+       # --- general input for Complement NB Classifier
+       # --- general input for Gaussian NB Classifier
        # --- general input for neural network MLP Classifier
+       # --- general input for Linear SV Classifier
+       # --- general input for Nu-Support SV Classifier
        'nItPartialFit': nItPartialFit,
        'bVerb': bVerb,
        # ======================================================================

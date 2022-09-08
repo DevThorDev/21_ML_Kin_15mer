@@ -11,14 +11,22 @@ sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
-dNumRep = {GC.S_MTH_DUMMY: 1,
-           GC.S_MTH_ADA: 1,
-           GC.S_MTH_RF: 1,
-           GC.S_MTH_X_TR: 1,
-           GC.S_MTH_GR_B: 1,
-           GC.S_MTH_H_GR_B: 1,
-           GC.S_MTH_GP: 1,
-           GC.S_MTH_MLP: 1}
+dNumRep = {GC.S_MTH_DUMMY: 0,
+           GC.S_MTH_ADA: 0,
+           GC.S_MTH_RF: 0,
+           GC.S_MTH_X_TR: 0,
+           GC.S_MTH_GR_B: 0,
+           GC.S_MTH_H_GR_B: 0,
+           GC.S_MTH_GP: 0,
+           GC.S_MTH_PA_A: 1,
+           GC.S_MTH_PCT: 0,
+           GC.S_MTH_SGD: 0,
+           GC.S_MTH_CT_NB: 0,
+           GC.S_MTH_CP_NB: 0,
+           GC.S_MTH_GS_NB: 0,
+           GC.S_MTH_MLP: 0,
+           GC.S_MTH_LSV: 0,
+           GC.S_MTH_NSV: 0}
 
 # === Dummy Classifier ========================================================
 # --- list of parameter grids for Dummy Classifier grid search ----------------
@@ -217,7 +225,7 @@ lParGrid_GP = [{'n_restarts_optimizer': stats.randint(0, 10 + 1),
                 'multi_class': ['one_vs_rest', 'one_vs_one']}]
 lParGrid_GP = None
 
-# --- parameter dictionary for Gaussian Process Classifier -----------------------
+# --- parameter dictionary for Gaussian Process Classifier --------------------
 d2Par_GP = {'A': {'kernel': None,
                   'optimizer': 'fmin_l_bfgs_b',
                   'n_restarts_optimizer': 0,
@@ -231,6 +239,29 @@ d2Par_GP = {'A': {'kernel': None,
             #       'copy_X_train': True,
             #       'multi_class': 'one_vs_one'}
             }
+
+# === Passive Aggressive Classifier ===========================================
+# --- list of parameter grids for Passive Aggressive Classifier grid search ---
+# or lParGrid_PaA = None if no such search should be performed
+lParGrid_PaA = [{'C': [0.1, 1.0, 10.0],
+                 'loss': ['hinge', 'squared_hinge'],
+                 'class_weight': [None, 'balanced']}]
+lParGrid_PaA = [{'C': stats.uniform(0.01, 10.0),
+                 'loss': ['hinge', 'squared_hinge'],
+                 'class_weight': [None, 'balanced']}]
+# lParGrid_PaA = None
+
+# --- parameter dictionary for Passive Aggressive Classifier --------------------
+d2Par_PaA = {'A': {'C': 1.0,
+                   'max_iter': 1000,
+                   'tol': 1.0e-3,
+                   'early_stopping': False,
+                   'validation_fraction': 0.1,
+                   'n_iter_no_change': 5,
+                   'shuffle': True,
+                   'loss': 'hinge',
+                   'class_weight': None,
+                   'average': False}}
 
 # === neural network MLP Classifier ===========================================
 # --- list of parameter grids for neural network MLP Classifier grid search ---
@@ -348,6 +379,11 @@ dIO = {# --- general
        'lParGrid_GP': lParGrid_GP,
        # --- parameter dictionary for Gaussian Process Classifier
        'd2Par_GP': d2Par_GP,
+       # === Passive Aggressive Classifier
+       # --- parameter grid for optimising the Passive Aggressive Classifier
+       'lParGrid_PaA': lParGrid_PaA,
+       # --- parameter dictionary for Passive Aggressive Classifier
+       'd2Par_PaA': d2Par_PaA,
        # === neural network MLP Classifier
        # --- parameter grid for optimising the neural network MLP Classifier
        'lParGrid_MLP': lParGrid_MLP,
@@ -361,6 +397,7 @@ dIO = {# --- general
                  GC.S_MTH_GR_B: d2Par_GrB,
                  GC.S_MTH_H_GR_B: d2Par_HGrB,
                  GC.S_MTH_GP: d2Par_GP,
+                 GC.S_MTH_PA_A: d2Par_PaA,
                  GC.S_MTH_MLP: d2Par_MLP},
        # === other input
        # --- numbers

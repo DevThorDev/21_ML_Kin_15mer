@@ -78,6 +78,7 @@ sDescXTr = GC.S_DESC_X_TR
 sDescGrB = GC.S_DESC_GR_B
 sDescHGrB = GC.S_DESC_H_GR_B
 sDescGP = GC.S_DESC_GP
+sDescPaA = GC.S_DESC_PA_A
 sDescMLP = GC.S_DESC_MLP
 sMthNoneL, sMthNone = GC.S_MTH_NONE_L, GC.S_MTH_NONE
 sMthDummyL, sMthDummy = GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
@@ -87,6 +88,7 @@ sMthXTrL, sMthXTr = GC.S_MTH_X_TR_L, GC.S_MTH_X_TR
 sMthGrBL, sMthGrB = GC.S_MTH_GR_B_L, GC.S_MTH_GR_B
 sMthHGrBL, sMthHGrB = GC.S_MTH_H_GR_B_L, GC.S_MTH_H_GR_B
 sMthGPL, sMthGP = GC.S_MTH_GP_L, GC.S_MTH_GP
+sMthPaAL, sMthPaA = GC.S_MTH_PA_A_L, GC.S_MTH_PA_A
 sMthMLPL, sMthMLP = GC.S_MTH_MLP_L, GC.S_MTH_MLP
 sPar, sGSRS = GC.S_PAR, GC.S_GSRS
 sSummary = GC.S_SUMMARY
@@ -188,6 +190,7 @@ dIO = {# --- general
        'sDescGrB': sDescGrB,
        'sDescHGrB': sDescHGrB,
        'sDescGP': sDescGP,
+       'sDescPaA': sDescPaA,
        'sDescMLP': sDescMLP,
        'sMthNoneL': sMthNoneL,
        'sMthNone': sMthNone,
@@ -205,6 +208,8 @@ dIO = {# --- general
        'sMthHGrB': sMthHGrB,
        'sMthGPL': sMthGPL,
        'sMthGP': sMthGP,
+       'sMthPaAL': sMthPaAL,
+       'sMthPaA': sMthPaA,
        'sMthMLPL': sMthMLPL,
        'sMthMLP': sMthMLP,
        'sPar': sPar,
@@ -233,9 +238,9 @@ dIO = {# --- general
        # --- numbers
        # --- lists
        'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL,
-                   sMthHGrBL, sMthGPL, sMthMLPL],
+                   sMthHGrBL, sMthGPL, sMthPaAL, sMthMLPL],
        'lSMth': [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB,
-                 sMthGP, sMthMLP],
+                 sMthGP, sMthPaA, sMthMLP],
        'lSMthPartFit': [sMthMLP]}
 
 ###############################################################################
