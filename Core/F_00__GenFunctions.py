@@ -603,7 +603,10 @@ def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
         return np.array(data)
 
 def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, i=0):
-    arrProba = cClf.predict_proba(dat2Pr)
+    if hasattr(cClf, 'predict_proba'):
+        arrProba = cClf.predict_proba(dat2Pr)
+    else:
+        return None
     if type(arrProba) == list:    # e.g. result of a random forest classifier
         return iniPdDfr(np.column_stack([1 - cArr[:, i] for cArr in arrProba]),
                         lSNmC=lSC, lSNmR=lSR)
@@ -677,7 +680,7 @@ def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
                 return pd.DataFrame(data, index=lSNmR, columns=lSNmC)
 
 def iniWShape(tmplDfr, fillV=np.nan):
-    iniPdDfr(shape=tmplDfr.shape, fillV=fillV)
+    return iniPdDfr(shape=tmplDfr.shape, fillV=fillV)
 
 def dictSglKey2Ser(cD):
     if len(cD) == 1:

@@ -166,7 +166,7 @@ class ViterbiLog(SeqAnalysis):
 
     def runViterbiAlgorithm(self, cTim, stT=None):
         if self.dITp['doViterbi']:
-            cStT = time.time()
+            cT = time.time()
             print(GC.S_EQ80, GC.S_NEWL, GC.S_DS30, ' Viterbi Algorithm ',
                   GC.S_DS31, GC.S_NEWL, sep='')
             nFSeq, sFS = len(self.dFSeq), 'full sequences [ViterbiAlgorithm]'
@@ -184,7 +184,7 @@ class ViterbiLog(SeqAnalysis):
                 GF.showProgress(N=nFSeq, n=k, modeDisp=self.dITp['mDsp'],
                                 varText=sFS, startTime=stT)
             self.saveViterbiResData()
-            cTim.updateTimes(iMth=13, stTMth=cStT, endTMth=time.time())
+            cTim.updateTimes(tMth=(5, 1), stTMth=cT, endTMth=time.time())
 
     # --- methods for saving data ---------------------------------------------
     def saveViterbiResData(self):

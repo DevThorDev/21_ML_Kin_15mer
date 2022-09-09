@@ -8,7 +8,6 @@ import Core.F_00__GenFunctions as GF
 from Control.A_00__GenInput import dictInpG
 from Core.C_00__GenConstants import S_OBJINP
 from Core.I_01__InpData import InputData
-from Core.O_00__BaseClass import Timing
 # from Core.O_01__ExpData import ExpData
 # from Core.O_02__SeqAnalysis import SeqAnalysis
 # from Core.O_03__Validation import Validation
@@ -17,6 +16,7 @@ from Core.O_06__ClfDataLoader import DataLoader
 # from Core.O_07__Classifier import RFClf, MLPClf, PropCalculator
 from Core.O_07__Classifier import PropCalculator
 from Core.O_80__Looper import Looper
+from Core.O_95__Timing import Timing
 
 # ### MAIN ####################################################################
 startTime = GF.startSimu()
@@ -77,7 +77,7 @@ print(GC.S_EQ29, 'Starting analysis...', GC.S_EQ29)
 # END - Viterbi algorithm (Hidden Markov Model)
 
 cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=99, stTMth=cStTime, endTMth=cEndTime)
+cTiming.updateTimes(tMth=(None, 9999), stTMth=cStTime, endTMth=cEndTime)
 
 cStTime = GF.showElapsedTime(startTime)
 cDataLoader = DataLoader(inpDatG)
@@ -91,7 +91,7 @@ cDataLoader.printDictNmerNoCl()
 # cDataLoader.printlSXClClf()
 # cDataLoader.printlSXClPrC()
 cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=14, stTMth=cStTime, endTMth=cEndTime)
+cTiming.updateTimes(tMth=(6, 1), stTMth=cStTime, endTMth=cEndTime)
 
 cLooper = Looper(inpDatG, D=cDataLoader)
 cLooper.doQuadLoop(cTim=cTiming, stT=startTime)
@@ -100,7 +100,7 @@ cStTime = GF.showElapsedTime(startTime)
 cPropCalc = PropCalculator(inpDatG, D=cDataLoader)
 cPropCalc.calcPropAAc()
 cEndTime = GF.showElapsedTime(startTime)
-cTiming.updateTimes(iMth=19, stTMth=cStTime, endTMth=cEndTime)
+cTiming.updateTimes(tMth=(7, 1000), stTMth=cStTime, endTMth=cEndTime)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

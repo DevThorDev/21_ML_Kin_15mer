@@ -209,7 +209,7 @@ class SeqAnalysis(BaseClass):
 
     def getLInpSeq(self, cTim, lSSeq=None, getFullS=True, red2WFullS=True,
                    uniqueS=True, stT=None):
-        cStT = time.time()
+        cT = time.time()
         pFNS, pFFS = self.dPF['lNmerSeq'], self.dPF['lFullSeq']
         [iS, iE], self.lSNmer = self.dITp['lIStartEnd'], lSSeq
         self.dfrInpSeq = self.loadData(pF=self.dPF['SeqCheck'], iC=0)
@@ -223,11 +223,11 @@ class SeqAnalysis(BaseClass):
             sNmSer = self.dITp['sTargSeq']
             self.saveListAsSer(self.lSFull, pF=pFFS, sName=sNmSer)
         self.saveListAsSer(self.lSNmer, pF=pFNS, sName=self.dITp['sNmer'])
-        cTim.updateTimes(iMth=1, stTMth=cStT, endTMth=time.time())
+        cTim.updateTimes(tMth=(2, 1), stTMth=cT, endTMth=time.time())
 
     # --- methods for generating the {seq. length: seq. list} dictionary ------
     def genDLenSeq(self, cTim, stT=None):
-        cStT = time.time()
+        cT = time.time()
         print('Creating Nmer {seq. length: seq. list} dictionary...')
         mDsp, varTxt = self.dITp['mDsp'], 'Nmer sequences [genDLenSeq]'
         if self.dITp['useNmerSeqFrom'] in [self.dITp['sProcInp'],
@@ -245,7 +245,7 @@ class SeqAnalysis(BaseClass):
                 GF.showProgress(N=len(lSq), n=n, modeDisp=mDsp, varText=varTxt,
                                 startTime=stT)
         print('Created Nmer {seq. length: seq. list} dictionary.')
-        cTim.updateTimes(iMth=2, stTMth=cStT, endTMth=time.time())
+        cTim.updateTimes(tMth=(2, 2), stTMth=cT, endTMth=time.time())
 
     # --- methods performing the Nmer-sequence snippet likelihood analysis ----
     def getRelLikelihoods(self, cEff=None):
@@ -285,11 +285,11 @@ class SeqAnalysis(BaseClass):
             self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, stT=stT)
             self.genDLenSeq(cTim=cTim, stT=stT)
             print('Performing calculation of Nmer sequence likelihoods...')
-            cStT = time.time()
+            cT = time.time()
             dLV, d3 = self.lhAnalysisLoop(lEff=lEff, lSSeq=lSSeq, stT=stT)
             self.saveDfrRelLikelihood(dLV, d3, lSCD3=self.dITp['lSCDfrLhD'])
             print('Performed calculation of Nmer sequence likelihoods.')
-            cTim.updateTimes(iMth=3, stTMth=cStT, endTMth=time.time())
+            cTim.updateTimes(tMth=(2, 3), stTMth=cT, endTMth=time.time())
 
     # --- methods performing the Nmer-sequence snippet probability analysis ---
     def addToDictSnip(self, cSeqF, dIPosSeq):
@@ -302,18 +302,18 @@ class SeqAnalysis(BaseClass):
                 GF.addToDictD(self.dSnipX, sSS, cSeqF.sSeq, tV)
 
     def probAnalysisLoop(self, cTim, N, stT=None):
-        cStT = time.time()
+        cT = time.time()
         cDLenSeq = GF.restrInt(self.dLenSeq, lRestrLen=self.dITp['lLenNmer'])
-        cTim.updateTimes(iMth=4, stTMth=cStT, endTMth=time.time())
+        cTim.updateTimes(tMth=(2, 4), stTMth=cT, endTMth=time.time())
         sFS = 'full sequences [probAnalysisLoop]'
         for n, cSeqF in enumerate(self.lFullSeq):
             for lSSeqNmer in cDLenSeq.values():
-                cStT = time.time()
+                cT = time.time()
                 dIPosSeq = cSeqF.getDictPosSeq(lSSeq2F=lSSeqNmer)
-                cTim.updateTimes(iMth=5, stTMth=cStT, endTMth=time.time())
-                cStT = time.time()
+                cTim.updateTimes(tMth=(2, 5), stTMth=cT, endTMth=time.time())
+                cT = time.time()
                 self.addToDictSnip(cSeqF, dIPosSeq)
-                cTim.updateTimes(iMth=6, stTMth=cStT, endTMth=time.time())
+                cTim.updateTimes(tMth=(2, 6), stTMth=cT, endTMth=time.time())
             GF.showProgress(N=N, n=n, modeDisp=self.dITp['mDsp'],
                             varText=sFS, startTime=stT)
         print('Performed calculation of Nmer sequence probabilities.')
@@ -326,10 +326,10 @@ class SeqAnalysis(BaseClass):
             print('Performing calculation of Nmer sequence probabilities...')
             self.dSnipS, self.dSnipX, N = {}, {}, len(self.lFullSeq)
             self.probAnalysisLoop(cTim=cTim, N=N, stT=stT)
-            cStT = time.time()
+            cT = time.time()
             self.saveDfrSnipS()
             self.saveDfrSnipX()
-            cTim.updateTimes(iMth=7, stTMth=cStT, endTMth=time.time())
+            cTim.updateTimes(tMth=(2, 7), stTMth=cT, endTMth=time.time())
             print('Saved Nmer sequence probability DataFrame.')
             # self.printDictSnipX(lSnipLen=[7], cSnip='AQRTLHG')
         if ((self.dITp['calcWtProb'] or self.dITp['calcRelProb']) and
@@ -352,7 +352,7 @@ class SeqAnalysis(BaseClass):
         if not self.dITp['convSnipXToProbTbl']:
             return None
         self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, stT=stT)
-        cStT = time.time()
+        cT = time.time()
         self.dSnipX = GF.pickleLoadDict(pF=self.dPF['SnipDictX'], reLoad=True)
         lSSeq, nSeq = [cSeq.sSeq for cSeq in self.lNmerSeq], len(self.lNmerSeq)
         lSC, nXt =  self.dITp['lSCMerAll'], len(self.dITp['lSCXt'])
@@ -362,7 +362,7 @@ class SeqAnalysis(BaseClass):
         self.dfrProbTbl.index = lSSeq
         self.saveData(self.dfrProbTbl, pF=self.dPF['ProbTblFS'],
                       idxLbl=self.dITp['sCNmer'])
-        cTim.updateTimes(iMth=8, stTMth=cStT, endTMth=time.time())
+        cTim.updateTimes(tMth=(2, 8), stTMth=cT, endTMth=time.time())
 
     # --- methods checking the Nmer-sequence snippet probability analysis -----
     def getD2TotalProbSnip(self, stT=None):
@@ -386,21 +386,21 @@ class SeqAnalysis(BaseClass):
         if (self.dITp['calcTotalProb'] or self.dITp['calcCondProb']):
             self.getLInpSeq(cTim=cTim, lSSeq=lSSeq, stT=stT)
             if self.dITp['calcTotalProb']:
-                cStT = time.time()
+                cT = time.time()
                 if not GF.Xist(self.d2TotalProbSnip):
                     self.getD2TotalProbSnip(stT=stT)
-                cTim.updateTimes(iMth=9, stTMth=cStT, endTMth=time.time())
-                cStT = time.time()
+                cTim.updateTimes(tMth=(2, 9), stTMth=cT, endTMth=time.time())
+                cT = time.time()
                 self.saveD2TCProbSnipAsDfr(typeProb=self.dITp['sTtlProb'])
-                cTim.updateTimes(iMth=11, stTMth=cStT, endTMth=time.time())
+                cTim.updateTimes(tMth=(2, 11), stTMth=cT, endTMth=time.time())
             if self.dITp['calcCondProb']:
-                cStT = time.time()
+                cT = time.time()
                 if not GF.Xist(self.d2CondProbSnip):
                     self.getD2CondProbSnip(stT=stT)
-                cTim.updateTimes(iMth=10, stTMth=cStT, endTMth=time.time())
-                cStT = time.time()
+                cTim.updateTimes(tMth=(2, 10), stTMth=cT, endTMth=time.time())
+                cT = time.time()
                 self.saveD2TCProbSnipAsDfr(typeProb=self.dITp['sCndProb'])
-                cTim.updateTimes(iMth=11, stTMth=cStT, endTMth=time.time())
+                cTim.updateTimes(tMth=(2, 11), stTMth=cT, endTMth=time.time())
 
     # --- methods performing the Nmer-sequence single pos. prob. analysis -----
     def getInfoLSFull(self, unqS=True):
@@ -457,7 +457,7 @@ class SeqAnalysis(BaseClass):
 
     def getProbSglPos(self, cTim, lEff=[None], lSSeq=None, stT=None):
         if self.dITp['calcSglPos']:
-            cStT = time.time()
+            cT = time.time()
             if not os.path.isfile(self.dPF['DictRFreqSP']):
                 self.processLFullSeq(unqS=True, stT=stT)
             else:
@@ -467,7 +467,7 @@ class SeqAnalysis(BaseClass):
                 self.d2NOccSglPos = GF.pickleLoadDict(self.dPF['DictNOccSP'])
             self.saveDfrResNOccSglPos()
             self.saveDfrResRFreqSglPos()
-            cTim.updateTimes(iMth=12, stTMth=cStT, endTMth=time.time())
+            cTim.updateTimes(tMth=(2, 12), stTMth=cT, endTMth=time.time())
 
     # --- methods for saving and loading data ---------------------------------
     def saveDfrRelLikelihood(self, dLV, d3, lSCD3):

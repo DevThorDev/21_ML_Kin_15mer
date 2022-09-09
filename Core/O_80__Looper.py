@@ -8,7 +8,9 @@ import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 from Core.O_07__Classifier import (DummyClf, AdaClf, RFClf, XTrClf, GrBClf,
-                                   HGrBClf, GPClf, PassAggrClf, MLPClf)
+                                   HGrBClf, GPClf, PaAggClf, PctClf, SGDClf,
+                                   CtNBClf, CpNBClf, GsNBClf, MLPClf, LinSVClf,
+                                   NuSVClf)
 
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
@@ -96,53 +98,80 @@ class Looper(BaseClass):
 
     # --- method for performing the calculations of the current repetition ----
     def getClfCRep(self, sMth, iSt, sKPar):
-        cClf, iM = None, 0
+        cClf, tM = None, 0
         if sMth == self.dITp['sMthDummy']:  # Dummy Classifier
-            iM = 15
+            tM = (7, 1)
             lG, d2Par = self.dITp['lParGrid_Dummy'], self.dITp['d2Par_Dummy']
             cClf = DummyClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
         elif sMth == self.dITp['sMthAda']:  # AdaBoost Classifier
-            iM = 17
+            tM = (7, 11)
             lG, d2Par = self.dITp['lParGrid_Ada'], self.dITp['d2Par_Ada']
             cClf = AdaClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
         elif sMth == self.dITp['sMthRF']:   # Random Forest Classifier
-            iM = 19
+            tM = (7, 21)
             lG, d2Par = self.dITp['lParGrid_RF'], self.dITp['d2Par_RF']
             cClf = RFClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthXTr']:   # Extra Trees Classifier
-            iM = 21
+        elif sMth == self.dITp['sMthXTr']:  # Extra Trees Classifier
+            tM = (7, 31)
             lG, d2Par = self.dITp['lParGrid_XTr'], self.dITp['d2Par_XTr']
             cClf = XTrClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthGrB']:   # Gradient Boosting Classifier
-            iM = 23
+        elif sMth == self.dITp['sMthGrB']:  # Gradient Boosting Classifier
+            tM = (7, 41)
             lG, d2Par = self.dITp['lParGrid_GrB'], self.dITp['d2Par_GrB']
             cClf = GrBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthHGrB']:   # Hist. Gradient Boosting Clf.
-            iM = 25
+        elif sMth == self.dITp['sMthHGrB']: # Hist. Gradient Boosting Clf.
+            tM = (7, 51)
             lG, d2Par = self.dITp['lParGrid_HGrB'], self.dITp['d2Par_HGrB']
             cClf = HGrBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
         elif sMth == self.dITp['sMthGP']:   # Gaussian Process Classifier
-            iM = 27
+            tM = (7, 61)
             lG, d2Par = self.dITp['lParGrid_GP'], self.dITp['d2Par_GP']
             cClf = GPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        elif sMth == self.dITp['sMthPaA']:   # Gaussian Process Classifier
-            iM = 27
+        elif sMth == self.dITp['sMthPaA']:  # Passive Aggressive Classifier
+            tM = (7, 71)
             lG, d2Par = self.dITp['lParGrid_PaA'], self.dITp['d2Par_PaA']
-            cClf = PassAggrClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar,
-                               iSt=iSt)
+            cClf = PaAggClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthPct']:  # Perceptron Classifier
+            tM = (7, 81)
+            lG, d2Par = self.dITp['lParGrid_Pct'], self.dITp['d2Par_Pct']
+            cClf = PctClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthSGD']:  # SGD Classifier
+            tM = (7, 91)
+            lG, d2Par = self.dITp['lParGrid_SGD'], self.dITp['d2Par_SGD']
+            cClf = SGDClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthCtNB']: # Categorical NB Classifier
+            tM = (7, 101)
+            lG, d2Par = self.dITp['lParGrid_CtNB'], self.dITp['d2Par_CtNB']
+            cClf = CtNBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthCpNB']: # Complement NB Classifier
+            tM = (7, 111)
+            lG, d2Par = self.dITp['lParGrid_CpNB'], self.dITp['d2Par_CpNB']
+            cClf = CpNBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthGsNB']: # Gaussian NB Classifier
+            tM = (7, 121)
+            lG, d2Par = self.dITp['lParGrid_GsNB'], self.dITp['d2Par_GsNB']
+            cClf = GsNBClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
         elif sMth == self.dITp['sMthMLP']:  # NN MLP Classifier
-            iM = 29
+            tM = (7, 131)
             lG, d2Par = self.dITp['lParGrid_MLP'], self.dITp['d2Par_MLP']
             cClf = MLPClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
-        return cClf, iM
+        elif sMth == self.dITp['sMthLSV']:  # Linear SV Classifier
+            tM = (7, 141)
+            lG, d2Par = self.dITp['lParGrid_LSV'], self.dITp['d2Par_LSV']
+            cClf = LinSVClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        elif sMth == self.dITp['sMthNSV']:  # Nu-Support SV Classifier
+            tM = (7, 151)
+            lG, d2Par = self.dITp['lParGrid_NSV'], self.dITp['d2Par_NSV']
+            cClf = NuSVClf(self.inpD, self.D, lG, d2Par, sKPar=sKPar, iSt=iSt)
+        return cClf, tM
 
     def doCRep(self, sMth, k, sKPar, iSt, cRep, cTim, stT=None):
         if sMth in self.dITp['lSMth']:
-            cStT = GF.showElapsedTime(startTime=stT)
-            cClf, iM = self.getClfCRep(sMth=sMth, iSt=iSt, sKPar=sKPar)
+            cT = GF.showElapsedTime(startTime=stT)
+            cClf, tM = self.getClfCRep(sMth=sMth, iSt=iSt, sKPar=sKPar)
             cEndT = GF.showElapsedTime(startTime=stT)
-            cTim.updateTimes(iMth=iM, stTMth=cStT, endTMth=cEndT)
-            cStT = GF.showElapsedTime(startTime=stT)
+            cTim.updateTimes(tMth=tM, stTMth=cT, endTMth=cEndT)
+            cT = GF.showElapsedTime(startTime=stT)
             self.updateAttr(cClf)
             cClf.ClfPred()
             cClf.printFitQuality()
@@ -155,7 +184,7 @@ class Looper(BaseClass):
                 self.saveData(cClf.dfrPred, pF=self.FPs.dPF['OutDetClf'])
                 self.saveData(cClf.dfrProba, pF=self.FPs.dPF['OutProbaClf'])
             cEndT = GF.showElapsedTime(startTime=stT)
-            cTim.updateTimes(iMth=iM + 1, stTMth=cStT, endTMth=cEndT)
+            cTim.updateTimes(tMth=(tM[0], tM[1] + 1), stTMth=cT, endTMth=cEndT)
 
     # --- method for saving the results ---------------------------------------
     def saveCombRes(self, sMth, iSt, d2Par, nRep=0):

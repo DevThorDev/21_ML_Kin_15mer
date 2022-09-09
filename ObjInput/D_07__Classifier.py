@@ -20,12 +20,12 @@ doXTrClf = True                     # do Extra Trees classification?
 doGrBClf = True                     # do Gradient Boosting classification?
 doHGrBClf = True                    # do HistGradientBoosting classification?
 doGPClf = True                      # do Gaussian Process classification?
-doPassAggrClf = True                # do Passive Aggressive classification?
-doPerceptrClf = True                # do Perceptron classification?
+doPaAggClf = True                   # do Passive Aggressive classification?
+doPctClf = True                     # do Perceptron classification?
 doSGDClf = True                     # do SGD classification?
-doCatNB = True                      # do Categorical NB classification?
-doComplNB = True                    # do Complement NB classification?
-doGaussNB = True                    # do Gaussian NB classification?
+doCtNBClf = True                    # do Categorical NB classification?
+doCpNBClf = True                    # do Complement NB classification?
+doGsNBClf = True                    # do Gaussian NB classification?
 doMLPClf = True                     # do neural network MLP classification?
 doLinSVClf = True                   # do Linear SV classification?
 doNuSVClf = True                    # do Nu-Support SV classification?
@@ -111,6 +111,10 @@ rndState = None             # None (random) or integer (reproducible)
 bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
+# === general input for any Classifier that implements 'partial_fit' ==========
+# nItPartialFit = None        # number of iterations / partial fit (or None)
+nItPartialFit = 1000        # number of iterations / partial fit (or None)
+
 # --- selection of grid search or randomised search; and halving --------------
 typeS = 'RandomizedSearchCV'        # 'GridSearchCV' / 'RandomizedSearchCV'
 halvingS = False                     # should halving search be performed?
@@ -122,13 +126,13 @@ retTrScoreS = False                 # should result include training scores?
 factorHvS = 2                       # 1/(prop. of candidates selected)
 aggrElimHvS = False                 # aggressive elimination of candidates?
 # --- randomised search input -------------------------------------------------
-nIterRS = 3                        # number of parameter settings sampled
+nIterRS = 20                        # number of parameter settings sampled
 # --- halving randomised search input -----------------------------------------
 nCandidatesHvRS = 'exhaust'         # number of candidate parameters to sample
 
 # --- cross validation of grid search / randomised search input ---------------
 nSplitsCV = 5                       # number of folds (rep. strat. k-fold CV)
-nRepeatsCV = 3                     # number of repeats (rep. strat. k-fold CV)
+nRepeatsCV = 5                     # number of repeats (rep. strat. k-fold CV)
 
 # --- general input for Dummy Classifier --------------------------------------
 
@@ -153,8 +157,10 @@ vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 vVerbPaA = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Perceptron Classifier ---------------------------------
+vVerbPct = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for SGD Classifier ----------------------------------------
+vVerbSGD = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Categorical NB Classifier -----------------------------
 
@@ -163,13 +169,13 @@ vVerbPaA = 1                # state of verbosity ([0], 1, 2, 3...)
 # --- general input for Gaussian NB Classifier --------------------------------
 
 # --- general input for neural network MLP Classifier -------------------------
-nItPartialFit = None        # number of iterations / partial fit (or None)
-# nItPartialFit = 1000        # number of iterations / partial fit (or None)
-bVerb = True                # state of verbosity (True: progress messages)
+bVerbMLP = True             # state of verbosity (True: progress messages)
 
 # --- general input for Linear SV Classifier ----------------------------------
+vVerbLSV = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Nu-Support SV Classifier ------------------------------
+vVerbNSV = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # =============================================================================
 # --- numbers -----------------------------------------------------------------
@@ -222,12 +228,12 @@ dIO = {# --- general
        'doGrBClf': doGrBClf,
        'doHGrBClf': doHGrBClf,
        'doGPClf': doGPClf,
-       'doPassAggrClf': doPassAggrClf,
-       'doPerceptrClf': doPerceptrClf,
+       'doPaAggClf': doPaAggClf,
+       'doPctClf': doPctClf,
        'doSGDClf': doSGDClf,
-       'doCatNB': doCatNB,
-       'doComplNB': doComplNB,
-       'doGaussNB': doGaussNB,
+       'doCtNBClf': doCtNBClf,
+       'doCpNBClf': doCpNBClf,
+       'doGsNBClf': doGsNBClf,
        'doMLPClf': doMLPClf,
        'doLinSVClf': doLinSVClf,
        'doNuSVClf': doNuSVClf,
@@ -276,6 +282,8 @@ dIO = {# --- general
        'rndState': rndState,
        'bWarmStart': bWarmStart,
        'nJobs': nJobs,
+       # === general input for any Classifier that implements 'partial_fit'
+       'nItPartialFit': nItPartialFit,
        # --- selection of grid search or randomised search; and halving
        'typeS': typeS,
        'halvingS': halvingS,
@@ -308,15 +316,18 @@ dIO = {# --- general
        # --- general input for Passive Aggressive Classifier
        'vVerbPaA': vVerbPaA,
        # --- general input for Perceptron Classifier
+       'vVerbPct': vVerbPct,
        # --- general input for SGD Classifier
+       'vVerbSGD': vVerbSGD,
        # --- general input for Categorical NB Classifier
        # --- general input for Complement NB Classifier
        # --- general input for Gaussian NB Classifier
        # --- general input for neural network MLP Classifier
+       'bVerbMLP': bVerbMLP,
        # --- general input for Linear SV Classifier
+       'vVerbLSV': vVerbLSV,
        # --- general input for Nu-Support SV Classifier
-       'nItPartialFit': nItPartialFit,
-       'bVerb': bVerb,
+       'vVerbNSV': vVerbNSV,
        # ======================================================================
        # --- numbers
        'propTestData': propTestData,

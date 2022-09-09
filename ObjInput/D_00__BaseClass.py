@@ -79,7 +79,14 @@ sDescGrB = GC.S_DESC_GR_B
 sDescHGrB = GC.S_DESC_H_GR_B
 sDescGP = GC.S_DESC_GP
 sDescPaA = GC.S_DESC_PA_A
+sDescPct = GC.S_DESC_PCT
+sDescSGD = GC.S_DESC_SGD
+sDescCtNB = GC.S_DESC_CT_NB
+sDescCpNB = GC.S_DESC_CP_NB
+sDescGsNB = GC.S_DESC_GS_NB
 sDescMLP = GC.S_DESC_MLP
+sDescLSV = GC.S_DESC_LSV
+sDescNSV = GC.S_DESC_NSV
 sMthNoneL, sMthNone = GC.S_MTH_NONE_L, GC.S_MTH_NONE
 sMthDummyL, sMthDummy = GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
 sMthAdaL, sMthAda = GC.S_MTH_ADA_L, GC.S_MTH_ADA
@@ -89,7 +96,14 @@ sMthGrBL, sMthGrB = GC.S_MTH_GR_B_L, GC.S_MTH_GR_B
 sMthHGrBL, sMthHGrB = GC.S_MTH_H_GR_B_L, GC.S_MTH_H_GR_B
 sMthGPL, sMthGP = GC.S_MTH_GP_L, GC.S_MTH_GP
 sMthPaAL, sMthPaA = GC.S_MTH_PA_A_L, GC.S_MTH_PA_A
+sMthPctL, sMthPct = GC.S_MTH_PCT_L, GC.S_MTH_PCT
+sMthSGDL, sMthSGD = GC.S_MTH_SGD_L, GC.S_MTH_SGD
+sMthCtNBL, sMthCtNB = GC.S_MTH_CT_NB_L, GC.S_MTH_CT_NB
+sMthCpNBL, sMthCpNB = GC.S_MTH_CP_NB_L, GC.S_MTH_CP_NB
+sMthGsNBL, sMthGsNB = GC.S_MTH_GS_NB_L, GC.S_MTH_GS_NB
 sMthMLPL, sMthMLP = GC.S_MTH_MLP_L, GC.S_MTH_MLP
+sMthLSVL, sMthLSV = GC.S_MTH_LSV_L, GC.S_MTH_LSV
+sMthNSVL, sMthNSV = GC.S_MTH_NSV_L, GC.S_MTH_NSV
 sPar, sGSRS = GC.S_PAR, GC.S_GSRS
 sSummary = GC.S_SUMMARY
 sCnfMat = GC.S_CNF_MAT
@@ -191,7 +205,14 @@ dIO = {# --- general
        'sDescHGrB': sDescHGrB,
        'sDescGP': sDescGP,
        'sDescPaA': sDescPaA,
+       'sDescPct': sDescPct,
+       'sDescSGD': sDescSGD,
+       'sDescCtNB': sDescCtNB,
+       'sDescCpNB': sDescCpNB,
+       'sDescGsNB': sDescGsNB,
        'sDescMLP': sDescMLP,
+       'sDescLSV': sDescLSV,
+       'sDescNSV': sDescNSV,
        'sMthNoneL': sMthNoneL,
        'sMthNone': sMthNone,
        'sMthDummyL': sMthDummyL,
@@ -210,8 +231,22 @@ dIO = {# --- general
        'sMthGP': sMthGP,
        'sMthPaAL': sMthPaAL,
        'sMthPaA': sMthPaA,
+       'sMthPctL': sMthPctL,
+       'sMthPct': sMthPct,
+       'sMthSGDL': sMthSGDL,
+       'sMthSGD': sMthSGD,
+       'sMthCtNBL': sMthCtNBL,
+       'sMthCtNB': sMthCtNB,
+       'sMthCpNBL': sMthCpNBL,
+       'sMthCpNB': sMthCpNB,
+       'sMthGsNBL': sMthGsNBL,
+       'sMthGsNB': sMthGsNB,
        'sMthMLPL': sMthMLPL,
        'sMthMLP': sMthMLP,
+       'sMthLSVL': sMthLSVL,
+       'sMthLSV': sMthLSV,
+       'sMthNSVL': sMthNSVL,
+       'sMthNSV': sMthNSV,
        'sPar': sPar,
        'sGSRS': sGSRS,
        'sSummary': sSummary,
@@ -238,9 +273,12 @@ dIO = {# --- general
        # --- numbers
        # --- lists
        'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL,
-                   sMthHGrBL, sMthGPL, sMthPaAL, sMthMLPL],
+                   sMthHGrBL, sMthGPL, sMthPaAL, sMthPctL, sMthSGDL, sMthCtNBL,
+                   sMthCpNBL, sMthGsNBL, sMthMLPL, sMthLSVL, sMthNSVL],
        'lSMth': [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB,
-                 sMthGP, sMthPaA, sMthMLP],
-       'lSMthPartFit': [sMthMLP]}
+                 sMthGP, sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB,
+                 sMthGsNB, sMthMLP, sMthLSV, sMthNSV],
+       'lSMthPartFit': [sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB,
+                        sMthGsNB, sMthMLP]}
 
 ###############################################################################

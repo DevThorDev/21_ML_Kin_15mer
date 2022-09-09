@@ -495,7 +495,7 @@ class GeneralClassifier(BaseSmplClfPrC):
         return X, Y
 
     def fitOrPartialFitClf(self, cClf, sMth=None):
-        if self.doPartFit:
+        if self.doPartFit and hasattr(cClf, 'partial_fit'):
             assert type(self.dITp['nItPartialFit']) in [int, float]
             XIni, YIni = self.getXYIfSpl()
             # repeat resampling and partial fit nItPartialFit times
@@ -532,6 +532,8 @@ class GeneralClassifier(BaseSmplClfPrC):
             self.YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC,
                                      lSNmR=lSR)
         self.YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
+        if self.YProba is None:
+            self.YProba = GF.iniWShape(tmplDfr=self.YPred)
         assert self.YProba.shape == self.YPred.shape
 
     # --- method for calculating values of the Classifier results dictionary --
@@ -660,9 +662,9 @@ class RFClf(SpecificClassifier):
     def getClf(self):
         self.Clf = RandomForestClassifier(random_state=self.dITp['rndState'],
                                           warm_start=self.dITp['bWarmStart'],
+                                          verbose=self.dITp['vVerbRF'],
                                           oob_score=self.dITp['estOobScore'],
                                           n_jobs=self.dITp['nJobs'],
-                                          verbose=self.dITp['vVerbRF'],
                                           **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
@@ -681,9 +683,9 @@ class XTrClf(SpecificClassifier):
     def getClf(self):
         self.Clf = ExtraTreesClassifier(random_state=self.dITp['rndState'],
                                         warm_start=self.dITp['bWarmStart'],
+                                        verbose=self.dITp['vVerbXTr'],
                                         oob_score=self.dITp['estOobScore'],
                                         n_jobs=self.dITp['nJobs'],
-                                        verbose=self.dITp['vVerbXTr'],
                                         **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
@@ -749,42 +751,43 @@ class GPClf(SpecificClassifier):
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
-class PassAggrClf(SpecificClassifier):
+class PaAggClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
         sDPaA, sMPaAL, sMPaA = GC.S_DESC_PA_A, GC.S_MTH_PA_A_L, GC.S_MTH_PA_A
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDPaA, sMthL=sMPaAL, sMth=sMPaA, iSt=iSt)
-        if self.dITp['doPassAggrClf']:
+        if self.dITp['doPaAggClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
-        print('Initiated "PassAggrClf" base object.')
+        print('Initiated "PaAggClf" base object.')
 
     # --- methods for fitting and predicting with a Passive Aggressive Clf. ---
     def getClf(self):
         dITp = self.dITp
         self.Clf = PassiveAggressiveClassifier(random_state=dITp['rndState'],
                                                warm_start=dITp['bWarmStart'],
-                                               n_jobs=dITp['nJobs'],
                                                verbose=self.dITp['vVerbPaA'],
+                                               n_jobs=dITp['nJobs'],
                                                **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
-class PerceptrClf(SpecificClassifier):
+class PctClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
         sDPct, sMPctL, sMPct = GC.S_DESC_PCT, GC.S_MTH_PCT_L, GC.S_MTH_PCT
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDPct, sMthL=sMPctL, sMth=sMPct, iSt=iSt)
-        if self.dITp['doPerceptrClf']:
+        if self.dITp['doPctClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
-        print('Initiated "PerceptrClf" base object.')
+        print('Initiated "PctClf" base object.')
 
     # --- methods for fitting and predicting with a Perceptron Classifier -----
     def getClf(self):
         dITp = self.dITp
         self.Clf = Perceptron(random_state=dITp['rndState'],
                               warm_start=dITp['bWarmStart'],
+                              verbose=self.dITp['vVerbPct'],
                               n_jobs=dITp['nJobs'], **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
@@ -804,66 +807,57 @@ class SGDClf(SpecificClassifier):
         dITp = self.dITp
         self.Clf = SGDClassifier(random_state=dITp['rndState'],
                                  warm_start=dITp['bWarmStart'],
+                                 verbose=self.dITp['vVerbSGD'],
                                  n_jobs=dITp['nJobs'],
                                  **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
-class CatNB(SpecificClassifier):
+class CtNBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
         sDCt, sMCtL, sMCt = GC.S_DESC_CT_NB, GC.S_MTH_CT_NB_L, GC.S_MTH_CT_NB
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDCt, sMthL=sMCtL, sMth=sMCt, iSt=iSt)
-        if self.dITp['doCatNB']:
+        if self.dITp['doCtNBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
-        print('Initiated "CatNB" base object.')
+        print('Initiated "CtNBClf" base object.')
 
     # --- methods for fitting and predicting with a Categorical NB Classifier -
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = CategoricalNB(random_state=dITp['rndState'],
-                                 warm_start=dITp['bWarmStart'],
-                                 n_jobs=dITp['nJobs'],
-                                 **self.d2Par[self.sKPar])
+        self.Clf = CategoricalNB(**self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
-class ComplNB(SpecificClassifier):
+class CpNBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
         sDCp, sMCpL, sMCp = GC.S_DESC_CP_NB, GC.S_MTH_CP_NB_L, GC.S_MTH_CP_NB
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDCp, sMthL=sMCpL, sMth=sMCp, iSt=iSt)
-        if self.dITp['doComplNB']:
+        if self.dITp['doCpNBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
-        print('Initiated "ComplNB" base object.')
+        print('Initiated "CpNBClf" base object.')
 
     # --- methods for fitting and predicting with a Complement NB Classifier --
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = ComplementNB(random_state=dITp['rndState'],
-                                warm_start=dITp['bWarmStart'],
-                                n_jobs=dITp['nJobs'], **self.d2Par[self.sKPar])
+        self.Clf = ComplementNB(**self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
-class GaussNB(SpecificClassifier):
+class GsNBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
         sDGs, sMGsL, sMGs = GC.S_DESC_GS_NB, GC.S_MTH_GS_NB_L, GC.S_MTH_GS_NB
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
                          sDesc=sDGs, sMthL=sMGsL, sMth=sMGs, iSt=iSt)
-        if self.dITp['doGaussNB']:
+        if self.dITp['doGsNBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
-        print('Initiated "GaussNB" base object.')
+        print('Initiated "GsNBClf" base object.')
 
     # --- methods for fitting and predicting with a Gaussian NB Classifier ----
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = GaussianNB(random_state=dITp['rndState'],
-                              warm_start=dITp['bWarmStart'],
-                              n_jobs=dITp['nJobs'], **self.d2Par[self.sKPar])
+        self.Clf = GaussianNB(**self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
@@ -882,7 +876,7 @@ class MLPClf(SpecificClassifier):
     def getClf(self):
         self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
                                  warm_start=self.dITp['bWarmStart'],
-                                 verbose=self.dITp['bVerb'],
+                                 verbose=self.dITp['bVerbMLP'],
                                  **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
@@ -901,8 +895,7 @@ class LinSVClf(SpecificClassifier):
     # --- methods for fitting and predicting with a Linear SV Classifier ------
     def getClf(self):
         self.Clf = LinearSVC(random_state=self.dITp['rndState'],
-                             warm_start=self.dITp['bWarmStart'],
-                             verbose=self.dITp['bVerb'],
+                             verbose=self.dITp['vVerbLSV'],
                              **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
@@ -921,8 +914,8 @@ class NuSVClf(SpecificClassifier):
     # --- methods for fitting and predicting with a Nu-Support SV Classifier --
     def getClf(self):
         self.Clf = NuSVC(random_state=self.dITp['rndState'],
-                         warm_start=self.dITp['bWarmStart'],
-                         verbose=self.dITp['bVerb'], **self.d2Par[self.sKPar])
+                         verbose=self.dITp['vVerbNSV'],
+                         **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
