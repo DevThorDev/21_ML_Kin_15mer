@@ -11,27 +11,29 @@ sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
 # --- flow control ------------------------------------------------------------
-dNumRep = {GC.S_MTH_DUMMY: 5,
-           GC.S_MTH_ADA: 5,
-           GC.S_MTH_RF: 5,
-           GC.S_MTH_X_TR: 5,
-           GC.S_MTH_GR_B: 5,
-           GC.S_MTH_H_GR_B: 5,
-           GC.S_MTH_GP: 5,
-           GC.S_MTH_PA_A: 5,
-           GC.S_MTH_PCT: 5,
-           GC.S_MTH_SGD: 5,
-           GC.S_MTH_CT_NB: 5,
-           GC.S_MTH_CP_NB: 5,
-           GC.S_MTH_GS_NB: 5,
-           GC.S_MTH_MLP: 5,
-           GC.S_MTH_LSV: 5,
-           GC.S_MTH_NSV: 5}
+nRp0, nRp = GC.N_REP_0, 5
+dNumRep = {GC.S_MTH_DUMMY: nRp,
+           GC.S_MTH_ADA: nRp,
+           GC.S_MTH_RF: nRp,
+           GC.S_MTH_X_TR: nRp,
+           GC.S_MTH_GR_B: nRp,
+           GC.S_MTH_H_GR_B: nRp0,
+           GC.S_MTH_GP: nRp0,
+           GC.S_MTH_PA_A: nRp,
+           GC.S_MTH_PCT: nRp,
+           GC.S_MTH_SGD: nRp,
+           GC.S_MTH_CT_NB: nRp,
+           GC.S_MTH_CP_NB: nRp,
+           GC.S_MTH_GS_NB: nRp,
+           GC.S_MTH_MLP: nRp,
+           GC.S_MTH_LSV: nRp,
+           GC.S_MTH_NSV: nRp}
 
 # === Dummy Classifier ========================================================
 # --- list of parameter grids for Dummy Classifier grid search ----------------
 # or lParGrid_Dy = None if no such search should be performed
-lParGrid_Dy = None
+lParGrid_Dy = [{'strategy': ['uniform', 'stratified']}]
+# lParGrid_Dy = None
 
 # --- parameter dictionary for Dummy Classifier -------------------------------
 d2Par_Dy = {'A': {'strategy': 'uniform',
@@ -537,79 +539,82 @@ dIO = {# --- general
        # --- parameter grid for optimising the Dummy Classifier
        'lParGrid_Dummy': lParGrid_Dy,
        # --- parameter dictionary for Dummy Classifier
-       'd2Par_Dummy': d2Par_Dy,
+       'd2Par_Dummy': (None if lParGrid_Dy is not None else d2Par_Dy),
        # === AdaBoost Classifier
        # --- parameter grid for optimising the AdaBoost Classifier
        'lParGrid_Ada': lParGrid_Ada,
        # --- parameter dictionary for AdaBoost Classifier
-       'd2Par_Ada': d2Par_Ada,
+       'd2Par_Ada': (None if lParGrid_Ada is not None else d2Par_Ada),
        # === Random Forest Classifier
        # --- parameter grid for optimising the Random Forest Classifier
        'lParGrid_RF': lParGrid_RF,
        # --- parameter dictionary for Random Forest Classifier
-       'd2Par_RF': d2Par_RF,
+       'd2Par_RF': (None if lParGrid_RF is not None else d2Par_RF),
+       # === Extra Trees Classifier
        # --- parameter grid for optimising the Extra Trees Classifier
        'lParGrid_XTr': lParGrid_XTr,
        # --- parameter dictionary for Extra Trees Classifier
-       'd2Par_XTr': d2Par_XTr,
+       'd2Par_XTr': (None if lParGrid_XTr is not None else d2Par_XTr),
+       # === Gradient Boosting Classifier
        # --- parameter grid for optimising the Gradient Boosting Classifier
        'lParGrid_GrB': lParGrid_GrB,
        # --- parameter dictionary for Gradient Boosting Classifier
-       'd2Par_GrB': d2Par_GrB,
+       'd2Par_GrB': (None if lParGrid_GrB is not None else d2Par_GrB),
+       # === Hist Gradient Boosting Classifier
        # --- parameter grid for optimising the Hist Gradient Boosting Classif.
        'lParGrid_HGrB': lParGrid_HGrB,
        # --- parameter dictionary for Hist Gradient Boosting Classifier
-       'd2Par_HGrB': d2Par_HGrB,
+       'd2Par_HGrB': (None if lParGrid_HGrB is not None else d2Par_HGrB),
        # === Gaussian Process Classifier
        # --- parameter grid for optimising the Gaussian Process Classifier
        'lParGrid_GP': lParGrid_GP,
        # --- parameter dictionary for Gaussian Process Classifier
-       'd2Par_GP': d2Par_GP,
+       'd2Par_GP': (None if lParGrid_GP is not None else d2Par_GP),
        # === Passive Aggressive Classifier
        # --- parameter grid for optimising the Passive Aggressive Classifier
        'lParGrid_PaA': lParGrid_PaA,
        # --- parameter dictionary for Passive Aggressive Classifier
-       'd2Par_PaA': d2Par_PaA,
+       'd2Par_PaA': (None if lParGrid_PaA is not None else d2Par_PaA),
        # === Perceptron Classifier
        # --- parameter grid for optimising the Perceptron Classifier
        'lParGrid_Pct': lParGrid_Pct,
        # --- parameter dictionary for Perceptron Classifier
-       'd2Par_Pct': d2Par_Pct,
+       'd2Par_Pct': (None if lParGrid_Pct is not None else d2Par_Pct),
        # === SGD Classifier
        # --- parameter grid for optimising the SGD Classifier
        'lParGrid_SGD': lParGrid_SGD,
        # --- parameter dictionary for SGD Classifier
-       'd2Par_SGD': d2Par_SGD,
+       'd2Par_SGD': (None if lParGrid_SGD is not None else d2Par_SGD),
        # === Categorical NB Classifier
        # --- parameter grid for optimising the Categorical NB Classifier
        'lParGrid_CtNB': lParGrid_CtNB,
        # --- parameter dictionary for Categorical NB Classifier
-       'd2Par_CtNB': d2Par_CtNB,
+       'd2Par_CtNB': (None if lParGrid_CtNB is not None else d2Par_CtNB),
        # === Complement NB Classifier
        # --- parameter grid for optimising the Complement NB Classifier
        'lParGrid_CpNB': lParGrid_CpNB,
        # --- parameter dictionary for Complement NB Classifier
-       'd2Par_CpNB': d2Par_CpNB,
+       'd2Par_CpNB': (None if lParGrid_CpNB is not None else d2Par_CpNB),
        # === Gaussian NB Classifier
        # --- parameter grid for optimising the Gaussian NB Classifier
        'lParGrid_GsNB': lParGrid_GsNB,
        # --- parameter dictionary for Gaussian NB Classifier
-       'd2Par_GsNB': d2Par_GsNB,
+       'd2Par_GsNB': (None if lParGrid_GsNB is not None else d2Par_GsNB),
        # === neural network MLP Classifier
        # --- parameter grid for optimising the neural network MLP Classifier
        'lParGrid_MLP': lParGrid_MLP,
        # --- parameter dictionary for neural network MLP Classifier
-       'd2Par_MLP': d2Par_MLP,
+       'd2Par_MLP': (None if lParGrid_MLP is not None else d2Par_MLP),
        # === Linear SV Classifier
        # --- parameter grid for optimising the Linear SV Classifier
        'lParGrid_LSV': lParGrid_LSV,
        # --- parameter dictionary for Linear SV Classifier
-       'd2Par_LSV': d2Par_LSV,
+       'd2Par_LSV': (None if lParGrid_LSV is not None else d2Par_LSV),
        # === Nu-Support SV Classifier
        # --- parameter grid for optimising the Nu-Support SV Classifier
        'lParGrid_NSV': lParGrid_NSV,
        # --- parameter dictionary for Nu-Support SV Classifier
-       'd2Par_NSV': d2Par_NSV,
+       'd2Par_NSV': (None if lParGrid_NSV is not None else d2Par_NSV),
        # --- parameter dictionary for all Classifier methods
        'd3Par': {GC.S_MTH_DUMMY: d2Par_Dy,
                  GC.S_MTH_ADA: d2Par_Ada,

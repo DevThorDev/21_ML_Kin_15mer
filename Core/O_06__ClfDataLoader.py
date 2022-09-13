@@ -58,7 +58,7 @@ class DataLoader(BaseClass):
                                   dIG['sLFC']: dITp['sNmer' + sTp],
                                   dIG['sLFE']: dITp['sFInpClf'],
                                   dIG['sLFJE']: dITp['sUS02'],
-                                  dIG['sLFJCE']: dITp['sUSC'],
+                                  dIG['sLFJCE']: dITp['sUS02'],
                                   dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['InpData', 'X', 'Y']:
             d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],

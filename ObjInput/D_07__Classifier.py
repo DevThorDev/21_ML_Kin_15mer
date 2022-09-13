@@ -30,7 +30,7 @@ doMLPClf = True                     # do neural network MLP classification?
 doLinSVClf = True                   # do Linear SV classification?
 doNuSVClf = True                    # do Nu-Support SV classification?
 
-doPropCalc = False                   # do calculation of AAc proportions/class?
+doPropCalc = True                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 stratData = None                    # split data stratified way? [None / True]

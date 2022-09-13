@@ -64,12 +64,13 @@ class FilePaths:
             self.dPF[sK] = FilePath(dInp=self.dI, dPI=dPI).pF
 
     # --- method for modifying a file path of the paths dictionary ------------
-    def modFP(self, d2PI, kMn, kPos, cS=None, sPos=GC.S_CAP_E):
-        if cS is not None and len(cS) > 0:
-            d2 = {kMn: {sK: cV for sK, cV in d2PI[kMn].items()}}
-            d2[kMn][self.dI[kPos]] = GF.insStartOrEnd(d2[kMn][self.dI[kPos]],
-                                                      cEl=cS, sPos=sPos)
-            self.dPF[kMn] = FilePath(dInp=self.dI, dPI=d2[kMn]).pF
+    def modFP(self, d2PI, kMn, kPos, cS=None, sPos=GC.S_CAP_E, modPI=False):
+        if cS is not None and len(str(cS)) > 0:
+            cD, sKP = d2PI[kMn], self.dI[kPos]
+            if not modPI:
+                cD = {sK: cV for sK, cV in d2PI[kMn].items()}
+            cD[sKP] = GF.insStartOrEnd(cD[sKP], cEl=cS, sPos=sPos)
+            self.dPF[kMn] = FilePath(dInp=self.dI, dPI=cD).pF
 
     # --- method for modifying file paths of the paths dictionary -------------
     def modFPs(self, d2PI, lKPI=[]):

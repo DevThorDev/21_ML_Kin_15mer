@@ -329,6 +329,7 @@ S_SET_07 = 'Set07_05Cl'
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15
 I_CENT_N_MER = LEN_N_MER_DEF//2
+N_REP_0 = 0
 R01 = 1
 R02 = 2
 R03 = 3

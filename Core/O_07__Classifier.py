@@ -35,7 +35,7 @@ from imblearn.under_sampling import (ClusterCentroids, AllKNN,
 # -----------------------------------------------------------------------------
 class BaseSmplClfPrC(BaseClass):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iTp=7, lITpUpd=[1, 2, 6]):
+    def __init__(self, inpDat, D, sKPar=None, iTp=7, lITpUpd=[1, 2, 6]):
         super().__init__(inpDat)
         self.idO = 'O_07'
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
@@ -54,7 +54,7 @@ class BaseSmplClfPrC(BaseClass):
             self.CLblsTrain = GF.joinS([sLbl, self.CLblsTrain, sTrain])
 
     # --- methods for initialising class attributes and loading input data ----
-    def iniAttr(self, sKPar='A'):
+    def iniAttr(self, sKPar=None):
         lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'dMltSt', 'lSXCl',
                       'X', 'XTrans', 'XTrain', 'XTest',
                       'XTransTrain', 'XTransTest',
@@ -273,7 +273,7 @@ class BaseSmplClfPrC(BaseClass):
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iSt=None, iTp=7,
+    def __init__(self, inpDat, D, iSt=None, sKPar=None, iTp=7,
                  lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Sampler for imbalanced learning'
@@ -342,11 +342,12 @@ class ImbSampler(BaseSmplClfPrC):
 # -----------------------------------------------------------------------------
 class GeneralClassifier(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar='A', iSt=None, iTp=7,
+    def __init__(self, inpDat, D, iSt=None, sKPar=None, cRep=0, iTp=7,
                  lITpUpd=[1, 2, 6]):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'General Classifier for data classification'
-        self.Smp = ImbSampler(inpDat, D, sKPar=sKPar, iSt=iSt, iTp=iTp,
+        self.iSt, self.sKPar, self.cRep = iSt, sKPar, cRep
+        self.Smp = ImbSampler(inpDat, D, iSt=iSt, sKPar=sKPar, iTp=iTp,
                               lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
         if not self.doPartFit:
@@ -363,10 +364,13 @@ class GeneralClassifier(BaseSmplClfPrC):
             print('Fitted Classifier to data of shape', X.shape)
             if self.optClf is not None:
                 dfrRes = SF.formatDfrCVRes(self.dIG, self.dITp, self.optClf)
+                sKMn, sKP, sS, sE = 'OutGSRS', 'sLFE', GC.S_CAP_S, GC.S_CAP_E
                 if sMth is not None:
-                    self.FPs.modFP(d2PI=self.d2PInf, kMn='OutGSRS',
-                                   kPos='sLFE', cS=sMth, sPos=GC.S_CAP_S)
-                self.saveData(dfrRes, pF=self.FPs.dPF['OutGSRS'])
+                    self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKP,
+                                   cS=sMth, sPos=sS, modPI=True)
+                self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKP,
+                               cS=self.cRep, sPos=sE)
+                self.saveData(dfrRes, pF=self.FPs.dPF[sKMn])
 
     def printClfFitError(self):
         print('ERROR: Cannot fit Classifier to data!')
@@ -603,11 +607,12 @@ class GeneralClassifier(BaseSmplClfPrC):
 # -----------------------------------------------------------------------------
 class SpecificClassifier(GeneralClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', sDesc=GC.S_DESC_NONE,
-                 sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0,
+                 sDesc=GC.S_DESC_NONE, sMthL=GC.S_MTH_NONE_L,
+                 sMth=GC.S_MTH_NONE):
         # Classifier method is needed before "super" is initialised
         self.sMthL, self.sMth = sMthL, sMth
-        super().__init__(inpDat, D=D, sKPar=sKPar, iSt=iSt)
+        super().__init__(inpDat, D=D, iSt=iSt, sKPar=sKPar, cRep=cRep)
         self.descO = sDesc
         self.lParG = lG
         self.d2Par = d2Par
@@ -616,106 +621,136 @@ class SpecificClassifier(GeneralClassifier):
 # -----------------------------------------------------------------------------
 class DummyClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDDy, sMDyL, sMDy = GC.S_DESC_DUMMY, GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDDy, sMthL=sMDyL, sMth=sMDy, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDDy, sMthL=sMDyL, sMth=sMDy)
         if self.dITp['doDummyClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "DummyClf" base object.')
 
     # --- methods for fitting and predicting with a Dummy Classifier ----------
     def getClf(self):
-        self.Clf = DummyClassifier(random_state=self.dITp['rndState'],
-                                   **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = DummyClassifier(random_state=self.dITp['rndState'])
+        else:
+            self.Clf = DummyClassifier(random_state=self.dITp['rndState'],
+                                       **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class AdaClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDAda, sMAdaL, sMAda = GC.S_DESC_ADA, GC.S_MTH_ADA_L, GC.S_MTH_ADA
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDAda, sMthL=sMAdaL, sMth=sMAda, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDAda, sMthL=sMAdaL, sMth=sMAda)
         if self.dITp['doAdaClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "AdaClf" base object.')
 
     # --- methods for fitting and predicting with an AdaBoost Classifier ------
     def getClf(self):
-        self.Clf = AdaBoostClassifier(random_state=self.dITp['rndState'],
-                                      **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = AdaBoostClassifier(random_state=self.dITp['rndState'])
+        else:
+            self.Clf = AdaBoostClassifier(random_state=self.dITp['rndState'],
+                                          **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class RFClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDRF, sMRFL, sMRF = GC.S_DESC_RF, GC.S_MTH_RF_L, GC.S_MTH_RF
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDRF, sMthL=sMRFL, sMth=sMRF, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDRF, sMthL=sMRFL, sMth=sMRF)
         if self.dITp['doRFClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "RFClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
-        self.Clf = RandomForestClassifier(random_state=self.dITp['rndState'],
-                                          warm_start=self.dITp['bWarmStart'],
-                                          verbose=self.dITp['vVerbRF'],
-                                          oob_score=self.dITp['estOobScore'],
-                                          n_jobs=self.dITp['nJobs'],
-                                          **self.d2Par[self.sKPar])
+        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
+        vVerb, oobSc = self.dITp['vVerbRF'], self.dITp['estOobScore']
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = RandomForestClassifier(random_state=rndSt,
+                                              warm_start=bWarmStart,
+                                              verbose=vVerb,
+                                              oob_score=oobSc,
+                                              n_jobs=self.dITp['nJobs'])
+        else:
+            self.Clf = RandomForestClassifier(random_state=rndSt,
+                                              warm_start=bWarmStart,
+                                              verbose=vVerb,
+                                              oob_score=oobSc,
+                                              n_jobs=self.dITp['nJobs'],
+                                              **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class XTrClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDXTr, sMXTrL, sMXTr = GC.S_DESC_X_TR, GC.S_MTH_X_TR_L, GC.S_MTH_X_TR
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDXTr, sMthL=sMXTrL, sMth=sMXTr, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDXTr, sMthL=sMXTrL, sMth=sMXTr)
         if self.dITp['doXTrClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "XTrClf" base object.')
 
     # --- methods for fitting and predicting with an Extra Trees Classifier ---
     def getClf(self):
-        self.Clf = ExtraTreesClassifier(random_state=self.dITp['rndState'],
-                                        warm_start=self.dITp['bWarmStart'],
-                                        verbose=self.dITp['vVerbXTr'],
-                                        oob_score=self.dITp['estOobScore'],
-                                        n_jobs=self.dITp['nJobs'],
-                                        **self.d2Par[self.sKPar])
+        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
+        vVerb, oobSc = self.dITp['vVerbXTr'], self.dITp['estOobScore']
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = ExtraTreesClassifier(random_state=rndSt,
+                                            warm_start=bWarmStart,
+                                            verbose=vVerb,
+                                            oob_score=oobSc,
+                                            n_jobs=self.dITp['nJobs'])
+        else:
+            self.Clf = ExtraTreesClassifier(random_state=rndSt,
+                                            warm_start=bWarmStart,
+                                            verbose=vVerb,
+                                            oob_score=oobSc,
+                                            n_jobs=self.dITp['nJobs'],
+                                            **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class GrBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDGrB, sMGrBL, sMGrB = GC.S_DESC_GR_B, GC.S_MTH_GR_B_L, GC.S_MTH_GR_B
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDGrB, sMthL=sMGrBL, sMth=sMGrB, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDGrB, sMthL=sMGrBL, sMth=sMGrB)
         if self.dITp['doGrBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "GrBClf" base object.')
 
     # --- methods for fitting and predicting with a Gradient Boosting Clf. ----
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = GradientBoostingClassifier(random_state=dITp['rndState'],
-                                              warm_start=dITp['bWarmStart'],
-                                              verbose=dITp['vVerbGrB'],
-                                              **self.d2Par[self.sKPar])
+        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
+        vVerb = self.dITp['vVerbGrB']
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = GradientBoostingClassifier(random_state=rndSt,
+                                                  warm_start=bWarmStart,
+                                                  verbose=vVerb)
+        else:
+            self.Clf = GradientBoostingClassifier(random_state=rndSt,
+                                                  warm_start=bWarmStart,
+                                                  verbose=vVerb,
+                                                  **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class HGrBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDH, sMHL, sMH = GC.S_DESC_H_GR_B, GC.S_MTH_H_GR_B_L, GC.S_MTH_H_GR_B
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDH, sMthL=sMHL, sMth=sMH, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDH, sMthL=sMHL, sMth=sMH)
         if self.dITp['doHGrBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "HGrBClf" base object.')
@@ -724,198 +759,248 @@ class HGrBClf(SpecificClassifier):
     def getClf(self):
         rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
         vVerb = self.dITp['vVerbHGrB']
-        self.Clf = HistGradientBoostingClassifier(random_state=rndSt,
-                                                  warm_start=bWarmStart,
-                                                  verbose=vVerb,
-                                                  **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = HistGradientBoostingClassifier(random_state=rndSt,
+                                                      warm_start=bWarmStart,
+                                                      verbose=vVerb)
+        else:
+            self.Clf = HistGradientBoostingClassifier(random_state=rndSt,
+                                                      warm_start=bWarmStart,
+                                                      verbose=vVerb,
+                                                      **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class GPClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDGP, sMGPL, sMGP = GC.S_DESC_GP, GC.S_MTH_GP_L, GC.S_MTH_GP
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDGP, sMthL=sMGPL, sMth=sMGP, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDGP, sMthL=sMGPL, sMth=sMGP)
         if self.dITp['doGPClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "GPClf" base object.')
 
     # --- methods for fitting and predicting with a Gaussian Process Classifier
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = GaussianProcessClassifier(random_state=dITp['rndState'],
-                                             warm_start=dITp['bWarmStart'],
-                                             n_jobs=dITp['nJobs'],
-                                             **self.d2Par[self.sKPar])
+        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = GaussianProcessClassifier(random_state=rndSt,
+                                                 warm_start=bWarmStart,
+                                                 n_jobs=self.dITp['nJobs'])
+        else:
+            self.Clf = GaussianProcessClassifier(random_state=rndSt,
+                                                 warm_start=bWarmStart,
+                                                 n_jobs=self.dITp['nJobs'],
+                                                 **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class PaAggClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDPaA, sMPaAL, sMPaA = GC.S_DESC_PA_A, GC.S_MTH_PA_A_L, GC.S_MTH_PA_A
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDPaA, sMthL=sMPaAL, sMth=sMPaA, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDPaA, sMthL=sMPaAL, sMth=sMPaA)
         if self.dITp['doPaAggClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "PaAggClf" base object.')
 
     # --- methods for fitting and predicting with a Passive Aggressive Clf. ---
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = PassiveAggressiveClassifier(random_state=dITp['rndState'],
-                                               warm_start=dITp['bWarmStart'],
-                                               verbose=self.dITp['vVerbPaA'],
-                                               n_jobs=dITp['nJobs'],
-                                               **self.d2Par[self.sKPar])
+        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
+        vVerb = self.dITp['vVerbPaA']
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = PassiveAggressiveClassifier(random_state=rndSt,
+                                                   warm_start=bWarmStart,
+                                                   verbose=vVerb,
+                                                   n_jobs=self.dITp['nJobs'])
+        else:
+            self.Clf = PassiveAggressiveClassifier(random_state=rndSt,
+                                                   warm_start=bWarmStart,
+                                                   verbose=vVerb,
+                                                   n_jobs=self.dITp['nJobs'],
+                                                   **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class PctClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDPct, sMPctL, sMPct = GC.S_DESC_PCT, GC.S_MTH_PCT_L, GC.S_MTH_PCT
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDPct, sMthL=sMPctL, sMth=sMPct, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDPct, sMthL=sMPctL, sMth=sMPct)
         if self.dITp['doPctClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "PctClf" base object.')
 
     # --- methods for fitting and predicting with a Perceptron Classifier -----
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = Perceptron(random_state=dITp['rndState'],
-                              warm_start=dITp['bWarmStart'],
-                              verbose=self.dITp['vVerbPct'],
-                              n_jobs=dITp['nJobs'], **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = Perceptron(random_state=self.dITp['rndState'],
+                                  warm_start=self.dITp['bWarmStart'],
+                                  verbose=self.dITp['vVerbPct'],
+                                  n_jobs=self.dITp['nJobs'])
+        else:
+            self.Clf = Perceptron(random_state=self.dITp['rndState'],
+                                  warm_start=self.dITp['bWarmStart'],
+                                  verbose=self.dITp['vVerbPct'],
+                                  n_jobs=self.dITp['nJobs'],
+                                  **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class SGDClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDSGD, sMSGDL, sMSGD = GC.S_DESC_SGD, GC.S_MTH_SGD_L, GC.S_MTH_SGD
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDSGD, sMthL=sMSGDL, sMth=sMSGD, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDSGD, sMthL=sMSGDL, sMth=sMSGD)
         if self.dITp['doSGDClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "SGDClf" base object.')
 
     # --- methods for fitting and predicting with a SGD Classifier ------------
     def getClf(self):
-        dITp = self.dITp
-        self.Clf = SGDClassifier(random_state=dITp['rndState'],
-                                 warm_start=dITp['bWarmStart'],
-                                 verbose=self.dITp['vVerbSGD'],
-                                 n_jobs=dITp['nJobs'],
-                                 **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = SGDClassifier(random_state=self.dITp['rndState'],
+                                     warm_start=self.dITp['bWarmStart'],
+                                     verbose=self.dITp['vVerbSGD'],
+                                     n_jobs=self.dITp['nJobs'])
+        else:
+            self.Clf = SGDClassifier(random_state=self.dITp['rndState'],
+                                     warm_start=self.dITp['bWarmStart'],
+                                     verbose=self.dITp['vVerbSGD'],
+                                     n_jobs=self.dITp['nJobs'],
+                                     **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class CtNBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDCt, sMCtL, sMCt = GC.S_DESC_CT_NB, GC.S_MTH_CT_NB_L, GC.S_MTH_CT_NB
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDCt, sMthL=sMCtL, sMth=sMCt, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDCt, sMthL=sMCtL, sMth=sMCt)
         if self.dITp['doCtNBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "CtNBClf" base object.')
 
     # --- methods for fitting and predicting with a Categorical NB Classifier -
     def getClf(self):
-        self.Clf = CategoricalNB(**self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = CategoricalNB()
+        else:
+            self.Clf = CategoricalNB(**self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class CpNBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDCp, sMCpL, sMCp = GC.S_DESC_CP_NB, GC.S_MTH_CP_NB_L, GC.S_MTH_CP_NB
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDCp, sMthL=sMCpL, sMth=sMCp, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDCp, sMthL=sMCpL, sMth=sMCp)
         if self.dITp['doCpNBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "CpNBClf" base object.')
 
     # --- methods for fitting and predicting with a Complement NB Classifier --
     def getClf(self):
-        self.Clf = ComplementNB(**self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = ComplementNB()
+        else:
+            self.Clf = ComplementNB(**self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class GsNBClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         sDGs, sMGsL, sMGs = GC.S_DESC_GS_NB, GC.S_MTH_GS_NB_L, GC.S_MTH_GS_NB
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDGs, sMthL=sMGsL, sMth=sMGs, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDGs, sMthL=sMGsL, sMth=sMGs)
         if self.dITp['doGsNBClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "GsNBClf" base object.')
 
     # --- methods for fitting and predicting with a Gaussian NB Classifier ----
     def getClf(self):
-        self.Clf = GaussianNB(**self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = GaussianNB()
+        else:
+            self.Clf = GaussianNB(**self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class MLPClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         # Classifier method is needed before "super" is initialised
         sDMLP, sMMLPL, sMMLP = GC.S_DESC_MLP, GC.S_MTH_MLP_L, GC.S_MTH_MLP
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDMLP, sMthL=sMMLPL, sMth=sMMLP, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDMLP, sMthL=sMMLPL, sMth=sMMLP)
         if self.dITp['doMLPClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "MLPClf" base object.')
 
     # --- methods for fitting and predicting with a neural network MLP Clf. ---
     def getClf(self):
-        self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
-                                 warm_start=self.dITp['bWarmStart'],
-                                 verbose=self.dITp['bVerbMLP'],
-                                 **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
+                                     warm_start=self.dITp['bWarmStart'],
+                                     verbose=self.dITp['bVerbMLP'])
+        else:
+            self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
+                                     warm_start=self.dITp['bWarmStart'],
+                                     verbose=self.dITp['bVerbMLP'],
+                                     **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class LinSVClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         # Classifier method is needed before "super" is initialised
         sDLSV, sMLSVL, sMLSV = GC.S_DESC_LSV, GC.S_MTH_LSV_L, GC.S_MTH_LSV
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDLSV, sMthL=sMLSVL, sMth=sMLSV, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDLSV, sMthL=sMLSVL, sMth=sMLSV)
         if self.dITp['doLinSVClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "LinSVClf" base object.')
 
     # --- methods for fitting and predicting with a Linear SV Classifier ------
     def getClf(self):
-        self.Clf = LinearSVC(random_state=self.dITp['rndState'],
-                             verbose=self.dITp['vVerbLSV'],
-                             **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = LinearSVC(random_state=self.dITp['rndState'],
+                                 verbose=self.dITp['vVerbLSV'])
+        else:
+            self.Clf = LinearSVC(random_state=self.dITp['rndState'],
+                                 verbose=self.dITp['vVerbLSV'],
+                                 **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
 class NuSVClf(SpecificClassifier):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, lG, d2Par, sKPar='A', iSt=None):
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=None, cRep=0):
         # Classifier method is needed before "super" is initialised
         sDNSV, sMNSVL, sMNSV = GC.S_DESC_NSV, GC.S_MTH_NSV_L, GC.S_MTH_NSV
-        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, sKPar=sKPar,
-                         sDesc=sDNSV, sMthL=sMNSVL, sMth=sMNSV, iSt=iSt)
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDNSV, sMthL=sMNSVL, sMth=sMNSV)
         if self.dITp['doNuSVClf']:
             self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
         print('Initiated "NuSVClf" base object.')
 
     # --- methods for fitting and predicting with a Nu-Support SV Classifier --
     def getClf(self):
-        self.Clf = NuSVC(random_state=self.dITp['rndState'],
-                         verbose=self.dITp['vVerbNSV'],
-                         **self.d2Par[self.sKPar])
+        if self.sKPar is None or self.d2Par is None:
+            self.Clf = NuSVC(random_state=self.dITp['rndState'],
+                             verbose=self.dITp['vVerbNSV'])
+        else:
+            self.Clf = NuSVC(random_state=self.dITp['rndState'],
+                             verbose=self.dITp['vVerbNSV'],
+                             **self.d2Par[self.sKPar])
         return self.getOptClfGridSearch()
 
 # -----------------------------------------------------------------------------
