@@ -45,10 +45,11 @@ class Looper(BaseClass):
         print(GC.S_EQ20, 'Method:', sMth, GC.S_VBAR, 'Parameter',
               'set:', sKPar, GC.S_VBAR, 'Step index:', iSt, GC.S_VBAR,
               'Repetition:', cRep + 1)
-    
-    def printSettingParGrid(self, sMth, iSt):
-        print(GC.S_EQ20, 'Method:', sMth, GC.S_VBAR, 'Parameter grid',
-              'optimisation', GC.S_VBAR, 'Step index:', iSt)
+
+    def printSettingParGrid(self, sMth, iSt, sKPar):
+        print(GC.S_EQ20, ' Method: ', sMth, GC.S_NEWL,
+              'Parameter grid optimisation using non-optimised values from ',
+              'parameter set ', sKPar, GC.S_NEWL, 'Step index: ', iSt, sep='')
 
     # --- loop methods --------------------------------------------------------
     # --- method for updating the type dictionary -----------------------------
@@ -97,11 +98,13 @@ class Looper(BaseClass):
 
     def adaptFPs(self, sMth, iSt, sKP, cRep):
         sKPR = GF.joinS([sKP, str(cRep + 1), self.sSt], cJ=self.dITp['sUSC'])
+        if self.dITp['doParGrid']:
+            sKPR = GF.joinS([sKP, self.sSt], cJ=self.dITp['sUSC'])
         for s in ['DetldClf', 'ProbaClf']:
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
 
     # --- method for performing the calculations of the current repetition ----
-    def getClfCRep(self, sMth, iSt=None, sKPar=None, cRep=0):
+    def getClfCRep(self, sMth, iSt=None, sKPar=GC.S_0, cRep=0):
         cClf, tM = None, 0
         if sMth == self.dITp['sMthDummy']:  # Dummy Classifier
             tM = (7, 1)
@@ -169,7 +172,7 @@ class Looper(BaseClass):
             cClf = NuSVClf(self.inpD, self.D, lG, d2Par, iSt, sKPar, cRep)
         self.cTM, self.cLParGrid, self.cD2Par, self.cClf = tM, lG, d2Par, cClf
 
-    def doCRep(self, cTim, sMth, iSt=None, k=0, sKPar=None, cRep=0, stT=None):
+    def doRep(self, cTim, sMth, iSt=None, k=0, sKPar=GC.S_0, cRep=0, stT=None):
         if sMth in self.dITp['lSMth']:
             cT = GF.showElapsedTime(startTime=stT)
             self.getClfCRep(sMth=sMth, iSt=iSt, sKPar=sKPar, cRep=cRep)
@@ -215,14 +218,17 @@ class Looper(BaseClass):
             for iSt in self.itISt:
                 sStI = GF.joinS([self.dITp['sFInpStIClf'], sStep + str(iSt)])
                 self.sSt = ('' if (iSt is None) else sStI)
-                if d2Par is not None:
+                if self.dITp['doParGrid'] and nRep > 0:
+                    assert self.dITp['s0'] in d2Par
+                    self.printSettingParGrid(sMth, iSt, sKPar=self.dITp['s0'])
+                    self.doRep(cTim, sMth, iSt, sKPar=self.dITp['s0'], stT=stT)
+                elif not self.dITp['doParGrid']:
+                    if not self.dITp['useKey0'] and self.dITp['s0'] in d2Par:
+                        del d2Par[self.dITp['s0']]
                     for k, sKPar in enumerate(d2Par):
                         for cRep in range(nRep):
                             self.printSettingCRep(sMth, iSt, sKPar, cRep)
-                            self.doCRep(cTim, sMth, iSt, k, sKPar, cRep, stT)
-                else:
-                    self.printSettingParGrid(sMth, iSt)
-                    self.doCRep(cTim, sMth, iSt, stT=stT)
-                self.saveCombRes(sMth, d2Par, nRep)
+                            self.doRep(cTim, sMth, iSt, k, sKPar, cRep, stT)
+                    self.saveCombRes(sMth, d2Par, nRep)
 
 ###############################################################################

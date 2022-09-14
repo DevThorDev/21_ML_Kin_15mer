@@ -30,7 +30,7 @@ doMLPClf = True                     # do neural network MLP classification?
 doLinSVClf = True                   # do Linear SV classification?
 doNuSVClf = True                    # do Nu-Support SV classification?
 
-doPropCalc = True                   # do calculation of AAc proportions/class?
+doPropCalc = False                   # do calculation of AAc proportions/class?
 
 doTrainTestSplit = True             # split data into train and test sets?
 stratData = None                    # split data stratified way? [None / True]
@@ -139,10 +139,11 @@ nRepeatsCV = 5                     # number of repeats (rep. strat. k-fold CV)
 # --- general input for AdaBoost Classifier -----------------------------------
 
 # --- general input for Random Forest Classifier ------------------------------
-estOobScore = False         # estimate the generalization score
+estOobScoreRF = False       # estimate the generalization score
 vVerbRF = 1                 # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Extra Trees Classifier --------------------------------
+estOobScoreXTr = False      # estimate the generalization score
 vVerbXTr = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Gradient Boosting Classifier --------------------------
@@ -304,9 +305,10 @@ dIO = {# --- general
        # --- general input for Dummy Classifier
        # --- general input for AdaBoost Classifier
        # --- general input for Random Forest Classifier
-       'estOobScore': estOobScore,
+       'estOobScoreRF': estOobScoreRF,
        'vVerbRF': vVerbRF,
        # --- general input for Extra Trees Classifier
+       'estOobScoreXTr': estOobScoreXTr,
        'vVerbXTr': vVerbXTr,
        # --- general input for Gradient Boosting Classifier
        'vVerbGrB': vVerbGrB,
