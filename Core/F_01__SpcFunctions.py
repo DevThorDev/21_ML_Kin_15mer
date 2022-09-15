@@ -327,10 +327,10 @@ def formatDfrCVRes(dIG, dITp, cClf):
           'Best score: ', round(cClf.best_score_, R04), sep='')
     dfrCVRes = GF.iniPdDfr(cClf.cv_results_)
     dfrCVRes = dfrCVRes.sort_values(by=['rank_test_score'])
-    # dfrCVRes = dfrCVRes.set_index(dfrCVRes['params'].apply(GF.joinS))
     dfrCVRes = dfrCVRes[[s for s in dfrCVRes.columns if not
                          (s.startswith('split') or s == 'params')]]
-    print('CV results:', nL, dfrCVRes, sep='')
+    dfrPrt = dfrCVRes[[s for s in dfrCVRes.columns if not s.endswith('time')]]
+    print('CV results:', nL, dfrPrt, sep='')
     return dfrCVRes
 
 # --- Functions (O_80__Looper) ------------------------------------------------

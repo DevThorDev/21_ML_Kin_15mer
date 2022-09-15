@@ -15,7 +15,7 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 # evaluations. Parameter grid calculations for a particular classification
 # method are performed if the number of repetitions is positve. Otherwise,
 # a parameter set is evaluated number of repetitions times.
-nRp0, nRpD = GC.N_REP_0, 3
+nRp0, nRpDef = GC.N_REP_0, 5
 dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_ADA: nRp0,
            GC.S_MTH_RF: nRp0,
@@ -23,12 +23,12 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
            GC.S_MTH_GP: nRp0,
-           GC.S_MTH_PA_A: nRp0,
+           GC.S_MTH_PA_A: nRpDef,
            GC.S_MTH_PCT: nRp0,
            GC.S_MTH_SGD: nRp0,
-           GC.S_MTH_CT_NB: nRpD,
-           GC.S_MTH_CP_NB: nRpD,
-           GC.S_MTH_GS_NB: nRpD,
+           GC.S_MTH_CT_NB: nRp0,
+           GC.S_MTH_CP_NB: nRp0,
+           GC.S_MTH_GS_NB: nRp0,
            GC.S_MTH_MLP: nRp0,
            GC.S_MTH_LSV: nRp0,
            GC.S_MTH_NSV: nRp0}
@@ -50,20 +50,22 @@ d2Par_Dy = {GC.S_0: {'strategy': 'uniform',
 
 # === AdaBoost Classifier =====================================================
 # --- list of parameter grids for AdaBoost Classifier grid search -------------
-# lParGrid_Ada = [{'n_estimators': [100, 1000],
-#                  'learning_rate': [0.5, 1.0, 2.0],
-#                  'algorithm': ['SAMME', 'SAMME.R']}]
-lParGrid_Ada = [{'learning_rate': [0.5, 1.0, 2.0],
+lParGrid_Ada = [{'n_estimators': [10, 50, 100, 1000],
+                 'learning_rate': [0.5, 1.0, 2.0],
                  'algorithm': ['SAMME', 'SAMME.R']}]
-lParGrid_Ada = [{'learning_rate': stats.uniform(0.0, 2.0),
-                 'algorithm': ['SAMME', 'SAMME.R']}]
+# lParGrid_Ada = [{'n_estimators': [1000],
+#                  'learning_rate': [0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+#                  'algorithm': ['SAMME']}]
+lParGrid_Ada = [{'n_estimators': [1000],
+                  'learning_rate': stats.uniform(loc=0.5, scale=0.3),
+                  'algorithm': ['SAMME']}]
 
 # --- parameter dictionary for AdaBoost Classifier ----------------------------
 d2Par_Ada = {GC.S_0: {'n_estimators': 50,
                       'learning_rate': 1.,
                       'algorithm': 'SAMME.R'},
-             'A': {'n_estimators': 100,
-                   'learning_rate': 1.,
+             'A': {'n_estimators': 1000,
+                   'learning_rate': 0.55,
                    'algorithm': 'SAMME'}}
 
 # === Random Forest Classifier ================================================
@@ -78,7 +80,7 @@ lParGrid_RF = [{'criterion': ['gini', 'entropy', 'log_loss'],
                {'max_features': [None, 'sqrt']}]
 lParGrid_RF = [{'criterion': ['gini', 'entropy', 'log_loss'],
                 'bootstrap': [True, False],
-                'ccp_alpha': stats.uniform(0.0, 0.5)},
+                'ccp_alpha': stats.uniform(loc=0.0, scale=0.5)},
                {'max_features': [None, 'sqrt']}]
 
 # --- parameter dictionary for Random Forest Classifier -----------------------
@@ -119,7 +121,7 @@ lParGrid_XTr = [{'criterion': ['gini', 'entropy', 'log_loss'],
                 {'max_features': [None, 'sqrt']}]
 lParGrid_XTr = [{'criterion': ['gini', 'entropy', 'log_loss'],
                  'bootstrap': [True, False],
-                 'ccp_alpha': stats.uniform(0.0, 0.5)},
+                 'ccp_alpha': stats.uniform(loc=0.0, scale=0.5)},
                 {'max_features': [None, 'sqrt']}]
 
 # --- parameter dictionary for Extra Trees Classifier -------------------------
@@ -158,10 +160,10 @@ lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
                 {'max_features': [None, 'sqrt'],
                  'ccp_alpha': [0.0, 0.1]}]
 lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
-                 'learning_rate': stats.uniform(0.0, 1.0),
-                 'ccp_alpha': stats.uniform(0.0, 0.5),
+                 'learning_rate': stats.uniform(loc=0.0, scale=1.0),
+                 'ccp_alpha': stats.uniform(loc=0.0, scale=0.5),
                  'n_estimators': [100, 1000],
-                 'subsample': stats.uniform(0.1, 1.0),
+                 'subsample': stats.uniform(loc=0.1, scale=0.9),
                  'criterion': ['friedman_mse', 'squared_error']}]
 
 # --- parameter dictionary for Gradient Boosting Classifier -------------------
@@ -192,12 +194,12 @@ d2Par_GrB = {GC.S_0: {'loss': 'log_loss',
 #                   'min_samples_leaf': [5, 20],
 #                   'l2_regularization': [0, 0.5],
 #                   'max_bins': [63, 255]}]
-lParGrid_HGrB = [{'learning_rate': stats.uniform(0.0, 1.0),
+lParGrid_HGrB = [{'learning_rate': stats.uniform(loc=0.0, scale=1.0),
                   'max_iter': stats.randint(10, 1000 + 1),
                   'max_leaf_nodes': [10, 31, None],
                   'max_depth': [5, None],
                   'min_samples_leaf': stats.randint(5, 20 + 1),
-                  'l2_regularization': stats.uniform(0.0, 1.0),
+                  'l2_regularization': stats.uniform(loc=0.0, scale=1.0),
                   'max_bins': [63, 255]}]
 
 # --- parameter dictionary for Hist Gradient Boosting Classifier --------------
@@ -247,9 +249,9 @@ d2Par_GP = {GC.S_0: {'kernel': None,
 lParGrid_PaA = [{'C': [0.1, 1.0, 10.0],
                  'loss': ['hinge', 'squared_hinge'],
                  'class_weight': [None, 'balanced']}]
-lParGrid_PaA = [{'C': stats.loguniform(0.01, 10.0),
-                 'max_iter': [100, 1000, 3000],
-                 'tol': [1.0e-2, 1.0e-3, 1.0e-4],
+lParGrid_PaA = [{'C': stats.loguniform(a=0.01, b=10.0),
+                 # 'max_iter': [100, 1000, 3000],
+                 # 'tol': [1.0e-2, 1.0e-3, 1.0e-4],
                  'loss': ['hinge', 'squared_hinge'],
                  'class_weight': [None, 'balanced']}]
 
@@ -274,9 +276,9 @@ lParGrid_Pct = [{'penalty': [None, 'l2', 'l1', 'elasticnet'],
                  'eta0': [0.5, 1., 2.],
                  'class_weight': [None, 'balanced']}]
 lParGrid_Pct = [{'penalty': [None, 'l2', 'l1', 'elasticnet'],
-                 'alpha': stats.uniform(0.00001, 1.),
-                 'l1_ratio': stats.uniform(0., 1.),
-                 'eta0': stats.uniform(0.1, 10.),
+                 'alpha': stats.uniform(loc=0.00001, scale=(1. - 0.00001)),
+                 'l1_ratio': stats.uniform(loc=0., scale=1.),
+                 'eta0': stats.uniform(loc=0.1, scale=(10. - 0.1)),
                  'class_weight': [None, 'balanced']}]
 
 # --- parameter dictionary for Perceptron Classifier --------------------------
@@ -311,13 +313,13 @@ lParGrid_SGD = [{'loss': ['hinge', 'log_loss', 'modified_huber',
 lParGrid_SGD = [{'loss': ['hinge', 'log_loss', 'modified_huber',
                           'squared_hinge', 'perceptron'],
                  'penalty': ['l2', 'l1', 'elasticnet'],
-                 'alpha': stats.uniform(0.00001, 1.),
-                 'l1_ratio': stats.uniform(0., 1.),
-                 'epsilon': stats.uniform(0., 10.),
+                 'alpha': stats.uniform(loc=0.00001, scale=(1. - 0.00001)),
+                 'l1_ratio': stats.uniform(loc=0., scale=1.),
+                 'epsilon': stats.uniform(loc=0., scale=10.),
                  'learning_rate': ['constant', 'optimal', 'invscaling',
                                    'adaptive'],
-                 'eta0': stats.uniform(0.1, 10.),
-                 'power_t': stats.uniform(0., 2.),
+                 'eta0': stats.uniform(loc=0.1, scale=(10. - 0.1)),
+                 'power_t': stats.uniform(loc=0., scale=2.),
                  'class_weight': [None, 'balanced']}]
 
 # --- parameter dictionary for SGD Classifier ---------------------------------
@@ -343,38 +345,46 @@ d2Par_SGD = {GC.S_0: {'loss': 'hinge',
 # --- list of parameter grids for Categorical NB Classifier grid search -------
 lParGrid_CtNB = [{'alpha': [0, 0.5, 1., 2.],
                   'fit_prior': [False, True]}]
-lParGrid_CtNB = [{'alpha': stats.uniform(0., 1.),
+lParGrid_CtNB = [{'alpha': stats.uniform(loc=0., scale=1.),
                   'fit_prior': [False, True]}]
 
 # --- parameter dictionary for Categorical NB Classifier ----------------------
 d2Par_CtNB = {GC.S_0: {'alpha': 1.,
                        'fit_prior': True,
                        'class_prior': None,
-                       'min_categories': None}}
+                       'min_categories': None},
+              'A': {'alpha': 0.37,
+                    'fit_prior': False}}
 
 # === Complement NB Classifier ================================================
 # --- list of parameter grids for Complement NB Classifier grid search --------
 lParGrid_CpNB = [{'alpha': [0, 0.5, 1., 2.],
                   'fit_prior': [False, True],
                   'norm': [False, True]}]
-lParGrid_CpNB = [{'alpha': stats.uniform(0., 1.),
-                  'fit_prior': [False, True],
-                  'norm': [False, True]}]
+lParGrid_CpNB = [{'alpha': [0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8,
+                            0.85, 0.9, 0.95, 1., 1.05, 1.1]}]
+# lParGrid_CpNB = [{'alpha': stats.uniform(loc=0., scale=1.),
+#                   'fit_prior': [False, True],
+#                   'norm': [False, True]}]
+# lParGrid_CpNB = [{'alpha': stats.uniform(loc=0.5, scale=0.45)}]
 
 # --- parameter dictionary for Complement NB Classifier -----------------------
 d2Par_CpNB = {GC.S_0: {'alpha': 1.,
                        'fit_prior': True,
                        'class_prior': None,
-                       'norm': False}}
+                       'norm': False},
+              'A': {'alpha': 1.,
+                    'fit_prior': False}}
 
 # === Gaussian NB Classifier ==================================================
 # --- list of parameter grids for Gaussian NB Classifier grid search ----------
 lParGrid_GsNB = [{'var_smoothing': [1.0e-11, 1.0e-10, 1.0e-9, 1.0e-8]}]
-lParGrid_GsNB = [{'var_smoothing': stats.loguniform(1.0e-11, 1.0e-7)}]
+lParGrid_GsNB = [{'var_smoothing': stats.loguniform(a=8.0e-2, b=2.0)}]
 
 # --- parameter dictionary for Gaussian NB Classifier -------------------------
 d2Par_GsNB = {GC.S_0: {'priors': None,
-                       'var_smoothing': 1.0e-9}}
+                       'var_smoothing': 1.0e-9},
+              'A': {'var_smoothing': 0.3}}
 
 # === neural network MLP Classifier ===========================================
 # --- list of parameter grids for neural network MLP Classifier grid search ---
@@ -383,11 +393,13 @@ lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
                  'solver': ['adam', 'lbfgs', 'sgd'],
                  'learning_rate': ['constant', 'adaptive'],
                  'momentum': [0.6, 0.9, 0.98]}]
-lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
+lParGrid_MLP = [{'hidden_layer_sizes': [(10,), (100,), (1024, 256, 64, 16)],
                  'activation': ['relu', 'identity', 'logistic', 'tanh'],
-                 'solver': ['adam', 'lbfgs', 'sgd'],
-                 'learning_rate': ['constant', 'adaptive'],
-                 'momentum': stats.uniform(0.1, 0.99)}]
+                 'solver': ['adam', 'lbfgs', 'sgd']
+                 # ,
+                 # 'learning_rate': ['constant', 'adaptive'],
+                 # 'momentum': stats.uniform(loc=0.1, scale=(0.99 - 0.1))
+                 }]
 
 # --- parameter dictionary for neural network MLP Classifier ------------------
 d2Par_MLP = {GC.S_0: {'hidden_layer_sizes': (100,),
@@ -442,8 +454,9 @@ lParGrid_LSV = [{'penalty': ['l1', 'l2'],
                  'class_weight': [None, 'balanced']}]
 lParGrid_LSV = [{'penalty': ['l1', 'l2'],
                  'loss': ['hinge', 'squared_hinge'],
-                 'C': stats.uniform(0.1, 10.),
-                 'intercept_scaling': stats.uniform(0.1, 10.),
+                 'C': stats.uniform(loc=0.1, scale=(10. - 0.1)),
+                 'intercept_scaling': stats.uniform(loc=0.1,
+                                                    scale=(10. - 0.1)),
                  'class_weight': [None, 'balanced']}]
 
 # --- parameter dictionary for Linear SV Classifier ---------------------------
@@ -470,11 +483,11 @@ lParGrid_NSV = [{'nu': [0.1, 0.5, 1.],
                  'class_weight': [None, 'balanced'],
                  'decision_function_shape': ['ovo', 'ovr'],
                  'break_ties': [False, True]}]
-lParGrid_NSV = [{'nu': stats.uniform(0.1, 1.),
+lParGrid_NSV = [{'nu': stats.uniform(loc=0.1, scale=(1. - 0.1)),
                  'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
                  'degree': stats.randint(2, 3 + 1),
                  'gamma': ['scale', 'auto'],
-                 'coef0': stats.uniform(0., 1.),
+                 'coef0': stats.uniform(loc=0., scale=1.),
                  'shrinking': [False, True],
                  'probability': [False, True],
                  'class_weight': [None, 'balanced'],
