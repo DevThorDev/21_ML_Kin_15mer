@@ -23,9 +23,9 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
            GC.S_MTH_GP: nRp0,
-           GC.S_MTH_PA_A: nRpDef,
+           GC.S_MTH_PA_A: nRp0,
            GC.S_MTH_PCT: nRp0,
-           GC.S_MTH_SGD: nRp0,
+           GC.S_MTH_SGD: nRpDef,
            GC.S_MTH_CT_NB: nRp0,
            GC.S_MTH_CP_NB: nRp0,
            GC.S_MTH_GS_NB: nRp0,
@@ -249,11 +249,21 @@ d2Par_GP = {GC.S_0: {'kernel': None,
 lParGrid_PaA = [{'C': [0.1, 1.0, 10.0],
                  'loss': ['hinge', 'squared_hinge'],
                  'class_weight': [None, 'balanced']}]
-lParGrid_PaA = [{'C': stats.loguniform(a=0.01, b=10.0),
-                 # 'max_iter': [100, 1000, 3000],
-                 # 'tol': [1.0e-2, 1.0e-3, 1.0e-4],
-                 'loss': ['hinge', 'squared_hinge'],
-                 'class_weight': [None, 'balanced']}]
+lParGrid_PaA = [{'max_iter': [10000],
+                 'tol': [1.0e-3, 1.0e-6, 1.0e-9],
+                 'loss': ['hinge'],
+                 'class_weight': ['balanced'],
+                 'average': [False, True]}]
+# lParGrid_PaA = [{'C': stats.loguniform(a=0.01, b=10.0),
+#                  'max_iter': [100, 1000, 3000],
+#                  'tol': [1.0e-2, 1.0e-3, 1.0e-4],
+#                  'loss': ['hinge', 'squared_hinge'],
+#                  'class_weight': [None, 'balanced']}]
+# lParGrid_PaA = [{'C': stats.loguniform(a=0.01, b=10.0),
+#                  'max_iter': [100, 1000, 3000],
+#                  'tol': [1.0e-2, 1.0e-3, 1.0e-4],
+#                  'loss': ['hinge'],
+#                  'class_weight': ['balanced']}]
 
 # --- parameter dictionary for Passive Aggressive Classifier ------------------
 d2Par_PaA = {GC.S_0: {'C': 1.0,
@@ -266,20 +276,24 @@ d2Par_PaA = {GC.S_0: {'C': 1.0,
                       'shuffle': True,
                       'loss': 'hinge',
                       'class_weight': None,
-                      'average': False}}
+                      'average': False},
+             'A': {'max_iter': 10000,
+                   'tol': 1.0e-6,
+                   'class_weight': None,
+                   'average': True}}
 
 # === Perceptron Classifier ===================================================
 # --- list of parameter grids for Perceptron Classifier grid search -----------
-lParGrid_Pct = [{'penalty': [None, 'l2', 'l1', 'elasticnet'],
-                 'alpha': [0.0001, 1.],
-                 'l1_ratio': [0., 0.15, 0.5, 1.],
-                 'eta0': [0.5, 1., 2.],
-                 'class_weight': [None, 'balanced']}]
-lParGrid_Pct = [{'penalty': [None, 'l2', 'l1', 'elasticnet'],
-                 'alpha': stats.uniform(loc=0.00001, scale=(1. - 0.00001)),
-                 'l1_ratio': stats.uniform(loc=0., scale=1.),
-                 'eta0': stats.uniform(loc=0.1, scale=(10. - 0.1)),
-                 'class_weight': [None, 'balanced']}]
+lParGrid_Pct = [{'penalty': ['elasticnet', None],
+                 'alpha': [1.0e-8],
+                 'l1_ratio': [0.5],
+                  'eta0': [0.01, 0.1, 1., 10.],
+                 # 'class_weight': [None, 'balanced']
+                 }]
+# lParGrid_Pct = [{'penalty': [None, 'l2', 'l1', 'elasticnet'],
+#                  'alpha': stats.uniform(loc=0.00001, scale=(1. - 0.00001)),
+#                  'l1_ratio': stats.uniform(loc=0., scale=1.),
+#                  'eta0': stats.uniform(loc=0.1, scale=(10. - 0.1))}]
 
 # --- parameter dictionary for Perceptron Classifier --------------------------
 d2Par_Pct = {GC.S_0: {'penalty': None,
@@ -293,7 +307,11 @@ d2Par_Pct = {GC.S_0: {'penalty': None,
                       'early_stopping': False,
                       'validation_fraction': 0.1,
                       'n_iter_no_change': 5,
-                      'class_weight': None}}
+                      'class_weight': None},
+             'A': {'penalty': 'elasticnet',
+                   'alpha': 1.0e-8,
+                   'l1_ratio': 0.5,
+                   'eta0': 0.01}}
 
 # === Stochastic Gradient Descent (SGD) Classifier ============================
 # --- list of parameter grids for SGD Classifier grid search ------------------
@@ -320,7 +338,8 @@ lParGrid_SGD = [{'loss': ['hinge', 'log_loss', 'modified_huber',
                                    'adaptive'],
                  'eta0': stats.uniform(loc=0.1, scale=(10. - 0.1)),
                  'power_t': stats.uniform(loc=0., scale=2.),
-                 'class_weight': [None, 'balanced']}]
+                 'class_weight': [None, 'balanced'],
+                 'average': [False, True]}]
 
 # --- parameter dictionary for SGD Classifier ---------------------------------
 d2Par_SGD = {GC.S_0: {'loss': 'hinge',
