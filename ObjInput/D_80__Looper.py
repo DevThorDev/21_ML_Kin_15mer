@@ -19,13 +19,13 @@ nRp0, nRpDef = GC.N_REP_0, 5
 dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_ADA: nRp0,
            GC.S_MTH_RF: nRp0,
-           GC.S_MTH_X_TR: nRp0,
+           GC.S_MTH_X_TR: nRpDef,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
            GC.S_MTH_GP: nRp0,
            GC.S_MTH_PA_A: nRp0,
            GC.S_MTH_PCT: nRp0,
-           GC.S_MTH_SGD: nRpDef,
+           GC.S_MTH_SGD: nRp0,
            GC.S_MTH_CT_NB: nRp0,
            GC.S_MTH_CP_NB: nRp0,
            GC.S_MTH_GS_NB: nRp0,
@@ -33,7 +33,7 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_LSV: nRp0,
            GC.S_MTH_NSV: nRp0}
 
-doParGrid = True                   # do parameter grid calculations?
+doParGrid = False                   # do parameter grid calculations?
 
 useKey0 = False                     # use the parameter key GC.S_0?
                                     # (in case doParGrid == False)
@@ -78,10 +78,12 @@ d2Par_Ada = {GC.S_0: {'n_estimators': 50,
 lParGrid_RF = [{'criterion': ['gini', 'entropy', 'log_loss'],
                 'ccp_alpha': [0.0, 0.1]},
                {'max_features': [None, 'sqrt']}]
-lParGrid_RF = [{'criterion': ['gini', 'entropy', 'log_loss'],
+lParGrid_RF = [{'n_estimators': [100, 1000],
+                'criterion': ['gini', 'entropy', 'log_loss'],
+                'min_impurity_decrease': stats.uniform(loc=-10., scale=20.),
                 'bootstrap': [True, False],
-                'ccp_alpha': stats.uniform(loc=0.0, scale=0.5)},
-               {'max_features': [None, 'sqrt']}]
+                'class_weight': [None, 'balanced', 'balanced_subsample'],
+                'ccp_alpha': stats.uniform(loc=0.0, scale=5.)}]
 
 # --- parameter dictionary for Random Forest Classifier -----------------------
 d2Par_RF = {GC.S_0: {'n_estimators': 100,
@@ -94,20 +96,37 @@ d2Par_RF = {GC.S_0: {'n_estimators': 100,
                      'max_leaf_nodes': None,
                      'min_impurity_decrease': 0.0,
                      'bootstrap': True,
+                     'class_weight': None,
                      'ccp_alpha': 0.0,
                      'max_samples': None},
-            'B': {'n_estimators': 100,
-                  'criterion': 'entropy',
-                  'max_depth': None,
-                  'min_samples_split': 2,
-                  'min_samples_leaf': 1,
-                  'min_weight_fraction_leaf': 0.0,
-                  'max_features': 'sqrt',
-                  'max_leaf_nodes': None,
-                  'min_impurity_decrease': 0.0,
-                  'bootstrap': True,
-                  'ccp_alpha': 0.0,
-                  'max_samples': None}}
+            # 'A': {'criterion': 'log_loss'},
+            'B': {'criterion': 'entropy'},
+            # 'C': {'criterion': 'entropy',
+            #       'n_estimators': 100},
+            # 'D': {'criterion': 'entropy',
+            #       'n_estimators': 1000},
+            # 'E': {'criterion': 'entropy',
+            #       'n_estimators': 1000,
+            #       'bootstrap': False},
+            # 'F': {'criterion': 'entropy',
+            #       'n_estimators': 1000,
+            #       'class_weight': 'balanced'},
+            # 'G': {'criterion': 'entropy',
+            #       'n_estimators': 1000,
+            #       'class_weight': 'balanced_subsample'},
+            # 'H': {'criterion': 'entropy',
+            #       'n_estimators': 5000,
+            #       'bootstrap': True},
+            # 'I': {'criterion': 'entropy',
+            #       'n_estimators': 5000,
+            #       'bootstrap': False},
+            # 'J': {'criterion': 'entropy',
+            #       'n_estimators': 1000,
+            #       'ccp_alpha': 0.1},
+            # 'K': {'criterion': 'entropy',
+            #       'n_estimators': 1000,
+            #       'ccp_alpha': 1.},
+            }
 
 # === Extra Trees Classifier ==================================================
 # --- list of parameter grids for Extra Trees Classifier grid search ----------
@@ -119,10 +138,11 @@ d2Par_RF = {GC.S_0: {'n_estimators': 100,
 lParGrid_XTr = [{'criterion': ['gini', 'entropy', 'log_loss'],
                  'ccp_alpha': [0.0, 0.1]},
                 {'max_features': [None, 'sqrt']}]
-lParGrid_XTr = [{'criterion': ['gini', 'entropy', 'log_loss'],
+lParGrid_XTr = [{'n_estimators': [100, 1000],
+                 'criterion': ['gini', 'entropy'],
+                 'max_features': ['sqrt'],
                  'bootstrap': [True, False],
-                 'ccp_alpha': stats.uniform(loc=0.0, scale=0.5)},
-                {'max_features': [None, 'sqrt']}]
+                 'ccp_alpha': [0.0]}]
 
 # --- parameter dictionary for Extra Trees Classifier -------------------------
 d2Par_XTr = {GC.S_0: {'n_estimators': 100,
@@ -137,18 +157,8 @@ d2Par_XTr = {GC.S_0: {'n_estimators': 100,
                       'bootstrap': False,
                       'ccp_alpha': 0.0,
                       'max_samples': None},
-             'A': {'n_estimators': 100,
-                   'criterion': 'entropy',
-                   'max_depth': None,
-                   'min_samples_split': 2,
-                   'min_samples_leaf': 1,
-                   'min_weight_fraction_leaf': 0.0,
-                   'max_features': 'sqrt',
-                   'max_leaf_nodes': None,
-                   'min_impurity_decrease': 0.0,
-                   'bootstrap': True,
-                   'ccp_alpha': 0.0,
-                   'max_samples': None}}
+             'A': {'n_estimators': 1000,
+                   'bootstrap': True}}
 
 # === Gradient Boosting Classifier ============================================
 # --- list of parameter grids for Gradient Boosting Classifier grid search ----
@@ -467,15 +477,20 @@ d2Par_MLP = {GC.S_0: {'hidden_layer_sizes': (100,),
 lParGrid_LSV = [{'penalty': ['l1', 'l2'],
                  'loss': ['hinge', 'squared_hinge'],
                  'dual': [False, True],
-                 'C': [0.1, 1., 10.],
+                 'tol': [1.0e-6, 1.0e-8],
+                 'C': [0.001, 0.01, 0.1, 1.],
                  'multi_class': ['ovr', 'crammer_singer'],
-                 'intercept_scaling': [0.1, 1., 10.],
                  'class_weight': [None, 'balanced']}]
 lParGrid_LSV = [{'penalty': ['l1', 'l2'],
                  'loss': ['hinge', 'squared_hinge'],
+                 'dual': [False, True],
+                 'tol': [1e-2, 1e-4, 1e-6],
                  'C': stats.uniform(loc=0.1, scale=(10. - 0.1)),
+                 'multi_class': ['ovr', 'crammer_singer'],
                  'intercept_scaling': stats.uniform(loc=0.1,
                                                     scale=(10. - 0.1)),
+                 'max_iter': [1000, 10000]}]
+lParGrid_LSV = [{'C': stats.loguniform(a=1e-7, b=1e-1),
                  'class_weight': [None, 'balanced']}]
 
 # --- parameter dictionary for Linear SV Classifier ---------------------------
@@ -488,7 +503,9 @@ d2Par_LSV = {GC.S_0: {'penalty': 'l2',
                       'fit_intercept': True,
                       'intercept_scaling': 1,
                       'class_weight': None,
-                      'max_iter': 1000}}
+                      'max_iter': 1000},
+             'A': {'dual': False,
+                   'C': 0.0025}}
 
 # === Nu-Support SV Classifier ================================================
 # --- list of parameter grids for Nu-Support SV Classifier grid search --------
@@ -502,29 +519,34 @@ lParGrid_NSV = [{'nu': [0.1, 0.5, 1.],
                  'class_weight': [None, 'balanced'],
                  'decision_function_shape': ['ovo', 'ovr'],
                  'break_ties': [False, True]}]
-lParGrid_NSV = [{'nu': stats.uniform(loc=0.1, scale=(1. - 0.1)),
-                 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-                 'degree': stats.randint(2, 3 + 1),
-                 'gamma': ['scale', 'auto'],
-                 'coef0': stats.uniform(loc=0., scale=1.),
-                 'shrinking': [False, True],
-                 'probability': [False, True],
-                 'class_weight': [None, 'balanced'],
+lParGrid_NSV = [{'nu': [0.5],
+                 'kernel': ['poly'],
+                 'degree': [3],
+                 'gamma': ['scale'],
+                 'coef0': stats.uniform(loc=-10., scale=20.),
+                 'shrinking': [True],
+                 'probability': [False],
+                 'tol': [1e-5],
+                 'class_weight': [None],
                  'decision_function_shape': ['ovo', 'ovr'],
-                 'break_ties': [False, True]}]
+                 'break_ties': [False]}]
 
 # --- parameter dictionary for Nu-Support SV Classifier -----------------------
 d2Par_NSV = {GC.S_0: {'nu': 0.5,
                       'kernel': 'rbf',
                       'degree': 3,
                       'gamma': 'scale',
+                      'coef0': 0.0,
                       'shrinking': True,
                       'probability': False,
                       'tol': 1e-3,
                       'class_weight': None,
                       'max_iter': -1,
                       'decision_function_shape': 'ovr',
-                      'break_ties': False}}
+                      'break_ties': False},
+             'A': {'kernel': 'poly',
+                   'probability': True,     # to use "predict_proba"
+                   'tol': 1e-5}}
 
 # === other input =============================================================
 # --- numbers -----------------------------------------------------------------
