@@ -31,6 +31,24 @@ def joinDirToPath(pF='', nmD='Directory'):
     else:
         return nmD
 
+def getLF(pF='', itSCmp=None, sSpl=GC.S_USC):
+    if itSCmp is None:              # trivial case - no filtering
+        return os.listdir(pF)
+    lSFRet = []
+    for sF in os.listdir(pF):
+        lSSpl, lSel = sF.split(GC.S_DOT)[0].split(sSpl), []
+        for k, s in enumerate(lSSpl):
+            if s in itSCmp:
+                lSel.append((k, s))
+                if (len(itSCmp) > 1) and (k < len(lSSpl[:-1])):
+                    for j, s in enumerate(lSSpl[(k + 1):]):
+                        if s in itSCmp:
+                            lSel.append((k, s))
+                break
+        if len(lSel) == len(itSCmp):        # boolean AND
+            lSFRet.append(sF)
+    return lSFRet
+
 def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
     if len(sStart) > 0:
         sF = sStart + sJoin + sF

@@ -185,7 +185,7 @@ class BaseClass:
         self.dTpDfr[self.dITp['sTrain']][sEffF] = self.dITp['sIEffFTrain']
         self.dTpDfr[self.dITp['sTest']][sEffF] = self.dITp['sIEffFTest']
 
-        # --- methods for loading and saving DataFrames ---------------------------
+        # --- methods for loading and saving DataFrames -----------------------
     def getPDir(self):
         if self.dIG['isTest']:
             self.pDirProcInp = self.dITp['pDirProcInp_T']
