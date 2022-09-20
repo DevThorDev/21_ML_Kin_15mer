@@ -32,11 +32,12 @@ S_TAB = '\t'
 S_NEWL = '\n'
 S_NULL = 'NULL'
 S_0, S_1 = '0', '1'
-S_CAP_C = 'C'
-S_CAP_E = 'E'
-S_CAP_X = 'X'
-S_CAP_Y = 'Y'
-S_CAP_XS, S_CAP_S, S_CAP_M, S_CAP_L = S_CAP_X + 'S', 'S', 'M', 'L'
+S_A, S_B, S_C, S_D, S_E = 'A', 'B', 'C', 'D', 'E'
+S_F, S_G, S_H, S_I, S_J = 'F', 'G', 'H', 'I', 'J'
+S_K, S_L, S_M, S_N, S_O = 'K', 'L', 'M', 'N', 'O'
+S_P, S_Q, S_R, S_S, S_T = 'P', 'Q', 'R', 'S', 'T'
+S_U, S_V, S_W, S_X, S_Y, S_Z = 'U', 'V', 'W', 'X', 'Y', 'Z'
+S_XS = S_X + S_S
 
 S_US02 = S_USC*2
 S_DT03 = S_DOT*3
@@ -95,12 +96,12 @@ S_PROB = 'Prob'
 S_TOTAL_PROB = S_TOTAL + S_PROB
 S_COND_PROB = S_COND + S_PROB
 S_LN_PROB = 'ln(' + S_PROB + ')'
-S_N_MER = 'N' + S_MER
+S_N_MER = S_N + S_MER
 S_NO = 'No'
-S_EFF, S_EFF_S = 'Eff', 'E'
+S_EFF, S_EFF_S = 'Eff', S_E
 S_EFF_F = S_EFF + S_FULL
 S_NO_EFF = S_NO + S_EFF
-S_FAM, S_FAM_S = 'Fam', 'F'
+S_FAM, S_FAM_S = 'Fam', S_F
 S_FAMILY = S_FAM + 'ily'
 S_EFF_FAM, S_EFF_FAM_S = S_EFF + S_FAM, S_EFF_S + S_FAM_S
 S_NO_FAM = S_NO + S_FAM
@@ -197,7 +198,7 @@ S_SEQ = 'Seq'
 S_INP = 'Inp'
 S_OUT = 'Out'
 S_CL = 'Cl'
-S_X_CL = S_CAP_X + S_CL
+S_X_CL = S_X + S_CL
 S_CLF, S_PRC = 'Clf', 'PrC'
 S_NONE = 'None'
 S_OLD = 'Old'
@@ -233,7 +234,7 @@ S_ALL_SEQ = 'AllSeq'
 S_ALL_SEQ_N_MER = S_ALL_SEQ + S_C_N_MER[1:]
 S_AMINO_ACID = 'AminoAcid'
 S_SEQ_CHECK = S_SEQ + 'Check'
-S_I_EFF_INP = 'I' + S_EFF + S_INP
+S_I_EFF_INP = S_I + S_EFF + S_INP
 S_PROC_INP = S_PROC + S_INP
 S_COMB_INP = S_COMB + S_INP
 S_TRAIN_DATA = S_TRAIN + S_DATA
@@ -307,6 +308,7 @@ S_I_POS = 'iPos'
 S_WITH_EXCL_EFF_FAM = 'wXcl' + S_EFF_FAM_S
 S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM_S
 S_SAMPLER, S_SAMPLER_S = 'Sampler', 'Smpl'
+S_SMPL_NO, S_SMPL_NO_S = (S_NO + S_SAMPLER, S_NO + S_SAMPLER_S)
 S_SMPL_CL_CTR, S_SMPL_CL_CTR_S = ('ClusterCentroids', 'ClCtr' + S_SAMPLER_S)
 S_SMPL_ALL_KNN, S_SMPL_ALL_KNN_S = ('AllKNN', 'KNN' + S_SAMPLER_S)
 S_SMPL_NBH_CL_R, S_SMPL_NBH_CL_R_S = ('NeighbourhoodCleaningRule',
@@ -316,6 +318,8 @@ S_SMPL_TOM_LKS, S_SMPL_TOM_LKS_S = ('TomekLinks', 'TomLks' + S_SAMPLER_S)
 S_STRAT_REAL_MAJO = 'RealMajo'
 S_STRAT_SHARE_MINO = 'ShareMino'
 S_PART_FIT, S_PART_FIT_S = 'PartFit', 'PF'
+S_0_PRED, S_1_PRED = S_USC.join([S_0, 'pred']), S_USC.join([S_1, 'pred'])
+S_NOT_PRED = S_USC.join(['not', 'pred'])
 
 # --- sets for X class mapping ------------------------------------------------
 S_SET_01 = 'Set01_11Cl'
@@ -355,7 +359,8 @@ CLR_TAB_GREEN = 'tab:green'
 CLR_TAB_BLUE = 'tab:blue'
 
 # === derived values and input processing =====================================
-D_S_SMPL = {S_SMPL_CL_CTR: S_SMPL_CL_CTR_S,
+D_S_SMPL = {S_SMPL_NO: S_SMPL_NO_S,
+            S_SMPL_CL_CTR: S_SMPL_CL_CTR_S,
             S_SMPL_ALL_KNN: S_SMPL_ALL_KNN_S,
             S_SMPL_NBH_CL_R: S_SMPL_NBH_CL_R_S,
             S_SMPL_RND_U: S_SMPL_RND_U_S,

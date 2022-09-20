@@ -51,7 +51,7 @@ S_TAB = '\t'
 S_NEWL = '\n'
 S_VBAR = '|'
 S_PERC = '%'
-S_CAP_S, S_CAP_X = 'S', 'X'
+S_S, S_X = 'S', 'X'
 S_0, S_1 = '0', '1'
 
 S_CSV = 'csv'
@@ -451,18 +451,18 @@ def getAAcPyl(dITp, sNmer):
     if len(sNmer) == dITp['lenNmerDef']:
         return sNmer[dITp['iCentNmer']]
 
-def getCentralPosOfSnip(dITp, sSnip=S_CAP_S):
+def getCentralPosOfSnip(dITp, sSnip=S_S):
     assert (len(sSnip) <= dITp['lenNmerDef'] and len(sSnip)%2 == 1)
     return sSnip[len(sSnip)//2]
 
-def getCentralSnipOfNmer(dITp, sNmer, sSnip=S_CAP_S):
+def getCentralSnipOfNmer(dITp, sNmer, sSnip=S_S):
     assert len(sNmer) == dITp['lenNmerDef']
     assert (len(sSnip) <= dITp['lenNmerDef'] and len(sSnip)%2 == 1)
     iS = dITp['iCentNmer'] - len(sSnip)//2
     iE = dITp['iCentNmer'] + len(sSnip)//2 + 1
     return sNmer[iS:iE]
 
-def checkCentralSnipOfNmer(dITp, sNmer, sSnip=S_CAP_S):
+def checkCentralSnipOfNmer(dITp, sNmer, sSnip=S_S):
     return getCentralSnipOfNmer(dITp, sNmer=sNmer, sSnip=sSnip) == sSnip
 
 # --- Functions converting between single- and multi-label systems ------------

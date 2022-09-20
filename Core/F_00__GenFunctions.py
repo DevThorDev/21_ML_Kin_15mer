@@ -31,23 +31,37 @@ def joinDirToPath(pF='', nmD='Directory'):
     else:
         return nmD
 
-def getLF(pF='', itSCmp=None, sSpl=GC.S_USC):
-    if itSCmp is None:              # trivial case - no filtering
+def selFs(lSel, lSSpl, itSCmp=None):
+    for k, s in enumerate(lSSpl):
+        if s in itSCmp:
+            lSel.append((k, s))
+            if (len(itSCmp) > 1) and (k < len(lSSpl[:-1])):
+                for j, s in enumerate(lSSpl[(k + 1):]):
+                    if s in itSCmp:
+                        lSel.append((k + j, s))
+            break
+
+def fillDSF(dSFTI, lSel, sF, iF=0, addI=True):
+    if addI:
+        iF += 1
+        dSFTI[tuple([iF] + [t[1] for t in lSel])] = sF
+    else:
+        if len(lSel) == 1:
+            dSFTI[lSel[0][1]] = sF
+        else:
+            dSFTI[tuple([t[1] for t in lSel])] = sF
+    return iF
+
+def getIFS(pF='', itSCmp=None, addI=True, sSpl=GC.S_USC):
+    if itSCmp is None:                      # trivial case - no filtering
         return os.listdir(pF)
-    lSFRet = []
+    dSFTI, iF = {}, 0
     for sF in os.listdir(pF):
-        lSSpl, lSel = sF.split(GC.S_DOT)[0].split(sSpl), []
-        for k, s in enumerate(lSSpl):
-            if s in itSCmp:
-                lSel.append((k, s))
-                if (len(itSCmp) > 1) and (k < len(lSSpl[:-1])):
-                    for j, s in enumerate(lSSpl[(k + 1):]):
-                        if s in itSCmp:
-                            lSel.append((k, s))
-                break
+        lSel, lSSpl = [], sF.split(GC.S_DOT)[0].split(sSpl)
+        selFs(lSel, lSSpl, itSCmp=itSCmp)
         if len(lSel) == len(itSCmp):        # boolean AND
-            lSFRet.append(sF)
-    return lSFRet
+            iF = fillDSF(dSFTI, lSel, sF=sF, iF=iF, addI=addI)
+    return dSFTI
 
 def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
     if len(sStart) > 0:
@@ -268,12 +282,12 @@ def tryRoundX(x, RD=None):
     return x
 
 # --- Functions handling lists ------------------------------------------------
-def insStartOrEnd(itS, cEl, sPos=GC.S_CAP_E):
+def insStartOrEnd(itS, cEl, sPos=GC.S_E):
     if type(itS) in [str, int, float]:    # convert to 1-element list
         itS = [str(itS)]
-    if sPos == GC.S_CAP_S:
+    if sPos == GC.S_S:
         return [str(cEl)] + [s for s in itS]
-    elif sPos == GC.S_CAP_E:
+    elif sPos == GC.S_E:
         return [s for s in itS] + [str(cEl)]
     else:
         return [s for s in itS]

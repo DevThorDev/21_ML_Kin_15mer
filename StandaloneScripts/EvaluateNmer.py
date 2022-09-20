@@ -37,7 +37,7 @@ S_CSV = 'csv'
 S_PDF = 'pdf'
 
 S_0 = '0'
-S_CAP_O, S_CAP_S, S_CAP_D = 'O', 'S', 'D'
+S_O, S_S, S_D = 'O', 'S', 'D'
 S_IN = 'In'
 S_OUT = 'Out'
 S_X_DAT = 'XDat'
@@ -151,17 +151,17 @@ dInp = {# --- flow control ----------------------------------------------------
         'pFResPropNmer': os.path.join(pDirRes, sFResPropNmer + xtCSV),
         # --- strings ---------------------------------------------------------
         's0': S_0,
-        'sO': S_CAP_O,
-        'sS': S_CAP_S,
-        'sD': S_CAP_D,
+        'sO': S_O,
+        'sS': S_S,
+        'sD': S_D,
         'sIn': S_IN,
         'sOut': S_OUT,
         'sXDat': S_X_DAT,
         'sMnSDDat': S_MN_SD_DAT,
         'sDfrRep': S_DATA_FRAME_REP,
-        'sDfrRepO': S_DATA_FRAME_REP + S_CAP_O,
-        'sDfrRepS': S_DATA_FRAME_REP + S_CAP_S,
-        'sDfrRepD': S_DATA_FRAME_REP + S_CAP_D,
+        'sDfrRepO': S_DATA_FRAME_REP + S_O,
+        'sDfrRepS': S_DATA_FRAME_REP + S_S,
+        'sDfrRepD': S_DATA_FRAME_REP + S_D,
         'sResType': S_RES_TYPE,
         'sMixType': S_MIX_TYPE,
         'sClass': S_CLASS,

@@ -47,7 +47,7 @@ S_STAR = '*'
 S_USC = '_'
 S_TAB = '\t'
 S_NEWL = '\n'
-S_CAP_S, S_CAP_X = 'S', 'X'
+S_S, S_X = 'S', 'X'
 
 S_CSV = 'csv'
 
@@ -70,7 +70,7 @@ S_FAM = 'Fam'
 S_EFFECTOR = 'Effector'
 S_FAMILY = 'Family'
 S_EFF_FAMILY = S_EFF + S_FAMILY
-S_X_CL = S_CAP_X + S_CL
+S_X_CL = S_X + S_CL
 
 S_UNIQUE = 'Unique'
 S_PROC_I_N_MER = 'ProcINmer'
@@ -445,22 +445,22 @@ def getAAcPyl(dInp, sNmer):
     if len(sNmer) == dInp['lenNmerDef']:
         return sNmer[dInp['iCentNmer']]
 
-def getCentralPosOfSnip(dInp, sSnip=S_CAP_S):
+def getCentralPosOfSnip(dInp, sSnip=S_S):
     assert (len(sSnip) <= dInp['lenNmerDef'] and len(sSnip)%2 == 1)
     return sSnip[len(sSnip)//2]
 
-def getCentralSnipOfNmer(dInp, sNmer, sSnip=S_CAP_S):
+def getCentralSnipOfNmer(dInp, sNmer, sSnip=S_S):
     assert len(sNmer) == dInp['lenNmerDef']
     assert (len(sSnip) <= dInp['lenNmerDef'] and len(sSnip)%2 == 1)
     iS = dInp['iCentNmer'] - len(sSnip)//2
     iE = dInp['iCentNmer'] + len(sSnip)//2 + 1
     return sNmer[iS:iE]
 
-def checkCentralSnipOfNmer(dInp, sNmer, sSnip=S_CAP_S):
+def checkCentralSnipOfNmer(dInp, sNmer, sSnip=S_S):
     return getCentralSnipOfNmer(dInp, sNmer=sNmer, sSnip=sSnip) == sSnip
 
 # --- Function calculating relative frequency of single snippet ---------------
-def calcProbPylData(dInp, cDfr, pFOut, sSnip=S_CAP_S):
+def calcProbPylData(dInp, cDfr, pFOut, sSnip=S_S):
     assert (len(sSnip) <= dInp['lenNmerDef'] and len(sSnip)%2 == 1)
     # chCentSnip = getCentralPosOfSnip(dInp, sSnip=sSnip)
     dRes = iniDictRes(cDfr.index)
@@ -592,7 +592,7 @@ def getNmerSnipsFromFullSeq(dITp, dfrI, lNmerSeqUnq=None):
     return {cK: toListUnqViaSer(cL) for cK, cL in dSnip.items()}
 
 # --- Function printing the results -------------------------------------------
-def printRes(dRes, sSnip=S_CAP_S):
+def printRes(dRes, sSnip=S_S):
     print('Dictionary mapping the number of occurrences in a sequence to the',
           'number of sequences with matching number of occurrences:')
     for nOcc in sorted(dRes['dNOccInFullSeq'], reverse=True):

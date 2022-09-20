@@ -115,7 +115,7 @@ lRowsResIGen = [sRowRaw, sTotalRaw, sNaNRaw,
                 sRowCombS, sTotalCombS, sNaNCombS,
                 sRowCombXS, sTotalCombXS, sNaNCombXS]
 lKCmb = [GC.S_X_SHORT, GC.S_SHORT, GC.S_MED, GC.S_LONG]
-lVCmb = [GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L]
+lVCmb = [GC.S_XS, GC.S_S, GC.S_M, GC.S_L]
 
 # === assertions ==============================================================
 assert len(lKCmb) == len(lVCmb)

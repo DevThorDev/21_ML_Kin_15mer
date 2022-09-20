@@ -33,11 +33,11 @@ sPath = GC.S_PATH
 sLFCS = GC.S_L_F_S
 sLFCC = GC.S_L_F_C
 sLFCE = GC.S_L_F_E
-sLFCJS = GC.S_L_F_J + GC.S_CAP_S
-sLFCJC = GC.S_L_F_J + GC.S_CAP_C
-sLFCJE = GC.S_L_F_J + GC.S_CAP_E
-sLFCJSC = GC.S_L_F_J + GC.S_CAP_S + GC.S_CAP_C
-sLFCJCE = GC.S_L_F_J + GC.S_CAP_C + GC.S_CAP_E
+sLFCJS = GC.S_L_F_J + GC.S_S
+sLFCJC = GC.S_L_F_J + GC.S_C
+sLFCJE = GC.S_L_F_J + GC.S_E
+sLFCJSC = GC.S_L_F_J + GC.S_S + GC.S_C
+sLFCJCE = GC.S_L_F_J + GC.S_C + GC.S_E
 sFXt = GC.S_F_XT
 
 # === create input dictionary =================================================

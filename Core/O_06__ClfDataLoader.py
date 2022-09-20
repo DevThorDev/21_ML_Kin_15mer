@@ -200,14 +200,14 @@ class DataLoader(BaseClass):
               self.lSXClPrC, GC.S_NEWL, '(length = ', len(self.lSXClPrC), ')',
               GC.S_NEWL, GC.S_DS80, sep='')
 
-    def getXorY(self, XorY=GC.S_CAP_X, sMd=GC.S_CLF):
+    def getXorY(self, XorY=GC.S_X, sMd=GC.S_CLF):
         cDat = None
-        if XorY == GC.S_CAP_X:
+        if XorY == GC.S_X:
             if sMd == self.dITp['sClf']:
                 cDat = self.XClf
             elif sMd == self.dITp['sPrC']:
                 cDat = self.XPrC
-        elif XorY == GC.S_CAP_Y:
+        elif XorY == GC.S_Y:
             if sMd == self.dITp['sClf']:
                 cDat = self.YClf
             elif sMd == self.dITp['sPrC']:
@@ -217,7 +217,7 @@ class DataLoader(BaseClass):
     def printX(self, sMd=GC.S_CLF):
         print(GC.S_DS80, GC.S_NEWL, 'Training input samples for mode "', sMd,
               '":', sep='')
-        X = self.getXorY(XorY=GC.S_CAP_X, sMd=sMd)
+        X = self.getXorY(XorY=GC.S_X, sMd=sMd)
         print(X)
         if self.dITp['lvlOut'] > 2:
             try:
@@ -230,7 +230,7 @@ class DataLoader(BaseClass):
     def printY(self, sMd=GC.S_CLF):
         print(GC.S_DS80, GC.S_NEWL, 'Class labels for mode "', sMd, '":',
               sep='')
-        Y = self.getXorY(XorY=GC.S_CAP_Y, sMd=sMd)
+        Y = self.getXorY(XorY=GC.S_Y, sMd=sMd)
         print(Y)
         if self.dITp['lvlOut'] > 2:
             try:

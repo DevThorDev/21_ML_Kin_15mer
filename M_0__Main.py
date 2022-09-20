@@ -16,6 +16,7 @@ from Core.O_06__ClfDataLoader import DataLoader
 # from Core.O_07__Classifier import RFClf, MLPClf, PropCalculator
 from Core.O_07__Classifier import PropCalculator
 from Core.O_80__Looper import Looper
+from Core.O_90__Evaluator import Evaluator
 from Core.O_95__Timing import Timing
 
 # ### MAIN ####################################################################
@@ -101,6 +102,20 @@ cPropCalc = PropCalculator(inpDatG, D=cDataLoader)
 cPropCalc.calcPropAAc()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(tMth=(7, 1000), stTMth=cStTime, endTMth=cEndTime)
+
+cEval = Evaluator(inpDatG)
+# cEval.FPs.printAllFPs()
+sMeth, itSFilt = 'LSV', {'Detailed',
+                         # 'RndUSmpl'
+                         }
+sMeth, itSFilt = 'NSV', None
+dDfrSubSet = cEval.selSubSetDDfr(sMth=sMeth, itSFlt=itSFilt)
+for tK in dDfrSubSet:
+    print(GC.S_DS04, tK, GC.S_DS04)
+    print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
+
+# cEval.printDDfrInp(tK=(4, 'Detailed', 'CtNB', 'RndUSmpl', 'A'))
+# cEval.printDDfrInp(tK=(4, 'Prob', 'CtNB', 'RndUSmpl', 'A'))
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

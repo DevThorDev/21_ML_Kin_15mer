@@ -38,7 +38,7 @@ class ExpData(BaseClass):
     # --- methods for filling the file paths ----------------------------------
     def fillFPsExp(self):
         d2PI, dIG, dITp, sFlFE = {}, self.dIG, self.dITp, self.dITp['sFull']
-        for sTp in [GC.S_CAP_XS, GC.S_CAP_S, GC.S_CAP_M, GC.S_CAP_L]:
+        for sTp in [GC.S_XS, GC.S_S, GC.S_M, GC.S_L]:
             d2PI['sCombined' + sTp] = {dIG['sPath']: self.pDirResComb,
                                        dIG['sLFC']: dITp['sFResComb' + sTp],
                                        dIG['sFXt']: dIG['xtCSV']}

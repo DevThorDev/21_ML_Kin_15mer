@@ -64,7 +64,7 @@ class FilePaths:
             self.dPF[sK] = FilePath(dInp=self.dI, dPI=dPI).pF
 
     # --- method for modifying a file path of the paths dictionary ------------
-    def modFP(self, d2PI, kMn, kPos, cS=None, sPos=GC.S_CAP_E, modPI=False):
+    def modFP(self, d2PI, kMn, kPos, cS=None, sPos=GC.S_E, modPI=False):
         if cS is not None and len(str(cS)) > 0:
             cD, sKP = d2PI[kMn], self.dI[kPos]
             if not modPI:

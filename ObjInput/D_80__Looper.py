@@ -19,8 +19,8 @@ nRp0, nRpDef = GC.N_REP_0, 5
 dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_ADA: nRp0,
            GC.S_MTH_RF: nRp0,
-           GC.S_MTH_X_TR: nRpDef,
-           GC.S_MTH_GR_B: nRp0,
+           GC.S_MTH_X_TR: nRp0,
+           GC.S_MTH_GR_B: nRpDef,
            GC.S_MTH_H_GR_B: nRp0,
            GC.S_MTH_GP: nRp0,
            GC.S_MTH_PA_A: nRp0,
@@ -33,7 +33,7 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_LSV: nRp0,
            GC.S_MTH_NSV: nRp0}
 
-doParGrid = False                   # do parameter grid calculations?
+doParGrid = True                   # do parameter grid calculations?
 
 useKey0 = False                     # use the parameter key GC.S_0?
                                     # (in case doParGrid == False)
@@ -45,8 +45,8 @@ lParGrid_Dy = [{'strategy': ['uniform', 'stratified']}]
 # --- parameter dictionary for Dummy Classifier -------------------------------
 d2Par_Dy = {GC.S_0: {'strategy': 'uniform',
                      'constant': None},
-            'A': {'strategy': 'stratified',
-                  'constant': None}}
+            GC.S_A: {'strategy': 'stratified',
+                     'constant': None}}
 
 # === AdaBoost Classifier =====================================================
 # --- list of parameter grids for AdaBoost Classifier grid search -------------
@@ -64,9 +64,9 @@ lParGrid_Ada = [{'n_estimators': [1000],
 d2Par_Ada = {GC.S_0: {'n_estimators': 50,
                       'learning_rate': 1.,
                       'algorithm': 'SAMME.R'},
-             'A': {'n_estimators': 1000,
-                   'learning_rate': 0.55,
-                   'algorithm': 'SAMME'}}
+             GC.S_A: {'n_estimators': 1000,
+                      'learning_rate': 0.55,
+                      'algorithm': 'SAMME'}}
 
 # === Random Forest Classifier ================================================
 # --- list of parameter grids for Random Forest Classifier grid search --------
@@ -99,8 +99,8 @@ d2Par_RF = {GC.S_0: {'n_estimators': 100,
                      'class_weight': None,
                      'ccp_alpha': 0.0,
                      'max_samples': None},
-            # 'A': {'criterion': 'log_loss'},
-            'B': {'criterion': 'entropy'},
+            # GC.S_A: {'criterion': 'log_loss'},
+            GC.S_B: {'criterion': 'entropy'},
             # 'C': {'criterion': 'entropy',
             #       'n_estimators': 100},
             # 'D': {'criterion': 'entropy',
@@ -157,8 +157,8 @@ d2Par_XTr = {GC.S_0: {'n_estimators': 100,
                       'bootstrap': False,
                       'ccp_alpha': 0.0,
                       'max_samples': None},
-             'A': {'n_estimators': 1000,
-                   'bootstrap': True}}
+             GC.S_A: {'n_estimators': 1000,
+                      'bootstrap': True}}
 
 # === Gradient Boosting Classifier ============================================
 # --- list of parameter grids for Gradient Boosting Classifier grid search ----
@@ -169,12 +169,15 @@ lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
                  'criterion': ['friedman_mse', 'squared_error']},
                 {'max_features': [None, 'sqrt'],
                  'ccp_alpha': [0.0, 0.1]}]
-lParGrid_GrB = [{'loss': ['log_loss', 'exponential'],
+lParGrid_GrB = [{'loss': ['log_loss'],
                  'learning_rate': stats.uniform(loc=0.0, scale=1.0),
-                 'ccp_alpha': stats.uniform(loc=0.0, scale=0.5),
-                 'n_estimators': [100, 1000],
-                 'subsample': stats.uniform(loc=0.1, scale=0.9),
-                 'criterion': ['friedman_mse', 'squared_error']}]
+                 'n_estimators': [100],
+                 'subsample': [1.0],
+                 'criterion': ['squared_error'],
+                 'max_depth': stats.randint(1, 5 + 1),
+                 'tol': stats.loguniform(a=1e-7, b=1e-1),
+                 # 'ccp_alpha': stats.uniform(loc=0.0, scale=0.5),
+                  }]
 
 # --- parameter dictionary for Gradient Boosting Classifier -------------------
 d2Par_GrB = {GC.S_0: {'loss': 'log_loss',
@@ -193,7 +196,8 @@ d2Par_GrB = {GC.S_0: {'loss': 'log_loss',
                       'validation_fraction': 0.1,
                       'n_iter_no_change': None,
                       'tol': 1.0e-4,
-                      'ccp_alpha': 0.0}}
+                      'ccp_alpha': 0.0},
+             GC.S_A: {'criterion': 'squared_error'}}
 
 # === Hist Gradient Boosting Classifier =======================================
 # --- list of parameter grids for Hist Gradient Boosting Classifier grid search
@@ -246,13 +250,12 @@ d2Par_GP = {GC.S_0: {'kernel': None,
                      'max_iter_predict': 100,
                      'copy_X_train': True,
                      'multi_class': 'one_vs_rest'},
-            # 'B': {'kernel': None,
-            #       'optimizer': 'fmin_l_bfgs_b',
-            #       'n_restarts_optimizer': 0,
-            #       'max_iter_predict': 100,
-            #       'copy_X_train': True,
-            #       'multi_class': 'one_vs_one'}
-            }
+            GC.S_B: {'kernel': None,
+                     'optimizer': 'fmin_l_bfgs_b',
+                     'n_restarts_optimizer': 0,
+                     'max_iter_predict': 100,
+                     'copy_X_train': True,
+                     'multi_class': 'one_vs_one'}}
 
 # === Passive Aggressive Classifier ===========================================
 # --- list of parameter grids for Passive Aggressive Classifier grid search ---
@@ -287,10 +290,10 @@ d2Par_PaA = {GC.S_0: {'C': 1.0,
                       'loss': 'hinge',
                       'class_weight': None,
                       'average': False},
-             'A': {'max_iter': 10000,
-                   'tol': 1.0e-6,
-                   'class_weight': None,
-                   'average': True}}
+             GC.S_A: {'max_iter': 10000,
+                      'tol': 1.0e-6,
+                      'class_weight': None,
+                      'average': True}}
 
 # === Perceptron Classifier ===================================================
 # --- list of parameter grids for Perceptron Classifier grid search -----------
@@ -318,10 +321,10 @@ d2Par_Pct = {GC.S_0: {'penalty': None,
                       'validation_fraction': 0.1,
                       'n_iter_no_change': 5,
                       'class_weight': None},
-             'A': {'penalty': 'elasticnet',
-                   'alpha': 1.0e-8,
-                   'l1_ratio': 0.5,
-                   'eta0': 0.01}}
+             GC.S_A: {'penalty': 'elasticnet',
+                      'alpha': 1.0e-8,
+                      'l1_ratio': 0.5,
+                      'eta0': 0.01}}
 
 # === Stochastic Gradient Descent (SGD) Classifier ============================
 # --- list of parameter grids for SGD Classifier grid search ------------------
@@ -382,8 +385,8 @@ d2Par_CtNB = {GC.S_0: {'alpha': 1.,
                        'fit_prior': True,
                        'class_prior': None,
                        'min_categories': None},
-              'A': {'alpha': 0.37,
-                    'fit_prior': False}}
+              GC.S_A: {'alpha': 0.37,
+                       'fit_prior': False}}
 
 # === Complement NB Classifier ================================================
 # --- list of parameter grids for Complement NB Classifier grid search --------
@@ -402,8 +405,8 @@ d2Par_CpNB = {GC.S_0: {'alpha': 1.,
                        'fit_prior': True,
                        'class_prior': None,
                        'norm': False},
-              'A': {'alpha': 1.,
-                    'fit_prior': False}}
+              GC.S_A: {'alpha': 1.,
+                       'fit_prior': False}}
 
 # === Gaussian NB Classifier ==================================================
 # --- list of parameter grids for Gaussian NB Classifier grid search ----------
@@ -413,7 +416,7 @@ lParGrid_GsNB = [{'var_smoothing': stats.loguniform(a=8.0e-2, b=2.0)}]
 # --- parameter dictionary for Gaussian NB Classifier -------------------------
 d2Par_GsNB = {GC.S_0: {'priors': None,
                        'var_smoothing': 1.0e-9},
-              'A': {'var_smoothing': 0.3}}
+              GC.S_A: {'var_smoothing': 0.3}}
 
 # === neural network MLP Classifier ===========================================
 # --- list of parameter grids for neural network MLP Classifier grid search ---
@@ -504,8 +507,8 @@ d2Par_LSV = {GC.S_0: {'penalty': 'l2',
                       'intercept_scaling': 1,
                       'class_weight': None,
                       'max_iter': 1000},
-             'A': {'dual': False,
-                   'C': 0.0025}}
+             GC.S_A: {'dual': False,
+                      'C': 0.0025}}
 
 # === Nu-Support SV Classifier ================================================
 # --- list of parameter grids for Nu-Support SV Classifier grid search --------
@@ -544,9 +547,9 @@ d2Par_NSV = {GC.S_0: {'nu': 0.5,
                       'max_iter': -1,
                       'decision_function_shape': 'ovr',
                       'break_ties': False},
-             'A': {'kernel': 'poly',
-                   'probability': True,     # to use "predict_proba"
-                   'tol': 1e-5}}
+             GC.S_A: {'kernel': 'poly',
+                      'probability': True,    # to use "predict_proba"
+                      'tol': 1e-5}}
 
 # === other input =============================================================
 # --- numbers -----------------------------------------------------------------

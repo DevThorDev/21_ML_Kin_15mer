@@ -197,6 +197,10 @@ class Looper(BaseClass):
     # --- method for saving the results ---------------------------------------
     def saveCombRes(self, sMth, d2Par, nRep=0):
         if nRep > 0:
+            # TEMP - BEGIN:
+            for sK, sF in self.FPs.dPF.items():
+                print(sK, ':', sF)
+            # TEMP - END.
             self.saveData(GF.iniPdDfr(d2Par), pF=self.FPs.dPF['OutParClf'],
                           saveAnyway=False)
             self.d2MnSEMResClf = GF.calcMnSEMFromD3Val(self.d3ResClf)

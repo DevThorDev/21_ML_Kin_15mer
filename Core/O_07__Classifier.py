@@ -364,7 +364,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             print('Fitted Classifier to data of shape', X.shape)
             if self.optClf is not None:
                 dfrRes = SF.formatDfrCVRes(self.dIG, self.dITp, self.optClf)
-                sKMn, sKP, sS = 'OutGSRS', 'sLFE', GC.S_CAP_S
+                sKMn, sKP, sS = 'OutGSRS', 'sLFE', GC.S_S
                 if sMth is not None:
                     self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKP,
                                    cS=sMth, sPos=sS, modPI=True)
