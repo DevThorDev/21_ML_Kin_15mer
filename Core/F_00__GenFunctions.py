@@ -222,6 +222,9 @@ def getLCentPosSSub(sFull, sSub, overLap=True):
     return [startPosToCentPos(iSt, sSub)
             for iSt in findAllSSubInStr(sFull, sSub, overLap=overLap)]
 
+def getSClFromCHdr(sCHdr, idxSpl=-1, sSep=GC.S_USC):
+    return sSep.join(sCHdr.split(sSep)[:idxSpl])
+
 # --- Functions yielding boolean values ---------------------------------------
 def isTrain(doSplit):
     return (True if doSplit else None)
@@ -359,6 +362,12 @@ def complDict(cDFull, cDAdd):
             complDict(cDFull[cK], cV)
         else:
             cDFull[cK] = cV
+
+def iniD2(itHdL1, itHdL2, fillV=np.nan):
+    d2 = {cKL1: None for cKL1 in itHdL1}
+    for cKL1 in d2:
+        d2[cKL1] = {cKL2: fillV for cKL2 in itHdL2}
+    return d2
 
 def setOthValSub(cD, lKMain, cKMain, cKSub, oVSub=None):
     for kM in [k for k in lKMain if k != cKMain]:

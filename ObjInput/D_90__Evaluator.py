@@ -27,28 +27,28 @@ sMthLSV = GC.S_MTH_LSV
 sMthNSV = GC.S_MTH_NSV
 
 # --- flow control (general) --------------------------------------------------
-# lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
-#              {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
-lSetFIDet = [{sMthDummy},
-             {sMthAda},
-             {sMthRF},
-             {sMthXTr},
-             {sMthPaA},
-             {sMthPct},
-             {sMthCtNB},
-             {sMthCpNB},
-             {sMthGsNB},
-             {sMthLSV},
-             {sMthNSV}]
+lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
+              {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
+# lSetFIDet = [{sMthDummy},
+#              {sMthAda},
+#              {sMthRF},
+#              {sMthXTr},
+#              {sMthPaA},
+#              {sMthPct},
+#              {sMthCtNB},
+#              {sMthCpNB},
+#              {sMthGsNB},
+#              {sMthLSV},
+#              {sMthNSV}]
 
 # --- names and paths of files and dirs ---------------------------------------
 sUnqNmer = GC.S_N_MER_SEQ_UNQ

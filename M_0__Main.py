@@ -105,15 +105,17 @@ cTiming.updateTimes(tMth=(7, 1000), stTMth=cStTime, endTMth=cEndTime)
 
 cEval = Evaluator(inpDatG)
 # cEval.FPs.printAllFPs()
-sMeth, itSFilt = 'LSV', {'Detailed',
-                         # 'RndUSmpl'
-                         }
-sMeth, itSFilt = 'NSV', None
-dDfrSubSet = cEval.selSubSetDDfr(sMth=sMeth, itSFlt=itSFilt)
-for tK in dDfrSubSet:
-    print(GC.S_DS04, tK, GC.S_DS04)
-    print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
-
+# sMeth, itSFilt = 'LSV', {'Detailed',
+#                          # 'RndUSmpl'
+#                          }
+# sMeth, itSFilt = 'NSV', None
+# dDfrSubSet = cEval.selSubSetDDfr(sMth=sMeth, itSFlt=itSFilt)
+# for tK in dDfrSubSet:
+#     print(GC.S_DS04, tK, GC.S_DS04)
+#     print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
+cEval.calcPredClassRes(dMthFlt={'Ada': ('Detailed', 'RndUSmpl', 'A'),
+                                'Dummy': ('Detailed', 'RndUSmpl', 'A')})
+cEval.printDDfrPredCl()
 # cEval.printDDfrInp(tK=(4, 'Detailed', 'CtNB', 'RndUSmpl', 'A'))
 # cEval.printDDfrInp(tK=(4, 'Prob', 'CtNB', 'RndUSmpl', 'A'))
 

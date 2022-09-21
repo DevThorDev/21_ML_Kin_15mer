@@ -124,6 +124,19 @@ sMltStep = GC.S_MLT_STEP
 sStratRealMajo = GC.S_STRAT_REAL_MAJO
 sStratShareMino = GC.S_STRAT_SHARE_MINO
 sPartFit, sPartFitS = GC.S_PART_FIT, GC.S_PART_FIT_S
+s0Pred, s1Pred, sNotPred = GC.S_0_PRED, GC.S_1_PRED, GC.S_NOT_PRED
+
+# === derived values and input processing =====================================
+lSMth_L = [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL, sMthHGrBL,
+           sMthGPL, sMthPaAL, sMthPctL, sMthSGDL, sMthCtNBL, sMthCpNBL,
+           sMthGsNBL, sMthMLPL, sMthLSVL, sMthNSVL]
+lSMth = [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB, sMthGP,
+         sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB, sMthGsNB, sMthMLP,
+         sMthLSV, sMthNSV]
+lSMthPartFit = [sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB, sMthGsNB,
+                sMthMLP]
+# lSPred = [s0Pred, s1Pred, sNotPred]
+lSPred = [s0Pred, s1Pred]
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -270,15 +283,13 @@ dIO = {# --- general
        'sStratShareMino': sStratShareMino,
        'sPartFit': sPartFit,
        'sPartFitS': sPartFitS,
-       # --- numbers
-       # --- lists
-       'lSMth_L': [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL,
-                   sMthHGrBL, sMthGPL, sMthPaAL, sMthPctL, sMthSGDL, sMthCtNBL,
-                   sMthCpNBL, sMthGsNBL, sMthMLPL, sMthLSVL, sMthNSVL],
-       'lSMth': [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB,
-                 sMthGP, sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB,
-                 sMthGsNB, sMthMLP, sMthLSV, sMthNSV],
-       'lSMthPartFit': [sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB,
-                        sMthGsNB, sMthMLP]}
+       's0Pred': s0Pred,
+       's1Pred': s1Pred,
+       'sNotPred': sNotPred,
+       # === derived values and input processing
+       'lSMth_L': lSMth_L,
+       'lSMth': lSMth,
+       'lSMthPartFit': lSMthPartFit,
+       'lSPred': lSPred}
 
 ###############################################################################
