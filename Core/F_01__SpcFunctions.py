@@ -353,8 +353,7 @@ def getLSE(dITp, sMth, lIFE):
     return lSEPar, lSESum, lSEDet
 
 # --- Functions (O_80__Evaluator) ---------------------------------------------
-def getD2Cl(dITp, dDfr, sMth=None):
-    # dSCl, lSHdC, sUSC = {}, [], dITp['sUSC']
+def getDMapCl(dITp, dDfr, sMth=None):
     dSCl, sUSC, lSPred = {}, dITp['sUSC'], dITp['lSPred']
     for cDfr in dDfr.values():
         for sC in cDfr.columns:
@@ -362,14 +361,10 @@ def getD2Cl(dITp, dDfr, sMth=None):
             if sCl not in dSCl:
                 dSCl[sCl] = None
     for sCl in dSCl:
-        # for sPred in lSPred:
-        #     lSHdC.append(sUSC.join([sCl, sPred]))
         if sMth is not None:
             dSCl[sCl] = [sUSC.join([sCl, sMth, sPred]) for sPred in lSPred]
         else:
             dSCl[sCl] = [sUSC.join([sCl, sPred]) for sPred in lSPred]
-    # return dSCl, lSHdC
-    print('dSCl =', dSCl)
     return dSCl
 
 ###############################################################################

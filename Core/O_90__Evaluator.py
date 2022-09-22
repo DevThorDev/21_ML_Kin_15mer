@@ -35,6 +35,15 @@ class Evaluator(BaseClass):
                 dFI = GF.getIFS(pF=self.dITp['pInpDet'], itSCmp=cSetF)
                 for tK, sF in dFI.items():
                     self.FPs.dPF[tK] = GF.joinToPath(self.dITp['pInpDet'], sF)
+        # add the path to the evaluation of class predictions
+        d2PI, dIG, dITp = {}, self.dIG, self.dITp
+        d2PI['OutEval'] = {dIG['sPath']: dITp['pOutEval'],
+                           dIG['sLFS']: dITp['sEvalClPred'],
+                           dIG['sLFC']: '',
+                           dIG['sLFJSC']: dITp['sUS02'],
+                           dIG['sFXt']: dIG['xtCSV']}
+        self.FPs.addFPs(d2PI)
+        self.d2PInf = d2PI
 
     # --- method for loading the input data -----------------------------------
     def loadInpData(self, iCS=0, iCG=1):
@@ -43,13 +52,15 @@ class Evaluator(BaseClass):
             if tK == sNmer:
                 self.serSUnqNmer = self.loadData(pF=self.FPs.dPF[tK], iC=iCS)
                 self.serSUnqNmer = self.serSUnqNmer[self.dITp['sCNmer']]
+            elif tK in ['OutEval']:     # result file --> do nothing
+                pass
             else:
                 cDfr = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
                 self.dDfrCmb[tK] = cDfr.iloc[:, 1:]
 
     # --- method for initialising the dictionary of result DataFrames ---------
     def iniDDfrRes(self):
-        self.d2AllCl = {}
+        self.d2ClDet = {}
         self.dDfrPredCl = {}
 
     # --- print methods -------------------------------------------------------
@@ -65,10 +76,6 @@ class Evaluator(BaseClass):
             for tK in self.dDfrCmb:
                 print(GC.S_EQ20, 'All input DataFrames', GC.S_EQ20)
                 self.printCDfrInp(tK=tK)
-
-    def printKeyAndDfr(self, cKey, cDfr):
-        print(GC.S_DS04, 'Key', cKey, GC.S_DS04)
-        print(cDfr, GC.S_NEWL, GC.S_DS80, sep='')
 
     def printDDfrPredCl(self, tFlt=None):
         if tFlt is None:
@@ -95,49 +102,72 @@ class Evaluator(BaseClass):
     #                 self.printKeyAndDfr(cKey=tK, cDfr=dfrPredCl)
 
     # --- method selecting subsets of the input Dataframe dictionary ----------
-    def selSubSetDDfr(self, sMth, itSFlt=None):
+    def selSubSetDDfr(self, sMth, itFlt=None):
         lKSel = list(self.FPs.dPF)
         for tK in self.FPs.dPF:
             # step 1: filter DataFrames that correspond to sMth
             if sMth not in tK:
                 lKSel.remove(tK)
-            if itSFlt is not None and sMth in tK:
-                # step 2: filter DataFrames via list of add. filters (itSFlt)
-                for sFlt in itSFlt:
+            if itFlt is not None and sMth in tK:
+                # step 2: filter DataFrames via list of add. filters (itFlt)
+                for sFlt in itFlt:
                     if sFlt not in tK:
                         lKSel.remove(tK)
         # step 3: create and return dictionary with DataFrames of subset
         return {tK: self.dDfrCmb[tK] for tK in lKSel if tK in self.dDfrCmb}
 
     # --- calculation methods -------------------------------------------------
-    def calcResSglClf(self, d2, cDfr, sMth, itSFlt=None):
+    def iniLSHdCol(self, dMthFlt=None):
+        lSHdC = []
+        if dMthFlt is not None:
+            for tFlt, lSMth in dMthFlt.items():
+                for sMth in lSMth:
+                    dMp = SF.getDMapCl(self.dITp, dDfr=self.dDfrCmb, sMth=sMth)
+                    self.d2ClDet[(tFlt, sMth)] = dMp
+                    lSHdC += list(self.d2ClDet[(tFlt, sMth)].values())
+        return GF.flattenIt(lSHdC)
+
+    def calcResSglClf(self, d1, cDfr, sMth, itFlt=None):
         nCl = cDfr.shape[1]//2
         for sCHd in cDfr.columns[-nCl:]:
             sCl = GF.getSClFromCHdr(sCHdr=sCHd)
-            ser0 = cDfr[sCHd].apply(lambda k: 1 - k)
-            for sRHd in ser0.index:
-                d2[self.d2AllCl[sMth][sCl][0]][sRHd] += ser0.at[sRHd]
-            ser1 = cDfr[sCHd]
-            for sRHd in ser1.index:
-                d2[self.d2AllCl[sMth][sCl][1]][sRHd] += ser1.at[sRHd]
+            lSKD1 = self.d2ClDet[(itFlt, sMth)][sCl]
+            d1[lSKD1[0]] = cDfr[sCHd].apply(lambda k: 1 - k)
+            d1[lSKD1[1]] = cDfr[sCHd]
+
+    # def calcResSglClf(self, d2, cDfr, sMth, itFlt=None):
+    #     nCl = cDfr.shape[1]//2
+    #     for sCHd in cDfr.columns[-nCl:]:
+    #         sCl = GF.getSClFromCHdr(sCHdr=sCHd)
+    #         ser0 = cDfr[sCHd].apply(lambda k: 1 - k)
+    #         for sRHd in ser0.index:
+    #             d2[self.d2ClDet[(itFlt, sMth)][sCl][0]][sRHd] += ser0.at[sRHd]
+    #         ser1 = cDfr[sCHd]
+    #         for sRHd in ser1.index:
+    #             d2[self.d2ClDet[(itFlt, sMth)][sCl][1]][sRHd] += ser1.at[sRHd]
+
+    def calcCFlt(self, d1, d2, tF, lSM=[]):
+        sKMn, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
+        print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
+        tFXt = tuple([self.dITp['sDetailed']] + list(tF))
+        for sM in lSM:
+            print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
+            for tK, cDfr in self.dDfrCmb.items():
+                if (set([sM]) | set(tFXt)) <= set(tK):
+                    self.calcResSglClf(d1, cDfr, sMth=sM, itFlt=tF)
+                    # self.calcResSglClf(d2, cDfr, sMth=sM, itFlt=tF)
+                    dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
+                    self.dDfrPredCl[tF] = dfrPredCl
+                    # self.dDfrPredCl[tF] = GF.iniPdDfr(d2)
+        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=sJ.join(tF))
+        self.saveData(self.dDfrPredCl[tF], pF=self.FPs.dPF[sKMn])
 
     def calcPredClassRes(self, dMthFlt=None):
-        lSHdC = []
-        if dMthFlt is not None:
-            for sMth, tFlt in dMthFlt.items():
-                self.d2AllCl[sMth] = SF.getD2Cl(self.dITp, self.dDfrCmb, sMth)
-                lSHdC += list(self.d2AllCl[sMth].values())
-        lSHdC = GF.flattenIt(lSHdC)
+        lSHdC = self.iniLSHdCol(dMthFlt=dMthFlt)
+        d1 = {sC: None for sC in lSHdC}
         d2 = GF.iniD2(itHdL1=lSHdC, itHdL2=self.serSUnqNmer, fillV=0)
         if dMthFlt is not None:
-            for sMth, tFlt in dMthFlt.items():
-                for tK, cDfr in self.dDfrCmb.items():
-                    if (set([sMth]) | set(tFlt)) <= set(tK):
-                        self.calcResSglClf(d2, cDfr, sMth=sMth, itSFlt=tFlt)
-                        self.dDfrPredCl[tFlt] = GF.iniPdDfr(d2)
-            sJ, sXt = self.dITp['sUSC'], self.dIG['xtCSV']
-                # sFTmp = sJ.join([sMth, sJ.join(tFlt)]) + sXt
-            sFTmp = sJ.join(tFlt) + sXt
-            self.saveData(self.dDfrPredCl[tFlt], pF=sFTmp)
+            for tFlt, lSMth in dMthFlt.items():
+                self.calcCFlt(d1, d2, tF=tFlt, lSM=lSMth)
 
 ###############################################################################

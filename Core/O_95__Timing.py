@@ -57,6 +57,7 @@ class Timing:
         self.elT_07_0151_NSVClf_Ini = 0.
         self.elT_07_0152_NSVClf_Pred = 0.
         self.elT_07_1000_PropCalculator = 0.
+        self.elT_90_0001_Evaluator_ClPred = 0.
         self.elT_XX_9999_Other = 0.
         self.elT_Sum = 0.
         self.updateLElTimes()
@@ -75,7 +76,8 @@ class Timing:
                       'CtNBClf_Pred', 'CpNBClf_Ini', 'CpNBClf_Pred',
                       'GsNBClf_Ini', 'GsNBClf_Pred', 'MLPClf_Ini',
                       'MLPClf_Pred', 'LSVClf_Ini', 'LSVClf_Pred', 'NSVClf_Ini',
-                      'NSVClf_Pred', 'PropCalculator', 'Other']
+                      'NSVClf_Pred', 'PropCalculator', 'Evaluator_ClPred',
+                      'Other']
         assert len(self.lSMth) == len(self.lElT)
 
     # --- update methods ------------------------------------------------------
@@ -127,6 +129,7 @@ class Timing:
                      self.elT_07_0151_NSVClf_Ini,
                      self.elT_07_0152_NSVClf_Pred,
                      self.elT_07_1000_PropCalculator,
+                     self.elT_90_0001_Evaluator_ClPred,
                      self.elT_XX_9999_Other]
 
     def updateTimes(self, tMth=None, stTMth=None, endTMth=None):
@@ -226,6 +229,8 @@ class Timing:
                 self.elT_07_0152_NSVClf_Pred += elT
             elif tMth == (7, 1000):
                 self.elT_07_1000_PropCalculator += elT
+            elif tMth == (90, 1):
+                self.elT_90_0001_Evaluator_ClPred += elT
             elif tMth == (None, 9999):
                 self.elT_XX_9999_Other += elT
             self.elT_Sum += elT
@@ -328,6 +333,8 @@ class Timing:
                str(round(self.elT_07_0152_NSVClf_Pred, self.rdDig)) +
                GC.S_NEWL + 'Method 07_1000 | "PropCalculator":\t' +
                str(round(self.elT_07_1000_PropCalculator, self.rdDig)) +
+               GC.S_NEWL + 'Method 90_0001 | "Evaluator_ClPred":\t' +
+               str(round(self.elT_90_0001_Evaluator_ClPred, self.rdDig)) +
                GC.S_NEWL + 'Method XX_9999 | "Other":\t' +
                str(round(self.elT_XX_9999_Other, self.rdDig)) +
                GC.S_NEWL + GC.S_WV80)

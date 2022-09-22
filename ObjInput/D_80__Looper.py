@@ -33,7 +33,7 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_LSV: nRp0,
            GC.S_MTH_NSV: nRp0}
 
-doParGrid = True                   # do parameter grid calculations?
+doParGrid = False                   # do parameter grid calculations?
 
 useKey0 = False                     # use the parameter key GC.S_0?
                                     # (in case doParGrid == False)
@@ -425,13 +425,15 @@ lParGrid_MLP = [{'hidden_layer_sizes': [(100,), (1024, 256, 64, 16)],
                  'solver': ['adam', 'lbfgs', 'sgd'],
                  'learning_rate': ['constant', 'adaptive'],
                  'momentum': [0.6, 0.9, 0.98]}]
-lParGrid_MLP = [{'hidden_layer_sizes': [(10,), (100,), (1024, 256, 64, 16)],
-                 'activation': ['relu', 'identity', 'logistic', 'tanh'],
-                 'solver': ['adam', 'lbfgs', 'sgd']
-                 # ,
-                 # 'learning_rate': ['constant', 'adaptive'],
-                 # 'momentum': stats.uniform(loc=0.1, scale=(0.99 - 0.1))
-                 }]
+lParGrid_MLP = [{'hidden_layer_sizes': [(100,)],
+                 'activation': ['relu', 'logistic', 'tanh'],
+                 'solver': ['lbfgs'],
+                 'alpha': stats.loguniform(a=1e-7, b=1e-1),
+                 'learning_rate': ['constant', 'adaptive'],
+                 'learning_rate_init': stats.loguniform(a=1e-7, b=1e-1),
+                 'max_iter': [20, 200, 2000],
+                 'tol': [1e-7, 1e-4, 1e-2],
+                 'max_fun': [1000, 15000]}]
 
 # --- parameter dictionary for neural network MLP Classifier ------------------
 d2Par_MLP = {GC.S_0: {'hidden_layer_sizes': (100,),
@@ -454,26 +456,9 @@ d2Par_MLP = {GC.S_0: {'hidden_layer_sizes': (100,),
                       'epsilon': 1e-8,
                       'n_iter_no_change': 10,
                       'max_fun': 15000},
-             'AH': {'hidden_layer_sizes': (100,),
-                    'activation': 'relu',
-                    'solver': 'adam',
-                    'alpha': 0.0001,
-                    'batch_size': 'auto',
-                    'learning_rate': 'constant',
-                    'learning_rate_init': 0.001,
-                    'power_t': 0.5,
-                    'max_iter': 50000,
-                    'shuffle': True,
-                    'tol': 1e-6,
-                    'momentum': 0.8,
-                    'nesterovs_momentum': True,
-                    'early_stopping': False,
-                    'validation_fraction': 0.1,
-                    'beta_1': 0.9,
-                    'beta_2': 0.999,
-                    'epsilon': 1e-8,
-                    'n_iter_no_change': 10,
-                    'max_fun': 15000}}
+             'A': {'learning_rate': 'adaptive',
+                   'max_iter': 50000,
+                   'tol': 1e-6}}
 
 # === Linear SV Classifier ====================================================
 # --- list of parameter grids for Linear SV Classifier grid search ------------

@@ -103,7 +103,9 @@ cPropCalc.calcPropAAc()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(tMth=(7, 1000), stTMth=cStTime, endTMth=cEndTime)
 
+cStTime = GF.showElapsedTime(startTime)
 cEval = Evaluator(inpDatG)
+
 # cEval.FPs.printAllFPs()
 # sMeth, itSFilt = 'LSV', {'Detailed',
 #                          # 'RndUSmpl'
@@ -113,11 +115,21 @@ cEval = Evaluator(inpDatG)
 # for tK in dDfrSubSet:
 #     print(GC.S_DS04, tK, GC.S_DS04)
 #     print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
-cEval.calcPredClassRes(dMthFlt={'Ada': ('Detailed', 'RndUSmpl', 'A'),
-                                'Dummy': ('Detailed', 'RndUSmpl', 'A')})
+
+tK1 = ('RndUSmpl', 'A')
+dMF = {tK1: [GC.S_MTH_DUMMY,
+             GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
+             GC.S_MTH_GR_B,
+             GC.S_MTH_PA_A, GC.S_MTH_PCT,
+             GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
+             GC.S_MTH_MLP,
+             GC.S_MTH_LSV, GC.S_MTH_NSV]}
+# dMF = {tK1: [GC.S_MTH_DUMMY, GC.S_MTH_ADA]}
+
+cEval.calcPredClassRes(dMthFlt=dMF)
 cEval.printDDfrPredCl()
-# cEval.printDDfrInp(tK=(4, 'Detailed', 'CtNB', 'RndUSmpl', 'A'))
-# cEval.printDDfrInp(tK=(4, 'Prob', 'CtNB', 'RndUSmpl', 'A'))
+cEndTime = GF.showElapsedTime(startTime)
+cTiming.updateTimes(tMth=(90, 1), stTMth=cStTime, endTMth=cEndTime)
 
 GF.printMode(inpDatG.dI['isTest'])
 print(cTiming)

@@ -28,16 +28,18 @@ sMthNSV = GC.S_MTH_NSV
 
 # --- flow control (general) --------------------------------------------------
 lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
-              {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
+             {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthGrB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthMLP, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
 # lSetFIDet = [{sMthDummy},
 #              {sMthAda},
 #              {sMthRF},
@@ -54,6 +56,7 @@ lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
 sUnqNmer = GC.S_N_MER_SEQ_UNQ
 pInpUnqNmer = GC.P_DIR_RES_UNQ_N_MER
 pInpDet = GC.P_DIR_RES_CLF_DETAILED
+pOutEval = GC.P_DIR_RES_CLF_EVAL
 
 # --- lists -------------------------------------------------------------------
 
@@ -67,6 +70,7 @@ dIO = {# --- general
        'sUnqNmer': sUnqNmer,
        'pInpUnqNmer': pInpUnqNmer,
        'pInpDet': pInpDet,
+       'pOutEval': pOutEval,
        # === derived values and input processing
        }
 

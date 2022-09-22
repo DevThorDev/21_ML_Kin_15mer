@@ -137,6 +137,10 @@ class BaseClass:
         print(self.dfrNmer)
         print(GC.S_DS80)
 
+    def printKeyAndDfr(self, cKey, cDfr):
+        print(GC.S_DS04, 'Key', cKey, GC.S_DS04)
+        print(cDfr, GC.S_NEWL, GC.S_DS80, sep='')
+
     # --- methods for retrieving values and modifying the input dictionary ----
     def getValDITp(self, cK):
         if cK in self.dITp:
