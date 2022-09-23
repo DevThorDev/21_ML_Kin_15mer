@@ -311,6 +311,7 @@ S_RESTR = 'rst'
 S_I_POS = 'iPos'
 S_WITH_EXCL_EFF_FAM = 'wXcl' + S_EFF_FAM_S
 S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM_S
+S_ONE_HOT, S_ORDINAL = 'OneHot', 'Ordinal'
 S_SAMPLER, S_SAMPLER_S = 'Sampler', 'Smpl'
 S_SMPL_NO, S_SMPL_NO_S = (S_NO + S_SAMPLER, S_NO + S_SAMPLER_S)
 S_SMPL_CL_CTR, S_SMPL_CL_CTR_S = ('ClusterCentroids', 'ClCtr' + S_SAMPLER_S)

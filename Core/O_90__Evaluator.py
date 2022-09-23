@@ -84,23 +84,6 @@ class Evaluator(BaseClass):
         else:
             self.printKeyAndDfr(cKey=tFlt, cDfr=self.dDfrPredCl[tFlt])
 
-    # def printDDfrPredCl(self, sMth=None, tFlt=None):
-    #     if sMth is None and tFlt is None:
-    #         for tK, dfrPredCl in self.dDfrPredCl.items():
-    #             self.printKeyAndDfr(cKey=tK, cDfr=dfrPredCl)
-    #     elif sMth is None and tFlt is not None:
-    #         for tK, dfrPredCl in self.dDfrPredCl.items():
-    #             if tFlt == tK[1]:
-    #                 self.printKeyAndDfr(cKey=tK, cDfr=dfrPredCl)
-    #     elif sMth is not None and tFlt is None:
-    #         for tK, dfrPredCl in self.dDfrPredCl.items():
-    #             if sMth == tK[0]:
-    #                 self.printKeyAndDfr(cKey=tK, cDfr=dfrPredCl)
-    #     else:
-    #         for tK, dfrPredCl in self.dDfrPredCl.items():
-    #             if sMth == tK[0] and tFlt == tK[1]:
-    #                 self.printKeyAndDfr(cKey=tK, cDfr=dfrPredCl)
-
     # --- method selecting subsets of the input Dataframe dictionary ----------
     def selSubSetDDfr(self, sMth, itFlt=None):
         lKSel = list(self.FPs.dPF)
@@ -135,18 +118,7 @@ class Evaluator(BaseClass):
             d1[lSKD1[0]] = cDfr[sCHd].apply(lambda k: 1 - k)
             d1[lSKD1[1]] = cDfr[sCHd]
 
-    # def calcResSglClf(self, d2, cDfr, sMth, itFlt=None):
-    #     nCl = cDfr.shape[1]//2
-    #     for sCHd in cDfr.columns[-nCl:]:
-    #         sCl = GF.getSClFromCHdr(sCHdr=sCHd)
-    #         ser0 = cDfr[sCHd].apply(lambda k: 1 - k)
-    #         for sRHd in ser0.index:
-    #             d2[self.d2ClDet[(itFlt, sMth)][sCl][0]][sRHd] += ser0.at[sRHd]
-    #         ser1 = cDfr[sCHd]
-    #         for sRHd in ser1.index:
-    #             d2[self.d2ClDet[(itFlt, sMth)][sCl][1]][sRHd] += ser1.at[sRHd]
-
-    def calcCFlt(self, d1, d2, tF, lSM=[]):
+    def calcCFlt(self, d1, tF, lSM=[]):
         sKMn, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
         tFXt = tuple([self.dITp['sDetailed']] + list(tF))
@@ -155,19 +127,16 @@ class Evaluator(BaseClass):
             for tK, cDfr in self.dDfrCmb.items():
                 if (set([sM]) | set(tFXt)) <= set(tK):
                     self.calcResSglClf(d1, cDfr, sMth=sM, itFlt=tF)
-                    # self.calcResSglClf(d2, cDfr, sMth=sM, itFlt=tF)
                     dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
                     self.dDfrPredCl[tF] = dfrPredCl
-                    # self.dDfrPredCl[tF] = GF.iniPdDfr(d2)
         self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=sJ.join(tF))
         self.saveData(self.dDfrPredCl[tF], pF=self.FPs.dPF[sKMn])
 
     def calcPredClassRes(self, dMthFlt=None):
         lSHdC = self.iniLSHdCol(dMthFlt=dMthFlt)
         d1 = {sC: None for sC in lSHdC}
-        d2 = GF.iniD2(itHdL1=lSHdC, itHdL2=self.serSUnqNmer, fillV=0)
         if dMthFlt is not None:
             for tFlt, lSMth in dMthFlt.items():
-                self.calcCFlt(d1, d2, tF=tFlt, lSM=lSMth)
+                self.calcCFlt(d1, tF=tFlt, lSM=lSMth)
 
 ###############################################################################

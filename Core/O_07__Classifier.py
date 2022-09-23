@@ -10,7 +10,7 @@ import Core.F_01__SpcFunctions as SF
 
 from Core.O_00__BaseClass import BaseClass
 
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import (train_test_split, GridSearchCV,
                                      HalvingGridSearchCV, RandomizedSearchCV,
@@ -112,16 +112,17 @@ class BaseSmplClfPrC(BaseClass):
     # --- methods for getting and setting X and Y -----------------------------
     def getXY(self, getTrain=None):
         X, Y = self.X, self.Y
-        if self.dITp['encodeCatFtr']:
+        doEnc = self.dITp['dEncCatFtr'][self.sMth] in self.dITp['lSEnc']
+        if doEnc:
             X = self.XTrans
         if getTrain is not None and self.dITp['doTrainTestSplit']:
             if getTrain:
                 X, Y = self.XTrain, self.YTrain
-                if self.dITp['encodeCatFtr']:
+                if doEnc:
                     X = self.XTransTrain
             else:
                 X, Y = self.XTest, self.YTest
-                if self.dITp['encodeCatFtr']:
+                if doEnc:
                     X = self.XTransTest
         return X, Y
 
@@ -130,22 +131,23 @@ class BaseSmplClfPrC(BaseClass):
         return self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
 
     def setXY(self, X, Y, setTrain=None):
+        doEnc = self.dITp['dEncCatFtr'][self.sMth] in self.dITp['lSEnc']
         if setTrain is not None and self.dITp['doTrainTestSplit']:
             if setTrain:
                 self.YTrain = Y
-                if self.dITp['encodeCatFtr']:
+                if doEnc:
                     self.XTransTrain = X
                 else:
                     self.XTrain = X
             else:
                 self.YTest = Y
-                if self.dITp['encodeCatFtr']:
+                if doEnc:
                     self.XTransTest = X
                 else:
                     self.XTest = X
         else:
             self.Y = Y
-            if self.dITp['encodeCatFtr']:
+            if doEnc:
                 self.XTrans = X
             else:
                 self.X = X
@@ -168,14 +170,19 @@ class BaseSmplClfPrC(BaseClass):
                 self.YTest, self.YPred, self.YProba)
 
     # --- method for encoding and transforming the categorical features -------
-    def encodeCatFeatures(self, catData=None):
+    def encodeCatFeatures(self, tpEnc=GC.S_ONE_HOT, catData=None):
         if catData is None:
             catData = self.X
-        self.cEnc = OneHotEncoder()
-        self.cEnc.fit(self.X)
-        XTrans = self.cEnc.transform(catData).toarray()
-        if self.dITp['lvlOut'] > 1:
-            self.printEncAttr(XTrans=XTrans)
+        self.cEnc, XTrans = None, None
+        if tpEnc in self.dITp['lSEnc']:    # encoders implemented so far
+            if tpEnc == self.dITp['sOneHot']:
+                self.cEnc = OneHotEncoder()
+                XTrans = self.cEnc.fit_transform(catData).toarray()
+            else:
+                self.cEnc = OrdinalEncoder(dtype=int, encoded_missing_value=-1)
+                XTrans = self.cEnc.fit_transform(catData)
+            if self.dITp['lvlOut'] > 1:
+                self.printEncAttr(XTrans=XTrans)
         return GF.iniPdDfr(XTrans, lSNmR=self.Y.index)
 
     # --- method for splitting data into training and test data ---------------
@@ -193,12 +200,14 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- method for splitting data into training and test data ---------------
     def encodeSplitData(self):
-        if self.dITp['encodeCatFtr'] and not self.dITp['doTrainTestSplit']:
-            self.XTrans = self.encodeCatFeatures()
-        elif not self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
+        cTp = self.dITp['dEncCatFtr'][self.sMth]
+        doEnc = cTp in self.dITp['lSEnc']
+        if doEnc and not self.dITp['doTrainTestSplit']:
+            self.XTrans = self.encodeCatFeatures(tpEnc=cTp)
+        elif not doEnc and self.dITp['doTrainTestSplit']:
             self.getTrainTestDS(X=self.X, Y=self.Y)
-        elif self.dITp['encodeCatFtr'] and self.dITp['doTrainTestSplit']:
-            self.getTrainTestDS(X=self.encodeCatFeatures(), Y=self.Y)
+        elif doEnc and self.dITp['doTrainTestSplit']:
+            self.getTrainTestDS(X=self.encodeCatFeatures(tpEnc=cTp), Y=self.Y)
 
     # --- print methods -------------------------------------------------------
     def printX(self):
@@ -273,8 +282,10 @@ class BaseSmplClfPrC(BaseClass):
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0, iTp=7,
+    def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0,
+                 sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iTp=7,
                  lITpUpd=[1, 2, 6]):
+        self.sMthL, self.sMth = sMthL, sMth
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Sampler for imbalanced learning'
         self.getInpData(sMd=self.dITp['sClf'], iSt=iSt)
@@ -342,12 +353,15 @@ class ImbSampler(BaseSmplClfPrC):
 # -----------------------------------------------------------------------------
 class GeneralClassifier(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0, cRep=0, iTp=7,
+    def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0, cRep=0,
+                 sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iTp=7,
                  lITpUpd=[1, 2, 6]):
+        self.sMthL, self.sMth = sMthL, sMth
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'General Classifier for data classification'
         self.iSt, self.sKPar, self.cRep = iSt, sKPar, cRep
-        self.Smp = ImbSampler(inpDat, D, iSt=iSt, sKPar=sKPar, iTp=iTp,
+        self.Smp = ImbSampler(inpDat, D, iSt=iSt, sKPar=sKPar,
+                              sMthL=self.sMthL, sMth=self.sMth, iTp=iTp,
                               lITpUpd=lITpUpd)
         self.setData(self.Smp.yieldData())
         if not self.doPartFit:
@@ -359,15 +373,15 @@ class GeneralClassifier(BaseSmplClfPrC):
         print('Initiated "GeneralClassifier" base object.')
 
     # --- print methods -------------------------------------------------------
-    def printClfFitRes(self, X, sMth=None):
+    def printClfFitRes(self, X):
         if self.dITp['lvlOut'] > 0:
             print('Fitted Classifier to data of shape', X.shape)
             if self.optClf is not None:
                 dfrRes = SF.formatDfrCVRes(self.dIG, self.dITp, self.optClf)
                 sKMn, sKP, sS = 'OutGSRS', 'sLFE', GC.S_S
-                if sMth is not None:
+                if self.sMth is not None:
                     self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKP,
-                                   cS=sMth, sPos=sS, modPI=True)
+                                   cS=self.sMth, sPos=sS, modPI=True)
                 self.saveData(dfrRes, pF=self.FPs.dPF[sKMn])
 
     def printClfFitError(self):
@@ -475,12 +489,12 @@ class GeneralClassifier(BaseSmplClfPrC):
         return (self.Clf if self.optClf is None else self.optClf)
 
     # --- method for fitting a Classifier -------------------------------------
-    def ClfFit(self, cClf, sMth=None):
+    def ClfFit(self, cClf):
         X, Y = self.getXY(getTrain=GF.isTrain(self.dITp['doTrainTestSplit']))
         if cClf is not None and X is not None and Y is not None:
             try:
                 cClf.fit(X, Y)
-                self.printClfFitRes(X, sMth=sMth)
+                self.printClfFitRes(X)
             except:
                 self.printClfFitError()
 
@@ -496,7 +510,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             self.printClfPartialFit(X)
         return X, Y
 
-    def fitOrPartialFitClf(self, cClf, sMth=None):
+    def fitOrPartialFitClf(self, cClf):
         if self.doPartFit and hasattr(cClf, 'partial_fit'):
             assert type(self.dITp['nItPartialFit']) in [int, float]
             XIni, YIni = self.getXYIfSpl()
@@ -506,7 +520,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             setTr = GF.isTrain(doSplit=self.dITp['doTrainTestSplit'])
             self.setXY(X=X, Y=Y, setTrain=setTr)
         else:
-            self.ClfFit(cClf, sMth=sMth)
+            self.ClfFit(cClf)
         # calculate the mean accuracy on the given test data and labels
         if self.dITp['doTrainTestSplit']:
             XTest, YTest = self.getXY(getTrain=False)
@@ -514,7 +528,8 @@ class GeneralClassifier(BaseSmplClfPrC):
 
     # --- method for selecting the appropriate XTest and YTest values ---------
     def getXYTest(self, dat2Pred=None):
-        if dat2Pred is not None and self.dITp['encodeCatFtr']:
+        doEnc = self.dITp['dEncCatFtr'][self.sMth] in self.dITp['lSEnc']
+        if dat2Pred is not None and doEnc:
             dat2Pred = self.cEnc.transform(dat2Pred).toarray()
         if dat2Pred is None:
             dat2Pred, self.YTest = self.getXY(getTrain=False)
@@ -609,8 +624,8 @@ class SpecificClassifier(GeneralClassifier):
                  sDesc=GC.S_DESC_NONE, sMthL=GC.S_MTH_NONE_L,
                  sMth=GC.S_MTH_NONE):
         # Classifier method is needed before "super" is initialised
-        self.sMthL, self.sMth = sMthL, sMth
-        super().__init__(inpDat, D=D, iSt=iSt, sKPar=sKPar, cRep=cRep)
+        super().__init__(inpDat, D=D, iSt=iSt, sKPar=sKPar, cRep=cRep,
+                         sMthL=sMthL, sMth=sMth)
         self.descO = sDesc
         self.lParG = lG
         assert self.sKPar in d2Par
@@ -625,7 +640,7 @@ class DummyClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDDy, sMthL=sMDyL, sMth=sMDy)
         if self.dITp['doDummyClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "DummyClf" base object.')
 
     # --- methods for fitting and predicting with a Dummy Classifier ----------
@@ -642,7 +657,7 @@ class AdaClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDAda, sMthL=sMAdaL, sMth=sMAda)
         if self.dITp['doAdaClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "AdaClf" base object.')
 
     # --- methods for fitting and predicting with an AdaBoost Classifier ------
@@ -659,7 +674,7 @@ class RFClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDRF, sMthL=sMRFL, sMth=sMRF)
         if self.dITp['doRFClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "RFClf" base object.')
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
@@ -682,7 +697,7 @@ class XTrClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDXTr, sMthL=sMXTrL, sMth=sMXTr)
         if self.dITp['doXTrClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "XTrClf" base object.')
 
     # --- methods for fitting and predicting with an Extra Trees Classifier ---
@@ -705,7 +720,7 @@ class GrBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDGrB, sMthL=sMGrBL, sMth=sMGrB)
         if self.dITp['doGrBClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "GrBClf" base object.')
 
     # --- methods for fitting and predicting with a Gradient Boosting Clf. ----
@@ -726,7 +741,7 @@ class HGrBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDH, sMthL=sMHL, sMth=sMH)
         if self.dITp['doHGrBClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "HGrBClf" base object.')
 
     # --- methods for fitting and predicting with a Hist Gradient Boosting Clf.
@@ -747,7 +762,7 @@ class GPClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDGP, sMthL=sMGPL, sMth=sMGP)
         if self.dITp['doGPClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "GPClf" base object.')
 
     # --- methods for fitting and predicting with a Gaussian Process Classifier
@@ -767,7 +782,7 @@ class PaAggClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDPaA, sMthL=sMPaAL, sMth=sMPaA)
         if self.dITp['doPaAggClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "PaAggClf" base object.')
 
     # --- methods for fitting and predicting with a Passive Aggressive Clf. ---
@@ -789,7 +804,7 @@ class PctClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDPct, sMthL=sMPctL, sMth=sMPct)
         if self.dITp['doPctClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "PctClf" base object.')
 
     # --- methods for fitting and predicting with a Perceptron Classifier -----
@@ -809,7 +824,7 @@ class SGDClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDSGD, sMthL=sMSGDL, sMth=sMSGD)
         if self.dITp['doSGDClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "SGDClf" base object.')
 
     # --- methods for fitting and predicting with a SGD Classifier ------------
@@ -829,7 +844,7 @@ class CtNBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDCt, sMthL=sMCtL, sMth=sMCt)
         if self.dITp['doCtNBClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "CtNBClf" base object.')
 
     # --- methods for fitting and predicting with a Categorical NB Classifier -
@@ -845,7 +860,7 @@ class CpNBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDCp, sMthL=sMCpL, sMth=sMCp)
         if self.dITp['doCpNBClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "CpNBClf" base object.')
 
     # --- methods for fitting and predicting with a Complement NB Classifier --
@@ -861,7 +876,7 @@ class GsNBClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDGs, sMthL=sMGsL, sMth=sMGs)
         if self.dITp['doGsNBClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "GsNBClf" base object.')
 
     # --- methods for fitting and predicting with a Gaussian NB Classifier ----
@@ -878,7 +893,7 @@ class MLPClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDMLP, sMthL=sMMLPL, sMth=sMMLP)
         if self.dITp['doMLPClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "MLPClf" base object.')
 
     # --- methods for fitting and predicting with a neural network MLP Clf. ---
@@ -898,7 +913,7 @@ class LinSVClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDLSV, sMthL=sMLSVL, sMth=sMLSV)
         if self.dITp['doLinSVClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "LinSVClf" base object.')
 
     # --- methods for fitting and predicting with a Linear SV Classifier ------
@@ -917,7 +932,7 @@ class NuSVClf(SpecificClassifier):
         super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
                          cRep=cRep, sDesc=sDNSV, sMthL=sMNSVL, sMth=sMNSV)
         if self.dITp['doNuSVClf']:
-            self.fitOrPartialFitClf(self.getClf(), sMth=self.sMth)
+            self.fitOrPartialFitClf(self.getClf())
         print('Initiated "NuSVClf" base object.')
 
     # --- methods for fitting and predicting with a Nu-Support SV Classifier --

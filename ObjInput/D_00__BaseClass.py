@@ -122,6 +122,7 @@ sNmerEffFam = GC.S_N_MER_EFF_FAM
 sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 sMltStep = GC.S_MLT_STEP
+sOneHot, sOrdinal = GC.S_ONE_HOT, GC.S_ORDINAL
 sStratRealMajo = GC.S_STRAT_REAL_MAJO
 sStratShareMino = GC.S_STRAT_SHARE_MINO
 sPartFit, sPartFitS = GC.S_PART_FIT, GC.S_PART_FIT_S
@@ -136,6 +137,7 @@ lSMth = [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB, sMthGP,
          sMthLSV, sMthNSV]
 lSMthPartFit = [sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB, sMthGsNB,
                 sMthMLP]
+lSEnc = [sOneHot, sOrdinal]
 # lSPred = [s0Pred, s1Pred, sNotPred]
 lSPred = [s0Pred, s1Pred]
 
@@ -281,6 +283,8 @@ dIO = {# --- general
        'sNmerSeqU': sNmerSeqU,
        'sInpData': sInpData,
        'sMltStep': sMltStep,
+       'sOneHot': sOneHot,
+       'sOrdinal': sOrdinal,
        'sStratRealMajo': sStratRealMajo,
        'sStratShareMino': sStratShareMino,
        'sPartFit': sPartFit,
@@ -292,6 +296,7 @@ dIO = {# --- general
        'lSMth_L': lSMth_L,
        'lSMth': lSMth,
        'lSMthPartFit': lSMthPartFit,
+       'lSEnc': lSEnc,
        'lSPred': lSPred}
 
 ###############################################################################
