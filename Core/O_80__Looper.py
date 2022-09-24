@@ -12,6 +12,8 @@ from Core.O_07__Classifier import (DummyClf, AdaClf, RFClf, XTrClf, GrBClf,
                                    CtNBClf, CpNBClf, GsNBClf, MLPClf, LinSVClf,
                                    NuSVClf)
 
+from sklearn.model_selection import StratifiedKFold
+
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
     # --- initialisation of the class -----------------------------------------
