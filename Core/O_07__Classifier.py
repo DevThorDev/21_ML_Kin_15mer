@@ -12,13 +12,10 @@ from Core.O_00__BaseClass import BaseClass
 
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from sklearn.experimental import enable_halving_search_cv
-# from sklearn.model_selection import (train_test_split, GridSearchCV,
-#                                      HalvingGridSearchCV, RandomizedSearchCV,
-#                                      HalvingRandomSearchCV,
-#                                      RepeatedStratifiedKFold)
 from sklearn.model_selection import (GridSearchCV, HalvingGridSearchCV,
                                      RandomizedSearchCV,
-                                     HalvingRandomSearchCV,
+                                     HalvingRandomSearchCV, KFold, GroupKFold,
+                                     StratifiedKFold, StratifiedGroupKFold,
                                      RepeatedStratifiedKFold)
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import (AdaBoostClassifier, RandomForestClassifier,
@@ -284,7 +281,7 @@ class BaseSmplClfPrC(BaseClass):
                       YRes[YRes == cY].size, sep='')
 
 # -----------------------------------------------------------------------------
-class ImbSampler(BaseSmplClfPrC):
+class KFoldImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0,
                  sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iTp=7,
@@ -294,8 +291,8 @@ class ImbSampler(BaseSmplClfPrC):
         self.descO = 'Sampler for imbalanced learning'
         self.getInpData(sMd=self.dITp['sClf'], iSt=iSt)
         self.encodeSplitData()
-        self.getSampler(iSt=iSt)
-        print('Initiated "ImbSampler" base object.')
+        self.getImbSampler(iSt=iSt)
+        print('Initiated "KFoldImbSampler" base object.')
 
     # --- Function obtaining a custom (imbalanced) sampling strategy ----------
     def getStrat(self, iSt=None):
@@ -315,7 +312,7 @@ class ImbSampler(BaseSmplClfPrC):
                 self.sStrat = GF.smplStratShareMino(Y, dI=self.dITp['dIStrat'])
 
     # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
-    def getSampler(self, iSt=None):
+    def getImbSampler(self, iSt=None):
         self.getStrat(iSt=iSt)
         self.imbSmp, dITp, sStrat = None, self.dITp, self.sStrat
         if dITp['sSampler'] == 'ClusterCentroids':
@@ -364,18 +361,35 @@ class GeneralClassifier(BaseSmplClfPrC):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'General Classifier for data classification'
         self.iSt, self.sKPar, self.cRep = iSt, sKPar, cRep
-        self.Smp = ImbSampler(inpDat, D, iSt=iSt, sKPar=sKPar,
-                              sMthL=self.sMthL, sMth=self.sMth, iTp=iTp,
-                              lITpUpd=lITpUpd)
-        self.setData(self.Smp.yieldData())
-        if not self.doPartFit:
-            if self.dITp['doImbSampling']:
-                self.Smp.fitResampleImbalanced()
-                self.setData(self.Smp.yieldData())
-            else:
-                self.printResNoResample(Y=self.getXYIfSpl()[1])
+        self.getKFoldSplitter()
+        for lITrain, lITest in self.kF.split(X):
+            self.Smp = KFoldImbSampler(inpDat, D, iSt=self.iSt, sKPar=self.sKPar,
+                                       sMthL=self.sMthL, sMth=self.sMth, iTp=iTp,
+                                       lITpUpd=lITpUpd)
+            self.setData(self.Smp.yieldData())
+            if not self.doPartFit:
+                if self.dITp['doImbSampling']:
+                    self.Smp.fitResampleImbalanced()
+                    self.setData(self.Smp.yieldData())
+                else:
+                    self.printResNoResample(Y=self.getXYIfSpl()[1])
         print('Initiated "GeneralClassifier" base object.')
 
+    # --- method for getting the defined kFold-Splitter -----------------------
+    def getKFoldSplitter(self):
+        self.kF, cTp, nSpl = None, self.dITp['tpKF'], self.dITp['nSplitsKF']
+        mdShf, rndSt = self.dITp['shuffleKF'], self.dITp['rndStateKF']
+        if cTp == GC.S_K_FOLD:
+            self.kF = KFold(n_splits=nSpl, shuffle=mdShf, random_state=rndSt)
+        elif cTp == GC.S_GROUP_K_FOLD:
+            self.kF = GroupKFold(n_splits=nSpl)
+        elif cTp == GC.S_STRAT_K_FOLD:
+            self.kF = StratifiedKFold(n_splits=nSpl, shuffle=mdShf,
+                                      random_state=rndSt)
+        elif cTp == GC.S_STRAT_GROUP_K_FOLD:
+            self.kF = StratifiedGroupKFold(n_splits=nSpl, shuffle=mdShf,
+                                           random_state=rndSt)
+    
     # --- print methods -------------------------------------------------------
     def printClfFitRes(self, X):
         if self.dITp['lvlOut'] > 0:

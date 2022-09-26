@@ -6,11 +6,11 @@ from scipy import stats
 
 import Core.C_00__GenConstants as GC
 
-# --- general -----------------------------------------------------------------
+# *** general *****************************************************************
 sOType = 'Data for looper over parameter sets and repetitions (D_80__Looper)'
 sNmSpec = 'Input data for the Looper class in O_80__Looper'
 
-# --- flow control ------------------------------------------------------------
+# *** flow control ************************************************************
 # use dNumRep for both parameter grid calculations and parameter dictionary
 # evaluations. Parameter grid calculations for a particular classification
 # method are performed if the number of repetitions is positve. Otherwise,
@@ -38,6 +38,7 @@ doParGrid = False                   # do parameter grid calculations?
 useKey0 = False                     # use the parameter key GC.S_0?
                                     # (in case doParGrid == False)
 
+# *** Specific Classifiers ****************************************************
 # === Dummy Classifier ========================================================
 # --- list of parameter grids for Dummy Classifier grid search ----------------
 lParGrid_Dy = [{'strategy': ['uniform', 'stratified']}]
@@ -536,25 +537,25 @@ d2Par_NSV = {GC.S_0: {'nu': 0.5,
                       'probability': True,    # to use "predict_proba"
                       'tol': 1e-5}}
 
-# === other input =============================================================
-# --- numbers -----------------------------------------------------------------
+# *** other input *************************************************************
+# === numbers =================================================================
 
-# --- strings -----------------------------------------------------------------
+# === strings =================================================================
 sMn = GC.S_MEAN
 sSD = GC.S_SD
 sSEM = GC.S_SEM
 
-# --- sets --------------------------------------------------------------------
+# === sets ====================================================================
 
-# --- lists -------------------------------------------------------------------
+# === lists ===================================================================
 lSTp = [sMn, sSD, sSEM]
 lSTpOut = [sMn, sSEM]
 
-# --- dictionaries ------------------------------------------------------------
+# === dictionaries ============================================================
 
-# === assertions ==============================================================
+# *** assertions **************************************************************
 
-# === derived values and input processing =====================================
+# *** derived values and input processing *************************************
 if not doParGrid:
     lParGrid_Dy = None
     lParGrid_Ada = None
@@ -573,94 +574,63 @@ if not doParGrid:
     lParGrid_LSV = None
     lParGrid_NSV = None
 
-# === create input dictionary =================================================
-dIO = {# --- general
+# *** create input dictionary *************************************************
+dIO = {# *** general **********************************************************
        'sOType': sOType,
        'sNmSpec': sNmSpec,
-       # --- flow control
+       # *** flow control *****************************************************
        'dNumRep': dNumRep,
        'doParGrid': doParGrid,
        'useKey0': useKey0,
+       # *** Specific Classifiers *********************************************
        # === Dummy Classifier
        # --- parameter grid for optimising the Dummy Classifier
        'lParGrid_Dummy': lParGrid_Dy,
-       # --- parameter dictionary for Dummy Classifier
-       'd2Par_Dummy': d2Par_Dy,
        # === AdaBoost Classifier
        # --- parameter grid for optimising the AdaBoost Classifier
        'lParGrid_Ada': lParGrid_Ada,
-       # --- parameter dictionary for AdaBoost Classifier
-       'd2Par_Ada': d2Par_Ada,
        # === Random Forest Classifier
        # --- parameter grid for optimising the Random Forest Classifier
        'lParGrid_RF': lParGrid_RF,
-       # --- parameter dictionary for Random Forest Classifier
-       'd2Par_RF': d2Par_RF,
        # === Extra Trees Classifier
        # --- parameter grid for optimising the Extra Trees Classifier
        'lParGrid_XTr': lParGrid_XTr,
-       # --- parameter dictionary for Extra Trees Classifier
-       'd2Par_XTr': d2Par_XTr,
        # === Gradient Boosting Classifier
        # --- parameter grid for optimising the Gradient Boosting Classifier
        'lParGrid_GrB': lParGrid_GrB,
-       # --- parameter dictionary for Gradient Boosting Classifier
-       'd2Par_GrB': d2Par_GrB,
        # === Hist Gradient Boosting Classifier
        # --- parameter grid for optimising the Hist Gradient Boosting Classif.
        'lParGrid_HGrB': lParGrid_HGrB,
-       # --- parameter dictionary for Hist Gradient Boosting Classifier
-       'd2Par_HGrB': d2Par_HGrB,
        # === Gaussian Process Classifier
        # --- parameter grid for optimising the Gaussian Process Classifier
        'lParGrid_GP': lParGrid_GP,
-       # --- parameter dictionary for Gaussian Process Classifier
-       'd2Par_GP': d2Par_GP,
        # === Passive Aggressive Classifier
        # --- parameter grid for optimising the Passive Aggressive Classifier
        'lParGrid_PaA': lParGrid_PaA,
-       # --- parameter dictionary for Passive Aggressive Classifier
-       'd2Par_PaA': d2Par_PaA,
        # === Perceptron Classifier
        # --- parameter grid for optimising the Perceptron Classifier
        'lParGrid_Pct': lParGrid_Pct,
-       # --- parameter dictionary for Perceptron Classifier
-       'd2Par_Pct': d2Par_Pct,
        # === SGD Classifier
        # --- parameter grid for optimising the SGD Classifier
        'lParGrid_SGD': lParGrid_SGD,
-       # --- parameter dictionary for SGD Classifier
-       'd2Par_SGD': d2Par_SGD,
        # === Categorical NB Classifier
        # --- parameter grid for optimising the Categorical NB Classifier
        'lParGrid_CtNB': lParGrid_CtNB,
-       # --- parameter dictionary for Categorical NB Classifier
-       'd2Par_CtNB': d2Par_CtNB,
        # === Complement NB Classifier
        # --- parameter grid for optimising the Complement NB Classifier
        'lParGrid_CpNB': lParGrid_CpNB,
-       # --- parameter dictionary for Complement NB Classifier
-       'd2Par_CpNB': d2Par_CpNB,
        # === Gaussian NB Classifier
        # --- parameter grid for optimising the Gaussian NB Classifier
        'lParGrid_GsNB': lParGrid_GsNB,
-       # --- parameter dictionary for Gaussian NB Classifier
-       'd2Par_GsNB': d2Par_GsNB,
        # === neural network MLP Classifier
        # --- parameter grid for optimising the neural network MLP Classifier
        'lParGrid_MLP': lParGrid_MLP,
-       # --- parameter dictionary for neural network MLP Classifier
-       'd2Par_MLP': d2Par_MLP,
        # === Linear SV Classifier
        # --- parameter grid for optimising the Linear SV Classifier
        'lParGrid_LSV': lParGrid_LSV,
-       # --- parameter dictionary for Linear SV Classifier
-       'd2Par_LSV': d2Par_LSV,
        # === Nu-Support SV Classifier
        # --- parameter grid for optimising the Nu-Support SV Classifier
        'lParGrid_NSV': lParGrid_NSV,
-       # --- parameter dictionary for Nu-Support SV Classifier
-       'd2Par_NSV': d2Par_NSV,
        # --- parameter dictionary for all Classifier methods
        'd3Par': {GC.S_MTH_DUMMY: d2Par_Dy,
                  GC.S_MTH_ADA: d2Par_Ada,
@@ -678,18 +648,18 @@ dIO = {# --- general
                  GC.S_MTH_MLP: d2Par_MLP,
                  GC.S_MTH_LSV: d2Par_LSV,
                  GC.S_MTH_NSV: d2Par_NSV},
-       # === other input
-       # --- numbers
-       # --- strings
+       # *** other input ******************************************************
+       # === numbers
+       # === strings
        'sMn': sMn,
        'sSD': sSD,
        'sSEM': sSEM,
-       # --- sets
-       # --- lists
+       # === sets
+       # === lists
        'lSTp': lSTp,
        'lSTpOut': lSTpOut
-       # --- dictionaries
-       # === derived values and input processing
+       # === dictionaries
+       # *** derived values and input processing ******************************
        }
 
 ###############################################################################

@@ -4,13 +4,13 @@
 ###############################################################################
 import Core.C_00__GenConstants as GC
 
-# --- general -----------------------------------------------------------------
+# *** general *****************************************************************
 sOType = 'Classifiers for data classification (D_07__Classifier)'
 sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
-# --- flow control ------------------------------------------------------------
+# *** flow control ************************************************************
 doImbSampling = True                # do imbalanced sampling before classific.?
 
 doDummyClf = True                   # do dummy classification?
@@ -71,7 +71,7 @@ usedAAcType = GC.S_AAC              # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
 usedClType = GC.S_NEW + GC.S_CL     # GC.S_NEW/GC.S_OLD + GC.S_CL
 
-# --- names and paths of files and dirs ---------------------------------------
+# *** names and paths of files and dirs ***************************************
 pInpClf = GC.P_DIR_INP_CLF
 pInpPrC = GC.P_DIR_INP_CLF
 pOutPar = GC.P_DIR_RES_CLF_PARS
@@ -80,6 +80,15 @@ pCnfMat = GC.P_DIR_RES_CLF_CNF_MAT
 pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
+# *** kFold Splitter input ****************************************************
+tpKF = GC.S_K_FOLD                  # type of kFold-split
+                                    # S_K_FOLD / S_GROUP_K_FOLD
+                                    # S_STRAT_K_FOLD / S_STRAT_GROUP_K_FOLD
+nSplitsKF = 5                       # number of folds
+shuffleKF = True                    # shuffle data before batches split?
+rndStateKF = None                   # None (random) or integer (reproducible)
+
+# *** over- and undersampler input ********************************************
 # === general over- and undersampler input ====================================
 sSampler = GC.S_SMPL_RND_U  # string matching the over/under-sampler
                             # GC.S_SMPL_CL_CTR, GC.S_SMPL_ALL_KNN,
@@ -119,8 +128,8 @@ threshold_cleaning = 0.5        # threshold 4 class considered during cleaning
 wReplacement = False            # is sample with or without replacement?
 
 # --- TomekLinks input --------------------------------------------------------
-# =============================================================================
 
+# *** Classifier input ********************************************************
 # === general input for any Classifier (that might use it) ====================
 rndState = None             # None (random) or integer (reproducible)
 bWarmStart = True           # warm start (True: use warm start)
@@ -193,27 +202,27 @@ vVerbLSV = 1                # state of verbosity ([0], 1, 2, 3...)
 # --- general input for Nu-Support SV Classifier ------------------------------
 vVerbNSV = 1                # state of verbosity ([0], 1, 2, 3...)
 
-# =============================================================================
-# --- numbers -----------------------------------------------------------------
+# *** other input *************************************************************
+# === numbers =================================================================
 propTestData = .2
 
 rndDigScore = GC.R04
 rndDigCorrect = GC.R04
 
-# --- strings -----------------------------------------------------------------
+# === strings =================================================================
 sFullList = GC.S_FULL_LIST
 sUnqList = GC.S_UNQ_LIST
 
 sSupTtlPlt = 'Confusion matrix'
 
-# --- sets --------------------------------------------------------------------
+# === sets ====================================================================
 setFeat = set('ACDEFGHIKLMNPQRSTVWY')
 if usedAAcType == GC.S_AAC_CHARGE:
     setFeat = set('NPST')
 elif usedAAcType == GC.S_AAC_POLAR:
     setFeat = set('ABCNPQ')
 
-# --- lists -------------------------------------------------------------------
+# === lists ===================================================================
 lFeatSrt = sorted(list(setFeat))
 lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
              'C12---', 'C1-3--', 'C1--4-', 'C1---5', 'C-23--', 'C-2-4-',
@@ -223,19 +232,19 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
              'C-2345', 'C12345']
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
-# === assertions ==============================================================
+# *** assertions **************************************************************
 assert typeS in ['GridSearchCV', 'RandomizedSearchCV']
 
-# === derived values and input processing =====================================
+# *** derived values and input processing *************************************
 sSmplS = (GC.D_S_SMPL[sSampler] if (sSampler in GC.D_S_SMPL) else None)
 lSmplStratCustom = [GC.S_STRAT_REAL_MAJO, GC.S_STRAT_SHARE_MINO]
 
-# === create input dictionary =================================================
-dIO = {# --- general
+# *** create input dictionary *************************************************
+dIO = {# *** general **********************************************************
        'sOType': sOType,
        'sNmSpec': sNmSpec,
        'lvlOut': lvlOut,
-       # --- flow control
+       # *** flow control *****************************************************
        'doImbSampling': doImbSampling,
        'doDummyClf': doDummyClf,
        'doAdaClf': doAdaClf,
@@ -266,7 +275,7 @@ dIO = {# --- general
        'usedNmerSeq': usedNmerSeq,
        'usedAAcType': usedAAcType,
        'usedClType': usedClType,
-       # --- names and paths of files and dirs
+       # *** names and paths of files and dirs ********************************
        'pInpClf': pInpClf,
        'pInpPrC': pInpPrC,
        'pOutPar': pOutPar,
@@ -274,7 +283,13 @@ dIO = {# --- general
        'pCnfMat': pCnfMat,
        'pOutDet': pOutDet,
        'pOutPrC': pOutPrC,
-       # === general over- and undersampler input =============================
+       # *** kFold Splitter input *********************************************
+       'tpKF': tpKF,
+       'nSplitsKF': nSplitsKF,
+       'shuffleKF': shuffleKF,
+       'rndStateKF': rndStateKF,
+       # *** over- and undersampler input *************************************
+       # === general over- and undersampler input
        'sSampler': sSampler,
        'sStrat': sStrat,
        'dSStrat': dSStrat,
@@ -293,8 +308,8 @@ dIO = {# --- general
        # --- RandomUnderSampler and BalancedRandomForestClassifier input
        'wReplacement': wReplacement,
        # --- TomekLinks input
-       # ======================================================================
-       # === general input for any Classifier (that might use it) =============
+       # *** Classifier input *************************************************
+       # === general input for any Classifier (that might use it)
        'rndState': rndState,
        'bWarmStart': bWarmStart,
        'nJobs': nJobs,
@@ -345,22 +360,22 @@ dIO = {# --- general
        'vVerbLSV': vVerbLSV,
        # --- general input for Nu-Support SV Classifier
        'vVerbNSV': vVerbNSV,
-       # ======================================================================
-       # --- numbers
+       # *** other input ******************************************************
+       # === numbers
        'propTestData': propTestData,
        'rndDigScore': rndDigScore,
        'rndDigCorrect': rndDigCorrect,
-       # --- strings
+       # === strings
        'sFullList': sFullList,
        'sUnqList': sUnqList,
        'sSupTtlPlt': sSupTtlPlt,
-       # --- sets
+       # === sets
        'setFeat': setFeat,
-       # --- lists
+       # === lists
        'lFeatSrt': lFeatSrt,
        'lOldClPlt': lOldClPlt,
        'lSResClf': lSResClf,
-       # === derived values and input processing ==============================
+       # *** derived values and input processing ******************************
        'sSmplS': sSmplS,
        'lSmplStratCustom': lSmplStratCustom}
 
