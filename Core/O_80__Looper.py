@@ -168,7 +168,7 @@ class Looper(BaseClass):
             self.cClf.ClfPred()
             self.cClf.printFitQuality()
             GF.updateDict(self.d3ResClf, cDUp=self.cClf.d2ResClf, cK=cRep)
-            GF.updateDict(self.d2CnfMat, cDUp=self.cClf.dCnfMat, cK=cRep)
+            GF.updateDict(self.d2CnfMat, cDUp=self.cClf.dDfrCnfMat, cK=cRep)
             if k == 0 and cRep == 0:
                 self.fillFPsMth()
             self.adaptFPs(sKP=sKPar, cRep=cRep)
@@ -204,7 +204,7 @@ class Looper(BaseClass):
                 self.printSettingCRep(sKPar, cRep)
                 self.doRep(cTim, k=k, sKPar=sKPar, cRep=cRep, stT=stT)
         self.saveCombRes(nRep=self.nRep)
-    
+
     def doQuadLoop(self, cTim, stT=None):
         sFInpStIClf, sStep = self.dITp['sFInpStIClf'], self.dITp['sStep']
         for self.sMth in self.dITp['lSMth']:

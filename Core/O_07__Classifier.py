@@ -40,8 +40,8 @@ class BaseSmplClfPrC(BaseClass):
         super().__init__(inpDat)
         self.idO = 'O_07'
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
+        self.D, self.iTp = D, iTp
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
-        self.D = D
         self.iniAttr(sKPar=sKPar)
         self.fillFPs()
         print('Initiated "BaseSmplClfPrC" base object.')
@@ -57,18 +57,22 @@ class BaseSmplClfPrC(BaseClass):
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar=GC.S_0):
         lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'dMltSt', 'lSXCl',
-                      'X', 'XTrans', 'XTrain', 'XTest',
-                      'XTransTrain', 'XTransTest',
-                      'Y', 'YTrain', 'YTest', 'YPred', 'YProba',
-                      'Clf', 'sMth', 'sMthL', 'scoreClf', 'confusMatrix',
+                      'X', 'XTrans', 'Y', 'Clf', 'optClf', 'sMth', 'sMthL',
                       'dfrPred', 'dfrProba']
-        lAttrDict = ['d2ResClf', 'dCnfMat', 'dPropAAc']
+        lAttrDict = ['d2ResClf', 'dDfrCnfMat', 'dPropAAc']
+        lAttrDictF = ['dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
+                     'dYTrain', 'dYTest', 'dYPred', 'dYProba',
+                     'dClf', 'dScoreClf', 'dConfusMatrix']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
         for cAttr in lAttrDict:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {})
+        for cAttr in lAttrDictF:
+            if not hasattr(self, cAttr):
+                setattr(self, cAttr, {j: None for j in
+                                      range(self.dITp['nSplitsKF'])})
         self.doPartFit = (self.sMth in self.dITp['lSMthPartFit'] and
                           self.dITp['nItPartialFit'] is not None)
         self.sKPar = sKPar
@@ -118,16 +122,20 @@ class BaseSmplClfPrC(BaseClass):
             X = self.XTrans
         if getTrain is not None and self.dITp['doTrainTestSplit']:
             if getTrain:
-                X, Y = self.XTrain, self.YTrain
+                Y = self.dYTrain[self.j]
                 if doEnc:
-                    X = self.XTransTrain
+                    X = self.dXTransTrain[self.j]
+                else:
+                    X = self.dXTrain[self.j]
             else:
-                X, Y = self.XTest, self.YTest
+                Y = self.dYTest[self.j]
                 if doEnc:
-                    X = self.XTransTest
+                    X = self.dXTransTest[self.j]
+                else:
+                    X = self.dXTest[self.j]
         return X, Y
 
-    def getXYIfSpl(self):
+    def getXYIfSplTrTe(self):
         doSpl = self.dITp['doTrainTestSplit']
         return self.getXY(getTrain=GF.isTrain(doSplit=doSpl))
 
@@ -135,17 +143,17 @@ class BaseSmplClfPrC(BaseClass):
         doEnc = self.dITp['dEncCatFtr'][self.sMth] in self.dITp['lSEnc']
         if setTrain is not None and self.dITp['doTrainTestSplit']:
             if setTrain:
-                self.YTrain = Y
+                self.dYTrain[self.j] = Y
                 if doEnc:
-                    self.XTransTrain = X
+                    self.dXTransTrain[self.j] = X
                 else:
-                    self.XTrain = X
+                    self.dXTrain[self.j] = X
             else:
-                self.YTest = Y
+                self.dYTest[self.j] = Y
                 if doEnc:
-                    self.XTransTest = X
+                    self.dXTransTest[self.j] = X
                 else:
-                    self.XTest = X
+                    self.dXTest[self.j] = X
         else:
             self.Y = Y
             if doEnc:
@@ -156,8 +164,8 @@ class BaseSmplClfPrC(BaseClass):
     # --- methods for setting data --------------------------------------------
     def setData(self, tData):
         lSAttr = ['dfrInp', 'serNmerSeq', 'dClMap', 'dMltSt', 'lSXCl', 'X',
-                  'XTrans', 'XTrain', 'XTest', 'XTransTrain', 'XTransTest',
-                  'Y', 'YTrain', 'YTest', 'YPred', 'YProba']
+                  'XTrans', 'dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
+                  'Y', 'dYTrain', 'dYTest', 'dYPred', 'dYProba']
         assert len(tData) == len(lSAttr)
         for sAttr, cV in zip(lSAttr, tData):
             if cV is not None:
@@ -165,10 +173,14 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- methods for yielding data -------------------------------------------
     def yieldData(self):
+        XTrain, XTest = self.dXTrain[self.j], self.dXTest[self.j]
+        XTransTrain = self.dXTransTrain[self.j]
+        XTransTest = self.dXTransTest[self.j]
+        YTrain, YTest = self.dYTrain[self.j], self.dYTest[self.j]
+        YPred, YProba = self.dYPred[self.j], self.dYProba[self.j]
         return (self.dfrInp, self.serNmerSeq, self.dClMap, self.dMltSt,
-                self.lSXCl, self.X, self.XTrans, self.XTrain, self.XTest,
-                self.XTransTrain, self.XTransTest, self.Y, self.YTrain,
-                self.YTest, self.YPred, self.YProba)
+                self.lSXCl, self.X, self.XTrans, XTrain, XTest,
+                XTransTrain, XTransTest, self.Y, YTrain, YTest, YPred, YProba)
 
     # --- method for encoding and transforming the categorical features -------
     def encodeCatFeatures(self, tpEnc=GC.S_ONE_HOT, catData=None):
@@ -188,10 +200,12 @@ class BaseSmplClfPrC(BaseClass):
 
     # --- method for splitting data into training and test data ---------------
     def getTrainTestDS(self, X, Y):
-        tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
-                                 test_size=self.dITp['propTestData'],
-                                 stratify=self.dITp['stratData'])
-        XTrain, XTest, YTrain, YTest = tTrTe
+        # tTrTe = train_test_split(X, Y, random_state=self.dITp['rndState'],
+        #                          test_size=self.dITp['propTestData'],
+        #                          stratify=self.dITp['stratData'])
+        # XTrain, XTest, YTrain, YTest = tTrTe
+        XTrain, XTest = X.loc[self.lITrain, :], X.loc[self.lITest, :]
+        YTrain, YTest = Y.loc[self.lITrain], Y.loc[self.lITest]
         if not (self.dITp['onlySglLbl'] or self.dITp['lLblTrain'] is None):
             lB = [(serR.sum() in self.dITp['lLblTrain']) for _, serR in
                   YTrain.iterrows()]
@@ -284,9 +298,10 @@ class BaseSmplClfPrC(BaseClass):
 class KFoldImbSampler(BaseSmplClfPrC):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0,
-                 sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iTp=7,
-                 lITpUpd=[1, 2, 6]):
+                 sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, j=None,
+                 lITrain=None, lITest=None, iTp=7, lITpUpd=[1, 2, 6]):
         self.sMthL, self.sMth = sMthL, sMth
+        self.j, self.lITrain, self.lITest = j, lITrain, lITest
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Sampler for imbalanced learning'
         self.getInpData(sMd=self.dITp['sClf'], iSt=iSt)
@@ -303,7 +318,7 @@ class KFoldImbSampler(BaseSmplClfPrC):
         self.printStrat(iSt=iSt)
         # in case of a custom sampling strategy, calculate the dictionary
         if self.sStrat in self.dITp['lSmplStratCustom']:
-            _, Y = self.getXYIfSpl()
+            _, Y = self.getXYIfSplTrTe()
             if self.sStrat == self.dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
                 self.sStrat = GF.smplStratRealMajo(Y)
@@ -342,8 +357,9 @@ class KFoldImbSampler(BaseSmplClfPrC):
     # --- Function performing the random sampling ("imblearn") ----------------
     def fitResampleImbalanced(self):
         print('Resampling data using resampler "', self.dITp['sSampler'],
-              '" with sampling strategy "', self.dITp['sStrat'], '".', sep='')
-        X, Y = self.getXYIfSpl()
+              '" with sampling strategy "', self.dITp['sStrat'], '" for fold ',
+              self.j + 1, '.', sep='')
+        X, Y = self.getXYIfSplTrTe()
         X, YResImb = self.imbSmp.fit_resample(X, Y)
         self.printResResampleImb(YIni=Y, YRes=YResImb)
         if not self.dITp['onlySglLbl']:
@@ -360,19 +376,8 @@ class GeneralClassifier(BaseSmplClfPrC):
         self.sMthL, self.sMth = sMthL, sMth
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'General Classifier for data classification'
-        self.iSt, self.sKPar, self.cRep = iSt, sKPar, cRep
-        self.getKFoldSplitter()
-        for lITrain, lITest in self.kF.split(X):
-            self.Smp = KFoldImbSampler(inpDat, D, iSt=self.iSt, sKPar=self.sKPar,
-                                       sMthL=self.sMthL, sMth=self.sMth, iTp=iTp,
-                                       lITpUpd=lITpUpd)
-            self.setData(self.Smp.yieldData())
-            if not self.doPartFit:
-                if self.dITp['doImbSampling']:
-                    self.Smp.fitResampleImbalanced()
-                    self.setData(self.Smp.yieldData())
-                else:
-                    self.printResNoResample(Y=self.getXYIfSpl()[1])
+        self.iSt, self.cRep = iSt, cRep
+        self.doAllKFolds(inpDat, lITpUpd=lITpUpd)
         print('Initiated "GeneralClassifier" base object.')
 
     # --- method for getting the defined kFold-Splitter -----------------------
@@ -389,7 +394,26 @@ class GeneralClassifier(BaseSmplClfPrC):
         elif cTp == GC.S_STRAT_GROUP_K_FOLD:
             self.kF = StratifiedGroupKFold(n_splits=nSpl, shuffle=mdShf,
                                            random_state=rndSt)
-    
+
+    # --- method for looping over all k folds ---------------------------------
+    def doAllKFolds(self, inpDat, lITpUpd):
+        self.getKFoldSplitter()
+        for j, (lITr, lITe) in enumerate(self.kF.split(self.D.yieldXClf())):
+            self.j, self.lITrain, self.lITest = j, lITr, lITe
+            self.Smp = KFoldImbSampler(inpDat, D=self.D, iSt=self.iSt,
+                                       sKPar=self.sKPar, sMthL=self.sMthL,
+                                       sMth=self.sMth, j=self.j,
+                                       lITrain=self.lITrain,
+                                       lITest=self.lITest, iTp=self.iTp,
+                                       lITpUpd=lITpUpd)
+            self.setData(self.Smp.yieldData())
+            if not self.doPartFit:
+                if self.dITp['doImbSampling']:
+                    self.Smp.fitResampleImbalanced()
+                    self.setData(self.Smp.yieldData())
+                else:
+                    self.printResNoResample(Y=self.getXYIfSplTrTe()[1])
+
     # --- print methods -------------------------------------------------------
     def printClfFitRes(self, X):
         if self.dITp['lvlOut'] > 0:
@@ -422,24 +446,28 @@ class GeneralClassifier(BaseSmplClfPrC):
             print((s1 if nPr == 0 else s1 + GC.S_SPACE + s2))
         if self.dITp['lvlOut'] > 1 and cSect in ['A1', 'B', 'C']:
             print(GC.S_NEWL, GC.S_DS04, GC.S_SPACE, 'Predictions:', sep='')
+            YTest, YPred = self.dYTest[self.j], self.dYPred[self.j]
             if cSect == 'A1':
-                for xT, yT, yP in zip(X2Pr, self.YTest, self.YPred):
+                for xT, yT, yP in zip(X2Pr, YTest, YPred):
                     print(xT[:10], GC.S_SPACE, GC.S_ARR_LR, GC.S_SPACE,
                           '(', yT, GC.S_COMMA, GC.S_SPACE, yP, ')', sep='')
             elif cSect == 'B':
-                for xT, yP in zip(X2Pr, self.YPred):
+                for xT, yP in zip(X2Pr, YPred):
                     print(xT, GC.S_ARR_LR, yP)
             elif cSect == 'C':
-                print(self.YPred)
+                print(YPred)
 
-    def printPredict(self, X2Pred=None):
+    def printPredict(self, X2Pred=None, YTest=None):
         if self.dITp['lvlOut'] > 0:
-            print('Predicted for data of shape', X2Pred.shape)
-            print('Shape of predicted Y', self.YPred.shape)
-            print('Shape of probs of Y (classes)', self.YProba.shape)
-            nPred, nOK, _ = tuple(self.d2ResClf[self.sKPar].values())
-            if X2Pred is not None and X2Pred.shape[0] == self.YPred.shape[0]:
-                if self.YTest is not None:
+            YPred, YProba = self.dYPred[self.j], self.dYProba[self.j]
+            print(GC.S_DS04, 'Predictions for fold', self.j + 1, GC.DS04)
+            # print('Predicted for data of shape', X2Pred.shape)
+            print('Shape of predicted Y', YPred.shape)
+            print('Shape of probs of Y (classes)', YProba.shape)
+            sKPFd = (self.sKPar, self.j)
+            nPred, nOK, _ = tuple(self.d2ResClf[sKPFd].values())
+            if X2Pred is not None and X2Pred.shape[0] == YPred.shape[0]:
+                if YTest is not None:
                     self.printDetailedPredict(X2Pred, cSect='A1')
                     self.printDetailedPredict(X2Pred, nPred, nOK, cSect='A2')
                 else:
@@ -448,15 +476,16 @@ class GeneralClassifier(BaseSmplClfPrC):
                 self.printDetailedPredict(cSect='C')
 
     def printFitQuality(self):
-        print(GC.S_DS04, ' Fit quality for the "', self.sMthL, '" method ',
-              GC.S_DS04, sep='')
-        if self.scoreClf is not None:
-            print('Classification score for the test data:',
-                  round(self.scoreClf, self.dITp['rndDigScore']))
-        if self.dITp['lvlOut'] > 0:
-            if self.confusMatrix is not None:
-                print('Confusion matrix:', GC.S_NEWL, self.confusMatrix,
-                      sep='')
+        for j, scoreClf in self.dScoreClf.items():
+            print(GC.S_DS04, ' Fit quality for the "', self.sMthL, '" method ',
+                  'and fold ', j + 1, GC.S_DS04, sep='')
+            if scoreClf is not None:
+                print('Classification score for the test data:',
+                      round(scoreClf, self.dITp['rndDigScore']))
+            if self.dITp['lvlOut'] > 0:
+                if self.dConfusMatrix is not None:
+                    print('Confusion matrix of fold ', j + 1, ':', GC.S_NEWL,
+                          self.dConfusMatrix[j], sep='')
 
     # --- method for obtaining an optimised Classifier from a grid search -----
     def getOptClf(self, cCV):
@@ -492,8 +521,8 @@ class GeneralClassifier(BaseSmplClfPrC):
                                          return_train_score=retTrScore, cv=cCV)
         return oClf
 
-    def getOptClfGridSearch(self):
-        dITp, self.optClf, retClf = self.dITp, None, self.Clf
+    def setClfOptClfGridSearch(self, cClf=None):
+        dITp, self.optClf, retClf = self.dITp, None, cClf
         if self.lParG is not None:
             cCV = RepeatedStratifiedKFold(n_splits=dITp['nSplitsCV'],
                                           n_repeats=dITp['nRepeatsCV'],
@@ -503,8 +532,12 @@ class GeneralClassifier(BaseSmplClfPrC):
         return retClf
 
     # --- method for selecting the desired Classifier -------------------------
-    def selClf(self):
-        return (self.Clf if self.optClf is None else self.optClf)
+    def selClf(self, j=None):
+        if j is None:
+            return (self.Clf if self.optClf is None else self.optClf)
+        else:
+            return (self.dClf[j] if self.optClf is None else self.optClf)
+
 
     # --- method for fitting a Classifier -------------------------------------
     def ClfFit(self, cClf):
@@ -529,20 +562,22 @@ class GeneralClassifier(BaseSmplClfPrC):
         return X, Y
 
     def fitOrPartialFitClf(self, cClf):
-        if self.doPartFit and hasattr(cClf, 'partial_fit'):
-            assert type(self.dITp['nItPartialFit']) in [int, float]
-            XIni, YIni = self.getXYIfSpl()
-            # repeat resampling and partial fit nItPartialFit times
-            for k in range(round(abs(self.dITp['nItPartialFit']))):
-                X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni, k=k)
-            setTr = GF.isTrain(doSplit=self.dITp['doTrainTestSplit'])
-            self.setXY(X=X, Y=Y, setTrain=setTr)
-        else:
-            self.ClfFit(cClf)
-        # calculate the mean accuracy on the given test data and labels
-        if self.dITp['doTrainTestSplit']:
-            XTest, YTest = self.getXY(getTrain=False)
-            self.scoreClf = cClf.score(XTest, YTest)
+        for self.j in range(self.dITp['nSplitsKF']):
+            if self.doPartFit and hasattr(cClf, 'partial_fit'):
+                assert type(self.dITp['nItPartialFit']) in [int, float]
+                XIni, YIni = self.getXYIfSplTrTe()
+                # repeat resampling and partial fit nItPartialFit times
+                for k in range(round(abs(self.dITp['nItPartialFit']))):
+                    X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni, k=k)
+                setTr = GF.isTrain(doSplit=self.dITp['doTrainTestSplit'])
+                self.setXY(X=X, Y=Y, setTrain=setTr)
+            else:
+                self.ClfFit(cClf)
+            self.dClf[self.j] = cClf
+            # calculate the mean accuracy on the given test data and labels
+            if self.dITp['doTrainTestSplit']:
+                XTest, YTest = self.getXY(getTrain=False)
+                self.dScoreClf[self.j] = cClf.score(XTest, YTest)
 
     # --- method for selecting the appropriate XTest and YTest values ---------
     def getXYTest(self, dat2Pred=None):
@@ -550,83 +585,84 @@ class GeneralClassifier(BaseSmplClfPrC):
         if dat2Pred is not None and doEnc:
             dat2Pred = self.cEnc.transform(dat2Pred).toarray()
         if dat2Pred is None:
-            dat2Pred, self.YTest = self.getXY(getTrain=False)
+            dat2Pred, YTest = self.getXY(getTrain=False)
         if self.dITp['onlySglLbl']:
-            self.YTest = SF.toMultiLbl(self.dITp, serY=self.YTest,
-                                       lXCl=self.lSXCl)
-        return dat2Pred
+            YTest = SF.toMultiLbl(self.dITp, serY=YTest, lXCl=self.lSXCl)
+        return dat2Pred, YTest
 
     # --- method for calculating the predicted y classes, and their probs -----
-    def getYPredProba(self, cClf, X2Pred=None):
-        lSC, lSR = self.YTest.columns, self.YTest.index
+    def getYPredProba(self, cClf, X2Pred=None, YTest=None):
+        lSC, lSR = self.dYTest[self.j].columns, self.dYTest[self.j].index
         if self.dITp['onlySglLbl']:
             YPred = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
                                 nameS=self.dITp['sEffFam'])
-            self.YPred = SF.toMultiLbl(self.dITp, serY=YPred, lXCl=self.lSXCl)
+            YPred = SF.toMultiLbl(self.dITp, serY=YPred, lXCl=self.lSXCl)
         else:
-            self.YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC,
-                                     lSNmR=lSR)
-        self.YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
-        if self.YProba is None:
-            self.YProba = GF.iniWShape(tmplDfr=self.YPred)
-        assert self.YProba.shape == self.YPred.shape
+            YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC, lSNmR=lSR)
+        YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
+        if YProba is None:
+            YProba = GF.iniWShape(tmplDfr=self.dYPred[self.j])
+        assert YProba.shape == YPred.shape
+        self.dYPred[self.j], self.dYProba[self.j] = YPred, YProba
 
     # --- method for calculating values of the Classifier results dictionary --
-    def assembleDfrPredProba(self, lSCTP):
-        lDfr = [self.dfrPred, self.dfrProba]
-        for k, cYP in enumerate([self.YPred, self.YProba]):
-            lDfr[k] = GF.concLObjAx1([self.YTest, cYP], ignIdx=True)
+    def assembleDfrPredProba(self, lSCTP, YTest=None, YPred=None):
+        lDfr, YProba = [self.dfrPred, self.dfrProba], self.dYProba[self.j]
+        for k, cYP in enumerate([YPred, YProba]):
+            lDfr[k] = GF.concLObjAx1([YTest, cYP], ignIdx=True)
             lDfr[k].columns = lSCTP
             lDfr[k] = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], lDfr[k]])
             lDfr[k].dropna(axis=0, inplace=True)
             lDfr[k] = lDfr[k].convert_dtypes()
         [self.dfrPred, self.dfrProba] = lDfr
 
-    def calcResPredict(self, X2Pred=None):
-        if (X2Pred is not None and self.YTest is not None and
-            self.YPred is not None and X2Pred.shape[0] == self.YPred.shape[0]):
-            nPred, sKPar = self.YPred.shape[0], self.sKPar
+    def calcResPredict(self, X2Pred=None, YTest=None):
+        YPred = self.dYPred[self.j]
+        if (X2Pred is not None and YTest is not None and
+            YPred is not None and X2Pred.shape[0] == YPred.shape[0]):
+            nPred, sKPFd = YPred.shape[0], (self.sKPar, self.j)
             nOK = sum([1 for k in range(nPred) if
-                       (self.YTest.iloc[k, :] == self.YPred.iloc[k, :]).all()])
+                       (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
             propOK = (nOK/nPred if nPred > 0 else None)
             lVCalc = [nPred, nOK, propOK]
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
-                GF.addToDictD(self.d2ResClf, cKMain=sKPar, cKSub=sK, cVSub=cV)
+                GF.addToDictD(self.d2ResClf, cKMain=sKPFd, cKSub=sK, cVSub=cV)
             # create dfrPred/dfrProba, containing YTest and YPred/YProba
             sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
             lSCTP = [GF.joinS([s, sTCl], cJ=self.dITp['sUSC'])
-                     for s in self.YTest.columns]
+                     for s in YTest.columns]
             lSCTP += [GF.joinS([s, sPCl], cJ=self.dITp['sUSC'])
-                      for s in self.YPred.columns]
-            self.assembleDfrPredProba(lSCTP=lSCTP)
+                      for s in YPred.columns]
+            self.assembleDfrPredProba(lSCTP=lSCTP, YTest=YTest, YPred=YPred)
+
+    # --- method for calculating the confusion matrix -------------------------
+    def calcCnfMatrix(self, YTest=None):
+        if self.dITp['calcCnfMatrix']:
+            YPred, lC = self.dYPred[self.j], self.lSXCl
+            if len(YTest.shape) > 1:
+                YTest = SF.toSglLbl(self.dITp, dfrY=YTest)
+            if len(YPred.shape) > 1:
+                YPred = SF.toSglLbl(self.dITp, dfrY=YPred)
+            cnfMat = confusion_matrix(y_true=YTest, y_pred=YPred, labels=lC)
+            self.dConfusMatrix[self.j] = cnfMat
+            dfrCM = GF.iniPdDfr(cnfMat, lSNmC=lC, lSNmR=lC)
+            self.dDfrCnfMat[(self.sKPar, self.j)] = dfrCM
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
-        cClf = self.selClf()
-        if cClf is not None:
-            XTest = self.getXYTest(dat2Pred=dat2Pred)
-            self.getYPredProba(cClf, X2Pred=XTest)
-            self.calcResPredict(X2Pred=XTest)
-            self.printPredict(X2Pred=XTest)
-            self.calcCnfMatrix()
-
-    # --- method for calculating the confusion matrix -------------------------
-    def calcCnfMatrix(self):
-        if self.dITp['calcCnfMatrix']:
-            YTest, YPred, lC = self.YTest, self.YPred, self.lSXCl
-            if len(YTest.shape) > 1:
-                YTest = SF.toSglLbl(self.dITp, dfrY=self.YTest)
-            if len(YPred.shape) > 1:
-                YPred = SF.toSglLbl(self.dITp, dfrY=self.YPred)
-            self.confusMatrix = confusion_matrix(y_true=YTest, y_pred=YPred,
-                                                 labels=lC)
-            dfrCM = GF.iniPdDfr(self.confusMatrix, lSNmC=lC, lSNmR=lC)
-            self.dCnfMat[self.sKPar] = dfrCM
+        for self.j in range(self.dITp['nSplitsKF']):
+            cClf = self.selClf(j=self.j)
+            if cClf is not None:
+                XTest, YTest = self.getXYTest(dat2Pred=dat2Pred)
+                self.getYPredProba(cClf, X2Pred=XTest, YTest=YTest)
+                self.calcResPredict(X2Pred=XTest, YTest=YTest)
+                self.printPredict(X2Pred=XTest, YTest=YTest)
+                self.calcCnfMatrix(YTest=YTest)
 
     # --- method for plotting the confusion matrix ----------------------------
-    def plotCnfMatrix(self):
-        if self.dITp['plotCnfMatrix'] and self.confusMatrix is not None:
-            CM, lCl = self.confusMatrix, self.lSXCl
+    def plotCnfMatrix(self, j=None):
+        if self.dITp['plotCnfMatrix'] and self.dConfusMatrix[j] is not None:
+            CM, lCl = self.dConfusMatrix[j], self.lSXCl
             D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
             D.plot()
             supTtl = self.dITp['sSupTtlPlt']
@@ -663,9 +699,9 @@ class DummyClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Dummy Classifier ----------
     def getClf(self):
-        self.Clf = DummyClassifier(random_state=self.dITp['rndState'],
-                                   **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = DummyClassifier(random_state=self.dITp['rndState'],
+                              **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class AdaClf(SpecificClassifier):
@@ -680,9 +716,9 @@ class AdaClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with an AdaBoost Classifier ------
     def getClf(self):
-        self.Clf = AdaBoostClassifier(random_state=self.dITp['rndState'],
-                                      **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = AdaBoostClassifier(random_state=self.dITp['rndState'],
+                                 **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class RFClf(SpecificClassifier):
@@ -697,15 +733,13 @@ class RFClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Random Forest Classifier --
     def getClf(self):
-        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
-        vVerb, oobSc = self.dITp['vVerbRF'], self.dITp['estOobScoreRF']
-        self.Clf = RandomForestClassifier(random_state=rndSt,
-                                          warm_start=bWarmStart,
-                                          verbose=vVerb,
-                                          oob_score=oobSc,
-                                          n_jobs=self.dITp['nJobs'],
-                                          **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = RandomForestClassifier(random_state=self.dITp['rndState'],
+                                     warm_start=self.dITp['bWarmStart'],
+                                     verbose=self.dITp['vVerbRF'],
+                                     oob_score=self.dITp['estOobScoreRF'],
+                                     n_jobs=self.dITp['nJobs'],
+                                     **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class XTrClf(SpecificClassifier):
@@ -720,15 +754,13 @@ class XTrClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with an Extra Trees Classifier ---
     def getClf(self):
-        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
-        vVerb, oobSc = self.dITp['vVerbXTr'], self.dITp['estOobScoreXTr']
-        self.Clf = ExtraTreesClassifier(random_state=rndSt,
-                                        warm_start=bWarmStart,
-                                        verbose=vVerb,
-                                        oob_score=oobSc,
-                                        n_jobs=self.dITp['nJobs'],
-                                        **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = ExtraTreesClassifier(random_state=self.dITp['rndState'],
+                                   warm_start=self.dITp['bWarmStart'],
+                                   verbose=self.dITp['vVerbXTr'],
+                                   oob_score=self.dITp['estOobScoreXTr'],
+                                   n_jobs=self.dITp['nJobs'],
+                                   **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class GrBClf(SpecificClassifier):
@@ -743,13 +775,11 @@ class GrBClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Gradient Boosting Clf. ----
     def getClf(self):
-        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
-        vVerb = self.dITp['vVerbGrB']
-        self.Clf = GradientBoostingClassifier(random_state=rndSt,
-                                              warm_start=bWarmStart,
-                                              verbose=vVerb,
-                                              **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = GradientBoostingClassifier(random_state=self.dITp['rndState'],
+                                         warm_start=self.dITp['bWarmStart'],
+                                         verbose=self.dITp['vVerbGrB'],
+                                         **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class HGrBClf(SpecificClassifier):
@@ -765,12 +795,11 @@ class HGrBClf(SpecificClassifier):
     # --- methods for fitting and predicting with a Hist Gradient Boosting Clf.
     def getClf(self):
         rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
-        vVerb = self.dITp['vVerbHGrB']
-        self.Clf = HistGradientBoostingClassifier(random_state=rndSt,
-                                                  warm_start=bWarmStart,
-                                                  verbose=vVerb,
-                                                  **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = HistGradientBoostingClassifier(random_state=rndSt,
+                                             warm_start=bWarmStart,
+                                             verbose=self.dITp['vVerbHGrB'],
+                                             **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class GPClf(SpecificClassifier):
@@ -785,12 +814,11 @@ class GPClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Gaussian Process Classifier
     def getClf(self):
-        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
-        self.Clf = GaussianProcessClassifier(random_state=rndSt,
-                                             warm_start=bWarmStart,
-                                             n_jobs=self.dITp['nJobs'],
-                                             **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = GaussianProcessClassifier(random_state=self.dITp['rndState'],
+                                        warm_start=self.dITp['bWarmStart'],
+                                        n_jobs=self.dITp['nJobs'],
+                                        **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class PaAggClf(SpecificClassifier):
@@ -805,14 +833,12 @@ class PaAggClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Passive Aggressive Clf. ---
     def getClf(self):
-        rndSt, bWarmStart = self.dITp['rndState'], self.dITp['bWarmStart']
-        vVerb = self.dITp['vVerbPaA']
-        self.Clf = PassiveAggressiveClassifier(random_state=rndSt,
-                                               warm_start=bWarmStart,
-                                               verbose=vVerb,
-                                               n_jobs=self.dITp['nJobs'],
-                                               **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = PassiveAggressiveClassifier(random_state=self.dITp['rndState'],
+                                          warm_start=self.dITp['bWarmStart'],
+                                          verbose=self.dITp['vVerbPaA'],
+                                          n_jobs=self.dITp['nJobs'],
+                                          **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class PctClf(SpecificClassifier):
@@ -827,12 +853,12 @@ class PctClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Perceptron Classifier -----
     def getClf(self):
-        self.Clf = Perceptron(random_state=self.dITp['rndState'],
-                              warm_start=self.dITp['bWarmStart'],
-                              verbose=self.dITp['vVerbPct'],
-                              n_jobs=self.dITp['nJobs'],
-                              **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = Perceptron(random_state=self.dITp['rndState'],
+                         warm_start=self.dITp['bWarmStart'],
+                         verbose=self.dITp['vVerbPct'],
+                         n_jobs=self.dITp['nJobs'],
+                         **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class SGDClf(SpecificClassifier):
@@ -847,12 +873,12 @@ class SGDClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a SGD Classifier ------------
     def getClf(self):
-        self.Clf = SGDClassifier(random_state=self.dITp['rndState'],
-                                 warm_start=self.dITp['bWarmStart'],
-                                 verbose=self.dITp['vVerbSGD'],
-                                 n_jobs=self.dITp['nJobs'],
-                                 **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = SGDClassifier(random_state=self.dITp['rndState'],
+                            warm_start=self.dITp['bWarmStart'],
+                            verbose=self.dITp['vVerbSGD'],
+                            n_jobs=self.dITp['nJobs'],
+                            **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class CtNBClf(SpecificClassifier):
@@ -867,8 +893,8 @@ class CtNBClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Categorical NB Classifier -
     def getClf(self):
-        self.Clf = CategoricalNB(**self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = CategoricalNB(**self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class CpNBClf(SpecificClassifier):
@@ -883,8 +909,8 @@ class CpNBClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Complement NB Classifier --
     def getClf(self):
-        self.Clf = ComplementNB(**self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = ComplementNB(**self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class GsNBClf(SpecificClassifier):
@@ -899,8 +925,8 @@ class GsNBClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Gaussian NB Classifier ----
     def getClf(self):
-        self.Clf = GaussianNB(**self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = GaussianNB(**self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class MLPClf(SpecificClassifier):
@@ -916,11 +942,11 @@ class MLPClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a neural network MLP Clf. ---
     def getClf(self):
-        self.Clf = MLPClassifier(random_state=self.dITp['rndState'],
-                                 warm_start=self.dITp['bWarmStart'],
-                                 verbose=self.dITp['bVerbMLP'],
-                                 **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = MLPClassifier(random_state=self.dITp['rndState'],
+                            warm_start=self.dITp['bWarmStart'],
+                            verbose=self.dITp['bVerbMLP'],
+                            **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class LinSVClf(SpecificClassifier):
@@ -936,10 +962,10 @@ class LinSVClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Linear SV Classifier ------
     def getClf(self):
-        self.Clf = LinearSVC(random_state=self.dITp['rndState'],
-                             verbose=self.dITp['vVerbLSV'],
-                             **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = LinearSVC(random_state=self.dITp['rndState'],
+                        verbose=self.dITp['vVerbLSV'],
+                        **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class NuSVClf(SpecificClassifier):
@@ -955,10 +981,10 @@ class NuSVClf(SpecificClassifier):
 
     # --- methods for fitting and predicting with a Nu-Support SV Classifier --
     def getClf(self):
-        self.Clf = NuSVC(random_state=self.dITp['rndState'],
-                         verbose=self.dITp['vVerbNSV'],
-                         **self.d2Par[self.sKPar])
-        return self.getOptClfGridSearch()
+        Clf = NuSVC(random_state=self.dITp['rndState'],
+                    verbose=self.dITp['vVerbNSV'],
+                    **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------
 class PropCalculator(BaseSmplClfPrC):
