@@ -149,7 +149,7 @@ def joinS(itS, cJ=GC.S_USC):
     elif type(cJ) in [tuple, list, range]:
         sRet = str(itS[0])
         if len(cJ) == 0:
-            cJ = [GC.S_USC]*(len(itS) - 1)
+            cJ = [cJ]*(len(itS) - 1)
         else:
             cJ = [str(j) for j in cJ]
         if len(cJ) >= len(itS) - 1:
@@ -250,7 +250,42 @@ def calcPylProb(cSS, dCSS):
         cPrb += tV[3]/nFSeq
     return [cSS, nPyl, nTtl, getFract(nPyl, nTtl), cPrb]
 
-# --- Functions handling iterators (lists/tuples or dictionaries) -------------
+# --- Functions handling iterables --------------------------------------------
+def allTrue(cIt):
+    return [cB for cB in cIt] == [True]*len(cIt)
+
+def toStr(cIt, sJoin=GC.S_USC, modStr=False):
+    if ((type(cIt) in [list, tuple, range, set, dict]) or
+        (type(cIt) == str and modStr)):
+        return sJoin.join([str(x) for x in cIt])
+    elif type(cIt) == str and not modStr:
+        return cIt
+    else:
+        return str(cIt)
+
+def iterIntersect(it1, it2, notIn2=False):
+    lIntersect = [x for x in it1 if x in set(it2)]
+    if notIn2:
+        lIntersect = [x for x in it1 if x not in set(it2)]
+    return lIntersect
+
+def flattenIt(cIterable, retArr=False):
+    itFlat = list(itertools.chain.from_iterable(cIterable))
+    if retArr:
+        itFlat = np.array(itFlat)
+    return itFlat
+
+def getItStartToEnd(cIt, iStart=None, iEnd=None):
+    if iStart is not None:
+        iStart = max(iStart, 0)
+    else:
+        iStart = 0
+    if iEnd is not None:
+        iEnd = min(iEnd, len(cIt))
+    else:
+        iEnd = len(cIt)
+    return cIt[iStart:iEnd], iStart, iEnd
+
 def restrIt(cIt, lRestrLen=[], useLenS=False):
     if len(lRestrLen) > 0:
         if type(cIt) in [list, tuple]:
@@ -455,7 +490,7 @@ def updateDict(cDFull, cDUp, cK=None):
         else:
             cDFull[cK] = cDUp
 
-def calcMeanSEMOfDfrs(itDfrs, idxDfr=None, colDfr=None):
+def calcMnSEMOfDfrs(itDfrs, idxDfr=None, colDfr=None):
     d2Mn, d2SEM, N = {}, {}, len(itDfrs)
     for i in idxDfr:
         for j in colDfr:
@@ -476,10 +511,10 @@ def calcMnSEMFromD3Val(cD3, sJoin=GC.S_USC):
                 addToDictL(dT, cK=(cKL2, cKL3), cE=cV)
     # fill d2MnSEM
     for cKT, cLV in dT.items():
-        addToDictD(d2MnSEM, cKMain=sJoin.join([cKT[0], GC.S_MEAN]),
+        addToDictD(d2MnSEM, cKMain=sJoin.join([toStr(cKT[0]), GC.S_MEAN]),
                    cKSub=cKT[1], cVSub=np.mean(cLV))
         cSEM = (0. if N == 0 else np.std(cLV, ddof=1)/np.sqrt(N))
-        addToDictD(d2MnSEM, cKMain=sJoin.join([cKT[0], GC.S_SEM]),
+        addToDictD(d2MnSEM, cKMain=sJoin.join([toStr(cKT[0]), GC.S_SEM]),
                    cKSub=cKT[1], cVSub=cSEM)
     return d2MnSEM
 
@@ -495,9 +530,9 @@ def calcMnSEMFromD2Dfr(d2Dfr, sJoin=GC.S_USC):
     # fill dMnSEM
     if lI is not None:
         for cK, cLDfr in dT.items():
-            dfrMn, dfrSEM = calcMeanSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
-            dMnSEM[sJoin.join([cK, GC.S_MEAN])] = dfrMn
-            dMnSEM[sJoin.join([cK, GC.S_SEM])] = dfrSEM
+            dfrMn, dfrSEM = calcMnSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
+            dMnSEM[sJoin.join([toStr(cK), GC.S_MEAN])] = dfrMn
+            dMnSEM[sJoin.join([toStr(cK), GC.S_SEM])] = dfrSEM
     return dMnSEM
 
 def convDDNumToDDProp(dDNum, nDigRnd):
@@ -606,33 +641,6 @@ def appendToDictL(cD, itKeys, lVApp):
     for k, cKey in enumerate(itKeys):
         cD[cKey].append(lVApp[k])
 
-# --- Functions handling iterables --------------------------------------------
-def allTrue(cIt):
-    return [cB for cB in cIt] == [True]*len(cIt)
-
-def iterIntersect(it1, it2, notIn2=False):
-    lIntersect = [x for x in it1 if x in set(it2)]
-    if notIn2:
-        lIntersect = [x for x in it1 if x not in set(it2)]
-    return lIntersect
-
-def flattenIt(cIterable, retArr=False):
-    itFlat = list(itertools.chain.from_iterable(cIterable))
-    if retArr:
-        itFlat = np.array(itFlat)
-    return itFlat
-
-def getItStartToEnd(cIt, iStart=None, iEnd=None):
-    if iStart is not None:
-        iStart = max(iStart, 0)
-    else:
-        iStart = 0
-    if iEnd is not None:
-        iEnd = min(iEnd, len(cIt))
-    else:
-        iEnd = len(cIt)
-    return cIt[iStart:iEnd], iStart, iEnd
-
 # --- Functions performing numpy array calculation and manipulation -----------
 def getArrCartProd(it1, it2):
     return np.array(list(itertools.product(it1, it2)))
@@ -654,17 +662,28 @@ def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, i=0):
     elif type(arrProba) == np.ndarray:      # standard case
         return iniPdDfr(arrProba, lSNmC=lSC, lSNmR=lSR)
 
-# --- Functions performing pandas Series manipulation -------------------------
-def concLObj(lObj, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
+# --- Functions performing pandas Series/DataFrame operations -----------------
+def concLO(lObj, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
     return pd.concat(lObj, axis=concAx, ignore_index=ignIdx,
                      verify_integrity=verifInt, sort=srtDfr)
 
-def concLObjAx0(lObj, ignIdx=False, verifInt=False, srtDfr=False):
-    return concLObj(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+def concLOAx0(lObj, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLO(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
 
-def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
-    return concLObj(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
-                    srtDfr=srtDfr)
+def concLOAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLO(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
+                  srtDfr=srtDfr)
+
+def calcMeanLO(lObj, ignIdx=False, verifInt=False, srtDfr=False, lKMn=[]):
+    lSer, lKDfr = [], []
+    fullObj = concLOAx1(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+    for cK in lKMn:
+        if cK in fullObj.columns:
+            lKDfr.append(cK)
+            lSer.append(fullObj[cK].mean(axis=1))
+    retDfr = concLOAx1(lSer, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+    retDfr.columns = lKDfr
+    return retDfr
 
 def toSerUnique(pdSer, sName=None):
     nameS = pdSer.name
@@ -672,7 +691,6 @@ def toSerUnique(pdSer, sName=None):
         nameS = sName
     return pd.Series(pdSer.unique(), name=nameS)
 
-# --- Functions performing pandas DataFrame calculation and manipulation ------
 def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
     assert (((type(data) == np.ndarray and len(data.shape) == 1) or
              (type(data) in [list, tuple]) or (data is None))

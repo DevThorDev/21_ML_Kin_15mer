@@ -59,7 +59,8 @@ class BaseSmplClfPrC(BaseClass):
         lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'dMltSt', 'lSXCl',
                       'X', 'XTrans', 'Y', 'Clf', 'optClf', 'sMth', 'sMthL',
                       'dfrPred', 'dfrProba']
-        lAttrDict = ['d2ResClf', 'dDfrCnfMat', 'dPropAAc']
+        lAttrDict = ['d2ResClf', 'dDfrCnfMat', 'dDfrPred', 'dDfrProba',
+                     'dPropAAc']
         lAttrDictF = ['dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
                      'dYTrain', 'dYTest', 'dYPred', 'dYProba',
                      'dClf', 'dScoreClf', 'dConfusMatrix']
@@ -162,14 +163,26 @@ class BaseSmplClfPrC(BaseClass):
                 self.X = X
 
     # --- methods for setting data --------------------------------------------
-    def setData(self, tData):
+    # def setData(self, tData):
+    #     lSAttr = ['dfrInp', 'serNmerSeq', 'dClMap', 'dMltSt', 'lSXCl', 'X',
+    #               'XTrans', 'dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
+    #               'Y', 'dYTrain', 'dYTest', 'dYPred', 'dYProba']
+    #     assert len(tData) == len(lSAttr)
+    #     for sAttr, cV in zip(lSAttr, tData):
+    #         if cV is not None:
+    #             setattr(self, sAttr, cV)
+
+    def setSamplerData(self):
         lSAttr = ['dfrInp', 'serNmerSeq', 'dClMap', 'dMltSt', 'lSXCl', 'X',
-                  'XTrans', 'dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
-                  'Y', 'dYTrain', 'dYTest', 'dYPred', 'dYProba']
-        assert len(tData) == len(lSAttr)
-        for sAttr, cV in zip(lSAttr, tData):
-            if cV is not None:
-                setattr(self, sAttr, cV)
+                  'XTrans', 'Y']
+        lSAttrF = ['dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
+                   'dYTrain', 'dYTest', 'dYPred', 'dYProba']
+        for sAttr in lSAttr:
+            if hasattr(self.Smp, sAttr):
+                setattr(self, sAttr, getattr(self.Smp, sAttr))
+        for sAttr in lSAttrF:
+            if hasattr(self, sAttr) and hasattr(self.Smp, sAttr):
+                getattr(self, sAttr)[self.j] = getattr(self.Smp, sAttr)[self.j]
 
     # --- methods for yielding data -------------------------------------------
     def yieldData(self):
@@ -406,11 +419,13 @@ class GeneralClassifier(BaseSmplClfPrC):
                                        lITrain=self.lITrain,
                                        lITest=self.lITest, iTp=self.iTp,
                                        lITpUpd=lITpUpd)
-            self.setData(self.Smp.yieldData())
+            # self.setData(self.Smp.yieldData())
+            self.setSamplerData()
             if not self.doPartFit:
                 if self.dITp['doImbSampling']:
                     self.Smp.fitResampleImbalanced()
-                    self.setData(self.Smp.yieldData())
+                    # self.setData(self.Smp.yieldData())
+                    self.setSamplerData()
                 else:
                     self.printResNoResample(Y=self.getXYIfSplTrTe()[1])
 
@@ -460,12 +475,11 @@ class GeneralClassifier(BaseSmplClfPrC):
     def printPredict(self, X2Pred=None, YTest=None):
         if self.dITp['lvlOut'] > 0:
             YPred, YProba = self.dYPred[self.j], self.dYProba[self.j]
-            print(GC.S_DS04, 'Predictions for fold', self.j + 1, GC.DS04)
+            print(GC.S_DS08, 'Predictions for fold', self.j + 1, GC.S_DS08)
             # print('Predicted for data of shape', X2Pred.shape)
             print('Shape of predicted Y', YPred.shape)
             print('Shape of probs of Y (classes)', YProba.shape)
-            sKPFd = (self.sKPar, self.j)
-            nPred, nOK, _ = tuple(self.d2ResClf[sKPFd].values())
+            nPred, nOK, _ = tuple(self.d2ResClf[self.sKPar][self.j].values())
             if X2Pred is not None and X2Pred.shape[0] == YPred.shape[0]:
                 if YTest is not None:
                     self.printDetailedPredict(X2Pred, cSect='A1')
@@ -592,7 +606,7 @@ class GeneralClassifier(BaseSmplClfPrC):
 
     # --- method for calculating the predicted y classes, and their probs -----
     def getYPredProba(self, cClf, X2Pred=None, YTest=None):
-        lSC, lSR = self.dYTest[self.j].columns, self.dYTest[self.j].index
+        lSC, lSR = YTest.columns, YTest.index
         if self.dITp['onlySglLbl']:
             YPred = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
                                 nameS=self.dITp['sEffFam'])
@@ -607,27 +621,31 @@ class GeneralClassifier(BaseSmplClfPrC):
 
     # --- method for calculating values of the Classifier results dictionary --
     def assembleDfrPredProba(self, lSCTP, YTest=None, YPred=None):
-        lDfr, YProba = [self.dfrPred, self.dfrProba], self.dYProba[self.j]
+        j = self.j
+        lDDfr, YProba = [self.dDfrPred, self.dDfrProba], self.dYProba[j]
         for k, cYP in enumerate([YPred, YProba]):
-            lDfr[k] = GF.concLObjAx1([YTest, cYP], ignIdx=True)
-            lDfr[k].columns = lSCTP
-            lDfr[k] = GF.concLObjAx1(lObj=[self.dfrInp['c15mer'], lDfr[k]])
-            lDfr[k].dropna(axis=0, inplace=True)
-            lDfr[k] = lDfr[k].convert_dtypes()
-        [self.dfrPred, self.dfrProba] = lDfr
+            cDfr = lDDfr[k][j]
+            cDfr = GF.concLOAx1([YTest, cYP], ignIdx=True)
+            cDfr.columns = lSCTP
+            cDfr = GF.concLOAx1(lObj=[self.dfrInp[self.dITp['sCNmer']], cDfr])
+            cDfr.dropna(axis=0, inplace=True)
+            cDfr = cDfr.convert_dtypes()
+            lDDfr[k][j] = cDfr
+        self.dDfrPred[j], self.dDfrProba[j] = lDDfr[0][j], lDDfr[1][j]
 
     def calcResPredict(self, X2Pred=None, YTest=None):
         YPred = self.dYPred[self.j]
         if (X2Pred is not None and YTest is not None and
             YPred is not None and X2Pred.shape[0] == YPred.shape[0]):
-            nPred, sKPFd = YPred.shape[0], (self.sKPar, self.j)
+            nPred = YPred.shape[0]
             nOK = sum([1 for k in range(nPred) if
                        (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
             propOK = (nOK/nPred if nPred > 0 else None)
             lVCalc = [nPred, nOK, propOK]
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
-                GF.addToDictD(self.d2ResClf, cKMain=sKPFd, cKSub=sK, cVSub=cV)
-            # create dfrPred/dfrProba, containing YTest and YPred/YProba
+                GF.addToDictD(self.d2ResClf, cKMain=self.sKPFd, cKSub=sK,
+                              cVSub=cV)
+            # create dDfrPred/dDfrProba, containing YTest and YPred/YProba
             sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
             lSCTP = [GF.joinS([s, sTCl], cJ=self.dITp['sUSC'])
                      for s in YTest.columns]
@@ -646,18 +664,26 @@ class GeneralClassifier(BaseSmplClfPrC):
             cnfMat = confusion_matrix(y_true=YTest, y_pred=YPred, labels=lC)
             self.dConfusMatrix[self.j] = cnfMat
             dfrCM = GF.iniPdDfr(cnfMat, lSNmC=lC, lSNmR=lC)
-            self.dDfrCnfMat[(self.sKPar, self.j)] = dfrCM
+            self.dDfrCnfMat[self.sKPar][self.j] = dfrCM
+
+    # --- method for calculating the mean values of dDfrPred/dDfrProba --------
+    def calcFoldsMnPredProba(self):
+        self.dYPred[self.j], self.dYProba[self.j]
+        self.dDfrCnfMat[self.sKPar][self.j]
+        self.dDfrPred[self.j], self.dDfrProba[self.j]
+        self.d2ResClf[self.sKPar][self.j]
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
         for self.j in range(self.dITp['nSplitsKF']):
-            cClf = self.selClf(j=self.j)
+            cClf, self.sKPFd = self.selClf(j=self.j), (self.sKPar, self.j)
             if cClf is not None:
                 XTest, YTest = self.getXYTest(dat2Pred=dat2Pred)
                 self.getYPredProba(cClf, X2Pred=XTest, YTest=YTest)
                 self.calcResPredict(X2Pred=XTest, YTest=YTest)
                 self.printPredict(X2Pred=XTest, YTest=YTest)
                 self.calcCnfMatrix(YTest=YTest)
+
 
     # --- method for plotting the confusion matrix ----------------------------
     def plotCnfMatrix(self, j=None):

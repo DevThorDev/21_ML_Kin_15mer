@@ -36,6 +36,8 @@ sVBarSep = GC.S_VBAR_SEP
 sBase = GC.S_BASE
 sTrain = GC.S_TRAIN
 sTest = GC.S_TEST
+sRep, sRepS = GC.S_REP, GC.S_REP_S
+sFold, sFoldS = GC.S_FOLD, GC.S_FOLD_S
 sCombined = GC.S_COMBINED
 sCombinedInp = GC.S_COMBINED_INP
 sCombinedOut = GC.S_COMBINED_OUT
@@ -177,6 +179,10 @@ dIO = {# --- general
        'sBase': sBase,
        'sTrain': sTrain,
        'sTest': sTest,
+       'sRep': sRep,
+       'sRepS': sRepS,
+       'sFold': sFold,
+       'sFoldS': sFoldS,
        'sCombined': sCombined,
        'sCombinedInp': sCombinedInp,
        'sCombinedOut': sCombinedOut,

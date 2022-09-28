@@ -160,7 +160,7 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd=GC.S_CLF):
         cSer = cDfr.iloc[0, :]
         cSer.at[sCY] = getClassStr(dITp, lSCl=lSC, sMd=sMd)
         lSer.append(cSer)
-    return GF.concLObjAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
+    return GF.concLOAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
 def preProcInp(dITp, dfrInp, dNmerNoCl):
     lInpNoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam']]

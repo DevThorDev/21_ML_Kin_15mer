@@ -429,16 +429,16 @@ def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
                 return pd.DataFrame(data, index=lSNmR, columns=lSNmC)
 
 # --- Functions performing pandas Series manipulation -------------------------
-def concLObj(lObj, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
+def concLO(lObj, concAx=0, ignIdx=False, verifInt=False, srtDfr=False):
     return pd.concat(lObj, axis=concAx, ignore_index=ignIdx,
                      verify_integrity=verifInt, sort=srtDfr)
 
-def concLObjAx0(lObj, ignIdx=False, verifInt=False, srtDfr=False):
-    return concLObj(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+def concLOAx0(lObj, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLO(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
 
-def concLObjAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
-    return concLObj(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
-                    srtDfr=srtDfr)
+def concLOAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
+    return concLO(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
+                  srtDfr=srtDfr)
 
 def toSerUnique(pdSer, sName=None):
     nameS = pdSer.name
@@ -606,9 +606,9 @@ def fitBalancedRFClf(dITp, X, Y):
 def assembleDfrPredProba(lSCTP, YPred, YProba, serSeq=None):
     lDfr = [None, None]
     for k, cYP in enumerate([YPred, YProba]):
-        lDfr[k] = concLObjAx1([YTest, cYP], ignIdx=True)
+        lDfr[k] = concLOAx1([YTest, cYP], ignIdx=True)
         lDfr[k].columns = lSCTP
-        lDfr[k] = concLObjAx1(lObj=[serSeq, lDfr[k]])
+        lDfr[k] = concLOAx1(lObj=[serSeq, lDfr[k]])
         lDfr[k].dropna(axis=0, inplace=True)
         lDfr[k] = lDfr[k].convert_dtypes()
     return lDfr

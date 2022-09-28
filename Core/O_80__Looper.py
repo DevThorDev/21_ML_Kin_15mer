@@ -98,9 +98,10 @@ class Looper(BaseClass):
         self.d2PInf = d2PI
 
     def adaptFPs(self, sKP, cRep):
-        sKPR = GF.joinS([sKP, str(cRep + 1), self.sSt], cJ=self.dITp['sUSC'])
+        sRepS, sUSC = self.dITp['sRepS'], self.dITp['sUSC']
+        sKPR = GF.joinS([sKP, sRepS + str(cRep + 1), self.sSt], cJ=sUSC)
         if self.dITp['doParGrid']:
-            sKPR = GF.joinS([sKP, self.sSt], cJ=self.dITp['sUSC'])
+            sKPR = GF.joinS([sKP, self.sSt], cJ=sUSC)
         for s in ['DetldClf', 'ProbaClf']:
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
 
