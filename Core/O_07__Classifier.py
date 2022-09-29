@@ -57,10 +57,10 @@ class BaseSmplClfPrC(BaseClass):
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar=GC.S_0):
         lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'dMltSt', 'lSXCl',
-                      'X', 'XTrans', 'Y', 'Clf', 'optClf', 'sMth', 'sMthL',
-                      'dfrPred', 'dfrProba']
-        lAttrDict = ['d2ResClf', 'dDfrCnfMat', 'dDfrPred', 'dDfrProba',
-                     'dPropAAc']
+                      'X', 'XTrans', 'Y', 'YPred', 'YProba', 'Clf', 'optClf',
+                      'sMth', 'sMthL', 'dfrPred', 'dfrProba']
+        lAttrDict = ['d3ResClf', 'd2DfrCnfMat', 'd2ResClf', 'dDfrCnfMat',
+                     'dDfrPred', 'dDfrProba', 'dPropAAc']
         lAttrDictF = ['dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
                      'dYTrain', 'dYTest', 'dYPred', 'dYProba',
                      'dClf', 'dScoreClf', 'dConfusMatrix']
@@ -70,10 +70,10 @@ class BaseSmplClfPrC(BaseClass):
         for cAttr in lAttrDict:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {})
+        nSplKF = self.dITp['nSplitsKF']
         for cAttr in lAttrDictF:
             if not hasattr(self, cAttr):
-                setattr(self, cAttr, {j: None for j in
-                                      range(self.dITp['nSplitsKF'])})
+                setattr(self, cAttr, {j: None for j in range(nSplKF)})
         self.doPartFit = (self.sMth in self.dITp['lSMthPartFit'] and
                           self.dITp['nItPartialFit'] is not None)
         self.sKPar = sKPar
@@ -163,18 +163,9 @@ class BaseSmplClfPrC(BaseClass):
                 self.X = X
 
     # --- methods for setting data --------------------------------------------
-    # def setData(self, tData):
-    #     lSAttr = ['dfrInp', 'serNmerSeq', 'dClMap', 'dMltSt', 'lSXCl', 'X',
-    #               'XTrans', 'dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
-    #               'Y', 'dYTrain', 'dYTest', 'dYPred', 'dYProba']
-    #     assert len(tData) == len(lSAttr)
-    #     for sAttr, cV in zip(lSAttr, tData):
-    #         if cV is not None:
-    #             setattr(self, sAttr, cV)
-
     def setSamplerData(self):
         lSAttr = ['dfrInp', 'serNmerSeq', 'dClMap', 'dMltSt', 'lSXCl', 'X',
-                  'XTrans', 'Y']
+                  'XTrans', 'Y', 'YPred', 'YProba']
         lSAttrF = ['dXTrain', 'dXTest', 'dXTransTrain', 'dXTransTest',
                    'dYTrain', 'dYTest', 'dYPred', 'dYProba']
         for sAttr in lSAttr:
@@ -479,7 +470,7 @@ class GeneralClassifier(BaseSmplClfPrC):
             # print('Predicted for data of shape', X2Pred.shape)
             print('Shape of predicted Y', YPred.shape)
             print('Shape of probs of Y (classes)', YProba.shape)
-            nPred, nOK, _ = tuple(self.d2ResClf[self.sKPar][self.j].values())
+            nPred, nOK, _ = tuple(self.d3ResClf[self.sKPar][self.j].values())
             if X2Pred is not None and X2Pred.shape[0] == YPred.shape[0]:
                 if YTest is not None:
                     self.printDetailedPredict(X2Pred, cSect='A1')
@@ -492,7 +483,7 @@ class GeneralClassifier(BaseSmplClfPrC):
     def printFitQuality(self):
         for j, scoreClf in self.dScoreClf.items():
             print(GC.S_DS04, ' Fit quality for the "', self.sMthL, '" method ',
-                  'and fold ', j + 1, GC.S_DS04, sep='')
+                  'and fold ', j + 1, GC.S_SPACE, GC.S_DS04, sep='')
             if scoreClf is not None:
                 print('Classification score for the test data:',
                       round(scoreClf, self.dITp['rndDigScore']))
@@ -615,16 +606,15 @@ class GeneralClassifier(BaseSmplClfPrC):
             YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC, lSNmR=lSR)
         YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
         if YProba is None:
-            YProba = GF.iniWShape(tmplDfr=self.dYPred[self.j])
+            YProba = GF.iniWShape(tmplDfr=YPred)
         assert YProba.shape == YPred.shape
         self.dYPred[self.j], self.dYProba[self.j] = YPred, YProba
 
     # --- method for calculating values of the Classifier results dictionary --
-    def assembleDfrPredProba(self, lSCTP, YTest=None, YPred=None):
+    def assembleDDfrPredProba(self, lSCTP, YTest=None, YPred=None):
         j = self.j
         lDDfr, YProba = [self.dDfrPred, self.dDfrProba], self.dYProba[j]
         for k, cYP in enumerate([YPred, YProba]):
-            cDfr = lDDfr[k][j]
             cDfr = GF.concLOAx1([YTest, cYP], ignIdx=True)
             cDfr.columns = lSCTP
             cDfr = GF.concLOAx1(lObj=[self.dfrInp[self.dITp['sCNmer']], cDfr])
@@ -643,15 +633,15 @@ class GeneralClassifier(BaseSmplClfPrC):
             propOK = (nOK/nPred if nPred > 0 else None)
             lVCalc = [nPred, nOK, propOK]
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
-                GF.addToDictD(self.d2ResClf, cKMain=self.sKPFd, cKSub=sK,
-                              cVSub=cV)
+                GF.addToD3(self.d3ResClf, cKL1=self.sKPar, cKL2=self.j,
+                           cKL3=sK, cVL3=cV)
             # create dDfrPred/dDfrProba, containing YTest and YPred/YProba
             sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
             lSCTP = [GF.joinS([s, sTCl], cJ=self.dITp['sUSC'])
                      for s in YTest.columns]
             lSCTP += [GF.joinS([s, sPCl], cJ=self.dITp['sUSC'])
                       for s in YPred.columns]
-            self.assembleDfrPredProba(lSCTP=lSCTP, YTest=YTest, YPred=YPred)
+            self.assembleDDfrPredProba(lSCTP=lSCTP, YTest=YTest, YPred=YPred)
 
     # --- method for calculating the confusion matrix -------------------------
     def calcCnfMatrix(self, YTest=None):
@@ -664,26 +654,33 @@ class GeneralClassifier(BaseSmplClfPrC):
             cnfMat = confusion_matrix(y_true=YTest, y_pred=YPred, labels=lC)
             self.dConfusMatrix[self.j] = cnfMat
             dfrCM = GF.iniPdDfr(cnfMat, lSNmC=lC, lSNmR=lC)
-            self.dDfrCnfMat[self.sKPar][self.j] = dfrCM
+            GF.addToDictD(self.d2DfrCnfMat, cKMain=self.sKPar, cKSub=self.j,
+                          cVSub=dfrCM)
 
     # --- method for calculating the mean values of dDfrPred/dDfrProba --------
     def calcFoldsMnPredProba(self):
-        self.dYPred[self.j], self.dYProba[self.j]
-        self.dDfrCnfMat[self.sKPar][self.j]
-        self.dDfrPred[self.j], self.dDfrProba[self.j]
-        self.d2ResClf[self.sKPar][self.j]
+        lAttrFold = ['dYPred', 'dYProba', 'dDfrPred', 'dDfrProba']
+        lAttrFold2Set = ['YPred', 'YProba', 'dfrPred', 'dfrProba']
+        for sAttr, sAttr2Set in zip(lAttrFold, lAttrFold2Set):
+            dDfr = getattr(self, sAttr)
+            lHd = GF.extractLHdNumColDDfr(dDfr)
+            setattr(self, sAttr2Set, GF.calcMeanItO(itO=dDfr, lKMn=lHd))
+        dDfr = self.d2DfrCnfMat[self.sKPar]
+        lHd = GF.extractLHdNumColDDfr(dDfr)
+        self.dDfrCnfMat[self.sKPar] = GF.calcMeanItO(itO=dDfr, lKMn=lHd)
+        self.d2ResClf[self.sKPar] = GF.getMeansD2Val(self.d3ResClf[self.sKPar])
 
     # --- method for predicting with a Classifier -----------------------------
     def ClfPred(self, dat2Pred=None):
         for self.j in range(self.dITp['nSplitsKF']):
-            cClf, self.sKPFd = self.selClf(j=self.j), (self.sKPar, self.j)
+            cClf = self.selClf(j=self.j)
             if cClf is not None:
                 XTest, YTest = self.getXYTest(dat2Pred=dat2Pred)
                 self.getYPredProba(cClf, X2Pred=XTest, YTest=YTest)
                 self.calcResPredict(X2Pred=XTest, YTest=YTest)
                 self.printPredict(X2Pred=XTest, YTest=YTest)
                 self.calcCnfMatrix(YTest=YTest)
-
+        self.calcFoldsMnPredProba()
 
     # --- method for plotting the confusion matrix ----------------------------
     def plotCnfMatrix(self, j=None):

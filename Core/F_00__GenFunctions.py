@@ -7,6 +7,7 @@ import os, pickle, itertools, time
 import numpy as np
 from numpy.random import default_rng as RNG
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 
 import Core.C_00__GenConstants as GC
 
@@ -490,6 +491,13 @@ def updateDict(cDFull, cDUp, cK=None):
         else:
             cDFull[cK] = cDUp
 
+def getMeansD2Val(d2):
+    dMn = {}
+    for d in d2.values():
+        for cK, cV in d.items():
+            addToDictL(dMn, cK=cK, cE=cV)
+    return {cK: np.mean(cL) for cK, cL in dMn.items()}
+
 def calcMnSEMOfDfrs(itDfrs, idxDfr=None, colDfr=None):
     d2Mn, d2SEM, N = {}, {}, len(itDfrs)
     for i in idxDfr:
@@ -674,14 +682,60 @@ def concLOAx1(lObj, ignIdx=False, verifInt=False, srtDfr=False):
     return concLO(lObj, concAx=1, ignIdx=ignIdx, verifInt=verifInt,
                   srtDfr=srtDfr)
 
-def calcMeanLO(lObj, ignIdx=False, verifInt=False, srtDfr=False, lKMn=[]):
+def makeLblUnq(itLbl, getDict=False, sJoin=GC.S_USC):
+    dCtLbl, lLblUnq, dLbl2Unq = {}, [], {}
+    for cLbl in itLbl:
+        addToDictCt(dCtLbl, cK=cLbl)
+    for cK, cCt in dCtLbl.items():
+        dCtLbl[cK] = [cCt, cCt]
+    for cLbl in itLbl:
+        n, N = dCtLbl[cLbl][0], dCtLbl[cLbl][1]
+        sLblUnq = sJoin.join([str(cLbl), str(N - n)])
+        if getDict:
+            addToDictL(dLbl2Unq, cK=cLbl, cE=sLblUnq)
+        else:
+            lLblUnq.append(sLblUnq)
+        dCtLbl[cLbl][0] -= 1
+    if getDict:
+        return dLbl2Unq
+    else:
+        return lLblUnq
+
+def dropLblUnq(itLbl, sJoin=GC.S_USC):
+    lLbl, lLblRed = [], [sJoin.join(cLbl.split(sJoin)[:-1]) for cLbl in itLbl]
+    fillListUnique(cL=lLbl, cIt=lLblRed)
+    return lLbl
+
+# def calcMeanItO(itO, ignIdx=False, srtDfr=False, itKMn=[]):
+#     lSer, lKDfr = [], []
+#     if type(itO) == dict:
+#         itO = itO.values()
+#     fullObj = concLOAx1(itO, ignIdx=ignIdx, verifInt=False, srtDfr=srtDfr)
+#     dLbl = makeLblUnq(itLbl=fullObj.columns, getDict=True)
+#     fullObj.columns = makeLblUnq(itLbl=fullObj.columns)
+#     for cK in itKMn:
+#         if cK in dLbl:
+#             lKDfr.append(cK)
+#             lSer.append(fullObj[dLbl[cK]].mean(axis=1))
+#     retDfr = concLOAx1(lSer, ignIdx=ignIdx, verifInt=True, srtDfr=srtDfr)
+#     retDfr.columns = lKDfr
+#     return retDfr
+
+def calcMeanItO(itO, ignIdx=False, srtDfr=False, lKMn=[]):
     lSer, lKDfr = [], []
-    fullObj = concLOAx1(lObj, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
-    for cK in lKMn:
-        if cK in fullObj.columns:
-            lKDfr.append(cK)
-            lSer.append(fullObj[cK].mean(axis=1))
-    retDfr = concLOAx1(lSer, ignIdx=ignIdx, verifInt=verifInt, srtDfr=srtDfr)
+    if type(itO) == dict:
+        itO = itO.values()
+    fullObj = concLOAx1(itO, ignIdx=ignIdx, verifInt=False, srtDfr=srtDfr)
+    dLbl = makeLblUnq(itLbl=fullObj.columns, getDict=True)
+    fullObj.columns = makeLblUnq(itLbl=fullObj.columns)
+    for cK in dLbl:
+        if cK in lKMn:
+            lSer.append(fullObj[dLbl[cK]].mean(axis=1))
+        else:
+            pass
+        
+        lKDfr.append(cK)
+    retDfr = concLOAx1(lSer, ignIdx=ignIdx, verifInt=True, srtDfr=srtDfr)
     retDfr.columns = lKDfr
     return retDfr
 
@@ -772,6 +826,17 @@ def getColDfr(nLvl=1, colDfr=None):
     if colDfr is None or len(colDfr) < nCol:
         colDfr = range(nCol)
     return nCol, colDfr
+
+def extractLHdNumColDDfr(dDfr, inAll=True):
+    dHdCnt, n = {}, len(dDfr)
+    for cDfr in dDfr.values():
+        for sCHd in cDfr.columns:
+            if is_numeric_dtype(cDfr[sCHd]):
+                addToDictCt(dHdCnt, cK=sCHd)
+    if inAll:
+        return [sHd for sHd in dHdCnt if dHdCnt[sHd] == n]
+    else:
+        return list(dHdCnt)
 
 def addToDfrSpc(d2, pdDfr=None, concAx=1):
     if pdDfr is None:

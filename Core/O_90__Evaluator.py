@@ -56,7 +56,20 @@ class Evaluator(BaseClass):
                 pass
             else:
                 cDfr = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
+                # TEMP - BEGIN
+                print(GC.S_DS08, tK, GC.S_DS08)
+                print('Index of Dfr:', cDfr.index)
+                print(cDfr)
+                print(GC.S_DS80)
+                # TEMP - END
                 self.dDfrCmb[tK] = cDfr.iloc[:, 1:]
+        # TEMP - BEGIN
+        for cK, cDfr in self.dDfrCmb.items():
+            print(GC.S_EQ08, cK, GC.S_EQ08)
+            print('Index of Dfr:', cDfr.index)
+            print(cDfr)
+            print(GC.S_EQ80)
+        # TEMP - END
 
     # --- method for initialising the dictionary of result DataFrames ---------
     def iniDDfrRes(self):
@@ -68,7 +81,7 @@ class Evaluator(BaseClass):
         print(GC.S_DS04, tK, GC.S_DS04)
         print(self.dDfrCmb[tK], GC.S_NEWL, GC.S_DS80, sep='')
 
-    def printdDfrCmb(self, tK=None):
+    def printDDfrCmb(self, tK=None):
         if tK is not None:
             self.printCDfrInp(tK=tK)
         else:
@@ -127,8 +140,7 @@ class Evaluator(BaseClass):
             for tK, cDfr in self.dDfrCmb.items():
                 if (set([sM]) | set(tFXt)) <= set(tK):
                     self.calcResSglClf(d1, cDfr, sMth=sM, itFlt=tF)
-                    dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
-                    self.dDfrPredCl[tF] = dfrPredCl
+        self.dDfrPredCl[tF] = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
         self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=sJ.join(tF))
         self.saveData(self.dDfrPredCl[tF], pF=self.FPs.dPF[sKMn])
 
