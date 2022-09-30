@@ -721,6 +721,13 @@ def dropLblUnq(itLbl, sJoin=GC.S_USC):
 #     retDfr.columns = lKDfr
 #     return retDfr
 
+def red2TpStr(cR):
+    l = [x for x in cR if type(x) == str]
+    if len(l) == 0:
+        return np.nan
+    else:
+        return l[0]
+
 def calcMeanItO(itO, ignIdx=False, srtDfr=False, lKMn=[]):
     lSer, lKDfr = [], []
     if type(itO) == dict:
@@ -729,12 +736,12 @@ def calcMeanItO(itO, ignIdx=False, srtDfr=False, lKMn=[]):
     dLbl = makeLblUnq(itLbl=fullObj.columns, getDict=True)
     fullObj.columns = makeLblUnq(itLbl=fullObj.columns)
     for cK in dLbl:
-        if cK in lKMn:
-            lSer.append(fullObj[dLbl[cK]].mean(axis=1))
-        else:
-            pass
-        
         lKDfr.append(cK)
+        if cK in lKMn:
+            redObj = fullObj[dLbl[cK]].mean(axis=1)
+        else:
+            redObj = fullObj[dLbl[cK]].apply(red2TpStr, axis=1)
+        lSer.append(redObj)
     retDfr = concLOAx1(lSer, ignIdx=ignIdx, verifInt=True, srtDfr=srtDfr)
     retDfr.columns = lKDfr
     return retDfr
