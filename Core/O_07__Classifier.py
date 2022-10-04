@@ -410,7 +410,7 @@ class GeneralClassifier(BaseClfPrC):
     def printStatusPartFit(self, k=0):
         if (k + 1)%round(self.dITp['nItPrintPtFit']) == 0:
             print('Performed ', k + 1, ' partial fits using method "',
-                  self.sMth, '" in fold ', self.j, '.', sep='')
+                  self.sMth, '" in fold ', self.j + 1, '.', sep='')
 
     def printClfFitRes(self, X):
         if self.dITp['lvlOut'] > 0:
