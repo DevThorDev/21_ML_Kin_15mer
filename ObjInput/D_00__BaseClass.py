@@ -64,8 +64,8 @@ sXCl = GC.S_X_CL
 sNone = GC.S_NONE
 sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
-sTrueCl = GC.S_TRUE_CL
-sPredCl = GC.S_PRED_CL
+sPred, sProba = GC.S_PRED, GC.S_PROBA
+sTrueCl, sPredCl = GC.S_TRUE_CL, GC.S_PRED_CL
 sIGen = GC.S_I_GEN
 sCNmer = GC.S_C_N_MER
 sAllSeq = GC.S_ALL_SEQ
@@ -210,6 +210,8 @@ dIO = {# --- general
        'sClf': sClf,
        'sPrC': sPrC,
        'sEffFam': sEffFam,
+       'sPred': sPred,
+       'sProba': sProba,
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sIGen': sIGen,

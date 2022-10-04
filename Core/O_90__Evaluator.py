@@ -56,20 +56,7 @@ class Evaluator(BaseClass):
                 pass
             else:
                 cDfr = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
-                # TEMP - BEGIN
-                print(GC.S_DS08, tK, GC.S_DS08)
-                print('Index of Dfr:', cDfr.index)
-                print(cDfr)
-                print(GC.S_DS80)
-                # TEMP - END
                 self.dDfrCmb[tK] = cDfr.iloc[:, 1:]
-        # TEMP - BEGIN
-        for cK, cDfr in self.dDfrCmb.items():
-            print(GC.S_EQ08, cK, GC.S_EQ08)
-            print('Index of Dfr:', cDfr.index)
-            print(cDfr)
-            print(GC.S_EQ80)
-        # TEMP - END
 
     # --- method for initialising the dictionary of result DataFrames ---------
     def iniDDfrRes(self):

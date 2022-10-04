@@ -706,21 +706,6 @@ def dropLblUnq(itLbl, sJoin=GC.S_USC):
     fillListUnique(cL=lLbl, cIt=lLblRed)
     return lLbl
 
-# def calcMeanItO(itO, ignIdx=False, srtDfr=False, itKMn=[]):
-#     lSer, lKDfr = [], []
-#     if type(itO) == dict:
-#         itO = itO.values()
-#     fullObj = concLOAx1(itO, ignIdx=ignIdx, verifInt=False, srtDfr=srtDfr)
-#     dLbl = makeLblUnq(itLbl=fullObj.columns, getDict=True)
-#     fullObj.columns = makeLblUnq(itLbl=fullObj.columns)
-#     for cK in itKMn:
-#         if cK in dLbl:
-#             lKDfr.append(cK)
-#             lSer.append(fullObj[dLbl[cK]].mean(axis=1))
-#     retDfr = concLOAx1(lSer, ignIdx=ignIdx, verifInt=True, srtDfr=srtDfr)
-#     retDfr.columns = lKDfr
-#     return retDfr
-
 def red2TpStr(cR):
     l = [x for x in cR if type(x) == str]
     if len(l) == 0:

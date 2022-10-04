@@ -340,11 +340,10 @@ def getLSE(dITp, sMth, lIFE):
     lSEDet = lIFE + [sMth]
     l2Add = []
     if sMth in dITp['lSMthPartFit']:
-        if dITp['nItPartialFit'] is None:
+        if dITp['nItPtFit'] is None:
             l2Add += [dITp['sPartFitS'] + dITp['sNone']]
         else:
-            assert type(dITp['nItPartialFit']) in [int, float]
-            sNIt = str(round(dITp['nItPartialFit']))
+            sNIt = str(round(dITp['nItPtFit']))
             l2Add += [dITp['sPartFitS'] + sNIt]
     if dITp['doImbSampling'] and dITp['sSmplS'] is not None:
         l2Add += [dITp['sSmplS']]

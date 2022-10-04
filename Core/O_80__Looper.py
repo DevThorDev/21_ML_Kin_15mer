@@ -156,7 +156,7 @@ class Looper(BaseClass):
         elif sMth == self.dITp['sMthNSV']:  # Nu-Support SV Classifier
             tM, lG = (7, 151), self.dITp['lParGrid_NSV']
             cClf = NuSVClf(self.inpD, self.D, lG, d2Par, iSt, sKPar, cRep)
-        self.cTM, self.cLParGrid, self.cClf = tM, lG, cClf
+        self.cTM, self.lParGrid, self.cClf = tM, lG, cClf
 
     def doRep(self, cTim, k=0, sKPar=GC.S_0, cRep=0, stT=None):
         if self.sMth in self.dITp['lSMth']:

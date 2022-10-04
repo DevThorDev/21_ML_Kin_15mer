@@ -32,9 +32,6 @@ doNuSVClf = True                    # do Nu-Support SV classification?
 
 doPropCalc = False                   # do calculation of AAc proportions/class?
 
-doTrainTestSplit = True             # split data into train and test sets?
-stratData = None                    # split data stratified way? [None / True]
-
 doMultiSteps = False                 # do a multi-step classification approach?
 
 saveDetailedClfRes = True           # save the detailed classification results?
@@ -81,7 +78,7 @@ pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # *** kFold Splitter input ****************************************************
-tpKF = GC.S_K_FOLD                  # type of kFold-split
+tpKF = GC.S_K_FOLD                  # type of kFold-split, or None (no split)
                                     # S_K_FOLD / S_GROUP_K_FOLD
                                     # S_STRAT_K_FOLD / S_STRAT_GROUP_K_FOLD
 nSplitsKF = 3                       # number of folds
@@ -136,8 +133,9 @@ bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-# nItPartialFit = None        # number of iterations / partial fit (or None)
-nItPartialFit = 1000        # number of iterations / partial fit (or None)
+# nItPtFit = None             # number of iterations / partial fit (or None)
+nItPtFit = 1000             # number of iterations / partial fit (or None)
+nItPrintPtFit = 100         # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------
 typeS = 'RandomizedSearchCV'        # 'GridSearchCV' / 'RandomizedSearchCV'
@@ -204,8 +202,6 @@ vVerbNSV = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # *** other input *************************************************************
 # === numbers =================================================================
-propTestData = .2
-
 rndDigScore = GC.R04
 rndDigCorrect = GC.R04
 
@@ -233,6 +229,8 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # *** assertions **************************************************************
+assert type(nItPtFit) in [int, float]
+assert type(nItPrintPtFit) in [int, float]
 assert typeS in ['GridSearchCV', 'RandomizedSearchCV']
 
 # *** derived values and input processing *************************************
@@ -263,8 +261,6 @@ dIO = {# *** general **********************************************************
        'doLinSVClf': doLinSVClf,
        'doNuSVClf': doNuSVClf,
        'doPropCalc': doPropCalc,
-       'doTrainTestSplit': doTrainTestSplit,
-       'stratData': stratData,
        'doMultiSteps': doMultiSteps,
        'saveDetailedClfRes': saveDetailedClfRes,
        'calcCnfMatrix': calcCnfMatrix,
@@ -314,7 +310,8 @@ dIO = {# *** general **********************************************************
        'bWarmStart': bWarmStart,
        'nJobs': nJobs,
        # === general input for any Classifier that implements 'partial_fit'
-       'nItPartialFit': nItPartialFit,
+       'nItPtFit': nItPtFit,
+       'nItPrintPtFit': nItPrintPtFit,
        # --- selection of grid search or randomised search; and halving
        'typeS': typeS,
        'halvingS': halvingS,
@@ -362,7 +359,6 @@ dIO = {# *** general **********************************************************
        'vVerbNSV': vVerbNSV,
        # *** other input ******************************************************
        # === numbers
-       'propTestData': propTestData,
        'rndDigScore': rndDigScore,
        'rndDigCorrect': rndDigCorrect,
        # === strings
