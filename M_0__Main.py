@@ -135,7 +135,7 @@ dMF = {tK1: [GC.S_MTH_DUMMY,
 # dMF = {tK1: [GC.S_MTH_DUMMY, GC.S_MTH_ADA]}
 
 cEval.calcPredClassRes(dMthFlt=dMF)
-cEval.printDDfrPredCl()
+cEval.printDDfrCl()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(tMth=(90, 1), stTMth=cStTime, endTMth=cEndTime)
 
