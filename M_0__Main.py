@@ -119,11 +119,19 @@ cEval = Evaluator(inpDatG)
 tK1 = ('RndUSmpl', 'A')
 dMF = {tK1: [GC.S_MTH_DUMMY,
              GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
-             GC.S_MTH_GR_B,
-             GC.S_MTH_PA_A, GC.S_MTH_PCT,
+             GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
+             GC.S_MTH_GP,
+             GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
              GC.S_MTH_MLP,
              GC.S_MTH_LSV, GC.S_MTH_NSV]}
+# dMF = {tK1: [GC.S_MTH_DUMMY,
+#              GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
+#              GC.S_MTH_GR_B,
+#              GC.S_MTH_PA_A, GC.S_MTH_PCT,
+#              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
+#              GC.S_MTH_MLP,
+#              GC.S_MTH_LSV, GC.S_MTH_NSV]}
 # dMF = {tK1: [GC.S_MTH_DUMMY, GC.S_MTH_ADA]}
 
 cEval.calcPredClassRes(dMthFlt=dMF)

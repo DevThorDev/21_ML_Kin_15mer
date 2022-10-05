@@ -3,7 +3,6 @@
 # --- D_90__Evaluator.py ------------------------------------------------------
 ###############################################################################
 import Core.C_00__GenConstants as GC
-# import Core.F_00__GenFunctions as GF
 
 # --- general -----------------------------------------------------------------
 
@@ -27,19 +26,37 @@ sMthLSV = GC.S_MTH_LSV
 sMthNSV = GC.S_MTH_NSV
 
 # --- flow control (general) --------------------------------------------------
+doEvaluation = True             # do evaluation?
+
 lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthGrB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthHGrB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthGP, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthSGD, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthMLP, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
+# lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthGrB, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthMLP, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
+#              {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
 # lSetFIDet = [{sMthDummy},
 #              {sMthAda},
 #              {sMthRF},
@@ -65,6 +82,7 @@ pOutEval = GC.P_DIR_RES_CLF_EVAL
 # === create input dictionary =================================================
 dIO = {# --- general
        # --- flow control (general)
+       'doEvaluation': doEvaluation,
        'lSetFIDet': lSetFIDet,
        # --- names and paths of files and dir
        'sUnqNmer': sUnqNmer,

@@ -15,21 +15,21 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 # evaluations. Parameter grid calculations for a particular classification
 # method are performed if the number of repetitions is positve. Otherwise,
 # a parameter set is evaluated number of repetitions times.
-nRp0, nRpDef = GC.N_REP_0, 2
-dNumRep = {GC.S_MTH_DUMMY: nRpDef,
-           GC.S_MTH_ADA: nRpDef,
+nRp0, nRpDef = GC.N_REP_0, 5
+dNumRep = {GC.S_MTH_DUMMY: nRp0,
+           GC.S_MTH_ADA: nRp0,
            GC.S_MTH_RF: nRp0,
            GC.S_MTH_X_TR: nRp0,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
            GC.S_MTH_GP: nRp0,
-           GC.S_MTH_PA_A: nRp0,
-           GC.S_MTH_PCT: nRp0,
+           GC.S_MTH_PA_A: nRpDef,
+           GC.S_MTH_PCT: nRpDef,
            GC.S_MTH_SGD: nRp0,
-           GC.S_MTH_CT_NB: nRpDef,
+           GC.S_MTH_CT_NB: nRp0,
            GC.S_MTH_CP_NB: nRp0,
            GC.S_MTH_GS_NB: nRp0,
-           GC.S_MTH_MLP: nRp0,
+           GC.S_MTH_MLP: nRpDef,
            GC.S_MTH_LSV: nRp0,
            GC.S_MTH_NSV: nRp0}
 

@@ -81,7 +81,7 @@ pOutPrC = GC.P_DIR_RES_CLF_PROP
 tpKF = GC.S_K_FOLD                  # type of kFold-split, or None (no split)
                                     # S_K_FOLD / S_GROUP_K_FOLD
                                     # S_STRAT_K_FOLD / S_STRAT_GROUP_K_FOLD
-nSplitsKF = 3                       # number of folds
+nSplitsKF = 5                       # number of folds
 shuffleKF = True                    # shuffle data before batches split?
 rndStateKF = None                   # None (random) or integer (reproducible)
 
