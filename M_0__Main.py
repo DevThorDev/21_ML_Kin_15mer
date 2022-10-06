@@ -116,7 +116,8 @@ cEval = Evaluator(inpDatG)
 #     print(GC.S_DS04, tK, GC.S_DS04)
 #     print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
 
-tK1 = ('RndUSmpl', 'A')
+# tK1 = ('RndUSmpl', 'A')
+tK1 = ('RndUSmpl',)
 dMF = {tK1: [GC.S_MTH_DUMMY,
              GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
@@ -134,8 +135,9 @@ dMF = {tK1: [GC.S_MTH_DUMMY,
 #              GC.S_MTH_LSV, GC.S_MTH_NSV]}
 # dMF = {tK1: [GC.S_MTH_DUMMY, GC.S_MTH_ADA]}
 
+# cEval.printDDfrCmb(tK=tK1)
 cEval.calcPredClassRes(dMthFlt=dMF)
-cEval.printDDfrCl()
+# cEval.printDDfrCl()
 cEndTime = GF.showElapsedTime(startTime)
 cTiming.updateTimes(tMth=(90, 1), stTMth=cStTime, endTMth=cEndTime)
 

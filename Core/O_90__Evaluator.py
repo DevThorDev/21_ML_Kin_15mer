@@ -28,6 +28,10 @@ class Evaluator(BaseClass):
         pFNmer, sNmer = self.dITp['pInpUnqNmer'], self.dITp['sUnqNmer']
         dFI = GF.getIFS(pF=pFNmer, itSCmp={sNmer}, addI=False)
         self.FPs.dPF[sNmer] = GF.joinToPath(pFNmer, dFI[sNmer])
+        # add the file with input data (X_Classes)
+        pFInpD, sInpD = self.dITp['pInpData'], self.dITp['sInpData']
+        dFI = GF.getIFS(pF=pFInpD, itSCmp={sInpD}, addI=False)
+        self.FPs.dPF[sInpD] = GF.joinToPath(pFInpD, dFI[sInpD])
         # add the files with detailed and probability info for the classes
         for sKT in [self.dITp['sDetailed'], self.dITp['sProba']]:
             for cSet in self.dITp['lSetFIDet']:
@@ -49,11 +53,14 @@ class Evaluator(BaseClass):
 
     # --- method for loading the input data -----------------------------------
     def loadInpData(self, iCS=0, iCG=1):
-        self.dDfrCmb, self.serSUnqNmer, sNmer = {}, None, self.dITp['sUnqNmer']
+        self.dDfrCmb, self.serSUnqNmer = {}, None
         for tK, pF in self.FPs.dPF.items():
-            if tK == sNmer:
+            if tK == self.dITp['sUnqNmer']:
                 self.serSUnqNmer = self.loadData(pF=self.FPs.dPF[tK], iC=iCS)
                 self.serSUnqNmer = self.serSUnqNmer[self.dITp['sCNmer']]
+            elif tK == self.dITp['sInpData']:
+                self.serXCl = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
+                self.serXCl = self.serXCl[self.dITp['sEffFam']]
             elif tK in ['OutEval']:     # result file --> do nothing
                 pass
             else:
@@ -66,18 +73,20 @@ class Evaluator(BaseClass):
         self.dDfrTrueCl, self.dDfrPredCl = {}, {}
 
     # --- print methods -------------------------------------------------------
-    def printCDfrInp(self, tK):
-        print(GC.S_DS04, tK, GC.S_DS04)
-        print(self.dDfrCmb[tK], GC.S_NEWL, GC.S_DS80, sep='')
+    def printDfrInpFlt(self, tKSub):
+        for tK in self.dDfrCmb:
+            if set(tKSub) <= set(tK):
+                print(GC.S_DS04, 'Input DataFrame with key', tK, GC.S_DS04)
+                print(self.dDfrCmb[tK], GC.S_NEWL, GC.S_DS80, sep='')
 
     def printDDfrCmb(self, tK=None):
         if tK is not None:
-            self.printCDfrInp(tK=tK)
+            self.printDfrInpFlt(tKSub=tK)
         else:
             # print all input DataFrames
             for tK in self.dDfrCmb:
                 print(GC.S_EQ20, 'All input DataFrames', GC.S_EQ20)
-                self.printCDfrInp(tK=tK)
+                self.printDfrInpFlt(tKSub=tK)
 
     def printDDfrCl(self, tFlt=None, tpCl=GC.S_PRED_CL):
         dDfrCl = self.dDfrPredCl
@@ -115,14 +124,14 @@ class Evaluator(BaseClass):
                     lSHdC += list(self.d2ClDet[(tFlt, sMth)].values())
         return GF.flattenIt(lSHdC)
 
-    def calcResSglClf(self, d1, cDfr, sMth, itFlt=None):
+    def calcResSglClf(self, d1, cDfr, tF, sMth):
         nCl = cDfr.shape[1]//2
-        dfrTrueCl = cDfr.columns[-2*nCl:-nCl]
-        for sCHd in cDfr.columns[-nCl:]:
-            sCl = GF.getSClFromCHdr(sCHdr=sCHd)
-            lSKD1 = self.d2ClDet[(itFlt, sMth)][sCl]
-            d1[lSKD1[0]] = cDfr[sCHd].apply(lambda k: 1 - k)
-            d1[lSKD1[1]] = cDfr[sCHd]
+        dfrTrueCl = cDfr.iloc[:, (-2*nCl):(-nCl)].sort_index(axis=0)
+        if tF in self.dDfrTrueCl:
+            assert self.dDfrTrueCl[tF].equals(dfrTrueCl)
+        else:
+            self.dDfrTrueCl[tF] = dfrTrueCl
+        SF.fillDPrimaryRes(d1, self.d2ClDet, cDfr, nCl, tFlt=tF, sMth=sMth)
 
     def calcSummaryVals(self):
         pass
@@ -138,12 +147,15 @@ class Evaluator(BaseClass):
                     if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
                         print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
                         self.lAllMth.append(sM)
-                    self.calcResSglClf(d1, cDfr, sMth=sM, itFlt=tF)
+                    self.calcResSglClf(d1, cDfr, tF=tF, sMth=sM)
         self.dDfrPredCl[tF] = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
+        lO = [self.serXCl, self.dDfrTrueCl[tF], self.dDfrPredCl[tF]]
+        self.dDfrPredCl[tF] = GF.concLOAx1(lObj=lO, verifInt=True, srtDfr=True)
         self.sFltMth = self.dITp['sUS02'].join([sJ.join(tF),
                                                 sJ.join(self.lAllMth)])
         self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=self.sFltMth)
-        self.saveData(self.dDfrPredCl[tF], pF=self.FPs.dPF[sKMn])
+        self.saveData(self.dDfrPredCl[tF].convert_dtypes(),
+                      pF=self.FPs.dPF[sKMn])
 
     def calcPredClassRes(self, dMthFlt=None):
         lSHdC = self.iniLSHdCol(dMthFlt=dMthFlt)

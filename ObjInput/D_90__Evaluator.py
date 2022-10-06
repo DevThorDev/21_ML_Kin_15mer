@@ -44,6 +44,22 @@ lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthMLP, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
              {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
+lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthRF, GC.S_SMPL_RND_U_S, GC.S_B},
+             {sMthXTr, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthGrB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthHGrB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthGP, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthPaA, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthPct, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthSGD, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthCtNB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthCpNB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthGsNB, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthMLP, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthLSV, GC.S_SMPL_RND_U_S, GC.S_A},
+             {sMthNSV, GC.S_SMPL_RND_U_S, GC.S_A}]
 # lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
 #              {sMthAda, GC.S_SMPL_RND_U_S, GC.S_A},
 #              {sMthRF, GC.S_SMPL_RND_U_S, GC.S_A},
@@ -71,7 +87,9 @@ lSetFIDet = [{sMthDummy, GC.S_SMPL_RND_U_S, GC.S_A},
 
 # --- names and paths of files and dirs ---------------------------------------
 sUnqNmer = GC.S_N_MER_SEQ_UNQ
+sInpData = GC.S_INP_DATA
 pInpUnqNmer = GC.P_DIR_RES_UNQ_N_MER
+pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
 pInpDet = GC.P_DIR_RES_CLF_DETAILED
 pOutEval = GC.P_DIR_RES_CLF_EVAL
 
@@ -86,7 +104,9 @@ dIO = {# --- general
        'lSetFIDet': lSetFIDet,
        # --- names and paths of files and dir
        'sUnqNmer': sUnqNmer,
+       'sInpData': sInpData,
        'pInpUnqNmer': pInpUnqNmer,
+       'pInpData': pInpData,
        'pInpDet': pInpDet,
        'pOutEval': pOutEval,
        # === derived values and input processing

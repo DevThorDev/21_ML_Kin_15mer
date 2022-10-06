@@ -366,4 +366,13 @@ def getDMapCl(dITp, dDfr, sMth=None):
             dSCl[sCl] = [sUSC.join([sCl, sPred]) for sPred in lSPred]
     return dSCl
 
+def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, tFlt, sMth):
+    for sCHd in cDfr.columns[-nCl:]:
+        k0, k1 = d2CD[(tFlt, sMth)][GF.getSClFromCHdr(sCHdr=sCHd)]
+        for cK in [k0, k1]:
+            if (cK in dRes and dRes[cK] is None) or (cK not in dRes):
+                dRes[cK] = GF.iniPdSer(lSNmI=cDfr.index, nameS=sCHd, fillV=0)
+        dRes[k0] = dRes[k0].add(cDfr[sCHd].apply(lambda k: 1 - k))
+        dRes[k1] = dRes[k1].add(cDfr[sCHd])
+
 ###############################################################################

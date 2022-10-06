@@ -458,12 +458,10 @@ class GeneralClassifier(BaseClfPrC):
 
     def printPredict(self, X2Pred=None, YTest=None):
         if self.dITp['lvlOut'] > 0:
-            sM, sPd, sPa = self.sMth, self.dITp['sPred'], self.dITp['sProba']
+            sM, sPd = self.sMth, self.dITp['sPred']
             YPred = self.XY.getY(sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
-            YProba = self.XY.getY(sMth=sM, sTp=sPa, iSt=self.iSt, j=self.j)
             print(GC.S_DS08, 'Predictions for fold', self.j + 1, GC.S_DS08)
             print('Shape of predicted Y:', YPred.shape)
-            print('Shape of probs of Y (classes):', YProba.shape)
             nPred, nOK, _ = tuple(self.d3ResClf[self.sKPar][self.j].values())
             if X2Pred is not None and X2Pred.shape[0] == YPred.shape[0]:
                 if YTest is not None:
