@@ -19,7 +19,7 @@ class Evaluator(BaseClass):
         self.getDITp(iTp=iTp)
         self.fillFPs()
         self.loadInpData()
-        self.iniDDfrRes()
+        self.iniResObj()
         print('Initiated "Evaluator" base object.')
 
     # --- method for filling the file paths -----------------------------------
@@ -68,9 +68,10 @@ class Evaluator(BaseClass):
                 self.dDfrCmb[tK] = cDfr.iloc[:, 1:]
 
     # --- method for initialising the dictionary of result DataFrames ---------
-    def iniDDfrRes(self):
+    def iniResObj(self):
         self.d2ClDet = {}
         self.dDfrTrueCl, self.dDfrPredCl = {}, {}
+        self.dCmpTP = {'RelMax': None, 'AbsMax': None, 'PDiff': None}
 
     # --- print methods -------------------------------------------------------
     def printDfrInpFlt(self, tKSub):
@@ -78,6 +79,12 @@ class Evaluator(BaseClass):
             if set(tKSub) <= set(tK):
                 print(GC.S_DS04, 'Input DataFrame with key', tK, GC.S_DS04)
                 print(self.dDfrCmb[tK], GC.S_NEWL, GC.S_DS80, sep='')
+
+    def printD2ClDet(self):
+        for (tFlt, sMth), dMap in self.d2ClDet.items():
+            print(GC.S_DS08, 'Filter:', tFlt, '| Method:', sMth, GC.S_DS08)
+            for sCl, lSCHd in dMap.items():
+                print(GC.S_DS04, sCl, '| Header list:', lSCHd, GC.S_DS04)
 
     def printDDfrCmb(self, tK=None):
         if tK is not None:
@@ -116,7 +123,7 @@ class Evaluator(BaseClass):
     # --- calculation methods -------------------------------------------------
     def iniLSHdCol(self, dMthFlt=None):
         lSHdC = []
-        if dMthFlt is not None:
+        if self.dITp['doEvaluation'] and dMthFlt is not None:
             for tFlt, lSMth in dMthFlt.items():
                 for sMth in lSMth:
                     dMp = SF.getDMapCl(self.dITp, dDfr=self.dDfrCmb, sMth=sMth)
@@ -136,9 +143,18 @@ class Evaluator(BaseClass):
     def calcSummaryVals(self):
         pass
 
-    def calcCFlt(self, d1, tF, lSM=[]):
-        sKMn, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
-        print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
+    def compareTruePred(self, d1, tF, lSM=[]):
+        dfrT, dfrP = self.dDfrTrueCl[tF], self.dDfrPredCl[tF]
+        self.dMapClT = GF.getDSClFromCHdr(itCol=self.dDfrTrueCl[tF].columns)
+        for sM in lSM:
+            for sCl, lSCHd in self.d2ClDet[(tF, sM)].items():
+                if sCl in self.dMapClT:
+                    d = GF.concLOAx1([dfrT[self.dMapClT[sCl]], dfrP[lSCHd[0]]])
+                    # serSum = d.apply(np.sum, axis=1)
+        self.dCmpTP
+
+
+    def loopOverMethods(self, d1, tF, lSM=[]):
         tFXt = tuple([self.dITp['sDetailed']] + list(tF))
         for sM in lSM:
             print(GC.S_DS04, 'Checking for results of method', sM, GC.S_DS04)
@@ -148,6 +164,11 @@ class Evaluator(BaseClass):
                         print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
                         self.lAllMth.append(sM)
                     self.calcResSglClf(d1, cDfr, tF=tF, sMth=sM)
+
+    def calcCFlt(self, d1, tF, lSM=[]):
+        sKMn, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
+        print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
+        self.loopOverMethods(d1, tF=tF, lSM=lSM)
         self.dDfrPredCl[tF] = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
         lO = [self.serXCl, self.dDfrTrueCl[tF], self.dDfrPredCl[tF]]
         self.dDfrPredCl[tF] = GF.concLOAx1(lObj=lO, verifInt=True, srtDfr=True)
@@ -156,10 +177,12 @@ class Evaluator(BaseClass):
         self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=self.sFltMth)
         self.saveData(self.dDfrPredCl[tF].convert_dtypes(),
                       pF=self.FPs.dPF[sKMn])
+        # self.compareTruePred(d1, tF=tF, lSM=lSM)
 
     def calcPredClassRes(self, dMthFlt=None):
-        lSHdC = self.iniLSHdCol(dMthFlt=dMthFlt)
-        d1 = {sC: None for sC in lSHdC}
+        lSHdPred = self.iniLSHdCol(dMthFlt=dMthFlt)
+        # self.printD2ClDet()
+        d1 = {sC: None for sC in lSHdPred}
         if self.dITp['doEvaluation'] and dMthFlt is not None:
             for tFlt, lSMth in dMthFlt.items():
                 self.calcCFlt(d1, tF=tFlt, lSM=lSMth)

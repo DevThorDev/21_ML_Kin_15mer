@@ -226,6 +226,12 @@ def getLCentPosSSub(sFull, sSub, overLap=True):
 def getSClFromCHdr(sCHdr, idxSpl=-1, sSep=GC.S_USC):
     return sSep.join(sCHdr.split(sSep)[:idxSpl])
 
+def getDSClFromCHdr(itCol, idxSpl=-1, sSep=GC.S_USC):
+    dSCl = {}
+    for sCHdr in itCol:
+        dSCl[getSClFromCHdr(sCHdr=sCHdr, idxSpl=idxSpl, sSep=sSep)] = sCHdr
+    return dSCl
+
 # --- Functions yielding boolean values ---------------------------------------
 def isTrain(doSplit):
     return (True if doSplit else None)
@@ -705,6 +711,20 @@ def dropLblUnq(itLbl, sJoin=GC.S_USC):
     lLbl, lLblRed = [], [sJoin.join(cLbl.split(sJoin)[:-1]) for cLbl in itLbl]
     fillListUnique(cL=lLbl, cIt=lLblRed)
     return lLbl
+
+def getMaxC(cIt, thrV=None):
+    lRet, maxIt = [0 for _ in cIt], max(cIt)
+    for k, x in enumerate(cIt):
+        if x == maxIt:
+            if (thrV is None) or (thrV is not None and x > thrV):
+                lRet[k] = 1
+    return pd.Series(lRet)
+
+def getRelVals(cIt):
+    lenIt, lRet = len(cIt), []
+    if lenIt > 0:
+        lRet = [x/lenIt for x in cIt]
+    return pd.Series(lRet)
 
 def red2TpStr(cR):
     l = [x for x in cR if type(x) == str]

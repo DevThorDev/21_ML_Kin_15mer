@@ -64,7 +64,7 @@ sXCl = GC.S_X_CL
 sNone = GC.S_NONE
 sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
-sPred, sProba = GC.S_PRED, GC.S_PROBA
+sPredS, sPred, sNPred, sProba = GC.S_PRED_S, GC.S_PRED, GC.S_N_PRED, GC.S_PROBA
 sTrueCl, sPredCl = GC.S_TRUE_CL, GC.S_PRED_CL
 sIGen = GC.S_I_GEN
 sCNmer = GC.S_C_N_MER
@@ -110,7 +110,7 @@ sPar, sGSRS = GC.S_PAR, GC.S_GSRS
 sSummary = GC.S_SUMMARY
 sCnfMat = GC.S_CNF_MAT
 sDetailed = GC.S_DETAILED
-sProba = GC.S_PROB
+sProb = GC.S_PROB
 sProp = GC.S_PROP
 sEvalClPred = GC.S_EVAL_CL_PRED
 sLbl, sStep = GC.S_LBL, GC.S_STEP
@@ -141,7 +141,8 @@ lSMthPartFit = [sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB, sMthGsNB,
                 sMthMLP]
 lSEnc = [sOneHot, sOrdinal]
 # lSPred = [s0Pred, s1Pred, sNotPred]
-lSPred = [s0Pred, s1Pred]
+# lSPred = [s0Pred, s1Pred]
+lSPred = [sNPred]
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -210,7 +211,9 @@ dIO = {# --- general
        'sClf': sClf,
        'sPrC': sPrC,
        'sEffFam': sEffFam,
+       'sPredS': sPredS,
        'sPred': sPred,
+       'sNPred': sNPred,
        'sProba': sProba,
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
@@ -276,7 +279,7 @@ dIO = {# --- general
        'sSummary': sSummary,
        'sCnfMat': sCnfMat,
        'sDetailed': sDetailed,
-       'sProba': sProba,
+       'sProb': sProb,
        'sProp': sProp,
        'sEvalClPred': sEvalClPred,
        'sLbl': sLbl,
