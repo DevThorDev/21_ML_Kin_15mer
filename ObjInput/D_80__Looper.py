@@ -29,7 +29,7 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_CT_NB: nRp0,
            GC.S_MTH_CP_NB: nRp0,
            GC.S_MTH_GS_NB: nRp0,
-           GC.S_MTH_MLP: nRp0,
+           GC.S_MTH_MLP: nRpDef,
            GC.S_MTH_LSV: nRp0,
            GC.S_MTH_NSV: nRp0}
 
