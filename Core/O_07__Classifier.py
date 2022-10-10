@@ -409,7 +409,7 @@ class GeneralClassifier(BaseClfPrC):
     # --- print methods -------------------------------------------------------
     def printStatusPartFit(self, k=0):
         if (k + 1)%round(self.dITp['nItPrintPtFit']) == 0:
-            print(GC.S_ARR_LR, 'Performed ', k + 1, ' partial fits using ',
+            print(GC.S_ARR_LR, ' Performed ', k + 1, ' partial fits using ',
                   'method "', self.sMth, '" in fold ', self.j + 1, '.', sep='')
 
     def printClfFitRes(self, X):

@@ -177,7 +177,7 @@ vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 # --- general input for Gaussian Process Classifier ---------------------------
 
 # --- general input for Passive Aggressive Classifier -------------------------
-vVerbPaA = 1                # state of verbosity ([0], 1, 2, 3...)
+vVerbPaA = 0                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Perceptron Classifier ---------------------------------
 vVerbPct = 1                # state of verbosity ([0], 1, 2, 3...)

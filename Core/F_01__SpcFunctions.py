@@ -2,6 +2,7 @@
 ###############################################################################
 # --- F_01__SpcFunctions.py ---------------------------------------------------
 ###############################################################################
+import numpy as np
 import pandas as pd
 
 import Core.C_00__GenConstants as GC
@@ -375,11 +376,23 @@ def getDMapCl(dITp, dDfr, sMth=None):
 #         dRes[k0] = dRes[k0].add(cDfr[sCHd].apply(lambda k: 1 - k))
 #         dRes[k1] = dRes[k1].add(cDfr[sCHd])
 
-def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, tFlt, sMth):
+def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, sMth):
     for sCHd in cDfr.columns[-nCl:]:
-        [sNewHd] = d2CD[(tFlt, sMth)][GF.getSClFromCHdr(sCHdr=sCHd)]
+        [sNewHd] = d2CD[sMth][GF.getSClFromCHdr(sCHdr=sCHd)]
         if (sNewHd in dRes and dRes[sNewHd] is None) or (sNewHd not in dRes):
             dRes[sNewHd] = GF.iniPdSer(lSNmI=cDfr.index, nameS=sCHd, fillV=0)
         dRes[sNewHd] = dRes[sNewHd].add(cDfr[sCHd])
+
+def compTruePredLoop(d2CD, dMapCT, lDfr, lSM=[]):
+    dDfrAllM, (dfrT, dfrP) = {}, lDfr
+    for sM in lSM:
+        dDfrSglCl = {}
+        for sCl, lSCHd in d2CD[sM].items():
+            if sCl in dMapCT:
+                dfr2C = GF.concLOAx1([dfrT[dMapCT[sCl]], dfrP[lSCHd[0]]])
+                dDfrSglCl[sCl] = dfr2C.apply(np.sum, axis=1)
+        dfrM = GF.concLOAx1([dDfrSglCl[sCl] for sCl in d2CD[sM]])
+        dDfrAllM[sM] = dfrM.apply(GF.classifyTP, axis=1)
+    return GF.concLOAx1([dDfrAllM[sM] for sM in dDfrAllM])
 
 ###############################################################################
