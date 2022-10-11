@@ -180,10 +180,10 @@ vVerbHGrB = 1               # state of verbosity ([0], 1, 2, 3...)
 vVerbPaA = 0                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Perceptron Classifier ---------------------------------
-vVerbPct = 1                # state of verbosity ([0], 1, 2, 3...)
+vVerbPct = 0                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for SGD Classifier ----------------------------------------
-vVerbSGD = 1                # state of verbosity ([0], 1, 2, 3...)
+vVerbSGD = 0                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Categorical NB Classifier -----------------------------
 

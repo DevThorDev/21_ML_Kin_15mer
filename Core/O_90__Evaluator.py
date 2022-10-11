@@ -65,12 +65,12 @@ class Evaluator(BaseClass):
                 pass
             else:
                 cDfr = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
-                self.dDfrCmb[tK] = cDfr.iloc[:, 1:]
+                self.dDfrCmb[tK] = cDfr.iloc[:, 1:].convert_dtypes()
 
     # --- method for initialising the dictionary of result DataFrames ---------
     def iniResObj(self):
         self.d2ClDet = {}
-        self.dfrTrueCl, self.dfrPredCl = None, None
+        self.dfrTrueCl, self.dfrPredCl, self.dfrCl = None, None, None
         self.dCmpTP = {'RelMax': None, 'AbsMax': None, 'PDiff': None}
 
     # --- print methods -------------------------------------------------------
@@ -95,10 +95,12 @@ class Evaluator(BaseClass):
                 print(GC.S_EQ20, 'All input DataFrames', GC.S_EQ20)
                 self.printDfrInpFlt(tKSub=tK)
 
-    def printDfrCl(self, tpCl=GC.S_PRED_CL):
-        dfrCl = self.dfrPredCl
+    def printDfrCl(self, tpCl=GC.S_CL):
+        dfrCl = self.dfrCl
         if tpCl == self.dITp['sTrueCl']:
             dfrCl = self.dfrTrueCl
+        elif tpCl == self.dITp['sPredCl']:
+            dfrCl = self.dfrPredCl
         print(dfrCl, GC.S_NEWL, GC.S_DS80, sep='')
 
     def printDfrTrueCl(self):
@@ -155,11 +157,12 @@ class Evaluator(BaseClass):
     def calcSummaryVals(self):
         pass
 
-    def compareTruePred(self, d1, lSM=[]):
+    def compareTruePred(self, lSM=[]):
         self.dMapClT = GF.getDSClFromCHdr(itCol=self.dfrTrueCl.columns)
         lDfr = [self.dfrTrueCl, self.dfrPredCl]
-        self.dCmpTP = SF.compTruePredLoop(self.d2ClDet, self.dMapClT,
-                                          lDfr=lDfr, lSM=lSM)
+        for s in self.dCmpTP:
+            dfrCmp = SF.compTP(self.d2ClDet, self.dMapClT, lDfr, lSM, sCmp=s)
+            self.dCmpTP[s] = dfrCmp
 
     def calcCFlt(self, d1, tF, lSM=[]):
         sKMn, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
@@ -168,12 +171,12 @@ class Evaluator(BaseClass):
         self.loopOverMethods(d1, tFXt=tFXt, lSM=lSM)
         self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
         lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]
-        self.dfrPredCl = GF.concLOAx1(lObj=lO, verifInt=True, srtDfr=True)
+        self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True, srtDfr=True)
         self.sFltMth = self.dITp['sUS02'].join([sJ.join(tF),
                                                 sJ.join(self.lAllMth)])
         self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=self.sFltMth)
-        self.saveData(self.dfrPredCl.convert_dtypes(), pF=self.FPs.dPF[sKMn])
-        self.compareTruePred(d1, lSM=lSM)
+        self.saveData(self.dfrCl.convert_dtypes(), pF=self.FPs.dPF[sKMn])
+        self.compareTruePred(lSM=lSM)
 
     def calcPredClassRes(self, dMthFlt=None):
         lSHdPred = self.iniLSHdCol(dMthFlt=dMthFlt)

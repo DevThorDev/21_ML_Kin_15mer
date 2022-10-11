@@ -383,16 +383,28 @@ def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, sMth):
             dRes[sNewHd] = GF.iniPdSer(lSNmI=cDfr.index, nameS=sCHd, fillV=0)
         dRes[sNewHd] = dRes[sNewHd].add(cDfr[sCHd])
 
-def compTruePredLoop(d2CD, dMapCT, lDfr, lSM=[]):
+def modDfrP(dfrP, sCmp='PDiff'):
+    if sCmp == 'RelMax':
+        return dfrP.apply(GF.getMaxC, axis=1).convert_dtypes()
+    elif sCmp == 'AbsMax':
+        halfNCl = dfrP.shape[1]/2
+        return dfrP.apply(GF.getMaxC, axis=1, thrV=halfNCl).convert_dtypes()
+    elif sCmp == 'PDiff':
+        return dfrP.apply(GF.getRelVals, axis=1).convert_dtypes()
+
+def compTP(d2CD, dMapCT, lDfr, lSM=[], sCmp='PDiff'):   # for single-class
     dDfrAllM, (dfrT, dfrP) = {}, lDfr
-    for sM in lSM:
-        dDfrSglCl = {}
-        for sCl, lSCHd in d2CD[sM].items():
+    for sMth in lSM:
+        dfrPMd = dfrP[GF.flattenIt(cIterable=d2CD[sMth].values())]
+        itC = dfrPMd.columns
+        dDfrSglCl, dfrPMd = {}, modDfrP(dfrPMd, sCmp=sCmp)
+        dfrPMd.columns=itC
+        for sCl, lSCHd in d2CD[sMth].items():
             if sCl in dMapCT:
-                dfr2C = GF.concLOAx1([dfrT[dMapCT[sCl]], dfrP[lSCHd[0]]])
+                dfr2C = GF.concLOAx1([dfrT[dMapCT[sCl]], dfrPMd[lSCHd[0]]])
                 dDfrSglCl[sCl] = dfr2C.apply(np.sum, axis=1)
-        dfrM = GF.concLOAx1([dDfrSglCl[sCl] for sCl in d2CD[sM]])
-        dDfrAllM[sM] = dfrM.apply(GF.classifyTP, axis=1)
-    return GF.concLOAx1([dDfrAllM[sM] for sM in dDfrAllM])
+        dfrMth = GF.concLOAx1([dDfrSglCl[sCl] for sCl in d2CD[sMth]])
+        dDfrAllM[sMth] = dfrMth.apply(GF.classifyTP, axis=1)
+    return GF.concLOAx1([dDfrAllM[sMth] for sMth in dDfrAllM])
 
 ###############################################################################

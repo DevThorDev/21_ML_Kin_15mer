@@ -23,10 +23,10 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
            GC.S_MTH_GP: nRp0,
-           GC.S_MTH_PA_A: nRpDef,
+           GC.S_MTH_PA_A: nRp0,
            GC.S_MTH_PCT: nRp0,
            GC.S_MTH_SGD: nRp0,
-           GC.S_MTH_CT_NB: nRpDef,
+           GC.S_MTH_CT_NB: nRp0,
            GC.S_MTH_CP_NB: nRp0,
            GC.S_MTH_GS_NB: nRp0,
            GC.S_MTH_MLP: nRp0,
@@ -372,7 +372,8 @@ d2Par_SGD = {GC.S_0: {'loss': 'hinge',
                       'validation_fraction': 0.1,
                       'n_iter_no_change': 5,
                       'class_weight': None,
-                      'average': False}}
+                      'average': False},
+             GC.S_A: {'tol': 1.0e-4}}
 
 # === Categorical NB Classifier ===============================================
 # --- list of parameter grids for Categorical NB Classifier grid search -------

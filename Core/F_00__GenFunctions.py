@@ -713,23 +713,33 @@ def dropLblUnq(itLbl, sJoin=GC.S_USC):
     return lLbl
 
 def getMaxC(cIt, thrV=None):
+    if pd.isna(cIt).all():
+        return pd.Series([np.nan for _ in cIt])
     lRet, maxIt = [0 for _ in cIt], max(cIt)
     for k, x in enumerate(cIt):
+        if x is None or np.isnan(x):
+            lRet[k] = np.nan
         if x == maxIt:
             if (thrV is None) or (thrV is not None and x > thrV):
                 lRet[k] = 1
     return pd.Series(lRet)
 
 def getRelVals(cIt):
+    if pd.isna(cIt).all():
+        return pd.Series([np.nan for _ in cIt])
     lenIt, lRet = len(cIt), []
     if lenIt > 0:
         lRet = [x/lenIt for x in cIt]
     return pd.Series(lRet)
 
 def classifyTP(cIt):        # works only if always exactly one true class
+    if pd.isna(cIt).all():
+        return np.nan
     lenIt = (len(cIt) if type(cIt) in {list, tuple, set, dict} else cIt.size)
-    vRet, minIt, maxIt = GC.S_0, min(cIt), max(cIt)
-    assert maxIt in {1, 2}
+    vRet, minIt, maxIt = np.nan, min(cIt), max(cIt)
+    if maxIt not in {1, 2}:
+        print('ERROR: cIt:\n', cIt, '\nminIt = ', minIt, '\nmaxIt = ', maxIt, sep='')
+        assert False
     lVRem = [cV for cV in cIt if (cV < maxIt)]
     if len(lVRem) > 0:
         maxVRem = max(lVRem)
