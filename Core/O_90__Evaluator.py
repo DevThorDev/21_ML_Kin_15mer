@@ -41,10 +41,15 @@ class Evaluator(BaseClass):
                     self.FPs.dPF[tK] = GF.joinToPath(self.dITp['pInpDet'], sF)
         # initialise filter and classifier methods string
         self.sFltMth, self.lAllMth = '', []
-        # add the path to the evaluation of class predictions
+        # add the paths to the evaluation of class predictions
         d2PI, dIG, dITp = {}, self.dIG, self.dITp
         d2PI['OutEval'] = {dIG['sPath']: dITp['pOutEval'],
                            dIG['sLFS']: dITp['sEvalClPred'],
+                           dIG['sLFC']: self.sFltMth,
+                           dIG['sLFJSC']: dITp['sUS02'],
+                           dIG['sFXt']: dIG['xtCSV']}
+        d2PI['OutClfr'] = {dIG['sPath']: dITp['pOutEval'],
+                           dIG['sLFS']: dITp['sClfrClPred'],
                            dIG['sLFC']: self.sFltMth,
                            dIG['sLFJSC']: dITp['sUS02'],
                            dIG['sFXt']: dIG['xtCSV']}
@@ -61,7 +66,7 @@ class Evaluator(BaseClass):
             elif tK == self.dITp['sInpData']:
                 self.serXCl = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
                 self.serXCl = self.serXCl[self.dITp['sEffFam']]
-            elif tK in ['OutEval']:     # result file --> do nothing
+            elif tK in ['OutEval', 'OutClfr']:    # result file --> do nothing
                 pass
             else:
                 cDfr = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
@@ -71,7 +76,8 @@ class Evaluator(BaseClass):
     def iniResObj(self):
         self.d2ClDet = {}
         self.dfrTrueCl, self.dfrPredCl, self.dfrCl = None, None, None
-        self.dCmpTP = {'RelMax': None, 'AbsMax': None, 'PDiff': None}
+        # self.dCmpTP = {'RelMax': None, 'AbsMax': None, 'PDiff': None}
+        self.dCmpTP = {'RelMax': None}
 
     # --- print methods -------------------------------------------------------
     def printDfrInpFlt(self, tKSub):
@@ -159,13 +165,14 @@ class Evaluator(BaseClass):
 
     def compareTruePred(self, lSM=[]):
         self.dMapClT = GF.getDSClFromCHdr(itCol=self.dfrTrueCl.columns)
-        lDfr = [self.dfrTrueCl, self.dfrPredCl]
         for s in self.dCmpTP:
-            dfrCmp = SF.compTP(self.d2ClDet, self.dMapClT, lDfr, lSM, sCmp=s)
-            self.dCmpTP[s] = dfrCmp
+            cDfrCmpTP = self.dfrCl.apply(SF.compTP, axis=1, d2CD=self.d2ClDet,
+                                         dMapCT=self.dMapClT, lSM=lSM, sCmp=s)
+            self.dCmpTP[s] = cDfrCmpTP
+            self.saveData(cDfrCmpTP, pF=self.FPs.dPF['OutClfr'])
 
     def calcCFlt(self, d1, tF, lSM=[]):
-        sKMn, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
+        sKA, sKB, sKPos, sJ = 'OutEval', 'OutClfr', 'sLFC', self.dITp['sUSC']
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
         tFXt = tuple([self.dITp['sDetailed']] + list(tF))
         self.loopOverMethods(d1, tFXt=tFXt, lSM=lSM)
@@ -174,8 +181,10 @@ class Evaluator(BaseClass):
         self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True, srtDfr=True)
         self.sFltMth = self.dITp['sUS02'].join([sJ.join(tF),
                                                 sJ.join(self.lAllMth)])
-        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKMn, kPos=sKPos, cS=self.sFltMth)
-        self.saveData(self.dfrCl.convert_dtypes(), pF=self.FPs.dPF[sKMn])
+        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKA, kPos=sKPos, cS=self.sFltMth)
+        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKB, kPos=sKPos, cS=self.sFltMth)
+        self.dfrCl = self.dfrCl.convert_dtypes()
+        self.saveData(self.dfrCl, pF=self.FPs.dPF[sKA])
         self.compareTruePred(lSM=lSM)
 
     def calcPredClassRes(self, dMthFlt=None):

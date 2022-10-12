@@ -714,7 +714,8 @@ def dropLblUnq(itLbl, sJoin=GC.S_USC):
 
 def getMaxC(cIt, thrV=None):
     if pd.isna(cIt).all():
-        return pd.Series([np.nan for _ in cIt])
+        # return pd.Series([np.nan for _ in cIt])
+        return [np.nan for _ in cIt]
     lRet, maxIt = [0 for _ in cIt], max(cIt)
     for k, x in enumerate(cIt):
         if x is None or np.isnan(x):
@@ -722,44 +723,53 @@ def getMaxC(cIt, thrV=None):
         if x == maxIt:
             if (thrV is None) or (thrV is not None and x > thrV):
                 lRet[k] = 1
-    return pd.Series(lRet)
+    # return pd.Series(lRet)
+    return lRet
 
 def getRelVals(cIt):
     if pd.isna(cIt).all():
-        return pd.Series([np.nan for _ in cIt])
+        # return pd.Series([np.nan for _ in cIt])
+        [np.nan for _ in cIt]
     lenIt, lRet = len(cIt), []
     if lenIt > 0:
         lRet = [x/lenIt for x in cIt]
-    return pd.Series(lRet)
+    # return pd.Series(lRet)
+    return lRet
 
 def classifyTP(cIt):        # works only if always exactly one true class
     if pd.isna(cIt).all():
         return np.nan
-    lenIt = (len(cIt) if type(cIt) in {list, tuple, set, dict} else cIt.size)
-    vRet, minIt, maxIt = np.nan, min(cIt), max(cIt)
+    sRet, cIt = np.nan, [x for x in cIt if not pd.isna(x)]
+    lenIt, minIt, maxIt = len(cIt), min(cIt), max(cIt)
     if maxIt not in {1, 2}:
-        print('ERROR: cIt:\n', cIt, '\nminIt = ', minIt, '\nmaxIt = ', maxIt, sep='')
-        assert False
+        return np.nan
+        # print('ERROR: cIt:\n', cIt, '\nminIt = ', minIt, '\nmaxIt = ',
+        #       maxIt, sep='')
+        # assert False
     lVRem = [cV for cV in cIt if (cV < maxIt)]
     if len(lVRem) > 0:
         maxVRem = max(lVRem)
         if maxIt == 2:
             if maxVRem == 0:
-                vRet = GC.S_A               # A: pred. cl. == true cl. (only)
+                sRet = GC.S_A               # A: pred. cl. == true cl. (only)
             elif maxVRem == 1 and minIt == 1:
-                vRet = GC.S_D               # D: all classes pred.
+                sRet = GC.S_D               # D: all classes pred.
             elif maxVRem == 1 and minIt < 1:
-                vRet = GC.S_B               # B: pred. cl. == true cl. (+ oth.)
+                sRet = GC.S_B               # B: pred. cl. == true cl. (+ oth.)
         elif maxIt == 1:
-            assert maxVRem == 0
+            # assert maxVRem == 0
+            if maxVRem != 0:
+                print('ERROR: cIt:\n', cIt, '\nlVRem:\n', lVRem,
+                      '\nmaxVRem = ', maxVRem)
+                assert False
             if len(lVRem) == lenIt - 1:
-                vRet = GC.S_C               # C: no class pred.
+                sRet = GC.S_C               # C: no class pred.
             elif len(lVRem) < lenIt - 1:
-                vRet = GC.S_E               # E: pred. class(es) != true cl.
+                sRet = GC.S_E               # E: pred. class(es) != true cl.
     else:
         assert minIt == 1 and maxIt == 1
-        vRet = GC.S_E                       # E: pred. class(es) != true cl.
-    return vRet
+        sRet = GC.S_E                       # E: pred. class(es) != true cl.
+    return sRet
 
 def red2TpStr(cR):
     l = [x for x in cR if type(x) == str]

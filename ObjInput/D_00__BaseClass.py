@@ -113,6 +113,7 @@ sDetailed = GC.S_DETAILED
 sProb = GC.S_PROB
 sProp = GC.S_PROP
 sEvalClPred = GC.S_EVAL_CL_PRED
+sClfrClPred = GC.S_CLFR_CL_PRED
 sLbl, sStep = GC.S_LBL, GC.S_STEP
 sClMapping = GC.S_CL_MAPPING
 sClSteps = GC.S_CL_STEPS
@@ -282,6 +283,7 @@ dIO = {# --- general
        'sProb': sProb,
        'sProp': sProp,
        'sEvalClPred': sEvalClPred,
+       'sClfrClPred': sClfrClPred,
        'sLbl': sLbl,
        'sStep': sStep,
        'sClMapping': sClMapping,

@@ -383,28 +383,44 @@ def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, sMth):
             dRes[sNewHd] = GF.iniPdSer(lSNmI=cDfr.index, nameS=sCHd, fillV=0)
         dRes[sNewHd] = dRes[sNewHd].add(cDfr[sCHd])
 
-def modDfrP(dfrP, sCmp='PDiff'):
-    if sCmp == 'RelMax':
-        return dfrP.apply(GF.getMaxC, axis=1).convert_dtypes()
-    elif sCmp == 'AbsMax':
-        halfNCl = dfrP.shape[1]/2
-        return dfrP.apply(GF.getMaxC, axis=1, thrV=halfNCl).convert_dtypes()
-    elif sCmp == 'PDiff':
-        return dfrP.apply(GF.getRelVals, axis=1).convert_dtypes()
+# def modDfrP(dfrP, sCmp='PDiff'):
+#     if sCmp == 'RelMax':
+#         return dfrP.apply(GF.getMaxC, axis=1).convert_dtypes()
+#     elif sCmp == 'AbsMax':
+#         halfNCl = dfrP.shape[1]/2
+#         return dfrP.apply(GF.getMaxC, axis=1, thrV=halfNCl).convert_dtypes()
+#     elif sCmp == 'PDiff':
+#         return dfrP.apply(GF.getRelVals, axis=1).convert_dtypes()
 
-def compTP(d2CD, dMapCT, lDfr, lSM=[], sCmp='PDiff'):   # for single-class
-    dDfrAllM, (dfrT, dfrP) = {}, lDfr
+def getL01(lNOcc, sCmp='PDiff'):
+    if sCmp == 'RelMax':
+        return GF.getMaxC(cIt=lNOcc)
+    elif sCmp == 'AbsMax':
+        return GF.getMaxC(cIt=lNOcc, thrV=len(lNOcc)/2)
+    elif sCmp == 'PDiff':
+        return GF.getRelVals(cIt=lNOcc)
+
+def compTP(cIt, d2CD, dMapCT, lSM=[], sCmp='PDiff'):    # only 4 single-class
+    lRet = []
     for sMth in lSM:
-        dfrPMd = dfrP[GF.flattenIt(cIterable=d2CD[sMth].values())]
-        itC = dfrPMd.columns
-        dDfrSglCl, dfrPMd = {}, modDfrP(dfrPMd, sCmp=sCmp)
-        dfrPMd.columns=itC
-        for sCl, lSCHd in d2CD[sMth].items():
-            if sCl in dMapCT:
-                dfr2C = GF.concLOAx1([dfrT[dMapCT[sCl]], dfrPMd[lSCHd[0]]])
-                dDfrSglCl[sCl] = dfr2C.apply(np.sum, axis=1)
-        dfrMth = GF.concLOAx1([dDfrSglCl[sCl] for sCl in d2CD[sMth]])
-        dDfrAllM[sMth] = dfrMth.apply(GF.classifyTP, axis=1)
-    return GF.concLOAx1([dDfrAllM[sMth] for sMth in dDfrAllM])
+        assert list(d2CD[sMth]) == list(dMapCT)
+        lT = [cIt.at[dMapCT[sCl]] for sCl in dMapCT]
+        lP = [cIt.at[lSCHd[0]] for lSCHd in d2CD[sMth].values()]
+        lP = getL01(lNOcc=lP, sCmp=sCmp)
+        assert len(lT) == len(lP)
+        lSumTP = [np.sum([cT, cP]) for cT, cP in zip(lT, lP)]
+        # lSC = GF.flattenIt(cIterable=d2CD[sMth].values())
+        # dDfrSglCl, dfrPMd = {}, modDfrP(dfrPMd, sCmp=sCmp)
+        # for k, (sCl, lSCHd) in enumerate(d2CD[sMth].items()):
+        #     if sCl in dMapCT:
+        #         lSumTP[k] = np.sum([cIt.at[dMapCT[sCl]], cIt.at[lSCHd[0]]])
+
+                # dfr2C = GF.concLOAx1([dfrT[dMapCT[sCl]], dfrPMd[lSCHd[0]]])
+                # dDfrSglCl[sCl] = dfr2C.apply(np.sum, axis=1)
+        # dfrMth = GF.concLOAx1([dDfrSglCl[sCl] for sCl in d2CD[sMth]])
+        # dDfrAllM[sMth] = dfrMth.apply(GF.classifyTP, axis=1)
+        lRet.append(GF.classifyTP(cIt=lSumTP))
+    # return GF.concLOAx1([dDfrAllM[sMth] for sMth in dDfrAllM])
+    return pd.Series(lRet, name=sCmp, index=lSM)
 
 ###############################################################################
