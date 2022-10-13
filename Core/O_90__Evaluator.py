@@ -65,7 +65,7 @@ class Evaluator(BaseClass):
                 self.serSUnqNmer = self.serSUnqNmer[self.dITp['sCNmer']]
             elif tK == self.dITp['sInpData']:
                 self.serXCl = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
-                self.serXCl = self.serXCl[self.dITp['sEffFam']]
+                self.serXCl = self.serXCl[self.dITp['sEffFam']].sort_index()
             elif tK in ['OutEval', 'OutClfr']:    # result file --> do nothing
                 pass
             else:
@@ -77,7 +77,7 @@ class Evaluator(BaseClass):
         self.d2ClDet = {}
         self.dfrTrueCl, self.dfrPredCl, self.dfrCl = None, None, None
         # self.dCmpTP = {'RelMax': None, 'AbsMax': None, 'PDiff': None}
-        self.dCmpTP = {'RelMax': None}
+        self.dCmpTP = {'RelMax': None, 'AbsMax': None}
 
     # --- print methods -------------------------------------------------------
     def printDfrInpFlt(self, tKSub):
@@ -165,31 +165,37 @@ class Evaluator(BaseClass):
 
     def compareTruePred(self, lSM=[]):
         self.dMapClT = GF.getDSClFromCHdr(itCol=self.dfrTrueCl.columns)
+        sKCf, sKPosS, sKPosC, sFM = 'OutClfr', 'sLFS', 'sLFC', self.sFltMth
         for s in self.dCmpTP:
+            print('Comparing true/predicted cLasses, mode "', s, '"', sep='')
             cDfrCmpTP = self.dfrCl.apply(SF.compTP, axis=1, d2CD=self.d2ClDet,
                                          dMapCT=self.dMapClT, lSM=lSM, sCmp=s)
             self.dCmpTP[s] = cDfrCmpTP
-            self.saveData(cDfrCmpTP, pF=self.FPs.dPF['OutClfr'])
+            dIMd = {sKCf: {sKPosC: (sFM, self.dITp['sE']),
+                           sKPosS: (s, self.dITp['sE'])}}
+            self.FPs.modFP(d2PI=self.d2PInf, dIMod=dIMd)
+            self.dCmpTP[s] = GF.concLOAx1(lObj=[self.serXCl, self.dCmpTP[s]])
+            self.saveData(self.dCmpTP[s], pF=self.FPs.dPF['OutClfr'])
+        print(GC.S_DS04, 'Finished comparing true/predicted cLasses.',
+              GC.S_DS04)
 
     def calcCFlt(self, d1, tF, lSM=[]):
-        sKA, sKB, sKPos, sJ = 'OutEval', 'OutClfr', 'sLFC', self.dITp['sUSC']
+        sKEv, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
         tFXt = tuple([self.dITp['sDetailed']] + list(tF))
         self.loopOverMethods(d1, tFXt=tFXt, lSM=lSM)
         self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
         lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]
-        self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True, srtDfr=True)
+        self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True)
         self.sFltMth = self.dITp['sUS02'].join([sJ.join(tF),
                                                 sJ.join(self.lAllMth)])
-        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKA, kPos=sKPos, cS=self.sFltMth)
-        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKB, kPos=sKPos, cS=self.sFltMth)
+        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKEv, kPos=sKPos, cS=self.sFltMth)
         self.dfrCl = self.dfrCl.convert_dtypes()
-        self.saveData(self.dfrCl, pF=self.FPs.dPF[sKA])
+        self.saveData(self.dfrCl, pF=self.FPs.dPF[sKEv])
         self.compareTruePred(lSM=lSM)
 
     def calcPredClassRes(self, dMthFlt=None):
         lSHdPred = self.iniLSHdCol(dMthFlt=dMthFlt)
-        # self.printD2ClDet()
         d1 = {sC: None for sC in lSHdPred}
         if self.dITp['doEvaluation'] and dMthFlt is not None:
             for tFlt, lSMth in dMthFlt.items():

@@ -11,7 +11,7 @@ sNmSpec = 'Input data for the Classifier class in O_07__Classifier'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # *** flow control ************************************************************
-doImbSampling = True                # do imbalanced sampling before classific.?
+doImbSampling = False                # do imbalanced sampling before classific.?
 
 doDummyClf = True                   # do dummy classification?
 doAdaClf = True                     # do AdaBoost classification?
@@ -133,8 +133,8 @@ bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-# nItPtFit = None             # number of iterations / partial fit (or None)
-nItPtFit = 1000             # number of iterations / partial fit (or None)
+nItPtFit = None             # number of iterations / partial fit (or None)
+# nItPtFit = 1000             # number of iterations / partial fit (or None)
 nItPrintPtFit = 100         # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------
@@ -229,8 +229,8 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
 lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
 
 # *** assertions **************************************************************
-assert type(nItPtFit) in [int, float]
-assert type(nItPrintPtFit) in [int, float]
+assert nItPtFit is None or type(nItPtFit) in [int, float]
+assert nItPrintPtFit is None or type(nItPrintPtFit) in [int, float]
 assert typeS in ['GridSearchCV', 'RandomizedSearchCV']
 
 # *** derived values and input processing *************************************

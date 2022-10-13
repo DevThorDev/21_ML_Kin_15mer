@@ -64,12 +64,24 @@ class FilePaths:
             self.dPF[sK] = FilePath(dInp=self.dI, dPI=dPI).pF
 
     # --- method for modifying a file path of the paths dictionary ------------
-    def modFP(self, d2PI, kMn, kPos, cS=None, sPos=GC.S_E, modPI=False):
+    def insStr(self, cD, kPos, cS=None, sPos=GC.S_E):
         if cS is not None and len(str(cS)) > 0:
-            cD, sKP = d2PI[kMn], self.dI[kPos]
-            if not modPI:
-                cD = {sK: cV for sK, cV in d2PI[kMn].items()}
+            sKP =self.dI[kPos]
             cD[sKP] = GF.insStartOrEnd(cD[sKP], cEl=cS, sPos=sPos)
+    
+    def modFP(self, d2PI, kMn=None, kPos=None, cS=None, sPos=GC.S_E,
+              dIMod=None, modPI=False):
+        # dI supports an alternative method to modify the file path
+        if dIMod is not None:
+            for kMn, dSub in dIMod.items():
+                cD = GF.genDictFromD2PI(d2PI, cK=kMn, modPI=modPI)
+                for kPos, (cS, sPos) in dSub.items():
+                    self.insStr(cD, kPos=kPos, cS=cS, sPos=sPos)
+                self.dPF[kMn] = FilePath(dInp=self.dI, dPI=cD).pF
+        else:
+            assert kMn is not None and kPos is not None
+            cD = GF.genDictFromD2PI(d2PI, cK=kMn, modPI=modPI)
+            self.insStr(cD, kPos=kPos, cS=cS, sPos=sPos)
             self.dPF[kMn] = FilePath(dInp=self.dI, dPI=cD).pF
 
     # --- method for modifying file paths of the paths dictionary -------------

@@ -120,16 +120,6 @@ class ImbSampler(BaseClass):
             else:
                 print(GC.S_DS04, 'No imbalanced sampling.')
 
-    def printResNoResample(self, Y, doPrt=True):
-        if doPrt:
-            print(GC.S_DS04, ' Size of Y:', Y.size)
-            YUnq = Y.unique()
-            print('Unique values of Y:', YUnq)
-            print('Sizes of classes:')
-            for cY in YUnq:
-                print(cY, self.dITp['sColon'], self.dITp['sTab'],
-                      Y[Y == cY].size, sep='')
-
     def printResResampleImb(self, YIni, YRes, doPrt=True):
         if doPrt:
             print(GC.S_DS04, ' Size of Y:', GC.S_NEWL, 'Initial: ', YIni.size,
@@ -332,6 +322,16 @@ class GeneralClassifier(BaseClfPrC):
         print('Resampling data using resampler "', self.dITp['sSampler'],
               '" with sampling strategy "', self.dITp['sStrat'], '" for fold ',
               self.j + 1, '.', sep='')
+
+    def printResNoResample(self, Y, doPrt=True):
+        if doPrt:
+            print(GC.S_DS04, ' Size of Y:', Y.size)
+            YUnq = Y.unique()
+            print('Unique values of Y:', YUnq)
+            print('Sizes of classes:')
+            for cY in YUnq:
+                print(cY, self.dITp['sColon'], self.dITp['sTab'],
+                      Y[Y == cY].size, sep='')
 
     # --- method for getting the defined kFold-Splitter -----------------------
     def getKFoldSplitter(self):
@@ -555,7 +555,7 @@ class GeneralClassifier(BaseClfPrC):
                 X, Y = cSmp.imbSmp.fit_resample(XInp, YInp)
                 cSmp.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
             else:
-                cSmp.printResNoResample(Y=Y, doPrt=(k==0))
+                self.printResNoResample(Y=Y, doPrt=(k==0))
             cClf.partial_fit(X, Y, classes=self.lSXCl)
             self.printClfPartialFit(X)
         return X, Y

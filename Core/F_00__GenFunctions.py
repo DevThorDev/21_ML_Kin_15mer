@@ -337,6 +337,13 @@ def insStartOrEnd(itS, cEl, sPos=GC.S_E):
     else:
         return [s for s in itS]
 
+def convToL(itTest, itRef):
+    if type(itTest) in [list, tuple]:
+        assert len(itTest) >= len(itRef)
+        return itTest[:len(itRef)]
+    else:
+        return [itTest]*len(itRef)
+
 def fillCondList(elCond, lToFill=[], lLoop=[], lUnqEl=True):
     for elCheckContain in lLoop:
         if elCond in elCheckContain:
@@ -654,6 +661,12 @@ def fillDProbSnip(dProb, lSeq, sSnip):
 def appendToDictL(cD, itKeys, lVApp):
     for k, cKey in enumerate(itKeys):
         cD[cKey].append(lVApp[k])
+
+def genDictFromD2PI(d2PI, cK, modPI=False):
+    cD = d2PI[cK]
+    if not modPI:
+        cD = {sK: cV for sK, cV in d2PI[cK].items()}
+    return cD
 
 # --- Functions performing numpy array calculation and manipulation -----------
 def getArrCartProd(it1, it2):
