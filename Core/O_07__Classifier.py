@@ -571,7 +571,11 @@ class GeneralClassifier(BaseClfPrC):
             dat2Pred = self.XY.getX(sMth=sM, sTp=sTe, iSt=iSt, j=self.j)
         if calcScore and self.dScoreClf[self.j] is None:
             if len(YTest.shape) == 1:
-                self.dScoreClf[self.j] = cClf.score(dat2Pred, YTest)
+                try:
+                    self.dScoreClf[self.j] = cClf.score(dat2Pred, YTest)
+                except:
+                    print('ERROR: Cannot calculate score of classifier "',
+                          self.sMthL, '"!', sep='')
         if self.dITp['onlySglLbl']:
             YTest = SF.toMultiLbl(self.dITp, serY=YTest, lXCl=self.lSXCl)
         return dat2Pred, YTest
