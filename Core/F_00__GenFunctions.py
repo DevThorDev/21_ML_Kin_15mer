@@ -749,6 +749,17 @@ def getRelVals(cIt):
     # return pd.Series(lRet)
     return lRet
 
+def getPredCl(cD, sRetNoCl=GC.S_NONE, sRetMltCl=GC.S_MULTI_CL):
+    if pd.isna(pd.Series(cD.values())).all():
+        return np.nan
+    cIt1 = [n for n in cD.values() if n == 1]
+    if len(cIt1) > 1:
+        return sRetMltCl
+    elif len(cIt1) == 1:
+        return [sCl for sCl in cD if cD[sCl] == 1][0]
+    else:
+        return sRetNoCl
+
 def classifyTP(cIt):        # works only if always exactly one true class
     if pd.isna(cIt).all():
         return np.nan

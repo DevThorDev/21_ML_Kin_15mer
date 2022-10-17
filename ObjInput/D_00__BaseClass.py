@@ -65,7 +65,7 @@ sNone = GC.S_NONE
 sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
 sPredS, sPred, sNPred, sProba = GC.S_PRED_S, GC.S_PRED, GC.S_N_PRED, GC.S_PROBA
-sTrueCl, sPredCl = GC.S_TRUE_CL, GC.S_PRED_CL
+sTrueCl, sPredCl, sMultiCl = GC.S_TRUE_CL, GC.S_PRED_CL, GC.S_MULTI_CL
 sIGen = GC.S_I_GEN
 sCNmer = GC.S_C_N_MER
 sAllSeq = GC.S_ALL_SEQ
@@ -113,6 +113,7 @@ sDetailed = GC.S_DETAILED
 sProb = GC.S_PROB
 sProp = GC.S_PROP
 sEvalClPred = GC.S_EVAL_CL_PRED
+sClsClPred = GC.S_CLS_CL_PRED
 sClfrClPred = GC.S_CLFR_CL_PRED
 sLbl, sStep = GC.S_LBL, GC.S_STEP
 sClMapping = GC.S_CL_MAPPING
@@ -218,6 +219,7 @@ dIO = {# --- general
        'sProba': sProba,
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
+       'sMultiCl': sMultiCl,
        'sIGen': sIGen,
        'sCNmer': sCNmer,
        'sAllSeq': sAllSeq,
@@ -283,6 +285,7 @@ dIO = {# --- general
        'sProb': sProb,
        'sProp': sProp,
        'sEvalClPred': sEvalClPred,
+       'sClsClPred': sClsClPred,
        'sClfrClPred': sClfrClPred,
        'sLbl': sLbl,
        'sStep': sStep,

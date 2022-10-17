@@ -391,16 +391,25 @@ def getL01(lNOcc, sCmp='PDiff'):
     elif sCmp == 'PDiff':
         return GF.getRelVals(cIt=lNOcc)
 
-def compTP(cIt, d2CD, dMapCT, lSM=[], sCmp='PDiff'):    # only 4 single-class
+def compTP(cIt, d2CD, dMapCT, lSM=[], sCmp='PDiff', doCompTP=False):
+    # only for single-class predictions
     lRet = []
     for sMth in lSM:
         assert list(d2CD[sMth]) == list(dMapCT)
-        lT = [cIt.at[dMapCT[sCl]] for sCl in dMapCT]
-        lP = [cIt.at[lSCHd[0]] for lSCHd in d2CD[sMth].values()]
-        lP = getL01(lNOcc=lP, sCmp=sCmp)
-        assert len(lT) == len(lP)
-        lSumTP = [np.sum([cT, cP]) for cT, cP in zip(lT, lP)]
-        lRet.append(GF.classifyTP(cIt=lSumTP))
+        if doCompTP:
+            lT = [cIt.at[dMapCT[sCl]] for sCl in dMapCT]
+            lP = [cIt.at[lSCHd[0]] for lSCHd in d2CD[sMth].values()]
+            lP = getL01(lNOcc=lP, sCmp=sCmp)
+            assert len(lT) == len(lP)
+            lSumTP = [np.sum([cT, cP]) for cT, cP in zip(lT, lP)]
+            lRet.append(GF.classifyTP(cIt=lSumTP))
+        else:
+            lSCl, lV = ['']*len(d2CD[sMth]), [np.nan]*len(d2CD[sMth])
+            for k, (sCl, lSCHd) in enumerate(d2CD[sMth].items()):
+                lSCl[k] = sCl
+                lV[k] = cIt.at[lSCHd[0]]
+            lV = getL01(lNOcc=lV, sCmp=sCmp)
+            lRet.append(GF.getPredCl(cD={sCl: n for sCl, n in zip(lSCl, lV)}))
     return pd.Series(lRet, name=sCmp, index=lSM)
 
 ###############################################################################
