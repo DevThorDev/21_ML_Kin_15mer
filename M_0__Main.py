@@ -107,17 +107,16 @@ cStTime = GF.showElapsedTime(startTime)
 cEval = Evaluator(inpDatG)
 
 # cEval.FPs.printAllFPs()
-# sMeth, itSFilt = 'LSV', {'Detailed',
-#                          # 'RndUSmpl'
-#                          }
+# sMeth, itSFilt = 'LSV', {GC.S_DETAILED, GC.S_SMPL_RND_U_S}
 # sMeth, itSFilt = 'NSV', None
 # dDfrSubSet = cEval.selSubSetDDfr(sMth=sMeth, itSFlt=itSFilt)
 # for tK in dDfrSubSet:
 #     print(GC.S_DS04, tK, GC.S_DS04)
 #     print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
 
-# tK1 = ('RndUSmpl', 'A')
-tK1 = ('RndUSmpl',)
+# tK1 = (GC.S_SMPL_RND_U_S, GC.S_A)
+# tK1 = (GC.S_SMPL_RND_U_S,)
+tK1 = (GC.S_SMPL_NO_S,)
 dMF = {tK1: [GC.S_MTH_DUMMY,
              GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,

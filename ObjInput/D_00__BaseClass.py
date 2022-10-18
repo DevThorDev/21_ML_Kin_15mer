@@ -127,8 +127,16 @@ sNmerSeqU = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 sMltStep = GC.S_MLT_STEP
 sOneHot, sOrdinal = GC.S_ONE_HOT, GC.S_ORDINAL
+sSampler, sSamplerS = GC.S_SAMPLER, GC.S_SAMPLER_S
+sSmplNo, sSmplNoS = GC.S_SMPL_NO, GC.S_SMPL_NO_S
+sSmplClCtr, sSmplClCtrS = GC.S_SMPL_CL_CTR, GC.S_SMPL_CL_CTR_S
+sSmplAllKNN, sSmplAllKNNS = GC.S_SMPL_ALL_KNN, GC.S_SMPL_ALL_KNN_S
+sSmplNbhClR, sSmplNbhClRS = GC.S_SMPL_NBH_CL_R, GC.S_SMPL_NBH_CL_R_S
+sSmplRndU, sSmplRndUS = GC.S_SMPL_RND_U, GC.S_SMPL_RND_U_S
+sSmplTomLks, sSmplTomLksS = GC.S_SMPL_TOM_LKS, GC.S_SMPL_TOM_LKS_S
 sStratRealMajo = GC.S_STRAT_REAL_MAJO
 sStratShareMino = GC.S_STRAT_SHARE_MINO
+sFullFit, sFullFitS = GC.S_FULL_FIT, GC.S_FULL_FIT_S
 sPartFit, sPartFitS = GC.S_PART_FIT, GC.S_PART_FIT_S
 s0Pred, s1Pred, sNotPred = GC.S_0_PRED, GC.S_1_PRED, GC.S_NOT_PRED
 
@@ -299,10 +307,26 @@ dIO = {# --- general
        'sNmerSeqU': sNmerSeqU,
        'sInpData': sInpData,
        'sMltStep': sMltStep,
+       'sSampler': sSampler,
+       'sSamplerS': sSamplerS,
+       'sSmplNo': sSmplNo,
+       'sSmplNoS': sSmplNoS,
+       'sSmplClCtr': sSmplClCtr,
+       'sSmplClCtrS': sSmplClCtrS,
+       'sSmplAllKNN': sSmplAllKNN,
+       'sSmplAllKNNS': sSmplAllKNNS,
+       'sSmplNbhClR': sSmplNbhClR,
+       'sSmplNbhClRS': sSmplNbhClRS,
+       'sSmplRndU': sSmplRndU,
+       'sSmplRndUS': sSmplRndUS,
+       'sSmplTomLks': sSmplTomLks,
+       'sSmplTomLksS': sSmplTomLksS,
        'sOneHot': sOneHot,
        'sOrdinal': sOrdinal,
        'sStratRealMajo': sStratRealMajo,
        'sStratShareMino': sStratShareMino,
+       'sFullFit': sFullFit,
+       'sFullFitS': sFullFitS,
        'sPartFit': sPartFit,
        'sPartFitS': sPartFitS,
        's0Pred': s0Pred,

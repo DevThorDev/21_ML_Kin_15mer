@@ -46,8 +46,8 @@ lParGrid_Dy = [{'strategy': ['uniform', 'stratified']}]
 # --- parameter dictionary for Dummy Classifier -------------------------------
 d2Par_Dy = {GC.S_0: {'strategy': 'uniform',
                      'constant': None},
-            GC.S_A: {'strategy': 'stratified',
-                     'constant': None}}
+            GC.S_A: {'strategy': 'uniform'},
+            GC.S_B: {'strategy': 'stratified'}}
 
 # === AdaBoost Classifier =====================================================
 # --- list of parameter grids for AdaBoost Classifier grid search -------------
@@ -232,8 +232,8 @@ d2Par_HGrB = {GC.S_0: {'loss': 'log_loss',
                        'scoring': 'loss',
                        'validation_fraction': 0.1,
                        'n_iter_no_change': 10,
-                       'tol': 1.0e-7}
-              }
+                       'tol': 1.0e-7},
+              GC.S_A: {'tol': 1.0e-8}}
 
 # === Gaussian Process Classifier =============================================
 # --- list of parameter grids for Gaussian Process Classifier grid search -----
@@ -251,6 +251,7 @@ d2Par_GP = {GC.S_0: {'kernel': None,
                      'max_iter_predict': 100,
                      'copy_X_train': True,
                      'multi_class': 'one_vs_rest'},
+            GC.S_A: {'max_iter_predict': 200},
             GC.S_B: {'kernel': None,
                      'optimizer': 'fmin_l_bfgs_b',
                      'n_restarts_optimizer': 0,
@@ -458,9 +459,9 @@ d2Par_MLP = {GC.S_0: {'hidden_layer_sizes': (100,),
                       'epsilon': 1e-8,
                       'n_iter_no_change': 10,
                       'max_fun': 15000},
-             'A': {'learning_rate': 'adaptive',
-                   'max_iter': 50000,
-                   'tol': 1e-6}}
+             GC.S_A: {'learning_rate': 'adaptive',
+                      'max_iter': 50000,
+                      'tol': 1e-6}}
 
 # === Linear SV Classifier ====================================================
 # --- list of parameter grids for Linear SV Classifier grid search ------------

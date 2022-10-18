@@ -340,14 +340,14 @@ def getLSE(dITp, sMth, lIFE):
     lSESum = [sMth] + list(dITp['d3Par'][sMth])
     lSEDet = lIFE + [sMth]
     l2Add = []
-    if sMth in dITp['lSMthPartFit']:
-        if dITp['nItPtFit'] is None:
-            l2Add += [dITp['sPartFitS'] + dITp['sNone']]
-        else:
-            sNIt = str(round(dITp['nItPtFit']))
-            l2Add += [dITp['sPartFitS'] + sNIt]
+    if sMth in dITp['lSMthPartFit'] and dITp['nItPtFit'] is not None:
+        l2Add += [dITp['sPartFitS'] + str(round(dITp['nItPtFit']))]
+    else:
+        l2Add += [dITp['sFullFitS']]
     if dITp['doImbSampling'] and dITp['sSmplS'] is not None:
         l2Add += [dITp['sSmplS']]
+    else:
+        l2Add += [dITp['sSmplNoS']]
     lSESum += l2Add
     lSEDet += l2Add
     return lSEPar, lSESum, lSEDet
