@@ -601,14 +601,14 @@ class GeneralClassifier(BaseClfPrC):
     # --- method for calculating the predicted y classes, and their probs -----
     def getYPredProba(self, cClf, X2Pred=None, YTest=None):
         sM, sPd, sPa = self.sMth, self.dITp['sPred'], self.dITp['sProba']
-        lSC, lSR = YTest.columns, YTest.index
+        sML, lSC, lSR = self.sMthL, YTest.columns, YTest.index
         if self.dITp['onlySglLbl']:
             YPred = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
                                 nameS=self.dITp['sEffFam'])
             YPred = SF.toMultiLbl(self.dITp, serY=YPred, lXCl=self.lSXCl)
         else:
             YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC, lSNmR=lSR)
-        YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR)
+        YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR, sMthL=sML)
         if YProba is None:
             YProba = GF.iniWShape(tmplDfr=YPred)
         assert YProba.shape == YPred.shape

@@ -678,10 +678,19 @@ def iniNpArr(data=None, shape=(0, 0), fillV=np.nan):
     else:       # ignore shape
         return np.array(data)
 
-def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, i=0):
+def getYProba(cClf, dat2Pr=None, lSC=None, lSR=None, sMthL=None, i=0):
     if hasattr(cClf, 'predict_proba'):
-        arrProba = cClf.predict_proba(dat2Pr)
+        try:
+            arrProba = cClf.predict_proba(dat2Pr)
+        except:
+            if sMthL is not None:
+                print('Classifier "', sMthL, '" cannot predict probabilities',
+                      ' with the current parameters!', sep='')
+            return None
     else:
+        if sMthL is not None:
+            print('Classifier "', sMthL, '" does not have the option to ',
+                  'predict probabilities!', sep='')
         return None
     if type(arrProba) == list:    # e.g. result of a random forest classifier
         return iniPdDfr(np.column_stack([1 - cArr[:, i] for cArr in arrProba]),
