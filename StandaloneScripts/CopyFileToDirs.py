@@ -10,7 +10,9 @@ S_DOT, S_USC, S_DBL_BS = '.', '_', '\\'
 S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'
 
+S_TMPL_TO_EVAL = 'TmplToEval'
 S_TMPL_TO_RES = 'TmplToRes'
+S_TMPL_TO_EVRES = 'TmplToEvRes'
 S_RES_TO_EVAL = 'ResToEval'
 
 # --- file name extensions ----------------------------------------------------
@@ -25,7 +27,7 @@ S_DIR_INPUT_M = 'B_Input'
 S_DIR_RESULTS_M = 'C_Results'
 S_DIR_SCRIPTS_L1_CONTROL = 'Control'
 S_DIR_SCRIPTS_L1_CORE = 'Core'
-S_DIR_SCRIPTS_L1_OBJINP = 'ObjInput'
+S_DIR_SCRIPTS_L1_OINP = 'ObjInput'
 S_DIR_RESULTS_L1_CLF = '39_ResClf'
 S_DIR_RESULTS_L2_PARS = '00_Pars'
 S_DIR_RESULTS_L2_SMRS = '01_Summaries'
@@ -37,8 +39,8 @@ S_DIR_RESULTS_L2_PROP = '41_Prop'
 S_DIR_RESULTS_L2_EVAL = '90_Eval'
 
 P_DIR_ROOT = os.path.join('..', '..', '..')
-P_DIR_TMPL_SCRIPTS_L1_CORE = os.path.join(S_DIR_TEMPLATE, S_DIR_SCRIPTS_M,
-                                          S_DIR_SCRIPTS_L1_CORE)
+P_DIR_SCRIPTS_L1_CORE = os.path.join(S_DIR_SCRIPTS_M, S_DIR_SCRIPTS_L1_CORE)
+P_DIR_SCRIPTS_L1_OINP = os.path.join(S_DIR_SCRIPTS_M, S_DIR_SCRIPTS_L1_OINP)
 P_DIR_TMPL_RESULTS_L1_CLF = os.path.join(S_DIR_TEMPLATE, S_DIR_RESULTS_M,
                                          S_DIR_RESULTS_L1_CLF)
 P_DIR_EVAL_RESULTS_L1_CLF = os.path.join(S_DIR_EVALUATION, S_DIR_RESULTS_M,
@@ -55,26 +57,43 @@ SET_S_SUB_DIR_RES = {S_DIR_RESULTS_L2_PARS, S_DIR_RESULTS_L2_SMRS,
 
 # === INPUT ===================================================================
 # --- strings -----------------------------------------------------------------
-sModeCopy = S_RES_TO_EVAL   # S_TMPL_TO_RES: copy from tmpl. to res. dir(s)
+sModeCopy = S_TMPL_TO_EVRES  # S_TMPL_TO_EVAL: copy from tmpl. to eval. dir
+                            # S_TMPL_TO_RES: copy from tmpl. to res. dir(s)
+                            # S_TMPL_TO_EVRES: copy... to eval. AND res. dir(s)
                             # S_RES_TO_EVAL: copy from res. to eval. dir
 xtF2Copy = XT_PY            # extension of the file(s) to copy
 
 # --- sets --------------------------------------------------------------------
+setSStDirEval = {S_DIR_EVALUATION}
 setSStDirResL1 = SET_S_ST_DIR_RES_L1
-setSStDirResL2 = {S_DIR_SCRIPTS_M}
-setSStDirResL3 = {S_DIR_SCRIPTS_L1_CORE}
+setSStDirEvalResL1 = setSStDirResL1.union(setSStDirEval)
 
 setSSubDirRes = SET_S_SUB_DIR_RES
 
-# --- tuples ------------------------------------------------------------------
-# tTmplEval = (P_DIR_TMPL_RESULTS_L1_CLF, P_DIR_EVAL_RESULTS_L1_CLF)
+# --- lists -------------------------------------------------------------------
+lSTxtPrnt = ['Copied file\n*\t"', '" to\n>\t"', '".\n']
 
 # --- dictionaries ------------------------------------------------------------
-dSStF2Copy = {P_DIR_TMPL_SCRIPTS_L1_CORE: {'F_00', 'O_07'}}
-# dSStD2Copy = {tTmplEval: setSSubDirRes}
+# dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'}}
+dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
+              P_DIR_SCRIPTS_L1_CORE: {'O_90'},
+              P_DIR_SCRIPTS_L1_OINP: {'D_90'}}
+# dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
+#               P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_00', 'O_07', 'O_80', 'O_90'},
+#               P_DIR_SCRIPTS_L1_OINP: {'D_00', 'D_01', 'D_06', 'D_07', 'D_80',
+#                                       'D_90'}}
+
+# === DERIVED VALUES ==========================================================
+setSStDir = setSStDirEval
+if sModeCopy == S_TMPL_TO_EVAL:
+    setSStDir = setSStDirEval
+elif sModeCopy == S_TMPL_TO_RES:
+    setSStDir = setSStDirResL1
+elif sModeCopy == S_TMPL_TO_EVRES:
+    setSStDir = setSStDirEvalResL1
 
 # === INPUT DICTIONARY ========================================================
-dInp = {# --- strings ---------------------------------------------------------
+dInp = {# --- strings (1) -----------------------------------------------------
         'sDot': S_DOT,
         'sUsc': S_USC,
         'sDblBS': S_DBL_BS,
@@ -89,7 +108,7 @@ dInp = {# --- strings ---------------------------------------------------------
         'sDirResM': S_DIR_RESULTS_M,
         'sDirScrL1Ctr': S_DIR_SCRIPTS_L1_CONTROL,
         'sDirScrL1Core': S_DIR_SCRIPTS_L1_CORE,
-        'sDirScrL1ObjI': S_DIR_SCRIPTS_L1_OBJINP,
+        'sDirScrL1ObjI': S_DIR_SCRIPTS_L1_OINP,
         'sDirResL1Clf': S_DIR_RESULTS_L1_CLF,
         'sDirResL2Pars': S_DIR_RESULTS_L2_PARS,
         'sDirResL2Smrs': S_DIR_RESULTS_L2_SMRS,
@@ -100,27 +119,45 @@ dInp = {# --- strings ---------------------------------------------------------
         'sDirResL2Prop': S_DIR_RESULTS_L2_PROP,
         'sDirResL2Eval': S_DIR_RESULTS_L2_EVAL,
         'pDirRoot': P_DIR_ROOT,
-        'pDirTmplScrL1Core': P_DIR_TMPL_SCRIPTS_L1_CORE,
-        'pDirTmplResL1Clf': P_DIR_TMPL_RESULTS_L1_CLF,
+        'pDirScrL1Core': P_DIR_SCRIPTS_L1_CORE,
+        'pDirScrL1OInp': P_DIR_SCRIPTS_L1_OINP,
+        'pDirResL1Clf': P_DIR_TMPL_RESULTS_L1_CLF,
         'pDirEvalResL1Clf': P_DIR_EVAL_RESULTS_L1_CLF,
-        # --- strings ---------------------------------------------------------
+        # --- strings (2) -----------------------------------------------------
         'sModeCopy': sModeCopy,
         'xtF2Copy': xtF2Copy,
         # --- sets ------------------------------------------------------------
+        'setSStDir': setSStDir,
+        'setSStDirEval': setSStDirEval,
         'setSStDirResL1': setSStDirResL1,
-        'setSStDirResL2': setSStDirResL2,
-        'setSStDirResL3': setSStDirResL3,
+        'setSStDirEvalResL1': setSStDirEvalResL1,
         'setSSubDirRes': setSSubDirRes,
-        # --- tuples ----------------------------------------------------------
-        # 'tTmplEval': tTmplEval,
+        # --- lists -----------------------------------------------------------
+        'lSTxtPrnt': lSTxtPrnt,
         # --- dictionaries ----------------------------------------------------
-        'dSStF2Copy': dSStF2Copy
-        # ,
-        # 'dSStD2Copy': dSStD2Copy
-        }
+        'dSStF2Copy': dSStF2Copy}
 
 # === FUNCTIONS ===============================================================
-def addToLP(dI, lP, pM, setSSt={}, sEnd=None):
+# --- general functions -------------------------------------------------------
+def addToDictL(cD, cK, cE, lUnqEl=False):
+    if cK in cD:
+        if not lUnqEl or cE not in cD[cK]:
+            cD[cK].append(cE)
+    else:
+        cD[cK] = [cE]
+
+def printAction(lSTxt=[''], lSIns=[], sepTxt=''):
+    lTxtP = []
+    for k in range(max(len(lSTxt), len(lSIns))):
+        if k < len(lSTxt):
+            lTxtP.append(lSTxt[k])
+        if k < len(lSIns):
+            lTxtP.append(lSIns[k])
+    print(*lTxtP, sep=sepTxt)
+
+# --- specific functions ------------------------------------------------------
+def getLP(dI, pM, setSSt={}, sEnd=None):
+    lP = []
     for s in os.listdir(pM):
         for sSt in setSSt:
             if (sEnd is None and s.startswith(sSt) or
@@ -129,33 +166,25 @@ def addToLP(dI, lP, pM, setSSt={}, sEnd=None):
         if len(setSSt) == 0:
             if (sEnd is None) or (sEnd is not None and s.endswith(sEnd)):
                 lP.append(os.path.join(pM, s))
+    return lP
 
-def getLPF2Copy(dI):
-    lPF2Copy, pDRoot, xtF = [], dI['pDirRoot'], dI['xtF2Copy']
-    for pF2Copy, setSStF2Copy in dI['dSStF2Copy'].items():
-        pFF = os.path.join(pDRoot, pF2Copy)
-        addToLP(dI=dI, lP=lPF2Copy, pM=pFF, setSSt=setSStF2Copy, sEnd=xtF)
-    return lPF2Copy
+def getDPF2Copy(dI):
+    dPF2Copy, pDRoot, xtF = {}, dI['pDirRoot'], dI['xtF2Copy']
+    for pDDst in getLP(dI, pM=pDRoot, setSSt=dI['setSStDir']):
+        for pD2Copy, setSStF2Copy in dI['dSStF2Copy'].items():
+            pDSrcF = os.path.join(pDRoot, dI['sDirTmpl'], pD2Copy)
+            pDDstF = os.path.join(pDDst, pD2Copy)
+            for pF in getLP(dI, pM=pDSrcF, setSSt=setSStF2Copy, sEnd=xtF):
+                addToDictL(dPF2Copy, cK=pDDstF, cE=pF, lUnqEl=True)
+    return dPF2Copy
 
-def getLPDDst(dI):
-    lPDDstL1, lPDDstL2, lPDDstL3, pDRoot = [], [], [], dI['pDirRoot']
-    addToLP(dI=dI, lP=lPDDstL1, pM=pDRoot, setSSt=dI['setSStDirResL1'])
-    for pD in lPDDstL1:
-        addToLP(dI=dI, lP=lPDDstL2, pM=pD, setSSt=dI['setSStDirResL2'])
-    for pD in lPDDstL2:
-        addToLP(dI=dI, lP=lPDDstL3, pM=pD, setSSt=dI['setSStDirResL3'])
-    return lPDDstL3
-
-def getLSourcesLDestinations(dI):
-    return {'lSources': getLPF2Copy(dI=dI), 'lDestinations': getLPDDst(dI=dI)}
-
-def copyFromTemplateToResultDirs(dI, dR):
-    for cSrc in dR['lSources']:
-        for cDst in dR['lDestinations']:
-            if os.path.isfile(cSrc) and os.path.isdir(cDst):
-                sFDst = os.path.join(cDst, cSrc.split(dI['sDblBS'])[-1])
-                shutil.copyfile(cSrc, sFDst)
-                print('Copied file "', cSrc, '" to\n\t"', sFDst, '".', sep='')
+def copyFromTemplateToResultDirs(dI, dPF):
+    for pDDst, lPFSrc in dPF.items():
+        for pFSrc in lPFSrc:
+            if os.path.isfile(pFSrc) and os.path.isdir(pDDst):
+                pFDst = os.path.join(pDDst, pFSrc.split(dI['sDblBS'])[-1])
+                shutil.copyfile(pFSrc, pFDst)
+                printAction(lSTxt=dI['lSTxtPrnt'], lSIns=[pFSrc, pFDst])
 
 def copyFromResultToEvaluationDirs(dI):
     pDDstM = os.path.join(dI['pDirRoot'], dI['sDirEval'], dI['sDirResM'])
@@ -171,13 +200,12 @@ def copyFromResultToEvaluationDirs(dI):
                             pFSrc = os.path.join(pDSrc, sF)
                             pFDst = os.path.join(pDDst, sF)
                             shutil.copyfile(pFSrc, pFDst)
-                            print('Copied file\n\t"', pFSrc, '" to\n\t"',
-                                  pFDst, '".\n', sep='')
+                            printAction(lSTxt=dI['lSTxtPrnt'],
+                                        lSIns=[pFSrc, pFDst])
 
 # === MAIN ====================================================================
-if dInp['sModeCopy'] == S_TMPL_TO_RES:
-    dRes = getLSourcesLDestinations(dI=dInp)
-    copyFromTemplateToResultDirs(dI=dInp, dR=dRes)
+if dInp['sModeCopy'] in [S_TMPL_TO_EVAL, S_TMPL_TO_RES, S_TMPL_TO_EVRES]:
+    copyFromTemplateToResultDirs(dI=dInp, dPF=getDPF2Copy(dI=dInp))
 elif dInp['sModeCopy'] == S_RES_TO_EVAL:
     copyFromResultToEvaluationDirs(dI=dInp)
 

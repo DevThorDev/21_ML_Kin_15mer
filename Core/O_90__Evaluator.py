@@ -163,7 +163,8 @@ class Evaluator(BaseClass):
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
                     if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
                         print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
-                        self.lAllMth.append(sM)
+                        if sM not in self.lAllMth:
+                            self.lAllMth.append(sM)
                     self.calcResSglClf(d1, cDfr, sMth=sM)
 
     def calcSummaryVals(self):
@@ -196,7 +197,7 @@ class Evaluator(BaseClass):
     def calcCFlt(self, d1, tF, lSM=[]):
         sKEv, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
-        tFXt = tuple([self.dITp['sDetailed']] + list(tF))
+        tFXt, self.lAllMth = tuple([self.dITp['sDetailed']] + list(tF)), []
         self.loopOverMethods(d1, tFXt=tFXt, lSM=lSM)
         self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
         lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]

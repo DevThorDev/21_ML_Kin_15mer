@@ -106,36 +106,25 @@ cTiming.updateTimes(tMth=(7, 1000), stTMth=cStTime, endTMth=cEndTime)
 cStTime = GF.showElapsedTime(startTime)
 cEval = Evaluator(inpDatG)
 
-# cEval.FPs.printAllFPs()
-# sMeth, itSFilt = 'LSV', {GC.S_DETAILED, GC.S_SMPL_RND_U_S}
-# sMeth, itSFilt = 'NSV', None
-# dDfrSubSet = cEval.selSubSetDDfr(sMth=sMeth, itSFlt=itSFilt)
-# for tK in dDfrSubSet:
-#     print(GC.S_DS04, tK, GC.S_DS04)
-#     print(dDfrSubSet[tK], GC.S_NEWL, GC.S_DS80, sep='')
-
 # tK1 = (GC.S_SMPL_RND_U_S, GC.S_A)
 # tK1 = (GC.S_SMPL_RND_U_S,)
-tK1 = (GC.S_SMPL_NO_S,)
-dMF = {tK1: [GC.S_MTH_DUMMY,
-             GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
+tK1 = (GC.S_FULL_FIT_S, GC.S_SMPL_NO_S)
+tK2 = (GC.S_FULL_FIT_S, GC.S_SMPL_RND_U_S)
+tK3 = (GC.S_PART_FIT_S + str(1000), GC.S_SMPL_RND_U_S)
+dMF = {tK1: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
+             GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
+             GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
+             GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
+             GC.S_MTH_MLP, GC.S_MTH_LSV],
+       tK2: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
              GC.S_MTH_GP,
              GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
-             GC.S_MTH_MLP,
-             GC.S_MTH_LSV, GC.S_MTH_NSV]}
-# dMF = {tK1: [GC.S_MTH_DUMMY,
-#              GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
-#              GC.S_MTH_GR_B,
-#              GC.S_MTH_PA_A, GC.S_MTH_PCT,
-#              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
-#              GC.S_MTH_MLP,
-#              GC.S_MTH_LSV, GC.S_MTH_NSV]}
-dMF = {tK1: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR, GC.S_MTH_PA_A,
-             GC.S_MTH_PCT, GC.S_MTH_SGD, GC.S_MTH_CT_NB, GC.S_MTH_CP_NB,
-             GC.S_MTH_GS_NB, GC.S_MTH_MLP]}
-# dMF = {tK1: [GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_CT_NB, GC.S_MTH_MLP]}
+             GC.S_MTH_MLP, GC.S_MTH_LSV, GC.S_MTH_NSV],
+       tK3: [GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
+             GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
+             GC.S_MTH_MLP]}
 
 # cEval.printDDfrCmb(tK=tK1)
 cEval.calcPredClassRes(dMthFlt=dMF)
