@@ -174,8 +174,11 @@ class Looper(BaseClass):
                 self.fillFPsMth()
             self.adaptFPs(sKP=sKPar, cRep=cRep)
             if self.dITp['saveDetailedClfRes']:
-                self.saveData(self.cClf.dfrPred, pF=self.FPs.dPF['DetldClf'])
-                self.saveData(self.cClf.dfrProba, pF=self.FPs.dPF['ProbaClf'])
+                lSrtBy = [self.dITp['sCNmer']]
+                dfrPred = self.cClf.dfrPred.sort_values(by=lSrtBy)
+                dfrProba = self.cClf.dfrPred.sort_values(by=lSrtBy)
+                self.saveData(dfrPred, pF=self.FPs.dPF['DetldClf'])
+                self.saveData(dfrProba, pF=self.FPs.dPF['ProbaClf'])
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(tMth=(self.cTM[0], self.cTM[1] + 1), stTMth=cT,
                              endTMth=cEndT)

@@ -16,9 +16,9 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 # method are performed if the number of repetitions is positve. Otherwise,
 # a parameter set is evaluated number of repetitions times.
 nRp0, nRpDef = GC.N_REP_0, 5
-dNumRep = {GC.S_MTH_DUMMY: nRp0,
+dNumRep = {GC.S_MTH_DUMMY: nRpDef,
            GC.S_MTH_ADA: nRp0,
-           GC.S_MTH_RF: nRp0,
+           GC.S_MTH_RF: nRpDef,
            GC.S_MTH_X_TR: nRp0,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
