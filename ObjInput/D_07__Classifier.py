@@ -78,7 +78,7 @@ pOutDet = GC.P_DIR_RES_CLF_DETAILED
 pOutPrC = GC.P_DIR_RES_CLF_PROP
 
 # *** kFold Splitter input ****************************************************
-tpKF = GC.S_K_FOLD                  # type of kFold-split, or None (no split)
+tpKF = GC.S_STRAT_K_FOLD            # type of kFold-split, or None (no split)
                                     # S_K_FOLD / S_GROUP_K_FOLD
                                     # S_STRAT_K_FOLD / S_STRAT_GROUP_K_FOLD
 nSplitsKF = 5                       # number of folds
@@ -133,8 +133,8 @@ bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-nItPtFit = None             # number of iterations / partial fit (or None)
-# nItPtFit = 1000             # number of iterations / partial fit (or None)
+# nItPtFit = None             # number of iterations / partial fit (or None)
+nItPtFit = 1000             # number of iterations / partial fit (or None)
 nItPrintPtFit = 100         # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------
