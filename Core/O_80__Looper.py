@@ -176,7 +176,7 @@ class Looper(BaseClass):
             if self.dITp['saveDetailedClfRes']:
                 lSrtBy = [self.dITp['sCNmer']]
                 dfrPred = self.cClf.dfrPred.sort_values(by=lSrtBy)
-                dfrProba = self.cClf.dfrPred.sort_values(by=lSrtBy)
+                dfrProba = self.cClf.dfrProba.sort_values(by=lSrtBy)
                 self.saveData(dfrPred, pF=self.FPs.dPF['DetldClf'])
                 self.saveData(dfrProba, pF=self.FPs.dPF['ProbaClf'])
             cEndT = GF.showElapsedTime(startTime=stT)

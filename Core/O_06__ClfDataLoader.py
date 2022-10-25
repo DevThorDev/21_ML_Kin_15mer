@@ -265,6 +265,12 @@ class DataLoader(BaseClass):
     def yieldXPrC(self):
         return self.XPrC
 
+    def yieldYClf(self):
+        return self.YClf
+
+    def yieldYPrC(self):
+        return self.YPrC
+
     def yieldData(self, sMd=None):
         if sMd == self.dITp['sClf']:
             return (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,

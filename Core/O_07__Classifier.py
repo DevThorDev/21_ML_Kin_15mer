@@ -390,7 +390,8 @@ class GeneralClassifier(BaseClfPrC):
     def doAllKFolds(self, inpDat, lITpUpd):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
         self.getKFoldSplitter()
-        for j, (lITr, lITe) in enumerate(self.kF.split(self.D.yieldXClf())):
+        for j, (lITr, lITe) in enumerate(self.kF.split(X=self.D.yieldXClf(),
+                                                       y=self.D.yieldYClf())):
             self.j, self.lITrain, self.lITest = j, lITr, lITe
             self.encodeSplitData()
             X, Y = self.XY.getXY(sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
