@@ -27,7 +27,11 @@ from sklearn.linear_model import (PassiveAggressiveClassifier, Perceptron,
 from sklearn.naive_bayes import CategoricalNB, ComplementNB, GaussianNB
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import LinearSVC, NuSVC
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
+                             top_k_accuracy_score,
+                             precision_recall_fscore_support, f1_score,
+                             roc_auc_score, matthews_corrcoef, log_loss,
+                             confusion_matrix, ConfusionMatrixDisplay)
 
 from imblearn.under_sampling import (ClusterCentroids, AllKNN,
                                      NeighbourhoodCleaningRule,
@@ -463,11 +467,11 @@ class GeneralClassifier(BaseClfPrC):
             YPred = self.XY.getY(sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
             print(GC.S_DS08, 'Predictions for fold', self.j + 1, GC.S_DS08)
             print('Shape of predicted Y:', YPred.shape)
-            nPred, nOK, _ = tuple(self.d3ResClf[self.sKPar][self.j].values())
+            t = tuple(self.d3ResClf[self.sKPar][self.j].values())
             if X2Pred is not None and X2Pred.shape[0] == YPred.shape[0]:
                 if YTest is not None:
                     self.printDetailedPredict(X2Pred, cSect='A1')
-                    self.printDetailedPredict(X2Pred, nPred, nOK, cSect='A2')
+                    self.printDetailedPredict(X2Pred, t[0], t[1], cSect='A2')
                 else:
                     self.printDetailedPredict(X2Pred, cSect='B')
             else:
@@ -578,8 +582,11 @@ class GeneralClassifier(BaseClfPrC):
                     print('ERROR: Cannot calculate score of classifier "',
                           self.sMthL, '"!', sep='')
         if self.dITp['onlySglLbl']:
-            YTest = SF.toMultiLbl(self.dITp, serY=YTest, lXCl=self.lSXCl)
-        return dat2Pred, YTest
+            self.YTS = YTest
+            self.YTM = SF.toMultiLbl(self.dITp, serY=YTest, lXCl=self.lSXCl)
+        else:
+            self.YTM = YTest
+        return dat2Pred, self.YTM
 
     def fitOrPartialFitClf(self):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
@@ -591,7 +598,6 @@ class GeneralClassifier(BaseClfPrC):
                 for k in range(round(abs(self.dITp['nItPtFit']))):
                     X, Y = self.ClfPartialFit(cClf, XInp=XIni, YInp=YIni, k=k)
                     self.printStatusPartFit(k=k)
-                # self.XY.setXY(X=X, Y=Y, sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
             else:
                 self.ClfFit(cClf)
             self.dClf[self.j] = cClf
@@ -604,19 +610,43 @@ class GeneralClassifier(BaseClfPrC):
         sM, sPd, sPa = self.sMth, self.dITp['sPred'], self.dITp['sProba']
         sML, lSC, lSR = self.sMthL, YTest.columns, YTest.index
         if self.dITp['onlySglLbl']:
-            YPred = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
-                                nameS=self.dITp['sEffFam'])
-            YPred = SF.toMultiLbl(self.dITp, serY=YPred, lXCl=self.lSXCl)
+            self.YPS = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
+                                   nameS=self.dITp['sEffFam'])
+            self.YPM = SF.toMultiLbl(self.dITp, serY=self.YPS, lXCl=self.lSXCl)
         else:
-            YPred = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC, lSNmR=lSR)
+            self.YPM = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC, lSNmR=lSR)
         YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR, sMthL=sML)
         if YProba is None:
-            YProba = GF.iniWShape(tmplDfr=YPred)
-        assert YProba.shape == YPred.shape
-        self.XY.setY(Y=YPred, sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
+            YProba = GF.iniWShape(tmplDfr=self.YPM)
+        assert YProba.shape == self.YPM.shape
+        self.XY.setY(Y=self.YPM, sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
         self.XY.setY(Y=YProba, sMth=sM, sTp=sPa, iSt=self.iSt, j=self.j)
 
     # --- method for calculating values of the Classifier results dictionary --
+    def calcLSumVals(self, YTest, YPred):
+        lV, lSXCl = [None]*len(self.dITp['lSResClf']), self.lSXCl
+        nPred = YPred.shape[0]
+        nOK = sum([1 for k in range(nPred) if
+                   (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
+        propOK = (nOK/nPred if nPred > 0 else None)
+        lV[:3] = [nPred, nOK, propOK]
+        # for n in range(3, len(lV)):
+        if self.dITp['onlySglLbl']:
+            lV[3] = accuracy_score(self.YTS, self.YPS)
+            lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
+            lV[5] = top_k_accuracy_score(self.YTS, self.YPM, k=2, labels=lSXCl)
+            lV[6] = top_k_accuracy_score(self.YTS, self.YPM, k=3, labels=lSXCl)
+            lV[7:11] = precision_recall_fscore_support(self.YTS, self.YPS,
+                                                       beta=1.0, labels=lSXCl,
+                                                       average='weighted')
+            lV[11] = f1_score(self.YTS, self.YPS, labels=lSXCl,
+                              average='weighted')
+            lV[12] = roc_auc_score(self.YTS, self.YPM, average='weighted',
+                                   multi_class='ovo', labels=lSXCl)
+            lV[13] = matthews_corrcoef(self.YTS, self.YPS)
+            lV[14] = log_loss(self.YTS, self.YPM, eps=1e-15, labels=lSXCl)
+        return lV
+    
     def assembleDDfrPredProba(self, lSCTP, YTest=None, YPred=None):
         lDDfr, j = [self.dDfrPred, self.dDfrProba], self.j
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
@@ -630,16 +660,12 @@ class GeneralClassifier(BaseClfPrC):
             lDDfr[k][j] = cDfr
         self.dDfrPred[j], self.dDfrProba[j] = lDDfr[0][j], lDDfr[1][j]
 
-    def calcResPredict(self, X2Pred=None, YTest=None):
+    def calcResPredict(self, YTest=None):
         YPred = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sPred'],
                              iSt=self.iSt, j=self.j)
-        if (X2Pred is not None and YTest is not None and
-            YPred is not None and X2Pred.shape[0] == YPred.shape[0]):
-            nPred = YPred.shape[0]
-            nOK = sum([1 for k in range(nPred) if
-                       (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
-            propOK = (nOK/nPred if nPred > 0 else None)
-            lVCalc = [nPred, nOK, propOK]
+        if (YTest is not None and YPred is not None and
+            YTest.shape == YPred.shape):
+            lVCalc = self.calcLSumVals(YTest, YPred)
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
                 GF.addToD3(self.d3ResClf, cKL1=self.sKPar, cKL2=self.j,
                            cKL3=sK, cVL3=cV)
@@ -684,9 +710,10 @@ class GeneralClassifier(BaseClfPrC):
         for self.j in range(self.dITp['nSplitsKF']):
             cClf = self.selClf(j=self.j)
             if cClf is not None:
+                self.YTS, self.YTM, self.YPS, self.YPM = [None]*4
                 XTest, YTest = self.getXYTest(cClf=cClf, dat2Pred=dat2Pred)
                 self.getYPredProba(cClf, X2Pred=XTest, YTest=YTest)
-                self.calcResPredict(X2Pred=XTest, YTest=YTest)
+                self.calcResPredict(YTest=YTest)
                 self.printPredict(X2Pred=XTest, YTest=YTest)
                 self.calcCnfMatrix(YTest=YTest)
         self.calcFoldsMnPredProba()

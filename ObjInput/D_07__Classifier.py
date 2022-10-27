@@ -226,7 +226,10 @@ lOldClPlt = ['C-----', 'C1----', 'C-2---', 'C--3--', 'C---4-', 'C----5',
              'C12--5', 'C1-34-', 'C1-3-5', 'C1--45', 'C-234-', 'C-23-5',
              'C-2-45', 'C--345', 'C1234-', 'C123-5', 'C12-45', 'C1-345',
              'C-2345', 'C12345']
-lSResClf = ['numPredicted', 'numCorrect', 'propCorrect']
+lSResClf = ['numPredicted', 'numCorrect', 'propCorrect',
+            'accurScore', 'balAccurScore', 'top2AccurScore', 'top3AccurScore',
+            'precScore', 'recallScore', 'fbetaScore', 'Support',
+            'f1Score', 'rocAucScore', 'matthewsCC', 'logLoss']
 
 # *** assertions **************************************************************
 assert nItPtFit is None or type(nItPtFit) in [int, float]

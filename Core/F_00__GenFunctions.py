@@ -509,7 +509,13 @@ def getMeansD2Val(d2):
     for d in d2.values():
         for cK, cV in d.items():
             addToDictL(dMn, cK=cK, cE=cV)
-    return {cK: np.mean(cL) for cK, cL in dMn.items()}
+    for cK, cL in dMn.items():
+        cL = [x for x in cL if x is not None]
+        if len(cL) > 0:
+            dMn[cK] = np.mean(cL)
+        else:
+            dMn[cK] = np.nan
+    return dMn
 
 def calcMnSEMOfDfrs(itDfrs, idxDfr=None, colDfr=None):
     d2Mn, d2SEM, N = {}, {}, len(itDfrs)
