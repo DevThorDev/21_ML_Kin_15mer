@@ -630,7 +630,6 @@ class GeneralClassifier(BaseClfPrC):
                    (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
         propOK = (nOK/nPred if nPred > 0 else None)
         lV[:3] = [nPred, nOK, propOK]
-        # for n in range(3, len(lV)):
         if self.dITp['onlySglLbl']:
             lV[3] = accuracy_score(self.YTS, self.YPS)
             lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
@@ -646,7 +645,7 @@ class GeneralClassifier(BaseClfPrC):
             lV[13] = matthews_corrcoef(self.YTS, self.YPS)
             lV[14] = log_loss(self.YTS, self.YPM, eps=1e-15, labels=lSXCl)
         return lV
-    
+
     def assembleDDfrPredProba(self, lSCTP, YTest=None, YPred=None):
         lDDfr, j = [self.dDfrPred, self.dDfrProba], self.j
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
@@ -698,10 +697,10 @@ class GeneralClassifier(BaseClfPrC):
         lAttrFold2Set = ['dfrPred', 'dfrProba']
         for sAttr, sAttr2Set in zip(lAttrFold, lAttrFold2Set):
             dDfr = getattr(self, sAttr)
-            lHd = GF.extractLHdNumColDDfr(dDfr)
+            lHd = GF.extractLHdFromDDfr(dDfr)
             setattr(self, sAttr2Set, GF.calcMeanItO(itO=dDfr, lKMn=lHd))
         dDfr = self.d2DfrCnfMat[self.sKPar]
-        lHd = GF.extractLHdNumColDDfr(dDfr)
+        lHd = GF.extractLHdFromDDfr(dDfr)
         self.dDfrCnfMat[self.sKPar] = GF.calcMeanItO(itO=dDfr, lKMn=lHd)
         self.d2ResClf[self.sKPar] = GF.getMeansD2Val(self.d3ResClf[self.sKPar])
 

@@ -26,17 +26,17 @@ class Evaluator(BaseClass):
     def fillFPs(self):
         # add the file with unique Nmer sequences
         pFNmer, sNmer = self.dITp['pInpUnqNmer'], self.dITp['sUnqNmer']
-        dFI = GF.getIFS(pF=pFNmer, itSCmp={sNmer}, addI=False)
+        dFI = SF.getIFS(self.dITp, pF=pFNmer, itSCmp={sNmer}, addI=False)
         self.FPs.dPF[sNmer] = GF.joinToPath(pFNmer, dFI[sNmer])
         # add the file with input data (X_Classes)
         pFInpD, sInpD = self.dITp['pInpData'], self.dITp['sInpData']
-        dFI = GF.getIFS(pF=pFInpD, itSCmp={sInpD}, addI=False)
+        dFI = SF.getIFS(self.dITp, pF=pFInpD, itSCmp={sInpD}, addI=False)
         self.FPs.dPF[sInpD] = GF.joinToPath(pFInpD, dFI[sInpD])
         # add the files with detailed and probability info for the classes
         for sKT in [self.dITp['sDetailed'], self.dITp['sProba']]:
             for cSet in self.dITp['lSetFIDet']:
-                cSetF = {sKT} | cSet
-                dFI = GF.getIFS(pF=self.dITp['pInpDet'], itSCmp=cSetF)
+                dFI = SF.getIFS(self.dITp, pF=self.dITp['pInpDet'],
+                                itSCmp=({sKT} | cSet))
                 for tK, sF in dFI.items():
                     self.FPs.dPF[tK] = GF.joinToPath(self.dITp['pInpDet'], sF)
         # initialise filter and classifier methods string
@@ -161,11 +161,12 @@ class Evaluator(BaseClass):
             print(GC.S_DS04, 'Checking for results of method', sM, GC.S_DS04)
             for tK, cDfr in self.dDfrCmb.items():
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
-                    if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
-                        print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
-                        if sM not in self.lAllMth:
-                            self.lAllMth.append(sM)
-                    self.calcResSglClf(d1, cDfr, sMth=sM)
+                    if tK[0] is not None:
+                        if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
+                            print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
+                            if sM not in self.lAllMth:
+                                self.lAllMth.append(sM)
+                        self.calcResSglClf(d1, cDfr, sMth=sM)
 
     def calcSummaryVals(self):
         pass
@@ -199,15 +200,15 @@ class Evaluator(BaseClass):
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
         tFXt, self.lAllMth = tuple([self.dITp['sDetailed']] + list(tF)), []
         self.loopOverMethods(d1, tFXt=tFXt, lSM=lSM)
-        self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
-        lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]
-        self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True)
-        self.sFltMth = self.dITp['sUS02'].join([sJ.join(tF),
-                                                sJ.join(self.lAllMth)])
-        self.FPs.modFP(d2PI=self.d2PInf, kMn=sKEv, kPos=sKPos, cS=self.sFltMth)
-        self.dfrCl = self.dfrCl.convert_dtypes()
-        self.saveData(self.dfrCl, pF=self.FPs.dPF[sKEv])
-        self.compareTruePred(lSM=lSM)
+        if not GF.allNone(d1.values()):
+            self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
+            lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]
+            self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True)
+            sFM = self.dITp['sUS02'].join([sJ.join(tF), sJ.join(self.lAllMth)])
+            self.sFltMth, self.dfrCl = sFM, self.dfrCl.convert_dtypes()
+            self.FPs.modFP(d2PI=self.d2PInf, kMn=sKEv, kPos=sKPos, cS=sFM)
+            self.saveData(self.dfrCl, pF=self.FPs.dPF[sKEv])
+            self.compareTruePred(lSM=lSM)
 
     def calcPredClassRes(self, dMthFlt=None):
         lSHdPred = self.iniLSHdCol(dMthFlt=dMthFlt)

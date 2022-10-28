@@ -29,6 +29,7 @@ class Looper(BaseClass):
         print('Initiated "Looper" base object.')
 
     def iniDicts(self):
+        self.dDfrPred, self.dDfrProba = None, None
         self.d3ResClf, self.d2MnSEMResClf = {}, {}
         self.d2CnfMat, self.dMnSEMCnfMat = {}, {}
 
@@ -158,6 +159,28 @@ class Looper(BaseClass):
             cClf = NuSVClf(self.inpD, self.D, lG, d2Par, iSt, sKPar, cRep)
         self.cTM, self.lParGrid, self.cClf = tM, lG, cClf
 
+    def saveMeanDetldProba(self, sKPar=GC.S_0):
+        lDDfr, lKFP = [self.dDfrPred, self.dDfrProba], ['DetldClf', 'ProbaClf']
+        for dDfr, cKFP in zip(lDDfr, lKFP):
+            dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.extractLHdFromDDfr(dDfr))
+            sKPR = GF.joinS([sKPar, self.sSt], cJ=self.dITp['sUSC'])
+            self.FPs.modFP(d2PI=self.d2PInf, kMn=cKFP, kPos='sLFE', cS=sKPR)
+            self.saveData(dfrMn, pF=self.FPs.dPF[cKFP])
+
+    def detailedClfRes(self, sKPar=GC.S_0, cRep=0):
+        if self.dITp['saveDetailedClfRes']:
+            lSrtBy = [self.dITp['sCNmer']]
+            dfrPred = self.cClf.dfrPred.sort_values(by=lSrtBy)
+            dfrProba = self.cClf.dfrProba.sort_values(by=lSrtBy)
+            if self.dDfrPred is not None:
+                self.dDfrPred[cRep] = dfrPred
+            if self.dDfrProba is not None:
+                self.dDfrProba[cRep] = dfrProba
+            self.saveData(dfrPred, pF=self.FPs.dPF['DetldClf'])
+            self.saveData(dfrProba, pF=self.FPs.dPF['ProbaClf'])
+            if cRep == (self.nRep - 1):
+                self.saveMeanDetldProba(sKPar=sKPar)
+
     def doRep(self, cTim, k=0, sKPar=GC.S_0, cRep=0, stT=None):
         if self.sMth in self.dITp['lSMth']:
             cT = GF.showElapsedTime(startTime=stT)
@@ -173,12 +196,7 @@ class Looper(BaseClass):
             if k == 0 and cRep == 0:
                 self.fillFPsMth()
             self.adaptFPs(sKP=sKPar, cRep=cRep)
-            if self.dITp['saveDetailedClfRes']:
-                lSrtBy = [self.dITp['sCNmer']]
-                dfrPred = self.cClf.dfrPred.sort_values(by=lSrtBy)
-                dfrProba = self.cClf.dfrProba.sort_values(by=lSrtBy)
-                self.saveData(dfrPred, pF=self.FPs.dPF['DetldClf'])
-                self.saveData(dfrProba, pF=self.FPs.dPF['ProbaClf'])
+            self.detailedClfRes(sKPar=sKPar, cRep=cRep)
             cEndT = GF.showElapsedTime(startTime=stT)
             cTim.updateTimes(tMth=(self.cTM[0], self.cTM[1] + 1), stTMth=cT,
                              endTMth=cEndT)
@@ -204,6 +222,7 @@ class Looper(BaseClass):
         if not self.dITp['useKey0'] and self.dITp['s0'] in self.d2Par:
             del self.d2Par[self.dITp['s0']]
         for k, sKPar in enumerate(self.d2Par):
+            self.dDfrPred, self.dDfrProba = {}, {}
             for cRep in range(self.nRep):
                 self.printSettingCRep(sKPar, cRep)
                 self.doRep(cTim, k=k, sKPar=sKPar, cRep=cRep, stT=stT)

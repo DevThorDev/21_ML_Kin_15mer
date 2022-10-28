@@ -2,6 +2,8 @@
 ###############################################################################
 # --- F_01__SpcFunctions.py ---------------------------------------------------
 ###############################################################################
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -353,6 +355,47 @@ def getLSE(dITp, sMth, lIFE):
     return lSEPar, lSESum, lSEDet
 
 # --- Functions (O_80__Evaluator) ---------------------------------------------
+def getRep(dITp, lS=[]):
+    cRep = None
+    for s in lS:
+        if s.startswith(dITp['sRepS']):
+            try:
+                cRep = int(s[len(dITp['sRepS']):])
+                break
+            except:
+                pass
+    return cRep
+
+def selFs(lSel, lSSpl, itSCmp=None):
+    for k, s in enumerate(lSSpl):
+        if s in itSCmp:
+            lSel.append((k, s))
+            if (len(itSCmp) > 1) and (k < len(lSSpl[:-1])):
+                for j, s in enumerate(lSSpl[(k + 1):]):
+                    if s in itSCmp:
+                        lSel.append((k + j, s))
+            break
+
+def fillDSF(dSFTI, lSel, sF, iRp=None, addI=True):
+    if addI:
+        dSFTI[tuple([iRp] + [t[1] for t in lSel])] = sF
+    else:
+        if len(lSel) == 1:
+            dSFTI[lSel[0][1]] = sF
+        else:
+            dSFTI[tuple([t[1] for t in lSel])] = sF
+
+def getIFS(dITp, pF='', itSCmp=None, addI=True, sSpl=GC.S_USC):
+    if itSCmp is None:                      # trivial case - no filtering
+        return os.listdir(pF)
+    dSFTI = {}
+    for sF in os.listdir(pF):
+        lSel, lSSpl = [], sF.split(GC.S_DOT)[0].split(sSpl)
+        selFs(lSel, lSSpl, itSCmp=itSCmp)
+        if len(lSel) == len(itSCmp):        # boolean AND
+            fillDSF(dSFTI, lSel, sF=sF, iRp=getRep(dITp, lS=lSSpl), addI=addI)
+    return dSFTI
+
 def getDMapCl(dITp, dDfr, sMth=None):
     dSCl, sUSC, lSPred = {}, dITp['sUSC'], dITp['lSPred']
     for cDfr in dDfr.values():
@@ -366,15 +409,6 @@ def getDMapCl(dITp, dDfr, sMth=None):
         else:
             dSCl[sCl] = [sUSC.join([sCl, sPred]) for sPred in lSPred]
     return dSCl
-
-# def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, tFlt, sMth):
-#     for sCHd in cDfr.columns[-nCl:]:
-#         k0, k1 = d2CD[(tFlt, sMth)][GF.getSClFromCHdr(sCHdr=sCHd)]
-#         for cK in [k0, k1]:
-#             if (cK in dRes and dRes[cK] is None) or (cK not in dRes):
-#                 dRes[cK] = GF.iniPdSer(lSNmI=cDfr.index, nameS=sCHd, fillV=0)
-#         dRes[k0] = dRes[k0].add(cDfr[sCHd].apply(lambda k: 1 - k))
-#         dRes[k1] = dRes[k1].add(cDfr[sCHd])
 
 def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, sMth):
     for sCHd in cDfr.columns[-nCl:]:

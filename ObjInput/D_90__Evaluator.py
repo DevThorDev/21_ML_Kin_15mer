@@ -26,7 +26,7 @@ sMthLSV = GC.S_MTH_LSV
 sMthNSV = GC.S_MTH_NSV
 
 # --- flow control (general) --------------------------------------------------
-doEvaluation = False             # do evaluation?
+doEvaluation = True             # do evaluation?
 
 sFF, sPF = GC.S_FULL_FIT_S, GC.S_PART_FIT_S + str(1000)
 lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)

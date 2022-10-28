@@ -11,6 +11,10 @@ from pandas.api.types import is_numeric_dtype
 
 import Core.C_00__GenConstants as GC
 
+# === Numpy/Pandas related constants ==========================================
+L_DTYPE_NP_PD = [np.ndarray, pd.core.series.Series, pd.core.frame.DataFrame]
+L_DTYPE_COMPLEX = [list, tuple, range, str, set, dict] + L_DTYPE_NP_PD
+
 # === General functions =======================================================
 # --- File system related functions -------------------------------------------
 def createDir(pF):
@@ -31,38 +35,6 @@ def joinDirToPath(pF='', nmD='Directory'):
         return pF
     else:
         return nmD
-
-def selFs(lSel, lSSpl, itSCmp=None):
-    for k, s in enumerate(lSSpl):
-        if s in itSCmp:
-            lSel.append((k, s))
-            if (len(itSCmp) > 1) and (k < len(lSSpl[:-1])):
-                for j, s in enumerate(lSSpl[(k + 1):]):
-                    if s in itSCmp:
-                        lSel.append((k + j, s))
-            break
-
-def fillDSF(dSFTI, lSel, sF, iF=0, addI=True):
-    if addI:
-        iF += 1
-        dSFTI[tuple([iF] + [t[1] for t in lSel])] = sF
-    else:
-        if len(lSel) == 1:
-            dSFTI[lSel[0][1]] = sF
-        else:
-            dSFTI[tuple([t[1] for t in lSel])] = sF
-    return iF
-
-def getIFS(pF='', itSCmp=None, addI=True, sSpl=GC.S_USC):
-    if itSCmp is None:                      # trivial case - no filtering
-        return os.listdir(pF)
-    dSFTI, iF = {}, 0
-    for sF in os.listdir(pF):
-        lSel, lSSpl = [], sF.split(GC.S_DOT)[0].split(sSpl)
-        selFs(lSel, lSSpl, itSCmp=itSCmp)
-        if len(lSel) == len(itSCmp):        # boolean AND
-            iF = fillDSF(dSFTI, lSel, sF=sF, iF=iF, addI=addI)
-    return dSFTI
 
 def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
     if len(sStart) > 0:
@@ -258,8 +230,15 @@ def calcPylProb(cSS, dCSS):
     return [cSS, nPyl, nTtl, getFract(nPyl, nTtl), cPrb]
 
 # --- Functions handling iterables --------------------------------------------
+def allEqual(cIt, cV=None):     # not for comparison of complex data types
+    lIt = [x for x in cIt if type(x) not in L_DTYPE_COMPLEX]
+    return lIt == [cV]*len(cIt)
+
+def allNone(cIt):
+    return allEqual(cIt=cIt)
+
 def allTrue(cIt):
-    return [cB for cB in cIt] == [True]*len(cIt)
+    return allEqual(cIt=cIt, cV=True)
 
 def toStr(cIt, sJoin=GC.S_USC, modStr=False):
     if ((type(cIt) in [list, tuple, range, set, dict]) or
@@ -923,7 +902,7 @@ def getColDfr(nLvl=1, colDfr=None):
         colDfr = range(nCol)
     return nCol, colDfr
 
-def extractLHdNumColDDfr(dDfr, inAll=True):
+def extractLHdFromDDfr(dDfr, inAll=True):
     dHdCnt, n = {}, len(dDfr)
     for cDfr in dDfr.values():
         for sCHd in cDfr.columns:
