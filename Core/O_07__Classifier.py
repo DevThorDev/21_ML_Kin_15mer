@@ -697,10 +697,10 @@ class GeneralClassifier(BaseClfPrC):
         lAttrFold2Set = ['dfrPred', 'dfrProba']
         for sAttr, sAttr2Set in zip(lAttrFold, lAttrFold2Set):
             dDfr = getattr(self, sAttr)
-            lHd = GF.extractLHdFromDDfr(dDfr)
+            lHd = GF.getLHdFromDDfr(dDfr)
             setattr(self, sAttr2Set, GF.calcMeanItO(itO=dDfr, lKMn=lHd))
         dDfr = self.d2DfrCnfMat[self.sKPar]
-        lHd = GF.extractLHdFromDDfr(dDfr)
+        lHd = GF.getLHdFromDDfr(dDfr)
         self.dDfrCnfMat[self.sKPar] = GF.calcMeanItO(itO=dDfr, lKMn=lHd)
         self.d2ResClf[self.sKPar] = GF.getMeansD2Val(self.d3ResClf[self.sKPar])
 

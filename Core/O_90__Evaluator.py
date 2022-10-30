@@ -156,10 +156,22 @@ class Evaluator(BaseClass):
             assert self.dfrTrueCl.equals(dfrTrueCl)
         SF.fillDPrimaryRes(d1, self.d2ClDet, cDfr=cDfr, nCl=nCl, sMth=sMth)
 
-    def loopOverMethods(self, d1, tFXt, lSM=[]):
+    def calcSaveMeanDetldProba(self, dDP):
+        for sKM in [self.dITp['sDetailed'], self.dITp['sProba']]:
+            for tK, dDfr in dDP[sKM].items():
+                dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.getLHdFromDDfr(dDfr))
+                tKFP = tuple([1] + list(tK))
+                if tKFP in self.FPs.dPF:
+                    pFMn = GF.modPF(self.FPs.dPF[tKFP], iRm=self.dITp['sLast'])
+                    self.saveData(dfrMn, pF=pFMn)
+
+    def loopOverMethods(self, d1, tF, tFXt, lSM=[]):
         for sM in lSM:
             print(GC.S_DS04, 'Checking for results of method', sM, GC.S_DS04)
+            dDP =  {self.dITp['sDetailed']: {}, self.dITp['sProba']: {}}
             for tK, cDfr in self.dDfrCmb.items():
+                if (len(tK) > 0) and ((set([sM]) | set(tF)) <= set(tK)):
+                    SF.fillDictDetldProba(self.dITp, dDP=dDP, tK=tK, cDfr=cDfr)
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
                     if tK[0] is not None:
                         if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
@@ -167,6 +179,7 @@ class Evaluator(BaseClass):
                             if sM not in self.lAllMth:
                                 self.lAllMth.append(sM)
                         self.calcResSglClf(d1, cDfr, sMth=sM)
+            self.calcSaveMeanDetldProba(dDP=dDP)
 
     def calcSummaryVals(self):
         pass
@@ -199,7 +212,7 @@ class Evaluator(BaseClass):
         sKEv, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
         tFXt, self.lAllMth = tuple([self.dITp['sDetailed']] + list(tF)), []
-        self.loopOverMethods(d1, tFXt=tFXt, lSM=lSM)
+        self.loopOverMethods(d1, tF=tF, tFXt=tFXt, lSM=lSM)
         if not GF.allNone(d1.values()):
             self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
             lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]

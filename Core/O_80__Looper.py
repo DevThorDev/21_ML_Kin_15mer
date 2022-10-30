@@ -162,10 +162,10 @@ class Looper(BaseClass):
     def saveMeanDetldProba(self, sKPar=GC.S_0):
         lDDfr, lKFP = [self.dDfrPred, self.dDfrProba], ['DetldClf', 'ProbaClf']
         for dDfr, cKFP in zip(lDDfr, lKFP):
-            dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.extractLHdFromDDfr(dDfr))
+            dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.getLHdFromDDfr(dDfr))
             sKPR = GF.joinS([sKPar, self.sSt], cJ=self.dITp['sUSC'])
             self.FPs.modFP(d2PI=self.d2PInf, kMn=cKFP, kPos='sLFE', cS=sKPR)
-            self.saveData(dfrMn, pF=self.FPs.dPF[cKFP])
+            self.saveData(dfrMn, pF=self.FPs.dPF[cKFP], saveIdx=False)
 
     def detailedClfRes(self, sKPar=GC.S_0, cRep=0):
         if self.dITp['saveDetailedClfRes']:

@@ -43,18 +43,38 @@ def addSStartSEnd(sF, sStart='', sEnd='', sJoin=''):
         sF = sF + sJoin + str(sEnd)
     return sF
 
-def modSF(sF, sStart='', sEnd='', sJoin=''):
+def removeFromLastPos(sF, sSpl=GC.S_USC):
+    sLastPart = sF.split(sSpl)[-1]
+    return sF[:-(len(sLastPart) + 1)]
+
+def removeFromIPos(sF, iP=None, sSpl=GC.S_USC):
+    sFMod = sF
+    if iP is not None:
+        lSPart, lSRet = sF.split(sSpl), []
+        for k, sPart in enumerate(lSPart):
+            if (iP != k) and (-iP != (len(lSPart) - k)):
+                lSRet.append(sPart)
+        sFMod = joinS(lSRet, cJ=sSpl)
+    return sFMod
+
+def modSF(sF, iRm=None, sStart='', sEnd='', sSpl=GC.S_USC, sJoin=''):
     if GC.S_DOT in sF:
         lSSpl = sF.split(GC.S_DOT)
         sFMod = joinS(lSSpl[:-1], cJ=GC.S_DOT)
+        if iRm == GC.S_LAST:
+            sFMod = removeFromLastPos(sFMod, sSpl=sSpl)
+        else:
+            sFMod = removeFromIPos(sFMod, iP=iRm, sSpl=sSpl)
         sFMod = addSStartSEnd(sFMod, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
         return sFMod + GC.S_DOT + lSSpl[-1]
     else:
         return addSStartSEnd(sF, sStart=sStart, sEnd=sEnd, sJoin=sJoin)
 
-def modPF(pF, sStart='', sEnd='', sJoin='', sJoinP=GC.S_DBLBACKSL):
+def modPF(pF, iRm=None, sStart='', sEnd='', sSpl=GC.S_USC, sJoin='',
+          sJoinP=GC.S_DBLBACKSL):
     lSSpl = pF.split(sJoinP)
-    sFMod = modSF(sF=lSSpl[-1], sStart=sStart, sEnd=sEnd, sJoin=sJoin)
+    sFMod = modSF(sF=lSSpl[-1], iRm=iRm, sStart=sStart, sEnd=sEnd, sSpl=sSpl,
+                  sJoin=sJoin)
     return joinS(lSSpl[:-1] + [sFMod], cJ=sJoinP)
 
 def fileXist(pF):
@@ -797,9 +817,11 @@ def red2TpStr(cR):
         return l[0]
 
 def calcMeanItO(itO, ignIdx=False, srtDfr=False, lKMn=[]):
-    lSer, lKDfr = [], []
+    if itO is None:
+        return None
     if type(itO) == dict:
         itO = itO.values()
+    lSer, lKDfr = [], []
     fullObj = concLOAx1(itO, ignIdx=ignIdx, verifInt=False, srtDfr=srtDfr)
     dLbl = makeLblUnq(itLbl=fullObj.columns, getDict=True)
     fullObj.columns = makeLblUnq(itLbl=fullObj.columns)
@@ -902,7 +924,9 @@ def getColDfr(nLvl=1, colDfr=None):
         colDfr = range(nCol)
     return nCol, colDfr
 
-def extractLHdFromDDfr(dDfr, inAll=True):
+def getLHdFromDDfr(dDfr, inAll=True):
+    if dDfr is None:
+        return None
     dHdCnt, n = {}, len(dDfr)
     for cDfr in dDfr.values():
         for sCHd in cDfr.columns:

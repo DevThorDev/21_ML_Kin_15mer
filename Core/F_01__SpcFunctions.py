@@ -355,9 +355,9 @@ def getLSE(dITp, sMth, lIFE):
     return lSEPar, lSESum, lSEDet
 
 # --- Functions (O_80__Evaluator) ---------------------------------------------
-def getRep(dITp, lS=[]):
+def getRep(dITp, itS=[]):
     cRep = None
-    for s in lS:
+    for s in itS:
         if s.startswith(dITp['sRepS']):
             try:
                 cRep = int(s[len(dITp['sRepS']):])
@@ -393,7 +393,7 @@ def getIFS(dITp, pF='', itSCmp=None, addI=True, sSpl=GC.S_USC):
         lSel, lSSpl = [], sF.split(GC.S_DOT)[0].split(sSpl)
         selFs(lSel, lSSpl, itSCmp=itSCmp)
         if len(lSel) == len(itSCmp):        # boolean AND
-            fillDSF(dSFTI, lSel, sF=sF, iRp=getRep(dITp, lS=lSSpl), addI=addI)
+            fillDSF(dSFTI, lSel, sF=sF, iRp=getRep(dITp, itS=lSSpl), addI=addI)
     return dSFTI
 
 def getDMapCl(dITp, dDfr, sMth=None):
@@ -409,6 +409,22 @@ def getDMapCl(dITp, dDfr, sMth=None):
         else:
             dSCl[sCl] = [sUSC.join([sCl, sPred]) for sPred in lSPred]
     return dSCl
+
+def fillDictDetldProba(dITp, dDP, tK, cDfr):
+    if len(tK) > 1:
+        for sKM in [dITp['sDetailed'], dITp['sProba']]:
+            if sKM in tK:
+                if tK[0] is None:
+                    dDP[sKM][tK[1:]] = None
+                else:
+                    try:
+                        cRep = int(tK[0])
+                        if ((tK[1:] not in dDP[sKM]) or
+                            (dDP[sKM][tK[1:]] is not None)):
+                            GF.addToDictD(dDP[sKM], cKMain=tK[1:], cKSub=cRep,
+                                          cVSub=cDfr)
+                    except:
+                        pass
 
 def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, sMth):
     for sCHd in cDfr.columns[-nCl:]:

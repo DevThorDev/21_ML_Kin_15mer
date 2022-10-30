@@ -71,6 +71,7 @@ sCNmer = GC.S_C_N_MER
 sAllSeq = GC.S_ALL_SEQ
 sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
+sLast = GC.S_LAST
 sUnique = GC.S_UNIQUE
 sDescNone = GC.S_DESC_NONE
 sDescDummy = GC.S_DESC_DUMMY
@@ -233,6 +234,7 @@ dIO = {# --- general
        'sAllSeq': sAllSeq,
        'sNmerSeq': sNmerSeq,
        'sFullSeq': sFullSeq,
+       'sLast': sLast,
        'sUnique': sUnique,
        'sDescNone': sDescNone,
        'sDescDummy': sDescDummy,
