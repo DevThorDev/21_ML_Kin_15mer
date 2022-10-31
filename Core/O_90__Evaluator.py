@@ -171,9 +171,10 @@ class Evaluator(BaseClass):
             dDP =  {self.dITp['sDetailed']: {}, self.dITp['sProba']: {}}
             for tK, cDfr in self.dDfrCmb.items():
                 if (len(tK) > 0) and ((set([sM]) | set(tF)) <= set(tK)):
-                    SF.fillDictDetldProba(self.dITp, dDP=dDP, tK=tK, cDfr=cDfr)
+                    if self.dITp['doDetailedProbaEval']:
+                        SF.fillDictDP(self.dITp, dDP=dDP, tK=tK, cDfr=cDfr)
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
-                    if tK[0] is not None:
+                    if tK[0] is not None and self.dITp['doClsPredEval']:
                         if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
                             print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
                             if sM not in self.lAllMth:

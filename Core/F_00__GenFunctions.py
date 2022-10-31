@@ -276,9 +276,10 @@ def iterIntersect(it1, it2, notIn2=False):
     return lIntersect
 
 def flattenIt(cIterable, retArr=False):
-    itFlat = list(itertools.chain.from_iterable(cIterable))
+    itFlat = sorted(list(itertools.chain.from_iterable(cIterable)))
     if retArr:
         itFlat = np.array(itFlat)
+        itFlat.sort()
     return itFlat
 
 def getItStartToEnd(cIt, iStart=None, iEnd=None):

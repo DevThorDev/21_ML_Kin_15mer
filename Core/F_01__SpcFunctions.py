@@ -410,7 +410,7 @@ def getDMapCl(dITp, dDfr, sMth=None):
             dSCl[sCl] = [sUSC.join([sCl, sPred]) for sPred in lSPred]
     return dSCl
 
-def fillDictDetldProba(dITp, dDP, tK, cDfr):
+def fillDictDP(dITp, dDP, tK, cDfr):
     if len(tK) > 1:
         for sKM in [dITp['sDetailed'], dITp['sProba']]:
             if sKM in tK:
@@ -445,17 +445,17 @@ def compTP(cIt, d2CD, dMapCT, lSM=[], sCmp='PDiff', doCompTP=False):
     # only for single-class predictions
     lRet = []
     for sMth in lSM:
-        assert list(d2CD[sMth]) == list(dMapCT)
+        assert sorted(list(d2CD[sMth])) == sorted(list(dMapCT))
         if doCompTP:
-            lT = [cIt.at[dMapCT[sCl]] for sCl in dMapCT]
-            lP = [cIt.at[lSCHd[0]] for lSCHd in d2CD[sMth].values()]
+            lT = [cIt.at[dMapCT[sCl]] for sCl in sorted(dMapCT)]
+            lP = [cIt.at[lSCHd[0]] for lSCHd in sorted(d2CD[sMth].values())]
             lP = getL01(lNOcc=lP, sCmp=sCmp)
             assert len(lT) == len(lP)
             lSumTP = [np.sum([cT, cP]) for cT, cP in zip(lT, lP)]
             lRet.append(GF.classifyTP(cIt=lSumTP))
         else:
             lSCl, lV = ['']*len(d2CD[sMth]), [np.nan]*len(d2CD[sMth])
-            for k, (sCl, lSCHd) in enumerate(d2CD[sMth].items()):
+            for k, (sCl, lSCHd) in enumerate(sorted(d2CD[sMth].items())):
                 lSCl[k] = sCl
                 lV[k] = cIt.at[lSCHd[0]]
             lV = getL01(lNOcc=lV, sCmp=sCmp)
