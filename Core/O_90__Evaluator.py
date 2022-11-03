@@ -149,7 +149,8 @@ class Evaluator(BaseClass):
 
     def calcResSglClf(self, d1, cDfr, sMth):
         nCl = cDfr.shape[1]//2
-        dfrTrueCl = cDfr.iloc[:, (-2*nCl):(-nCl)].sort_index(axis=0)
+        dfrTrueCl = cDfr.iloc[:, (-2*nCl):(-nCl)]
+        dfrTrueCl = dfrTrueCl.sort_index(axis=0).sort_index(axis=1)
         if self.dfrTrueCl is None:
             self.dfrTrueCl = dfrTrueCl
         else:
@@ -216,6 +217,7 @@ class Evaluator(BaseClass):
         self.loopOverMethods(d1, tF=tF, tFXt=tFXt, lSM=lSM)
         if not GF.allNone(d1.values()):
             self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
+            self.dfrPredCl = self.dfrPredCl.sort_index(axis=1)
             lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]
             self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True)
             sFM = self.dITp['sUS02'].join([sJ.join(tF), sJ.join(self.lAllMth)])
