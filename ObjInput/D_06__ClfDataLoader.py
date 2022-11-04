@@ -145,8 +145,12 @@ if maxLenNmer is not None and maxLenNmer != GC.LEN_N_MER_DEF:
 if dAAcPosRestr is not None:
     for sK, lV in dAAcPosRestr.items():
         sRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
-if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
-    sRestr = GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
+if lIPosUsed == list(range(lIPosUsed[0], lIPosUsed[-1] + 1)):
+    sPosUsed = GF.joinS([lIPosUsed[0], GC.S_TO, lIPosUsed[-1]])
+    sRestr = GF.joinS([sRestr, GC.S_I_POS, sPosUsed])
+else:
+    if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
+        sRestr = GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
 
 # === create input dictionary =================================================
 dIO = {# --- general

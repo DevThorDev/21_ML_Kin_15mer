@@ -325,6 +325,7 @@ S_CL_STEPS = S_CL + S_STEP + 's'
 S_MAX_LEN_S = 'mxL'
 S_RESTR = 'rst'
 S_I_POS = 'iPos'
+S_TO = 'to'
 S_WITH_EXCL_EFF_FAM = 'wXcl' + S_EFF_FAM_S
 S_NO_EXCL_EFF_FAM = 'noXcl' + S_EFF_FAM_S
 S_K_FOLD, S_GROUP_K_FOLD = 'KFold', 'GroupKFold'

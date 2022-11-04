@@ -74,10 +74,10 @@ lSTxtPrnt = ['Copied file\n*\t"', '" to\n>\t"', '".\n']
 
 # --- dictionaries ------------------------------------------------------------
 # dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'}}
-# dSStF2Copy = {P_DIR_SCRIPTS_L1_OINP: {'D_00'}}
-# dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'F_01'},
-#               P_DIR_SCRIPTS_L1_OINP: {'D_90'}}
-dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'F_01'}}
+# dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'F_01'}}
+dSStF2Copy = {P_DIR_SCRIPTS_L1_OINP: {'D_06'}}
+# dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00'},
+#               P_DIR_SCRIPTS_L1_OINP: {'D_06'}}
 # dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
 #               P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_00', 'O_07', 'O_80', 'O_90'},
 #               P_DIR_SCRIPTS_L1_OINP: {'D_00', 'D_01', 'D_06', 'D_07', 'D_80',
