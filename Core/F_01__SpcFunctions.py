@@ -120,13 +120,18 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_06__ClfDataLoader) -----------------------------------------
+def getCentSNmer(dITp, sSeq):
+    iStart = dITp['iCentNmer'] - dITp['maxPosNmer']
+    iEnd = dITp['iCentNmer'] + dITp['maxPosNmer'] + 1
+    return sSeq[iStart:iEnd]
+
 def filterNmerSeq(dITp, dSeq={}, serSeq=None):
     dSeqFilt = dSeq
     if dITp['dAAcPosRestr'] is not None and serSeq is not None:
-        assert min([len(sSeq) for sSeq in serSeq]) >= dITp['lenNmerDef']
+        minLen = min([len(sSeq) for sSeq in serSeq])
         for iP, lAAc in dITp['dAAcPosRestr'].items():
             iSeq = iP + dITp['iCentNmer']
-            if iSeq >= 0 and iSeq < dITp['lenNmerDef']:
+            if iSeq >= 0 and iSeq < minLen:
                 lB = [(sSeq[iSeq] in lAAc) for sSeq in serSeq]
                 serSeq = serSeq[lB]
         dSeqFilt = {sSeq: dSeq[sSeq] for sSeq in serSeq}
@@ -172,12 +177,14 @@ def preProcInp(dITp, dfrInp, dNmerNoCl):
     assert dfrInp.columns.to_list() == lInpNoCl
     dIC, dNmerEffF = dfrInp.to_dict(orient='list'), {}
     for sNmer, sEffFam in zip(dIC[dITp['sCNmer']], dIC[dITp['sEffFam']]):
-        GF.addToDictL(dNmerEffF, cK=sNmer, cE=sEffFam, lUnqEl=True)
+        GF.addToDictL(dNmerEffF, cK=getCentSNmer(dITp, sSeq=sNmer),
+                      cE=sEffFam, lUnqEl=True)
     if dNmerNoCl is None:
         return dfrInp
     for sAAc, lNmer in dNmerNoCl.items():
         for sNmer in lNmer:
-            GF.addToDictL(dNmerEffF, cK=sNmer, cE=dITp['sNoFam'], lUnqEl=True)
+            GF.addToDictL(dNmerEffF, cK=getCentSNmer(dITp, sSeq=sNmer),
+                          cE=dITp['sNoFam'], lUnqEl=True)
     serNmerSeq = GF.iniPdSer(list(dNmerEffF), nameS=dITp['sCNmer'])
     return filterNmerSeq(dITp, dSeq=dNmerEffF, serSeq=serNmerSeq)
 
@@ -254,7 +261,7 @@ def fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap, cSeq):
     return lXCl
 
 def procInp(dIG, dITp, dNmerEffF):
-    iCent, lIPosUsed = dITp['iCentNmer'], dITp['lIPosUsed']
+    iCent, lIPosUsed = dITp['maxPosNmer'], dITp['lIPosUsed']
     dfrProc, X, Y, dClMap, lSXCl = None, None, None, getDClMap(dIG, dITp), []
     dProc, dX, dY = iniObj(dIG, dITp, dNmerEffF)
     for cSeq in dNmerEffF:
