@@ -57,7 +57,7 @@ class Looper(BaseClass):
     # --- method for updating the type dictionary -----------------------------
     def updateAttr(self):
         self.CLblsTrain = self.cClf.CLblsTrain
-        self.lIFE = self.D.lIFE + [self.CLblsTrain]
+        self.lIFE = self.D.lIFES + [self.CLblsTrain]
 
     # --- methods for filling and changing the file paths ---------------------
     def fillFPsMth(self):

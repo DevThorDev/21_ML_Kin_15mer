@@ -234,7 +234,7 @@ class BaseClfPrC(BaseClass):
                           self.dITp['nItPtFit'] is not None)
         self.sKPar = sKPar
         self.getCLblsTrain()
-        self.lIFE = self.D.lIFE + [self.CLblsTrain]
+        self.lIFE = self.D.lIFES + [self.CLblsTrain]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -391,6 +391,15 @@ class GeneralClassifier(BaseClfPrC):
             self.splitTrainTest(X=XEnc, Y=self.Y)
 
     # --- method for looping over all k folds ---------------------------------
+    def doKFoldsFullFit(self, sM, sTr, iSt):
+        if self.dITp['doImbSampling']:
+            self.printInfoImbSampling()
+            X, Y = self.dSmp[self.j].fitResampleImbalanced()
+            self.XY.setXY(X=X, Y=Y, sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
+        else:       # imbalanced sampling done before each partial fit
+            self.printResNoResample(Y=self.XY.getY(sMth=sM, sTp=sTr, iSt=iSt,
+                                                   j=self.j))
+
     def doAllKFolds(self, inpDat, lITpUpd):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
         self.getKFoldSplitter()
@@ -402,14 +411,7 @@ class GeneralClassifier(BaseClfPrC):
             self.dSmp[self.j] = ImbSampler(inpDat, X=X, Y=Y, iSt=iSt,
                                            sMthL=self.sMthL, sMth=sM)
             if not self.doPartFit:
-                if self.dITp['doImbSampling']:
-                    self.printInfoImbSampling()
-                    X, Y = self.dSmp[self.j].fitResampleImbalanced()
-                    self.XY.setXY(X=X, Y=Y, sMth=sM, sTp=sTr, iSt=iSt,
-                                  j=self.j)
-                else:       # imbalanced sampling done before each partial fit
-                    self.printResNoResample(Y=self.XY.getY(sMth=sM, sTp=sTr,
-                                                           iSt=iSt, j=self.j))
+                self.doKFoldsFullFit(sM=sM, sTr=sTr, iSt=iSt)
 
     # --- print methods -------------------------------------------------------
     def printStatusPartFit(self, k=0):

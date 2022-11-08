@@ -30,6 +30,7 @@ usedClTypeClf = GC.S_NEW + GC.S_CL   # GC.S_NEW/GC.S_OLD + GC.S_CL
 
 # --- flow control (proportion calculator) ------------------------------------
 useFullSeqFromPrC = GC.S_COMB_INP    # S_COMB_INP
+useBinDicts = False                  # use binary dicts (in case they exist)?
 usedNmerSeqPrC = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcTypePrC = usedAAcTypeClf
@@ -77,7 +78,7 @@ printDClMap = True
 
 # --- numbers (general) -------------------------------------------------------
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
-# maxLenNmer = 9           # odd number between 1 and 15 or None (max. len)
+# maxLenNmer = 9
 
 # --- numbers (classifier) -------------------------------------------------------
 iCInpDataClf = 0
@@ -102,11 +103,12 @@ setNmerLen = set(range(1, GC.LEN_N_MER_DEF + 1, 2))
 
 # --- lists -------------------------------------------------------------------
 lIPosUsed = None                # None or list of positions used for classific.
-# lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]                # None or list of positions used for classific.
+# lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]
 
-lSIFEnd = ['sSet', 'sMaxLenNmer', 'sRestr', 'sSglMltLbl', 'sXclEffFam']
-                                # list of keys for file name end strings
-lSIFEndX = ['sMaxLenNmer', 'sRestr', 'sXclEffFam']
+# list of keys for file name end strings
+lSIFEndR = ['sSet', 'sRestr']
+lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam']
+lSIFEndT = ['sRestr', 'sXclEffFam']
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -139,9 +141,10 @@ else:
 lSCXClf = [str(n) for n in lIPosUsed]
 lSCXPrC = lSCXClf
 
-sMaxLenNmer, sRestr, sMxLen = '', '', str(maxLenNmer)
+sRestr, sMxLen = '', str(maxLenNmer)
 if maxLenNmer is not None and maxLenNmer != GC.LEN_N_MER_DEF:
-    sMaxLenNmer = GC.S_MAX_LEN_S + str(GC.S_0)*(2 - len(sMxLen)) + sMxLen
+    pass
+    # sMaxLenNmer = GC.S_MAX_LEN_S + str(GC.S_0)*(2 - len(sMxLen)) + sMxLen
 if dAAcPosRestr is not None:
     for sK, lV in dAAcPosRestr.items():
         sRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
@@ -169,6 +172,7 @@ dIO = {# --- general
        'usedClTypeClf': usedClTypeClf,
        # --- flow control (proportion calculator)
        'useFullSeqFromPrC': useFullSeqFromPrC,
+       'useBinDicts': useBinDicts,
        'usedNmerSeqPrC': usedNmerSeqPrC,
        'usedAAcTypePrC': usedAAcTypePrC,
        'usedClTypePrC': usedClTypePrC,
@@ -213,8 +217,9 @@ dIO = {# --- general
        # --- sets
        # --- lists
        'lIPosUsed': lIPosUsed,
-       'lSIFEnd': lSIFEnd,
-       'lSIFEndX': lSIFEndX,
+       'lSIFEndR': lSIFEndR,
+       'lSIFEndS': lSIFEndS,
+       'lSIFEndT': lSIFEndT,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
@@ -228,7 +233,6 @@ dIO = {# --- general
        'rngPosNmer': rngPosNmer,
        'lSCXClf': lSCXClf,
        'lSCXPrC': lSCXPrC,
-       'sMaxLenNmer': sMaxLenNmer,
        'sRestr': sRestr}
 
 ###############################################################################

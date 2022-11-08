@@ -120,17 +120,31 @@ def calcDictLikelihood(dITp, dLV, d3, dSqProfile, serLh, mxLSnip, cSSq, cEff):
             GF.addToDictL(dLV, cK=sC, cE=cV)
 
 # --- Functions (O_06__ClfDataLoader) -----------------------------------------
-def getCentSNmer(dITp, sSeq):
+def getCentSNmerDefLen(dITp, sSeq):
     iStart = dITp['iCentNmer'] - dITp['maxPosNmer']
     iEnd = dITp['iCentNmer'] + dITp['maxPosNmer'] + 1
     return sSeq[iStart:iEnd]
 
+def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None):
+    dSnip, iCA, dRst = {}, dITp['maxPosNmer'], dITp['dAAcPosRestr']
+    for sFullSeq in serFullSeqUnq:
+        lenSeq = len(sFullSeq)
+        if lenSeq >= dITp['maxLenNmer']:
+            for iCentC in range(iCA, lenSeq - iCA):
+                sSnip = sFullSeq[(iCentC - iCA):(iCentC + iCA + 1)]
+                if GF.allTrue([sSnip[iPR + iCA] in lAAc for iPR, lAAc in
+                               dRst.items()]):
+                    sAAc = ''.join([sSnip[iPR + iCA] for iPR in dRst])
+                    if lNmerSeqUnq is None or sSnip not in lNmerSeqUnq:
+                        GF.addToDictL(dSnip, cK=sAAc, cE=sSnip, lUnqEl=False)
+    return {cK: GF.toListUnqViaSer(cL) for cK, cL in dSnip.items()}
+
 def filterNmerSeq(dITp, dSeq={}, serSeq=None):
-    dSeqFilt = dSeq
+    dSeqFilt, iCentAdj = dSeq, dITp['maxPosNmer']
     if dITp['dAAcPosRestr'] is not None and serSeq is not None:
         minLen = min([len(sSeq) for sSeq in serSeq])
         for iP, lAAc in dITp['dAAcPosRestr'].items():
-            iSeq = iP + dITp['iCentNmer']
+            iSeq = iP + iCentAdj
             if iSeq >= 0 and iSeq < minLen:
                 lB = [(sSeq[iSeq] in lAAc) for sSeq in serSeq]
                 serSeq = serSeq[lB]
@@ -177,14 +191,13 @@ def preProcInp(dITp, dfrInp, dNmerNoCl):
     assert dfrInp.columns.to_list() == lInpNoCl
     dIC, dNmerEffF = dfrInp.to_dict(orient='list'), {}
     for sNmer, sEffFam in zip(dIC[dITp['sCNmer']], dIC[dITp['sEffFam']]):
-        GF.addToDictL(dNmerEffF, cK=getCentSNmer(dITp, sSeq=sNmer),
+        GF.addToDictL(dNmerEffF, cK=getCentSNmerDefLen(dITp, sSeq=sNmer),
                       cE=sEffFam, lUnqEl=True)
     if dNmerNoCl is None:
         return dfrInp
     for sAAc, lNmer in dNmerNoCl.items():
         for sNmer in lNmer:
-            GF.addToDictL(dNmerEffF, cK=getCentSNmer(dITp, sSeq=sNmer),
-                          cE=dITp['sNoFam'], lUnqEl=True)
+            GF.addToDictL(dNmerEffF, cK=sNmer, cE=dITp['sNoFam'], lUnqEl=True)
     serNmerSeq = GF.iniPdSer(list(dNmerEffF), nameS=dITp['sCNmer'])
     return filterNmerSeq(dITp, dSeq=dNmerEffF, serSeq=serNmerSeq)
 
@@ -261,11 +274,11 @@ def fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap, cSeq):
     return lXCl
 
 def procInp(dIG, dITp, dNmerEffF):
-    iCent, lIPosUsed = dITp['maxPosNmer'], dITp['lIPosUsed']
+    iCentAdj, lIPosUsed = dITp['maxPosNmer'], dITp['lIPosUsed']
     dfrProc, X, Y, dClMap, lSXCl = None, None, None, getDClMap(dIG, dITp), []
     dProc, dX, dY = iniObj(dIG, dITp, dNmerEffF)
     for cSeq in dNmerEffF:
-        cSeqRed = ''.join([cSeq[i + iCent] for i in lIPosUsed])
+        cSeqRed = ''.join([cSeq[i + iCentAdj] for i in lIPosUsed])
         lXCl = fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap,
                                 cSeq=cSeqRed)
         GF.fillListUnique(cL=lSXCl, cIt=lXCl)
@@ -298,19 +311,6 @@ def getIMltSt(dIG, dITp, Y):
                 YSt = YSt[YSt != dITp['sNone']]
             dYSt[iSt] = YSt
         return {'dXCl': dMltSt, 'dYSt': dYSt, 'nSteps': nSt}
-
-def getDSqNoCl(dITp, serFullSeqUnq=[], lNmerSeqUnq=None, iPCent=0):
-    dSnip, iCentNmer = {}, dITp['iCentNmer']
-    for sFullSeq in serFullSeqUnq:
-        lenSeq = len(sFullSeq)
-        if lenSeq >= dITp['lenNmerDef']:
-            for iCentC in range(iCentNmer, lenSeq - iCentNmer):
-                sSnip = sFullSeq[(iCentC - iCentNmer):(iCentC + iCentNmer + 1)]
-                sAAc = sSnip[iCentNmer]
-                if sAAc in dITp['dAAcPosRestr'][iPCent]:
-                    if lNmerSeqUnq is None or sSnip not in lNmerSeqUnq:
-                        GF.addToDictL(dSnip, cK=sAAc, cE=sSnip, lUnqEl=False)
-    return {cK: GF.toListUnqViaSer(cL) for cK, cL in dSnip.items()}
 
 # --- Functions (O_07__Classifier) --------------------------------------------
 # --- Functions converting between single- and multi-labels (imbalanced) ------

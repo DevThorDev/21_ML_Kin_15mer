@@ -34,8 +34,9 @@ class DataLoader(BaseClass):
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
-        self.lIFE = [self.dITp[s] for s in self.dITp['lSIFEnd']]
-        self.lIFEX = [self.dITp[s] for s in self.dITp['lSIFEndX']]
+        self.lIFER = [self.dITp[s] for s in self.dITp['lSIFEndR']]
+        self.lIFES = [self.dITp[s] for s in self.dITp['lSIFEndS']]
+        self.lIFET = [self.dITp[s] for s in self.dITp['lSIFEndT']]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -49,33 +50,36 @@ class DataLoader(BaseClass):
                                      dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['Snips', 'EffF']:
             d2PI['DictNmer' + sTp] = {dIG['sPath']: dITp['pBinData'],
-                                      dIG['sLFC']: dITp['sFDictNmer' + sTp],
-                                      dIG['sLFE']: dITp['sFResComb'],
+                                      dIG['sLFS']: dITp['sFDictNmer' + sTp],
+                                      dIG['sLFC']: dITp['sFResComb'],
+                                      dIG['sLFE']: self.lIFER,
+                                      dIG['sLFJSC']: dITp['sUS02'],
                                       dIG['sLFJCE']: dITp['sUS02'],
                                       dIG['sFXt']: dIG['xtBIN']}
         for sTp in ['EffFam', 'SeqU']:
             d2PI['Nmer' + sTp] = {dIG['sPath']: dITp['pUnqNmer'],
-                                  dIG['sLFC']: dITp['sNmer' + sTp],
-                                  dIG['sLFE']: dITp['sFInpClf'],
-                                  dIG['sLFJE']: dITp['sUS02'],
+                                  dIG['sLFS']: dITp['sNmer' + sTp],
+                                  dIG['sLFC']: dITp['sFInpClf'],
+                                  dIG['sLFE']: self.lIFER,
+                                  dIG['sLFJSC']: dITp['sUS02'],
                                   dIG['sLFJCE']: dITp['sUS02'],
                                   dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['InpData', 'X', 'Y']:
             d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],
                          dIG['sLFS']: dITp['s' + sTp],
                          dIG['sLFC']: dITp['sFInpClf'],
-                         dIG['sLFE']: self.lIFE,
+                         dIG['sLFE']: self.lIFES,
                          dIG['sLFJSC']: dITp['sUS02'],
                          dIG['sLFJCE']: dITp['sUS02'],
                          dIG['sFXt']: dIG['xtCSV']}
-        d2PI['X'][dIG['sLFE']] = self.lIFEX
+        d2PI['X'][dIG['sLFE']] = self.lIFET
         self.FPs.addFPs(d2PI)
         self.d2PInf = d2PI
 
     # --- method for generating the "no class" Nmer dictionary ----------------
     def getDictNmerNoCl(self):
         sDSn, sCCS, sCNmer = 'DictNmerSnips', 'sCCodeSeq', 'sCNmer'
-        if GF.fileXist(pF=self.FPs.dPF[sDSn]):
+        if self.dITp['useBinDicts'] and GF.fileXist(pF=self.FPs.dPF[sDSn]):
             self.dNmerNoCl = GF.pickleLoadDict(pF=self.FPs.dPF[sDSn])
         else:
             dfrComb = GF.readCSV(pF=self.FPs.dPF['ResComb'], iCol=0)
@@ -84,7 +88,8 @@ class DataLoader(BaseClass):
             serNmerUnq = None
             if self.dITp[sCNmer] in dfrComb.columns:
                 serNmerUnq = GF.toSerUnique(dfrComb[self.dITp[sCNmer]])
-            lNmerUnq = GF.toListUnqViaSer(serNmerUnq)
+            lNmerUnq = [SF.getCentSNmerDefLen(self.dITp, sSeq=sNmer) for sNmer
+                        in GF.toListUnqViaSer(serNmerUnq)]
             self.dNmerNoCl = SF.getDSqNoCl(self.dITp, serFullSeqUnq=serFullUnq,
                                            lNmerSeqUnq=lNmerUnq)
             GF.pickleSaveDict(cD=self.dNmerNoCl, pF=self.FPs.dPF[sDSn])
