@@ -133,8 +133,8 @@ bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-# nItPtFit = None             # number of iterations / partial fit (or None)
-nItPtFit = 1000             # number of iterations / partial fit (or None)
+nItPtFit = None             # number of iterations / partial fit (or None)
+# nItPtFit = 1000             # number of iterations / partial fit (or None)
 nItPrintPtFit = 100         # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------

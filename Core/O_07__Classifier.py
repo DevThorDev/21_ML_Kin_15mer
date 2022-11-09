@@ -147,13 +147,14 @@ class ImbSampler(BaseClass):
         self.printStrat()
         # in case of a custom sampling strategy, calculate the dictionary
         if self.sStrat in self.dITp['lSmplStratCustom']:
+            YSglLbl = SF.toSglLbl(self.dITp, dfrY=self.Y)
             if self.sStrat == self.dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
-                self.sStrat = GF.smplStratRealMajo(self.Y)
+                self.sStrat = GF.smplStratRealMajo(YSglLbl)
             elif self.sStrat == self.dITp['sStratShareMino']:
                 # implement the "ShareMino" strategy
                 dIStrat = self.dITp['dIStrat']
-                self.sStrat = GF.smplStratShareMino(self.Y, dI=dIStrat)
+                self.sStrat = GF.smplStratShareMino(YSglLbl, dI=dIStrat)
 
     # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
     def getImbSampler(self):
@@ -403,8 +404,9 @@ class GeneralClassifier(BaseClfPrC):
     def doAllKFolds(self, inpDat, lITpUpd):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
         self.getKFoldSplitter()
+        YSglLbl = SF.toSglLbl(self.dITp, dfrY=self.D.yieldYClf())
         for j, (lITr, lITe) in enumerate(self.kF.split(X=self.D.yieldXClf(),
-                                                       y=self.D.yieldYClf())):
+                                                       y=YSglLbl)):
             self.j, self.lITrain, self.lITest = j, lITr, lITe
             self.encodeSplitData()
             X, Y = self.XY.getXY(sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
@@ -683,10 +685,8 @@ class GeneralClassifier(BaseClfPrC):
         if self.dITp['calcCnfMatrix']:
             sM, sPd, lC = self.sMth, self.dITp['sPred'], self.lSXCl
             YPred = self.XY.getY(sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
-            if len(YTest.shape) > 1:
-                YTest = SF.toSglLbl(self.dITp, dfrY=YTest)
-            if len(YPred.shape) > 1:
-                YPred = SF.toSglLbl(self.dITp, dfrY=YPred)
+            YTest = SF.toSglLbl(self.dITp, dfrY=YTest)
+            YPred = SF.toSglLbl(self.dITp, dfrY=YPred)
             cnfMat = confusion_matrix(y_true=YTest, y_pred=YPred, labels=lC)
             self.dConfusMatrix[self.j] = cnfMat
             dfrCM = GF.iniPdDfr(cnfMat, lSNmC=lC, lSNmR=lC)

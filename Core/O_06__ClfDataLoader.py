@@ -107,7 +107,8 @@ class DataLoader(BaseClass):
     def procInpData(self, dfrInp, saveData=None):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,
                                               dNmerNoCl=self.dNmerNoCl)
-        dfrInp, X, Y, dClMp, lSXCl = SF.procInp(self.dIG, self.dITp, dNmerEffF)
+        t = SF.procInp(self.dIG, self.dITp, dNmerEffF=dNmerEffF)
+        dfrInp, X, YS, YM, dClMp, lSXCl = t
         dMltSt = SF.getIMltSt(self.dIG, self.dITp, Y)
         if saveData is not None:
             t2Save = (dNmerEffF, serNmerSeq, dfrInp, X, Y)

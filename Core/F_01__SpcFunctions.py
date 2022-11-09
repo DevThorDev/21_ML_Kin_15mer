@@ -285,9 +285,7 @@ def procInp(dIG, dITp, dNmerEffF):
     for cD in [dX, dY]:
         GF.complDict(cDFull=dProc, cDAdd=cD)
     dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
-    if dITp['onlySglLbl']:
-        Y = GF.dictSglKey2Ser(dY)
-    return dfrProc, X, Y, dClMap, sorted(lSXCl)
+    return dfrProc, X, toSglLbl(dITp, dfrY=Y), Y, dClMap, sorted(lSXCl)
 
 def getIMltSt(dIG, dITp, Y):
     pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'] + dIG['xtCSV'])
@@ -323,6 +321,8 @@ def toMultiLbl(dITp, serY, lXCl):
     return GF.iniPdDfr(dY, lSNmR=serY.index)
 
 def toSglLbl(dITp, dfrY):
+    if len(dfrY.shape) == 1:        # already single-label (Series) format
+        return dfrY
     lY = [dITp['sNone']]*dfrY.shape[0]
     for k, (_, serR) in enumerate(dfrY.iterrows()):
         if sum(serR) == 1:
