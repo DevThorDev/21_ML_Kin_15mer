@@ -20,7 +20,10 @@ useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 noExclEffFam = True                  # do not use Nmers with excl. effFam?
 useNmerNoCl = True                   # use "no class" Nmers from full seq.?
 
-onlySglLbl = True                    # perform single-label classification?
+I_Lbl = GC.S_SGL_LBL                 # use multi-label or single-label input?
+P_Lbl = GC.S_MLT_LBL_01              # multi-label or single-label predictions?
+                                     # GC.S_SGL_LBL / GC.S_MLT_LBL
+                                     # GC.S_MLT_LBL_01 (only no/single class)
 
 usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
 
@@ -166,7 +169,8 @@ dIO = {# --- general
        'useFullSeqFromClf': useFullSeqFromClf,
        'noExclEffFam': noExclEffFam,
        'useNmerNoCl': useNmerNoCl,
-       'onlySglLbl': onlySglLbl,
+       'I_Lbl': I_Lbl,
+       'P_Lbl': P_Lbl,
        'usedNmerSeqClf': usedNmerSeqClf,
        'usedAAcTypeClf': usedAAcTypeClf,
        'usedClTypeClf': usedClTypeClf,
