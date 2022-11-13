@@ -147,7 +147,7 @@ class ImbSampler(BaseClass):
         self.printStrat()
         # in case of a custom sampling strategy, calculate the dictionary
         if self.sStrat in self.dITp['lSmplStratCustom']:
-            YSglLbl = SF.toSglLbl(self.dITp, dfrY=self.Y)
+            YSglLbl = self.D.yieldYClf(sLbl=self.dITp['sSglLbl'])
             if self.sStrat == self.dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
                 self.sStrat = GF.smplStratRealMajo(YSglLbl)
@@ -267,9 +267,10 @@ class BaseClfPrC(BaseClass):
             self.dfrInp[self.dITp['sEffFam']] = self.Y
             self.lSXCl = sorted(list(self.Y.unique()))
 
-    def getInpData(self, sMd=None, iSt=None):
+    def getInpData(self, sMd=None, sLbl=GC.S_SGL_LBL, iSt=None):
+        sILbl = self.dITp['I_Lbl']
         (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
-         self.dMltSt, self.lSXCl) = self.D.yieldData(sMd=sMd)
+         self.dMltSt, self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=sILbl)
         self.modInpDataMltSt(iSt=iSt)
 
     # --- print methods -------------------------------------------------------
@@ -318,7 +319,8 @@ class GeneralClassifier(BaseClfPrC):
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'General Classifier for data classification'
         self.iSt, self.cRep, self.dSmp = iSt, cRep, {}
-        self.getInpData(sMd=self.dITp['sClf'], iSt=self.iSt)
+        self.getInpData(sMd=self.dITp['sClf'], sLbl=self.dITp['I_Lbl'],
+                        iSt=self.iSt)
         self.doAllKFolds(inpDat, lITpUpd=lITpUpd)
         print('Initiated "GeneralClassifier" base object.')
 
@@ -404,9 +406,9 @@ class GeneralClassifier(BaseClfPrC):
     def doAllKFolds(self, inpDat, lITpUpd):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
         self.getKFoldSplitter()
-        YSglLbl = SF.toSglLbl(self.dITp, dfrY=self.D.yieldYClf())
-        for j, (lITr, lITe) in enumerate(self.kF.split(X=self.D.yieldXClf(),
-                                                       y=YSglLbl)):
+        YSglLbl = self.D.yieldYClf(sLbl=self.dITp['sSglLbl'])
+        XClf = self.D.yieldXClf(sLbl=self.dITp['I_Lbl'])
+        for j, (lITr, lITe) in enumerate(self.kF.split(X=XClf, y=YSglLbl)):
             self.j, self.lITrain, self.lITest = j, lITr, lITe
             self.encodeSplitData()
             X, Y = self.XY.getXY(sMth=sM, sTp=sTr, iSt=iSt, j=self.j)

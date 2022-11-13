@@ -232,11 +232,11 @@ def getDClMap(dIG, dITp):
         print(dITp['lXCl'])
     return dClMap
 
-def iniObj(dIG, dITp, dNmerEffF):
-    dX, dY = {sI: [] for sI in dITp['lSCXClf']}, {dITp['sEffFam']: []}
-    if not dITp['onlySglLbl']:
-        dY = {sXCl: [] for sXCl in dITp['lXCl']}
-    return {}, dX, dY
+def iniDicts(dIG, dITp, dNmerEffF):
+    dXS = {sI: [] for sI in dITp['lSCXClf']}
+    dXM = {sI: [] for sI in dITp['lSCXClf']}
+    dYS, dYM = {dITp['sEffFam']: []}, {sXCl: [] for sXCl in dITp['lXCl']}
+    return {}, dXS, dXM, dYS, dYM
 
 def getLXCl(dIG, dITp, dNEF, dClMap, cSeq):
     # translation of effector families to XClasses
@@ -248,44 +248,36 @@ def getLXCl(dIG, dITp, dNEF, dClMap, cSeq):
         lXCl = [dClMap[sFam] for sFam in lEFIncl]
     return lXCl
 
-def fill_DProc_DX(dITp, dProc, dX, cSeq):
-    GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
+def fill_DX(dITp, dProc, dX, cSeq):
     for sKeyX, sAAc in zip(dX, cSeq):
         GF.addToDictL(dX, cK=sKeyX, cE=sAAc)
 
-def fill_DX_DY_Sgl(dITp, dProc, dX, dY, cSeq, lXCl=[]):
-    if len(lXCl) == 1:      # exactly 1 XCl assigned to this Nmer sequence
-        GF.addToDictL(dY, cK=dITp['sEffFam'], cE=lXCl[0])
-        fill_DProc_DX(dITp, dProc=dProc, dX=dX, cSeq=cSeq)
-
-def fill_DX_DY_Mlt(dITp, dProc, dX, dY, cSeq, lXCl=[]):
-    for cXCl in dITp['lXCl']:
-        GF.addToDictL(dY, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
-    fill_DProc_DX(dITp, dProc=dProc, dX=dX, cSeq=cSeq)
-
-def fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap, cSeq):
-    assert len(cSeq) == len(dX)
-    lXCl = getLXCl(dIG, dITp, dNEF=dNmerEffF, dClMap=dClMap, cSeq=cSeq)
+def fillDDat(dIG, dITp, dNEF, dProc, dXS, dXM, dYS, dYM, dClMap, cSeq):
+    assert len(cSeq) == len(dXS) and len(cSeq) == len(dXM)
+    lXCl = getLXCl(dIG, dITp, dNEF=dNEF, dClMap=dClMap, cSeq=cSeq)
     # filling of data dictionaries
-    if dITp['onlySglLbl']:
-        fill_DX_DY_Sgl(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
-    else:
-        fill_DX_DY_Mlt(dITp, dProc=dProc, dX=dX, dY=dY, cSeq=cSeq, lXCl=lXCl)
-    return lXCl
+    GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
+    if len(lXCl) == 1:      # exactly 1 XCl assigned to this Nmer sequence
+        GF.addToDictL(dYS, cK=dITp['sEffFam'], cE=lXCl[0])
+        fill_DX(dITp, dProc=dProc, dX=dXS, cSeq=cSeq)
+    for cXCl in dITp['lXCl']:
+        GF.addToDictL(dYM, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
+    fill_DX(dITp, dProc=dProc, dX=dXM, cSeq=cSeq)
 
 def procInp(dIG, dITp, dNmerEffF):
     iCentAdj, lIPosUsed = dITp['maxPosNmer'], dITp['lIPosUsed']
-    dfrProc, X, Y, dClMap, lSXCl = None, None, None, getDClMap(dIG, dITp), []
-    dProc, dX, dY = iniObj(dIG, dITp, dNmerEffF)
+    dClMap, lSXCl = getDClMap(dIG, dITp), []
+    dProc, dXS, dXM, dYS, dYM = iniDicts(dIG, dITp, dNmerEffF)
     for cSeq in dNmerEffF:
         cSeqRed = ''.join([cSeq[i + iCentAdj] for i in lIPosUsed])
-        lXCl = fill_DProc_DX_DY(dIG, dITp, dNmerEffF, dProc, dX, dY, dClMap,
-                                cSeq=cSeqRed)
+        lXCl = fillDDat(dIG, dITp, dNEF=dNmerEffF, dProc=dProc, dXS=dXS,
+                        dXM=dXM, dYS=dYS, dYM=dYM, dClMap=dClMap, cSeq=cSeqRed)
         GF.fillListUnique(cL=lSXCl, cIt=lXCl)
-    for cD in [dX, dY]:
+    for cD in [dXS, dXM, dYS, dYM]:
         GF.complDict(cDFull=dProc, cDAdd=cD)
-    dfrProc, X, Y = GF.iniPdDfr(dProc), GF.iniPdDfr(dX), GF.iniPdDfr(dY)
-    return dfrProc, X, toSglLbl(dITp, dfrY=Y), Y, dClMap, sorted(lSXCl)
+    dfrProc, XS, XM = GF.iniPdDfr(dProc), GF.iniPdDfr(dXS), GF.iniPdDfr(dXM)
+    YS, YM = GF.iniPdDfr(dYS), GF.iniPdDfr(dYM)
+    return dfrProc, XS, XM, YS, YM, dClMap, sorted(lSXCl)
 
 def getIMltSt(dIG, dITp, Y):
     pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'] + dIG['xtCSV'])

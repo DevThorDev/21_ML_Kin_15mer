@@ -129,11 +129,10 @@ if maxLenNmer not in setNmerLen:
 sFInpSzClf = sFInpBClf.split(GC.S_USC)[1]
 sFInpSzPrC = sFInpSzClf
 
-sXclEffFam, sSglMltLbl = GC.S_WITH_EXCL_EFF_FAM, GC.S_MLT_LBL
+sXclEffFam = GC.S_WITH_EXCL_EFF_FAM
 if noExclEffFam:
     sXclEffFam = GC.S_NO_EXCL_EFF_FAM
-if onlySglLbl:
-    sSglMltLbl = GC.S_SGL_LBL
+sSglMltLbl = GC.S_I + I_Lbl + GC.S_P + P_Lbl
 
 maxPosNmer = maxLenNmer//2
 rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)

@@ -96,6 +96,7 @@ class DataLoader(BaseClass):
 
     # --- methods for loading input data --------------------------------------
     def saveProcInpData(self, tData, lSKDPF, sMd=GC.S_CLF):
+        assert len(tData) == len(lSKDPF)
         for cDat, s in zip(tData, lSKDPF):
             self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sMd)
             if s == GC.S_N_MER_EFF_FAM:
@@ -108,37 +109,42 @@ class DataLoader(BaseClass):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,
                                               dNmerNoCl=self.dNmerNoCl)
         t = SF.procInp(self.dIG, self.dITp, dNmerEffF=dNmerEffF)
-        dfrInp, X, YS, YM, dClMp, lSXCl = t
-        dMltSt = SF.getIMltSt(self.dIG, self.dITp, Y)
+        dfrInp, XS, XM, YS, YM, dClMp, lSXCl = t
         if saveData is not None:
-            t2Save = (dNmerEffF, serNmerSeq, dfrInp, X, Y)
-            lSKeyDPF = GC.S_N_MER_EFF_FAM, 'NmerSeqU', 'InpData', 'X', 'Y'
+            t2Save = (dNmerEffF, serNmerSeq, dfrInp, XS, XM, YS, YM)
+            lSKeyDPF = (GC.S_N_MER_EFF_FAM, 'NmerSeqU', 'InpData', 'XS', 'XM',
+                        'YS', 'YM')
             self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
-        return dNmerEffF, serNmerSeq, dfrInp, X, Y, dClMp, dMltSt, lSXCl
+        return dNmerEffF, serNmerSeq, dfrInp, XS, XM, YS, YM, dClMp, lSXCl
 
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.FPs.dPF['InpDataClf'], iC=iC)
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
-        (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XClf,
-         self.YClf, self.dClMapClf, self.dMltStClf, self.lSXClClf) = t
+        (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XSClf,
+         self.XMClf, self.YSClf, self.YMClf, self.dClMapClf, self.lSXClClf) = t
+        self.dMltStSClf = SF.getIMltSt(self.dIG, self.dITp, self.YSClf)
+        self.dMltStMClf = SF.getIMltSt(self.dIG, self.dITp, self.YMClf)
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
             self.FPs.dPF['InpDataPrC'] == self.FPs.dPF['InpDataClf']):
             t = (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf,
-                 self.XClf, self.YClf, self.dClMapClf, self.dMltStClf,
+                 self.XSClf, self.XMClf, self.YSClf, self.YMClf,
+                 self.dClMapClf, self.dMltStSClf, self.dMltStMClf,
                  self.lSXClClf)
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC,
-             self.XPrC, self.YPrC, self.dClMapPrC, self.dMltStPrC,
-             self.lSXClPrC) = t
+             self.XSPrC, self.XMPrC, self.YSPrC, self.YMPrC, self.dClMapPrC,
+             self.dMltStSPrC, self.dMltStMPrC, self.lSXClPrC) = t
         elif ((self.dfrInpPrC is None and self.dfrInpClf is not None and
                self.FPs.dPF['InpDataPrC'] != self.FPs.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
             self.dfrInpPrC = self.loadData(self.FPs.dPF['InpDataPrC'], iC=iC)
             t = self.procInpData(dfrInp=self.dfrInpPrC)
-            (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC, self.XPrC,
-             self.YPrC, self.dClMapPrC, self.dMltStPrC, self.lSXClPrC) = t
+            (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC, self.XSPrC,
+             self.XMPrC, self.YSPrC, self.YMPrC, self.dClMapPrC,
+             self.lSXClPrC) = t
+            self.dMltStSPrC, self.dMltStMPrC = self.dMltStSClf, self.dMltStMClf
 
     # --- print methods -------------------------------------------------------
     def printSerNmerSeqClf(self):
@@ -206,24 +212,36 @@ class DataLoader(BaseClass):
               self.lSXClPrC, GC.S_NEWL, '(length = ', len(self.lSXClPrC), ')',
               GC.S_NEWL, GC.S_DS80, sep='')
 
-    def getXorY(self, XorY=GC.S_X, sMd=GC.S_CLF):
+    def getXorY(self, XorY=GC.S_X, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
         cDat = None
         if XorY == GC.S_X:
             if sMd == self.dITp['sClf']:
-                cDat = self.XClf
+                if sLbl == self.dITp['sSglLbl']:
+                    cDat = self.XSClf
+                else:
+                    cDat = self.XMClf
             elif sMd == self.dITp['sPrC']:
-                cDat = self.XPrC
+                if sLbl == self.dITp['sSglLbl']:
+                    cDat = self.XSPrC
+                else:
+                    cDat = self.XMPrC
         elif XorY == GC.S_Y:
             if sMd == self.dITp['sClf']:
-                cDat = self.YClf
+                if sLbl == self.dITp['sSglLbl']:
+                    cDat = self.YSClf
+                else:
+                    cDat = self.YMClf
             elif sMd == self.dITp['sPrC']:
-                cDat = self.YPrC
+                if sLbl == self.dITp['sSglLbl']:
+                    cDat = self.YSPrC
+                else:
+                    cDat = self.YMPrC
         return cDat
 
-    def printX(self, sMd=GC.S_CLF):
+    def printX(self, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
         print(GC.S_DS80, GC.S_NEWL, 'Training input samples for mode "', sMd,
               '":', sep='')
-        X = self.getXorY(XorY=GC.S_X, sMd=sMd)
+        X = self.getXorY(XorY=GC.S_X, sMd=sMd, sLbl=sLbl)
         print(X)
         if self.dITp['lvlOut'] > 2:
             try:
@@ -233,10 +251,10 @@ class DataLoader(BaseClass):
                 pass
         print(GC.S_DS80)
 
-    def printY(self, sMd=GC.S_CLF):
+    def printY(self, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
         print(GC.S_DS80, GC.S_NEWL, 'Class labels for mode "', sMd, '":',
               sep='')
-        Y = self.getXorY(XorY=GC.S_Y, sMd=sMd)
+        Y = self.getXorY(XorY=GC.S_Y, sMd=sMd, sLbl=sLbl)
         print(Y)
         if self.dITp['lvlOut'] > 2:
             try:
@@ -259,31 +277,117 @@ class DataLoader(BaseClass):
     def yieldSerNmerSeqPrC(self):
         return self.serNmerSeqPrC
 
+    def yieldSerNmerSeq(self, sMd=GC.S_CLF):
+        if sMd == self.dITp['sClf']:
+            return self.serNmerSeqClf
+        else:
+            return self.serNmerSeqPrC
+
     def yieldDfrInpClf(self):
         return self.dfrInpClf
 
     def yieldDfrInpPrC(self):
         return self.dfrInpPrC
 
-    def yieldXClf(self):
-        return self.XClf
-
-    def yieldXPrC(self):
-        return self.XPrC
-
-    def yieldYClf(self):
-        return self.YClf
-
-    def yieldYPrC(self):
-        return self.YPrC
-
-    def yieldData(self, sMd=None):
+    def yieldDfrInp(self, sMd=GC.S_CLF):
         if sMd == self.dITp['sClf']:
-            return (self.dfrInpClf, self.XClf, self.YClf, self.serNmerSeqClf,
-                    self.dClMapClf, self.dMltStClf, self.lSXClClf)
+            return self.dfrInpClf
+        else:
+            return self.dfrInpPrC
+
+    def yieldXSClf(self):
+        return self.XSClf
+
+    def yieldXMClf(self):
+        return self.XMClf
+
+    def yieldXClf(self, sLbl=GC.S_SGL_LBL):
+        if sLbl == self.dITp['sSglLbl']:
+            self.yieldXSClf()
+        else:
+            self.yieldXMClf()
+
+    def yieldXSPrC(self):
+        return self.XSPrC
+
+    def yieldXMPrC(self):
+        return self.XMPrC
+
+    def yieldXPrC(self, sLbl=GC.S_SGL_LBL):
+        if sLbl == self.dITp['sSglLbl']:
+            self.yieldXSPrC()
+        else:
+            self.yieldXMPrC()
+
+    def yieldX(self, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
+        if sMd == self.dITp['sClf']:
+            self.yieldXClf(sLbl=sLbl)
+        else:
+            self.yieldXPrC(sLbl=sLbl)
+
+    def yieldYSClf(self):
+        return self.YSClf
+
+    def yieldYMClf(self):
+        return self.YMClf
+
+    def yieldYClf(self, sLbl=GC.S_SGL_LBL):
+        if sLbl == self.dITp['sSglLbl']:
+            self.yieldYSClf()
+        else:
+            self.yieldYMClf()
+
+    def yieldYSPrC(self):
+        return self.YSPrC
+
+    def yieldYMPrC(self):
+        return self.YMPrC
+
+    def yieldYPrC(self, sLbl=GC.S_SGL_LBL):
+        if sLbl == self.dITp['sSglLbl']:
+            self.yieldYSPrC()
+        else:
+            self.yieldYMPrC()
+
+    def yieldY(self, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
+        if sMd == self.dITp['sClf']:
+            self.yieldYClf(sLbl=sLbl)
+        else:
+            self.yieldYPrC(sLbl=sLbl)
+
+    def yieldClfData(self, sLbl=GC.S_SGL_LBL):
+        if sLbl is None:
+            return (self.dfrInpClf, self.XSClf, self.XMClf, self.YSClf,
+                    self.YMClf, self.serNmerSeqClf, self.dClMapClf,
+                    self.dMltStSClf, self.dMltStMClf, self.lSXClClf)
+        elif sLbl == self.dITp['sSglLbl']:
+            return (self.dfrInpClf, self.XSClf, self.YSClf,
+                    self.serNmerSeqClf, self.dClMapClf, self.dMltStSClf,
+                    self.lSXClClf)
+        else:
+            return (self.dfrInpClf, self.XMClf, self.YMClf,
+                    self.serNmerSeqClf, self.dClMapClf, self.dMltStMClf,
+                    self.lSXClClf)
+
+    def yieldPrCData(self, sLbl=GC.S_SGL_LBL):
+        if sLbl is None:
+            return (self.dfrInpPrC, self.XSPrC, self.XMPrC, self.YSPrC,
+                    self.YMPrC, self.serNmerSeqPrC, self.dClMapPrC,
+                    self.dMltStSPrC, self.dMltStMPrC, self.lSXClPrC)
+        elif sLbl == self.dITp['sSglLbl']:
+            return (self.dfrInpPrC, self.XSPrC, self.YSPrC,
+                    self.serNmerSeqPrC, self.dClMapPrC, self.dMltStSPrC,
+                    self.lSXClPrC)
+        else:
+            return (self.dfrInpPrC, self.XMPrC, self.YMPrC,
+                    self.serNmerSeqPrC, self.dClMapPrC, self.dMltStMPrC,
+                    self.lSXClPrC)
+
+    def yieldData(self, sMd=None, sLbl=GC.S_SGL_LBL):
+        if sMd == self.dITp['sClf']:
+            self.yieldClfData(sLbl=sLbl)
         elif sMd == self.dITp['sPrC']:
-            return (self.dfrInpPrC, self.XPrC, self.YPrC, self.serNmerSeqPrC,
-                    self.dClMapPrC, self.dMltStPrC, self.lSXClPrC)
-        else: return tuple([None]*7)
+            self.yieldPrCData(sLbl=sLbl)
+        else: return None
 
 ###############################################################################
