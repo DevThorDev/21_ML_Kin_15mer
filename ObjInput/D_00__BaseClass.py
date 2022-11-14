@@ -31,6 +31,7 @@ sTab = GC.S_TAB
 sNewl = GC.S_NEWL
 sNULL = GC.S_NULL
 s0, sC, sE, sX, sY = GC.S_0, GC.S_C, GC.S_E, GC.S_X, GC.S_Y
+sXS, sXM, sYS, sYM = GC.S_XS, GC.S_XM, GC.S_YS, GC.S_YM
 sXS, sS, sM, sL = GC.S_XS, GC.S_S, GC.S_M, GC.S_L
 sVBarSep = GC.S_VBAR_SEP
 sBase = GC.S_BASE
@@ -187,6 +188,9 @@ dIO = {# --- general
        'sX': sX,
        'sY': sY,
        'sXS': sXS,
+       'sXM': sXM,
+       'sYS': sYS,
+       'sYM': sYM,
        'sS': sS,
        'sM': sM,
        'sL': sL,

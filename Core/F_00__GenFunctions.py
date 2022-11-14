@@ -372,12 +372,16 @@ def addToListUnq(cL, cEl):
     addToList(cL=cL, cEl=cEl, isUnq=True)
 
 def fillListUnique(cL=[], cIt=[]):
+    if cIt is None:
+        return cL
     for cEl in cIt:
         if cEl not in cL:
             cL.append(cEl)
 
 def toListUnique(cIt=[]):
     cLUnq = []
+    if cIt is None:
+        return cLUnq
     for cEl in cIt:
         if cEl not in cLUnq:
             cLUnq.append(cEl)
@@ -503,6 +507,34 @@ def updateDict(cDFull, cDUp, cK=None):
             cDFull[cK].update(cDUp)
         else:
             cDFull[cK] = cDUp
+
+def getInvDict(cD, i=None, valAsList=True, lUnq=True):
+    dInv = {}
+    for cK, cV in cD.items():
+        if i is None:
+            try:
+                dInv[cV] = cK
+            except:
+                print('ERROR: Cannot use', cV, 'as key of inverse dictionary!')
+                break
+        else:
+            try:
+                if valAsList:
+                    addToDictL(cD=dInv, cK=cV[i], cE=cK, lUnqEl=lUnq)
+                else:
+                    dInv[cV[i]] = cK
+            except:
+                if hasattr(cV, '__len__'):
+                    if i < len(cV):
+                        print('ERROR: Cannot use', cV[i], 'as key of inverse',
+                              'dictionary!')
+                    else:
+                        print('ERROR: Index ', i, ' out of range for ',
+                              'iterator ', cV, '!', sep='')
+                else:
+                    print('Dictionary value', cV, 'has no attribute "len"!')
+                break
+    return dInv
 
 def getMeansD2Val(d2):
     dMn = {}

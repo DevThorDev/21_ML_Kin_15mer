@@ -273,13 +273,48 @@ def procInp(dIG, dITp, dNmerEffF):
         lXCl = fillDDat(dIG, dITp, dNEF=dNmerEffF, dProc=dProc, dXS=dXS,
                         dXM=dXM, dYS=dYS, dYM=dYM, dClMap=dClMap, cSeq=cSeqRed)
         GF.fillListUnique(cL=lSXCl, cIt=lXCl)
-    for cD in [dXS, dXM, dYS, dYM]:
+    for cD in [dXM, dYM]:
         GF.complDict(cDFull=dProc, cDAdd=cD)
     dfrProc, XS, XM = GF.iniPdDfr(dProc), GF.iniPdDfr(dXS), GF.iniPdDfr(dXM)
     YS, YM = GF.iniPdDfr(dYS), GF.iniPdDfr(dYM)
     return dfrProc, XS, XM, YS, YM, dClMap, sorted(lSXCl)
 
-def getIMltSt(dIG, dITp, Y):
+def genYStS(dITp, dMltSt, YSt, iSt=0):
+    for sCl, lCl in dMltSt.items():
+        YSt.replace(sCl, lCl[iSt - 1], inplace=True)
+    return YSt[YSt != dITp['sNone']]
+
+def genYStM(dITp, dInv, YSt):
+    # lC = list(YSt.columns)
+    # assert GF.allTrue([sCl in lC for sCl in dMltSt])
+    # for sCl, lCl in dMltSt.items():
+    #     lC = list(map(lambda s: s.replace(sCl, lCl[iSt - 1]), lC))
+    lC = [s for s in dInv if s != dITp['sNone']]
+    YM = YSt.apply(lambda x: pd.Series([(1 if x.loc[dInv[s]].sum() >= 1 else 0)
+                                        for s in lC], index=lC), axis=1)
+    return YM
+
+def genYSt(dITp, dMltSt, Y, nSt, sLbl=GC.S_SGL_LBL):
+    # dYCSt contains the Y for each step (iSt == 0: initial Y)
+    dYCSt = {iSt: None for iSt in range(nSt + 1)}
+    dYCSt[0] = Y
+    for iSt in range(1, nSt + 1):
+        YCSt = Y.copy(deep=True)
+        if sLbl == dITp['sSglLbl']:
+            YCSt = genYStS(dITp, dMltSt=dMltSt, YSt=YCSt, iSt=iSt)
+        else:
+            YCSt = genYStM(dITp, dInv=GF.getInvDict(cD=dMltSt, i=(iSt - 1)),
+                           YSt=YCSt)
+        dYCSt[iSt] = YCSt
+    return dYCSt
+
+def getDYMltSt(dITp, dMltSt=None, Y=None, nSt=None, sLbl=GC.S_SGL_LBL):
+    if dMltSt is None or Y is None or nSt is None:
+        return None
+    else:
+        return genYSt(dITp, dMltSt=dMltSt, Y=Y, nSt=nSt, sLbl=sLbl)
+
+def getIMltSt(dIG, dITp, Y=None, sLbl=GC.S_SGL_LBL):
     pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'] + dIG['xtCSV'])
     dfrMltSt, dMltSt, sSt = GF.readCSV(pF=pDMS, iCol=0), {}, dITp['sStep']
     if dfrMltSt is not None:
@@ -291,15 +326,15 @@ def getIMltSt(dIG, dITp, Y):
         for _, serR in dfrMltSt.iterrows():
             lCl = [serR.at[cI] for cI in serR.index if cI != dITp['sXCl']]
             dMltSt[serR.at[dITp['sXCl']]] = lCl
-        # dYSt contains the Y for each step (iSt == 0: initial Y)
-        dYSt = {iSt: None for iSt in range(nSt + 1)}
-        dYSt[0] = Y
-        for iSt in range(1, nSt + 1):
-            YSt = Y.copy(deep=True)
-            for sCl, lCl in dMltSt.items():
-                YSt.replace(sCl, lCl[iSt - 1], inplace=True)
-                YSt = YSt[YSt != dITp['sNone']]
-            dYSt[iSt] = YSt
+        dYSt = getDYMltSt(dITp, dMltSt=dMltSt, Y=Y, nSt=nSt, sLbl=sLbl)
+        # TEMP - BEGIN
+        # print('Keys of dYSt:', list(dYSt))
+        # for cK, cDfr in dYSt.items():
+        #     print('---', cK, '---')
+        #     print(cDfr.iloc[:50, :])
+        #     # print(cDfr.iloc[-5:, :])
+        #     print('======================')
+        # TEMP - END
         return {'dXCl': dMltSt, 'dYSt': dYSt, 'nSteps': nSt}
 
 # --- Functions (O_07__Classifier) --------------------------------------------

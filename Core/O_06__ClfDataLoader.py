@@ -26,17 +26,19 @@ class DataLoader(BaseClass):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self):
-        lBase = ['serNmerSeq', 'dfrInp', 'X', 'Y', 'dClMap', 'dMltSt', 'lSXCl']
-        lAttr2None = []
+        lBase = ['serNmerSeq', 'dfrInp', 'XS', 'XM', 'YS', 'YM', 'dClMap',
+                 'dMltSt', 'lSXCl']
+        lAttr2None = ['dMltStSClf', 'dMltStMClf']
         for sTp in [self.dITp['sClf'], self.dITp['sPrC']]:
             lAttr2None += [s + sTp for s in lBase]
         lAttr2None += ['dNmerNoCl', 'lI']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, None)
-        self.lIFER = [self.dITp[s] for s in self.dITp['lSIFEndR']]
         self.lIFES = [self.dITp[s] for s in self.dITp['lSIFEndS']]
         self.lIFET = [self.dITp[s] for s in self.dITp['lSIFEndT']]
+        self.lIFEU = [self.dITp[s] for s in self.dITp['lSIFEndU']]
+        self.lIFEV = [self.dITp[s] for s in self.dITp['lSIFEndV']]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -52,7 +54,7 @@ class DataLoader(BaseClass):
             d2PI['DictNmer' + sTp] = {dIG['sPath']: dITp['pBinData'],
                                       dIG['sLFS']: dITp['sFDictNmer' + sTp],
                                       dIG['sLFC']: dITp['sFResComb'],
-                                      dIG['sLFE']: self.lIFER,
+                                      dIG['sLFE']: self.lIFEV,
                                       dIG['sLFJSC']: dITp['sUS02'],
                                       dIG['sLFJCE']: dITp['sUS02'],
                                       dIG['sFXt']: dIG['xtBIN']}
@@ -60,11 +62,11 @@ class DataLoader(BaseClass):
             d2PI['Nmer' + sTp] = {dIG['sPath']: dITp['pUnqNmer'],
                                   dIG['sLFS']: dITp['sNmer' + sTp],
                                   dIG['sLFC']: dITp['sFInpClf'],
-                                  dIG['sLFE']: self.lIFER,
+                                  dIG['sLFE']: self.lIFEV,
                                   dIG['sLFJSC']: dITp['sUS02'],
                                   dIG['sLFJCE']: dITp['sUS02'],
                                   dIG['sFXt']: dIG['xtCSV']}
-        for sTp in ['InpData', 'X', 'Y']:
+        for sTp in ['InpData', 'XS', 'XM', 'YS', 'YM']:
             d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],
                          dIG['sLFS']: dITp['s' + sTp],
                          dIG['sLFC']: dITp['sFInpClf'],
@@ -72,7 +74,9 @@ class DataLoader(BaseClass):
                          dIG['sLFJSC']: dITp['sUS02'],
                          dIG['sLFJCE']: dITp['sUS02'],
                          dIG['sFXt']: dIG['xtCSV']}
-        d2PI['X'][dIG['sLFE']] = self.lIFET
+        d2PI['InpData'][dIG['sLFE']] = self.lIFET
+        for sX in ['XS', 'XM']:
+            d2PI[sX][dIG['sLFE']] = self.lIFEU
         self.FPs.addFPs(d2PI)
         self.d2PInf = d2PI
 
@@ -123,19 +127,16 @@ class DataLoader(BaseClass):
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
         (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XSClf,
          self.XMClf, self.YSClf, self.YMClf, self.dClMapClf, self.lSXClClf) = t
-        self.dMltStSClf = SF.getIMltSt(self.dIG, self.dITp, self.YSClf)
-        self.dMltStMClf = SF.getIMltSt(self.dIG, self.dITp, self.YMClf)
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
             self.FPs.dPF['InpDataPrC'] == self.FPs.dPF['InpDataClf']):
             t = (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf,
                  self.XSClf, self.XMClf, self.YSClf, self.YMClf,
-                 self.dClMapClf, self.dMltStSClf, self.dMltStMClf,
-                 self.lSXClClf)
+                 self.dClMapClf, self.lSXClClf)
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC,
              self.XSPrC, self.XMPrC, self.YSPrC, self.YMPrC, self.dClMapPrC,
-             self.dMltStSPrC, self.dMltStMPrC, self.lSXClPrC) = t
+             self.lSXClPrC) = t
         elif ((self.dfrInpPrC is None and self.dfrInpClf is not None and
                self.FPs.dPF['InpDataPrC'] != self.FPs.dPF['InpDataClf']) or
               (self.dfrInpPrC is None and self.dfrInpClf is None)):
@@ -144,7 +145,6 @@ class DataLoader(BaseClass):
             (self.dNmerEffFPrC, self.serNmerSeqPrC, self.dfrInpPrC, self.XSPrC,
              self.XMPrC, self.YSPrC, self.YMPrC, self.dClMapPrC,
              self.lSXClPrC) = t
-            self.dMltStSPrC, self.dMltStMPrC = self.dMltStSClf, self.dMltStMClf
 
     # --- print methods -------------------------------------------------------
     def printSerNmerSeqClf(self):
@@ -267,6 +267,27 @@ class DataLoader(BaseClass):
         self.printX(sMd=sMd)
         self.printY(sMd=sMd)
 
+    # --- methods for getting multi-steps data --------------------------------
+    def getDMltStS(self, YS=None):
+        if self.dMltStSClf is None:
+            self.dMltStSClf = SF.getIMltSt(self.dIG, self.dITp, Y=YS)
+        return self.dMltStSClf
+
+    def getDMltStM(self, YM=None):
+        if self.dMltStMClf is None:
+            self.dMltStMClf = SF.getIMltSt(self.dIG, self.dITp, Y=YM,
+                                           sLbl=self.dITp['sMltLbl'])
+        return self.dMltStMClf
+
+    def getDMltSt(self, Y=None):
+        if self.dITp['I_Lbl'] == self.dITp['sSglLbl']:
+            return self.getDMltStS(YS=Y)
+        else:
+            return self.getDMltStM(YM=Y)
+
+    def getDMltStAll(self, YS=None, YM=None):
+        return (self.getDMltStS(YS=YS), self.getDMltStM(YM=YM))
+
     # --- methods for yielding data -------------------------------------------
     def yieldFPs(self):
         return self.FPs
@@ -359,29 +380,25 @@ class DataLoader(BaseClass):
         if sLbl is None:
             return (self.dfrInpClf, self.XSClf, self.XMClf, self.YSClf,
                     self.YMClf, self.serNmerSeqClf, self.dClMapClf,
-                    self.dMltStSClf, self.dMltStMClf, self.lSXClClf)
+                    self.lSXClClf)
         elif sLbl == self.dITp['sSglLbl']:
             return (self.dfrInpClf, self.XSClf, self.YSClf,
-                    self.serNmerSeqClf, self.dClMapClf, self.dMltStSClf,
-                    self.lSXClClf)
+                    self.serNmerSeqClf, self.dClMapClf, self.lSXClClf)
         else:
             return (self.dfrInpClf, self.XMClf, self.YMClf,
-                    self.serNmerSeqClf, self.dClMapClf, self.dMltStMClf,
-                    self.lSXClClf)
+                    self.serNmerSeqClf, self.dClMapClf, self.lSXClClf)
 
     def yieldPrCData(self, sLbl=GC.S_SGL_LBL):
         if sLbl is None:
             return (self.dfrInpPrC, self.XSPrC, self.XMPrC, self.YSPrC,
                     self.YMPrC, self.serNmerSeqPrC, self.dClMapPrC,
-                    self.dMltStSPrC, self.dMltStMPrC, self.lSXClPrC)
+                    self.lSXClPrC)
         elif sLbl == self.dITp['sSglLbl']:
             return (self.dfrInpPrC, self.XSPrC, self.YSPrC,
-                    self.serNmerSeqPrC, self.dClMapPrC, self.dMltStSPrC,
-                    self.lSXClPrC)
+                    self.serNmerSeqPrC, self.dClMapPrC, self.lSXClPrC)
         else:
             return (self.dfrInpPrC, self.XMPrC, self.YMPrC,
-                    self.serNmerSeqPrC, self.dClMapPrC, self.dMltStMPrC,
-                    self.lSXClPrC)
+                    self.serNmerSeqPrC, self.dClMapPrC, self.lSXClPrC)
 
     def yieldData(self, sMd=None, sLbl=GC.S_SGL_LBL):
         if sMd == self.dITp['sClf']:

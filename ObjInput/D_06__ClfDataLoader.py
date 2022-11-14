@@ -109,9 +109,10 @@ lIPosUsed = None                # None or list of positions used for classific.
 # lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]
 
 # list of keys for file name end strings
-lSIFEndR = ['sSet', 'sRestr']
 lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam']
-lSIFEndT = ['sRestr', 'sXclEffFam']
+lSIFEndT = ['sSet', 'sRestr', 'sXclEffFam']
+lSIFEndU = ['sRestr', 'sXclEffFam']
+lSIFEndV = ['sRestr']
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -220,9 +221,10 @@ dIO = {# --- general
        # --- sets
        # --- lists
        'lIPosUsed': lIPosUsed,
-       'lSIFEndR': lSIFEndR,
        'lSIFEndS': lSIFEndS,
        'lSIFEndT': lSIFEndT,
+       'lSIFEndU': lSIFEndU,
+       'lSIFEndV': lSIFEndV,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing

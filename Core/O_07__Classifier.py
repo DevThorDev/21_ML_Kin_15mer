@@ -216,8 +216,8 @@ class BaseClfPrC(BaseClass):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar=GC.S_0):
-        lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'dMltSt', 'lSXCl',
-                      'Clf', 'optClf', 'sMth', 'sMthL', 'dfrPred', 'dfrProba']
+        lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'lSXCl', 'Clf',
+                      'optClf', 'sMth', 'sMthL', 'dfrPred', 'dfrProba']
         lAttrDict = ['d3ResClf', 'd2DfrCnfMat', 'd2ResClf', 'dDfrCnfMat',
                      'dDfrPred', 'dDfrProba', 'dPropAAc']
         lAttrDictF = ['dClf', 'dScoreClf', 'dConfusMatrix']
@@ -260,18 +260,18 @@ class BaseClfPrC(BaseClass):
 
     # --- methods for getting (and possibly modifying) input data -------------
     def modInpDataMltSt(self, iSt=None):
-        if self.dITp['doMultiSteps'] and iSt is not None:
-            self.Y = self.dMltSt['dYSt'][iSt]
-            self.X = self.X.loc[self.Y.index, :]
-            self.dfrInp = self.dfrInp.loc[self.Y.index, :]
-            self.dfrInp[self.dITp['sEffFam']] = self.Y
-            self.lSXCl = sorted(list(self.Y.unique()))
+        self.Y = self.D.getDMltSt(Y=self.Y)['dYSt'][iSt]
+        self.X = self.X.loc[self.Y.index, :]
+        self.dfrInp = self.dfrInp.loc[self.Y.index, :]
+        self.dfrInp[self.dITp['sEffFam']] = self.Y
+        self.lSXCl = sorted(list(self.Y.unique()))
 
     def getInpData(self, sMd=None, sLbl=GC.S_SGL_LBL, iSt=None):
         sILbl = self.dITp['I_Lbl']
         (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
-         self.dMltSt, self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=sILbl)
-        self.modInpDataMltSt(iSt=iSt)
+         self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=sILbl)
+        if self.dITp['doMultiSteps'] and iSt is not None:
+            self.modInpDataMltSt(iSt=iSt)
 
     # --- print methods -------------------------------------------------------
     def printX(self):

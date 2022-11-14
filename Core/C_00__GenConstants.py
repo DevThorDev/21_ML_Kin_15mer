@@ -37,7 +37,7 @@ S_F, S_G, S_H, S_I, S_J = 'F', 'G', 'H', 'I', 'J'
 S_K, S_L, S_M, S_N, S_O = 'K', 'L', 'M', 'N', 'O'
 S_P, S_Q, S_R, S_S, S_T = 'P', 'Q', 'R', 'S', 'T'
 S_U, S_V, S_W, S_X, S_Y, S_Z = 'U', 'V', 'W', 'X', 'Y', 'Z'
-S_XS = S_X + S_S
+S_XS, S_XM, S_YS, S_YM = S_X + S_S, S_X + S_M, S_Y + S_S, S_Y + S_M
 
 S_US02 = S_USC*2
 S_DT03 = S_DOT*3
