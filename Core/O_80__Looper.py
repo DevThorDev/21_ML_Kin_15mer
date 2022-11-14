@@ -23,9 +23,11 @@ class Looper(BaseClass):
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.D = D
         self.iniDicts()
-        # define the iterator of the (MultiSteps) step index
-        self.itISt = (range(1, self.D.dMltStClf['nSteps'] + 1) if
-                      (self.dITp['doMultiSteps']) else [None])
+        # define MultiSteps dict. and iterator of the (MultiSteps) step index
+        dInfMltSt = self.D.getDMltSt()
+        self.dXClMltSt = dInfMltSt['dXCl']
+        self.itISt = (range(1, dInfMltSt['nSteps'] + 1) if
+                      self.dITp['doMultiSteps'] else [None])
         print('Initiated "Looper" base object.')
 
     def iniDicts(self):
