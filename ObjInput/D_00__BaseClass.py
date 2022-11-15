@@ -62,10 +62,12 @@ sIEffFTest = GC.S_I_EFF_F_TEST
 sEffCode = GC.S_EFF_CODE
 sEffCl = GC.S_EFF_CL
 sXCl = GC.S_X_CL
+sXNoCl = GC.S_X_NO_CL
 sNone = GC.S_NONE
 sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
 sPredS, sPred, sNPred, sProba = GC.S_PRED_S, GC.S_PRED, GC.S_N_PRED, GC.S_PROBA
+sPredProba = GC.S_PRED_PROBA
 sTrueCl, sPredCl, sMultiCl = GC.S_TRUE_CL, GC.S_PRED_CL, GC.S_MULTI_CL
 sIGen = GC.S_I_GEN
 sCNmer = GC.S_C_N_MER
@@ -225,6 +227,7 @@ dIO = {# --- general
        'sEffCode': sEffCode,
        'sEffCl': sEffCl,
        'sXCl': sXCl,
+       'sXNoCl': sXNoCl,
        'sNone': sNone,
        'sClf': sClf,
        'sPrC': sPrC,
@@ -233,6 +236,7 @@ dIO = {# --- general
        'sPred': sPred,
        'sNPred': sNPred,
        'sProba': sProba,
+       'sPredProba': sPredProba,
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sMultiCl': sMultiCl,

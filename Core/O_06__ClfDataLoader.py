@@ -38,7 +38,7 @@ class DataLoader(BaseClass):
         self.lIFES = [self.dITp[s] for s in self.dITp['lSIFEndS']]
         self.lIFET = [self.dITp[s] for s in self.dITp['lSIFEndT']]
         self.lIFEU = [self.dITp[s] for s in self.dITp['lSIFEndU']]
-        self.lIFEV = [self.dITp[s] for s in self.dITp['lSIFEndV']]
+        # self.lIFEV = [self.dITp[s] for s in self.dITp['lSIFEndV']]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -54,7 +54,7 @@ class DataLoader(BaseClass):
             d2PI['DictNmer' + sTp] = {dIG['sPath']: dITp['pBinData'],
                                       dIG['sLFS']: dITp['sFDictNmer' + sTp],
                                       dIG['sLFC']: dITp['sFResComb'],
-                                      dIG['sLFE']: self.lIFEV,
+                                      dIG['sLFE']: self.lIFEU,
                                       dIG['sLFJSC']: dITp['sUS02'],
                                       dIG['sLFJCE']: dITp['sUS02'],
                                       dIG['sFXt']: dIG['xtBIN']}
@@ -62,7 +62,7 @@ class DataLoader(BaseClass):
             d2PI['Nmer' + sTp] = {dIG['sPath']: dITp['pUnqNmer'],
                                   dIG['sLFS']: dITp['sNmer' + sTp],
                                   dIG['sLFC']: dITp['sFInpClf'],
-                                  dIG['sLFE']: self.lIFEV,
+                                  dIG['sLFE']: self.lIFEU,
                                   dIG['sLFJSC']: dITp['sUS02'],
                                   dIG['sLFJCE']: dITp['sUS02'],
                                   dIG['sFXt']: dIG['xtCSV']}
@@ -280,7 +280,7 @@ class DataLoader(BaseClass):
         return self.dMltStMClf
 
     def getDMltSt(self, Y=None):
-        if self.dITp['I_Lbl'] == self.dITp['sSglLbl']:
+        if self.dITp['ILblSgl']:
             return self.getDMltStS(YS=Y)
         else:
             return self.getDMltStM(YM=Y)
@@ -324,9 +324,9 @@ class DataLoader(BaseClass):
 
     def yieldXClf(self, sLbl=GC.S_SGL_LBL):
         if sLbl == self.dITp['sSglLbl']:
-            self.yieldXSClf()
+            return self.yieldXSClf()
         else:
-            self.yieldXMClf()
+            return self.yieldXMClf()
 
     def yieldXSPrC(self):
         return self.XSPrC
@@ -336,15 +336,15 @@ class DataLoader(BaseClass):
 
     def yieldXPrC(self, sLbl=GC.S_SGL_LBL):
         if sLbl == self.dITp['sSglLbl']:
-            self.yieldXSPrC()
+            return self.yieldXSPrC()
         else:
-            self.yieldXMPrC()
+            return self.yieldXMPrC()
 
     def yieldX(self, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
         if sMd == self.dITp['sClf']:
-            self.yieldXClf(sLbl=sLbl)
+            return self.yieldXClf(sLbl=sLbl)
         else:
-            self.yieldXPrC(sLbl=sLbl)
+            return self.yieldXPrC(sLbl=sLbl)
 
     def yieldYSClf(self):
         return self.YSClf
@@ -354,9 +354,9 @@ class DataLoader(BaseClass):
 
     def yieldYClf(self, sLbl=GC.S_SGL_LBL):
         if sLbl == self.dITp['sSglLbl']:
-            self.yieldYSClf()
+            return self.yieldYSClf()
         else:
-            self.yieldYMClf()
+            return self.yieldYMClf()
 
     def yieldYSPrC(self):
         return self.YSPrC
@@ -366,15 +366,15 @@ class DataLoader(BaseClass):
 
     def yieldYPrC(self, sLbl=GC.S_SGL_LBL):
         if sLbl == self.dITp['sSglLbl']:
-            self.yieldYSPrC()
+            return self.yieldYSPrC()
         else:
-            self.yieldYMPrC()
+            return self.yieldYMPrC()
 
     def yieldY(self, sMd=GC.S_CLF, sLbl=GC.S_SGL_LBL):
         if sMd == self.dITp['sClf']:
-            self.yieldYClf(sLbl=sLbl)
+            return self.yieldYClf(sLbl=sLbl)
         else:
-            self.yieldYPrC(sLbl=sLbl)
+            return self.yieldYPrC(sLbl=sLbl)
 
     def yieldClfData(self, sLbl=GC.S_SGL_LBL):
         if sLbl is None:
@@ -402,9 +402,9 @@ class DataLoader(BaseClass):
 
     def yieldData(self, sMd=None, sLbl=GC.S_SGL_LBL):
         if sMd == self.dITp['sClf']:
-            self.yieldClfData(sLbl=sLbl)
+            return self.yieldClfData(sLbl=sLbl)
         elif sMd == self.dITp['sPrC']:
-            self.yieldPrCData(sLbl=sLbl)
+            return self.yieldPrCData(sLbl=sLbl)
         else: return None
 
 ###############################################################################

@@ -31,7 +31,7 @@ class Looper(BaseClass):
         print('Initiated "Looper" base object.')
 
     def iniDicts(self):
-        self.dDfrPred, self.dDfrProba = None, None
+        self.dDfrPredProba = None
         self.d3ResClf, self.d2MnSEMResClf = {}, {}
         self.d2CnfMat, self.dMnSEMCnfMat = {}, {}
 
@@ -58,8 +58,8 @@ class Looper(BaseClass):
     # --- loop methods --------------------------------------------------------
     # --- method for updating the type dictionary -----------------------------
     def updateAttr(self):
-        self.CLblsTrain = self.cClf.CLblsTrain
-        self.lIFE = self.D.lIFES + [self.CLblsTrain]
+        self.sCLblsTrain = self.cClf.sCLblsTrain
+        self.lIFE = self.D.lIFES + [self.sCLblsTrain]
 
     # --- methods for filling and changing the file paths ---------------------
     def fillFPsMth(self):
@@ -85,28 +85,21 @@ class Looper(BaseClass):
                           dIG['sLFJC']: dITp['sUS02'],
                           dIG['sLFJCE']: dITp['sUS02'],
                           dIG['sFXt']: dIG['xtCSV']}
-        d2PI['DetldClf'] = {dIG['sPath']: dITp['pOutDet'],
-                            dIG['sLFC']: [dITp['sDetailed'], sSz],
-                            dIG['sLFE']: lSEDet,
-                            dIG['sLFJC']: dITp['sUS02'],
-                            dIG['sLFJCE']: dITp['sUS02'],
-                            dIG['sFXt']: dIG['xtCSV']}
-        d2PI['ProbaClf'] = {dIG['sPath']: dITp['pOutDet'],
-                            dIG['sLFC']: [dITp['sProba'], sSz],
-                            dIG['sLFE']: lSEDet,
-                            dIG['sLFJC']: dITp['sUS02'],
-                            dIG['sLFJCE']: dITp['sUS02'],
-                            dIG['sFXt']: dIG['xtCSV']}
+        d2PI['PredProbaClf'] = {dIG['sPath']: dITp['pOutDet'],
+                                dIG['sLFC']: [dITp['sPredProba'], sSz],
+                                dIG['sLFE']: lSEDet,
+                                dIG['sLFJC']: dITp['sUS02'],
+                                dIG['sLFJCE']: dITp['sUS02'],
+                                dIG['sFXt']: dIG['xtCSV']}
         self.FPs.addFPs(d2PI)
         self.d2PInf = d2PI
 
     def adaptFPs(self, sKP, cRep):
-        sRepS, sUSC = self.dITp['sRepS'], self.dITp['sUSC']
+        sRepS, sUSC, kP = self.dITp['sRepS'], self.dITp['sUSC'], 'sLFE'
         sKPR = GF.joinS([sKP, sRepS + str(cRep + 1), self.sSt], cJ=sUSC)
         if self.dITp['doParGrid']:
             sKPR = GF.joinS([sKP, self.sSt], cJ=sUSC)
-        for s in ['DetldClf', 'ProbaClf']:
-            self.FPs.modFP(d2PI=self.d2PInf, kMn=s, kPos='sLFE', cS=sKPR)
+        self.FPs.modFP(d2PI=self.d2PInf, kMn='PredProbaClf', kPos=kP, cS=sKPR)
 
     # --- method for performing the calculations of the current repetition ----
     def getClfCRep(self, sKPar=GC.S_0, cRep=0):
@@ -161,27 +154,22 @@ class Looper(BaseClass):
             cClf = NuSVClf(self.inpD, self.D, lG, d2Par, iSt, sKPar, cRep)
         self.cTM, self.lParGrid, self.cClf = tM, lG, cClf
 
-    def saveMeanDetldProba(self, sKPar=GC.S_0):
-        lDDfr, lKFP = [self.dDfrPred, self.dDfrProba], ['DetldClf', 'ProbaClf']
-        for dDfr, cKFP in zip(lDDfr, lKFP):
-            dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.getLHdFromDDfr(dDfr))
-            sKPR = GF.joinS([sKPar, self.sSt], cJ=self.dITp['sUSC'])
-            self.FPs.modFP(d2PI=self.d2PInf, kMn=cKFP, kPos='sLFE', cS=sKPR)
-            self.saveData(dfrMn, pF=self.FPs.dPF[cKFP], saveIdx=False)
+    def saveMeanPredProba(self, sKPar=GC.S_0):
+        dDfr, cKFP = self.dDfrPredProba, 'PredProbaClf'
+        dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.getLHdFromDDfr(dDfr))
+        sKPR = GF.joinS([sKPar, self.sSt], cJ=self.dITp['sUSC'])
+        self.FPs.modFP(d2PI=self.d2PInf, kMn=cKFP, kPos='sLFE', cS=sKPR)
+        self.saveData(dfrMn, pF=self.FPs.dPF[cKFP], saveIdx=False)
 
     def detailedClfRes(self, sKPar=GC.S_0, cRep=0):
         if self.dITp['saveDetailedClfRes']:
             lSrtBy = [self.dITp['sCNmer']]
-            dfrPred = self.cClf.dfrPred.sort_values(by=lSrtBy)
-            dfrProba = self.cClf.dfrProba.sort_values(by=lSrtBy)
-            if self.dDfrPred is not None:
-                self.dDfrPred[cRep] = dfrPred
-            if self.dDfrProba is not None:
-                self.dDfrProba[cRep] = dfrProba
-            self.saveData(dfrPred, pF=self.FPs.dPF['DetldClf'])
-            self.saveData(dfrProba, pF=self.FPs.dPF['ProbaClf'])
+            dfrPredProba = self.cClf.dfrPredProba.sort_values(by=lSrtBy)
+            if self.dDfrPredProba is not None:
+                self.dDfrPredProba[cRep] = dfrPredProba
+            self.saveData(dfrPredProba, pF=self.FPs.dPF['PredProbaClf'])
             if cRep == (self.nRep - 1):
-                self.saveMeanDetldProba(sKPar=sKPar)
+                self.saveMeanPredProba(sKPar=sKPar)
 
     def doRep(self, cTim, k=0, sKPar=GC.S_0, cRep=0, stT=None):
         if self.sMth in self.dITp['lSMth']:
@@ -224,7 +212,7 @@ class Looper(BaseClass):
         if not self.dITp['useKey0'] and self.dITp['s0'] in self.d2Par:
             del self.d2Par[self.dITp['s0']]
         for k, sKPar in enumerate(self.d2Par):
-            self.dDfrPred, self.dDfrProba = {}, {}
+            self.dDfrPredProba = {}
             for cRep in range(self.nRep):
                 self.printSettingCRep(sKPar, cRep)
                 self.doRep(cTim, k=k, sKPar=sKPar, cRep=cRep, stT=stT)

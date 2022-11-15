@@ -157,14 +157,14 @@ class Evaluator(BaseClass):
             assert self.dfrTrueCl.equals(dfrTrueCl)
         SF.fillDPrimaryRes(d1, self.d2ClDet, cDfr=cDfr, nCl=nCl, sMth=sMth)
 
-    def calcSaveMeanDetldProba(self, dDP):
-        for sKM in [self.dITp['sDetailed'], self.dITp['sProba']]:
-            for tK, dDfr in dDP[sKM].items():
-                dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.getLHdFromDDfr(dDfr))
-                tKFP = tuple([1] + list(tK))
-                if tKFP in self.FPs.dPF:
-                    pFMn = GF.modPF(self.FPs.dPF[tKFP], iRm=self.dITp['sLast'])
-                    self.saveData(dfrMn, pF=pFMn)
+    def calcSaveMeanPredProba(self, dDP):
+        sKM = self.dITp['sPredProba']
+        for tK, dDfr in dDP[sKM].items():
+            dfrMn = GF.calcMeanItO(itO=dDfr, lKMn=GF.getLHdFromDDfr(dDfr))
+            tKFP = tuple([1] + list(tK))
+            if tKFP in self.FPs.dPF:
+                pFMn = GF.modPF(self.FPs.dPF[tKFP], iRm=self.dITp['sLast'])
+                self.saveData(dfrMn, pF=pFMn)
 
     def loopOverMethods(self, d1, tF, tFXt, lSM=[]):
         for sM in lSM:
@@ -172,7 +172,7 @@ class Evaluator(BaseClass):
             dDP =  {self.dITp['sDetailed']: {}, self.dITp['sProba']: {}}
             for tK, cDfr in self.dDfrCmb.items():
                 if (len(tK) > 0) and ((set([sM]) | set(tF)) <= set(tK)):
-                    if self.dITp['doDetailedProbaEval']:
+                    if self.dITp['doPredProbaEval']:
                         SF.fillDictDP(self.dITp, dDP=dDP, tK=tK, cDfr=cDfr)
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
                     if tK[0] is not None and self.dITp['doClsPredEval']:
@@ -181,7 +181,7 @@ class Evaluator(BaseClass):
                             if sM not in self.lAllMth:
                                 self.lAllMth.append(sM)
                         self.calcResSglClf(d1, cDfr, sMth=sM)
-            self.calcSaveMeanDetldProba(dDP=dDP)
+            self.calcSaveMeanPredProba(dDP=dDP)
 
     def calcSummaryVals(self):
         pass

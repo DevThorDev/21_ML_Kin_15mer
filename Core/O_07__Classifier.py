@@ -147,14 +147,13 @@ class ImbSampler(BaseClass):
         self.printStrat()
         # in case of a custom sampling strategy, calculate the dictionary
         if self.sStrat in self.dITp['lSmplStratCustom']:
-            YSglLbl = self.D.yieldYClf(sLbl=self.dITp['sSglLbl'])
             if self.sStrat == self.dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
-                self.sStrat = GF.smplStratRealMajo(YSglLbl)
+                self.sStrat = GF.smplStratRealMajo(self.Y)
             elif self.sStrat == self.dITp['sStratShareMino']:
                 # implement the "ShareMino" strategy
                 dIStrat = self.dITp['dIStrat']
-                self.sStrat = GF.smplStratShareMino(YSglLbl, dI=dIStrat)
+                self.sStrat = GF.smplStratShareMino(self.Y, dI=dIStrat)
 
     # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
     def getImbSampler(self):
@@ -188,8 +187,8 @@ class ImbSampler(BaseClass):
     def fitResampleImbalanced(self):
         X, YResImb = self.imbSmp.fit_resample(self.X, self.Y)
         self.printResResampleImb(YIni=self.Y, YRes=YResImb)
-        if not self.dITp['onlySglLbl']:
-            YResImb = SF.toMultiLbl(self.dITp, serY=YResImb, lXCl=self.lSXCl)
+        if not self.dITp['ILblSgl']:
+            YResImb = SF.toMultiLbl(serY=YResImb, lXCl=self.lSXCl)
         return X, YResImb
 
 # -----------------------------------------------------------------------------
@@ -209,17 +208,17 @@ class BaseClfPrC(BaseClass):
     # --- method for complementing the type input dictionary ------------------
     def getCLblsTrain(self):
         sLbl, sTrain = self.dITp['sLbl'], self.dITp['sTrain']
-        lLblTrain, self.CLblsTrain = self.dITp['lLblTrain'], ''
-        if not (lLblTrain is None or self.dITp['onlySglLbl']):
-            self.CLblsTrain = GF.joinS([str(nLbl) for nLbl in lLblTrain])
-            self.CLblsTrain = GF.joinS([sLbl, self.CLblsTrain, sTrain])
+        lLblTrain, self.sCLblsTrain = self.dITp['lLblTrain'], ''
+        if not (lLblTrain is None or self.dITp['ILblSgl']):
+            self.sCLblsTrain = GF.joinS([str(nLbl) for nLbl in lLblTrain])
+            self.sCLblsTrain = GF.joinS([sLbl, self.sCLblsTrain, sTrain])
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar=GC.S_0):
         lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'lSXCl', 'Clf',
                       'optClf', 'sMth', 'sMthL', 'dfrPred', 'dfrProba']
         lAttrDict = ['d3ResClf', 'd2DfrCnfMat', 'd2ResClf', 'dDfrCnfMat',
-                     'dDfrPred', 'dDfrProba', 'dPropAAc']
+                     'dDfrPredProba', 'dPropAAc']
         lAttrDictF = ['dClf', 'dScoreClf', 'dConfusMatrix']
         for cAttr in lAttr2None:
             if not hasattr(self, cAttr):
@@ -235,7 +234,7 @@ class BaseClfPrC(BaseClass):
                           self.dITp['nItPtFit'] is not None)
         self.sKPar = sKPar
         self.getCLblsTrain()
-        self.lIFE = self.D.lIFES + [self.CLblsTrain]
+        self.lIFE = self.D.lIFES + [self.sCLblsTrain]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -267,9 +266,8 @@ class BaseClfPrC(BaseClass):
         self.lSXCl = sorted(list(self.Y.unique()))
 
     def getInpData(self, sMd=None, sLbl=GC.S_SGL_LBL, iSt=None):
-        sILbl = self.dITp['I_Lbl']
         (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
-         self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=sILbl)
+         self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=self.dITp['I_Lbl'])
         if self.dITp['doMultiSteps'] and iSt is not None:
             self.modInpDataMltSt(iSt=iSt)
 
@@ -375,7 +373,7 @@ class GeneralClassifier(BaseClfPrC):
     def splitTrainTest(self, X, Y):
         XTrain, XTest = X.loc[self.lITrain, :], X.loc[self.lITest, :]
         YTrain, YTest = Y.loc[self.lITrain], Y.loc[self.lITest]
-        if not (self.dITp['onlySglLbl'] or self.dITp['lLblTrain'] is None):
+        if not (self.dITp['ILblSgl'] or self.dITp['lLblTrain'] is None):
             lB = [(serR.sum() in self.dITp['lLblTrain']) for _, serR in
                   YTrain.iterrows()]
             XTrain, YTrain = XTrain[lB], YTrain[lB]
@@ -406,13 +404,13 @@ class GeneralClassifier(BaseClfPrC):
     def doAllKFolds(self, inpDat, lITpUpd):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
         self.getKFoldSplitter()
-        YSglLbl = self.D.yieldYClf(sLbl=self.dITp['sSglLbl'])
-        XClf = self.D.yieldXClf(sLbl=self.dITp['I_Lbl'])
-        for j, (lITr, lITe) in enumerate(self.kF.split(X=XClf, y=YSglLbl)):
+        # YSglLbl = self.D.yieldYClf(sLbl=self.dITp['sSglLbl'])
+        # XClf = self.D.yieldXClf(sLbl=self.dITp['I_Lbl'])
+        for j, (lITr, lITe) in enumerate(self.kF.split(X=self.X, y=self.Y)):
             self.j, self.lITrain, self.lITest = j, lITr, lITe
             self.encodeSplitData()
-            X, Y = self.XY.getXY(sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
-            self.dSmp[self.j] = ImbSampler(inpDat, X=X, Y=Y, iSt=iSt,
+            XTr, YTr = self.XY.getXY(sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
+            self.dSmp[self.j] = ImbSampler(inpDat, X=XTr, Y=YTr, iSt=iSt,
                                            sMthL=self.sMthL, sMth=sM)
             if not self.doPartFit:
                 self.doKFoldsFullFit(sM=sM, sTr=sTr, iSt=iSt)
@@ -587,12 +585,13 @@ class GeneralClassifier(BaseClfPrC):
                 except:
                     print('ERROR: Cannot calculate score of classifier "',
                           self.sMthL, '"!', sep='')
-        if self.dITp['onlySglLbl']:
+        if self.dITp['ILblSgl']:
             self.YTS = YTest
-            self.YTM = SF.toMultiLbl(self.dITp, serY=YTest, lXCl=self.lSXCl)
+            self.YTM = SF.toMultiLbl(serY=YTest, lXCl=self.lSXCl)
         else:
+            self.YTS = SF.toSglLbl(self.dITp, dfrY=YTest)
             self.YTM = YTest
-        return dat2Pred, self.YTM
+        return dat2Pred, YTest
 
     def fitOrPartialFitClf(self):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
@@ -612,31 +611,32 @@ class GeneralClassifier(BaseClfPrC):
                 self.getXYTest(cClf=self.dClf[self.j], calcScore=True)
 
     # --- method for calculating the predicted y classes, and their probs -----
+    def getYPred(self, cClf, X2Pr, lSC, lSR):
+        if self.dITp['ILblSgl']:
+            self.YPS = GF.iniPdSer(cClf.predict(X2Pr), lSNmI=lSR,
+                                   nameS=self.dITp['sEffFam'])
+            self.YPM = SF.toMultiLbl(serY=self.YPS, lXCl=self.lSXCl)
+            return self.YPS
+        else:
+            self.YPM = GF.iniPdDfr(cClf.predict(X2Pr), lSNmC=lSC, lSNmR=lSR)
+            return self.YPM
+    
     def getYPredProba(self, cClf, X2Pred=None, YTest=None):
         sM, sPd, sPa = self.sMth, self.dITp['sPred'], self.dITp['sProba']
-        sML, lSC, lSR = self.sMthL, YTest.columns, YTest.index
-        if self.dITp['onlySglLbl']:
-            self.YPS = GF.iniPdSer(cClf.predict(X2Pred), lSNmI=lSR,
-                                   nameS=self.dITp['sEffFam'])
-            self.YPM = SF.toMultiLbl(self.dITp, serY=self.YPS, lXCl=self.lSXCl)
-        else:
-            self.YPM = GF.iniPdDfr(cClf.predict(X2Pred), lSNmC=lSC, lSNmR=lSR)
+        sML, lSC, lSR = self.sMthL, self.lSXCl, YTest.index
+        YPred = self.getYPred(cClf=cClf, X2Pr=X2Pred, lSC=lSC, lSR=lSR)
         YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR, sMthL=sML)
         if YProba is None:
             YProba = GF.iniWShape(tmplDfr=self.YPM)
-        assert YProba.shape == self.YPM.shape
-        self.XY.setY(Y=self.YPM, sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
+        # assert YProba.shape == self.YPM.shape
+        self.XY.setY(Y=YPred, sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
         self.XY.setY(Y=YProba, sMth=sM, sTp=sPa, iSt=self.iSt, j=self.j)
 
     # --- method for calculating values of the Classifier results dictionary --
     def calcLSumVals(self, YTest, YPred):
         lV, lSXCl = [None]*len(self.dITp['lSResClf']), self.lSXCl
-        nPred = YPred.shape[0]
-        nOK = sum([1 for k in range(nPred) if
-                   (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
-        propOK = (nOK/nPred if nPred > 0 else None)
-        lV[:3] = [nPred, nOK, propOK]
-        if self.dITp['onlySglLbl']:
+        lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
+        if self.dITp['ILblSgl']:
             lV[3] = accuracy_score(self.YTS, self.YPS)
             lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
             lV[5] = top_k_accuracy_score(self.YTS, self.YPM, k=2, labels=lSXCl)
@@ -652,18 +652,17 @@ class GeneralClassifier(BaseClfPrC):
             lV[14] = log_loss(self.YTS, self.YPM, eps=1e-15, labels=lSXCl)
         return lV
 
-    def assembleDDfrPredProba(self, lSCTP, YTest=None, YPred=None):
-        lDDfr, j = [self.dDfrPred, self.dDfrProba], self.j
+    def assembleDDfrPredProba(self, YTest=None, YPred=None):
+        YPred = SF.toMultiLbl(serY=YPred, lXCl=self.lSXCl)
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
-                              iSt=self.iSt, j=j)
-        for k, cYP in enumerate([YPred, YProba]):
-            cDfr = GF.concLOAx1([YTest, cYP], ignIdx=True)
-            cDfr.columns = lSCTP
-            cDfr = GF.concLOAx1(lObj=[self.dfrInp[self.dITp['sCNmer']], cDfr])
-            cDfr.dropna(axis=0, inplace=True)
-            cDfr = cDfr.convert_dtypes()
-            lDDfr[k][j] = cDfr
-        self.dDfrPred[j], self.dDfrProba[j] = lDDfr[0][j], lDDfr[1][j]
+                              iSt=self.iSt, j=self.j)
+        lSCTP = SF.getLSC(self.dITp, YTest=YTest, YPred=YPred, YProba=YProba)
+        cDfr = GF.concLOAx1([YTest, YPred, YProba], ignIdx=True)
+        cDfr.columns = lSCTP
+        cDfr = GF.concLOAx1(lObj=[self.dfrInp[self.dITp['sCNmer']], cDfr])
+        cDfr.dropna(axis=0, inplace=True)
+        cDfr = cDfr.convert_dtypes()
+        self.dDfrPredProba[self.j] = cDfr
 
     def calcResPredict(self, YTest=None):
         YPred = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sPred'],
@@ -674,13 +673,8 @@ class GeneralClassifier(BaseClfPrC):
             for sK, cV in zip(self.dITp['lSResClf'], lVCalc):
                 GF.addToD3(self.d3ResClf, cKL1=self.sKPar, cKL2=self.j,
                            cKL3=sK, cVL3=cV)
-            # create dDfrPred/dDfrProba, containing YTest and YPred/YProba
-            sTCl, sPCl = self.dITp['sTrueCl'], self.dITp['sPredCl']
-            lSCTP = [GF.joinS([s, sTCl], cJ=self.dITp['sUSC'])
-                     for s in YTest.columns]
-            lSCTP += [GF.joinS([s, sPCl], cJ=self.dITp['sUSC'])
-                      for s in YPred.columns]
-            self.assembleDDfrPredProba(lSCTP=lSCTP, YTest=YTest, YPred=YPred)
+            # create dDfrPredProba, containing YTest and YPred/YProba
+            self.assembleDDfrPredProba(YTest=YTest, YPred=YPred)
 
     # --- method for calculating the confusion matrix -------------------------
     def calcCnfMatrix(self, YTest=None):
@@ -695,14 +689,11 @@ class GeneralClassifier(BaseClfPrC):
             GF.addToDictD(self.d2DfrCnfMat, cKMain=self.sKPar, cKSub=self.j,
                           cVSub=dfrCM)
 
-    # --- method for calculating the mean values of dDfrPred/dDfrProba --------
+    # --- method for calculating the mean values of dDfrPredProba -------------
     def calcFoldsMnPredProba(self):
-        lAttrFold = ['dDfrPred', 'dDfrProba']
-        lAttrFold2Set = ['dfrPred', 'dfrProba']
-        for sAttr, sAttr2Set in zip(lAttrFold, lAttrFold2Set):
-            dDfr = getattr(self, sAttr)
-            lHd = GF.getLHdFromDDfr(dDfr)
-            setattr(self, sAttr2Set, GF.calcMeanItO(itO=dDfr, lKMn=lHd))
+        dDfr = getattr(self, 'dDfrPredProba')
+        lHd = GF.getLHdFromDDfr(dDfr)
+        setattr(self, 'dfrPredProba', GF.calcMeanItO(itO=dDfr, lKMn=lHd))
         dDfr = self.d2DfrCnfMat[self.sKPar]
         lHd = GF.getLHdFromDDfr(dDfr)
         self.dDfrCnfMat[self.sKPar] = GF.calcMeanItO(itO=dDfr, lKMn=lHd)
@@ -1074,13 +1065,13 @@ class PropCalculator(BaseClfPrC):
         if self.dITp['doPropCalc']:
             dfrInp, dITp = self.dfrInp, self.dITp
             for sCl in self.lSXCl:
-                if self.dITp['onlySglLbl']:
+                if self.dITp['ILblSgl']:
                     cDfrI = dfrInp[dfrInp[dITp['sEffFam']] == sCl]
                 else:
                     cDfrI = dfrInp[dfrInp[sCl] > 0]
                 self.calcPropCDfr(cDfrI, sCl=sCl)
             # any XCl
-            if self.dITp['onlySglLbl']:
+            if self.dITp['ILblSgl']:
                 cDfrI = dfrInp[dfrInp[dITp['sEffFam']].isin(self.lSXCl)]
             else:
                 cDfrI = dfrInp[(dfrInp[self.lSXCl] > 0).any(axis=1)]

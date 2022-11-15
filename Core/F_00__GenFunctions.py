@@ -114,7 +114,8 @@ def pickleLoadDict(pF=('Dict' + GC.XT_BIN), reLoad=False):
         print('ERROR: Loading dictionary from', pF, 'failed.')
     return cD
 
-# --- Functions checking whether a data structure is filled -------------------
+# --- General helper functions ------------------------------------------------
+# --- Function checking whether a data structure is filled --------------------
 def Xist(cDat):
     if cDat is not None:
         if type(cDat) in [str, tuple, list, dict]:
@@ -248,6 +249,16 @@ def calcPylProb(cSS, dCSS):
         nTtl += tV[1]
         cPrb += tV[3]/nFSeq
     return [cSS, nPyl, nTtl, getFract(nPyl, nTtl), cPrb]
+
+def calcBasicClfRes(YTest, YPred):
+    nPred = YPred.shape[0]
+    if len(YTest.shape) > 1:
+        nOK = sum([1 for k in range(nPred) if
+                   (YTest.iloc[k, :] == YPred.iloc[k, :]).all()])
+    else:
+        nOK = sum([1 for k in range(nPred) if YTest.iat[k] == YPred.iat[k]])
+    propOK = (nOK/nPred if nPred > 0 else None)
+    return [nPred, nOK, propOK]
 
 # --- Functions handling iterables --------------------------------------------
 def allEqual(cIt, cV=None):     # not for comparison of complex data types
@@ -774,7 +785,6 @@ def dropLblUnq(itLbl, sJoin=GC.S_USC):
 
 def getMaxC(cIt, thrV=None):
     if pd.isna(cIt).all():
-        # return pd.Series([np.nan for _ in cIt])
         return [np.nan for _ in cIt]
     lRet, maxIt = [0 for _ in cIt], max(cIt)
     for k, x in enumerate(cIt):
@@ -783,17 +793,14 @@ def getMaxC(cIt, thrV=None):
         if x == maxIt:
             if (thrV is None) or (thrV is not None and x > thrV):
                 lRet[k] = 1
-    # return pd.Series(lRet)
     return lRet
 
 def getRelVals(cIt):
     if pd.isna(cIt).all():
-        # return pd.Series([np.nan for _ in cIt])
         [np.nan for _ in cIt]
     lenIt, lRet = len(cIt), []
     if lenIt > 0:
         lRet = [x/lenIt for x in cIt]
-    # return pd.Series(lRet)
     return lRet
 
 def getPredCl(cD, sRetNoCl=GC.S_NONE, sRetMltCl=GC.S_MULTI_CL):
@@ -814,9 +821,6 @@ def classifyTP(cIt):        # works only if always exactly one true class
     lenIt, minIt, maxIt = len(cIt), min(cIt), max(cIt)
     if maxIt not in {1, 2}:
         return np.nan
-        # print('ERROR: cIt:\n', cIt, '\nminIt = ', minIt, '\nmaxIt = ',
-        #       maxIt, sep='')
-        # assert False
     lVRem = [cV for cV in cIt if (cV < maxIt)]
     if len(lVRem) > 0:
         maxVRem = max(lVRem)
@@ -828,7 +832,6 @@ def classifyTP(cIt):        # works only if always exactly one true class
             elif maxVRem == 1 and minIt < 1:
                 sRet = GC.S_B               # B: pred. cl. == true cl. (+ oth.)
         elif maxIt == 1:
-            # assert maxVRem == 0
             if maxVRem != 0:
                 print('ERROR: cIt:\n', cIt, '\nlVRem:\n', lVRem,
                       '\nmaxVRem = ', maxVRem)
@@ -892,6 +895,12 @@ def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
             assert ((type(data) == np.ndarray and data.shape[0] == len(lSNmI))
                     or (type(data) == list and len(data) == len(lSNmI)))
             return pd.Series(data, index=lSNmI, name=nameS)
+
+def iniPdSerFromDict(dData):
+    if len(dData) == 0:
+        pd.Series()
+    else:
+        return iniPdDfr(data=dData).iloc[:, 0]
 
 def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
     assert len(shape) == 2

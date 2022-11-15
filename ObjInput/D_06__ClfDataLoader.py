@@ -18,7 +18,7 @@ sSet = GC.S_SET_07
 useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
 
 noExclEffFam = True                  # do not use Nmers with excl. effFam?
-useNmerNoCl = True                   # use "no class" Nmers from full seq.?
+useNmerNoCl = False                   # use "no class" Nmers from full seq.?
 
 I_Lbl = GC.S_SGL_LBL                 # use multi-label or single-label input?
 P_Lbl = GC.S_MLT_LBL_01              # multi-label or single-label predictions?
@@ -109,10 +109,10 @@ lIPosUsed = None                # None or list of positions used for classific.
 # lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]
 
 # list of keys for file name end strings
-lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam']
-lSIFEndT = ['sSet', 'sRestr', 'sXclEffFam']
-lSIFEndU = ['sRestr', 'sXclEffFam']
-lSIFEndV = ['sRestr']
+lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam', 'sXNoCl']
+lSIFEndT = ['sSet', 'sRestr', 'sXclEffFam', 'sXNoCl']
+lSIFEndU = ['sRestr', 'sXclEffFam', 'sXNoCl']
+# lSIFEndV = ['sRestr', 'sXNoCl']
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -130,10 +130,14 @@ if maxLenNmer not in setNmerLen:
 sFInpSzClf = sFInpBClf.split(GC.S_USC)[1]
 sFInpSzPrC = sFInpSzClf
 
-sXclEffFam = GC.S_WITH_EXCL_EFF_FAM
+sXclEffFam, sXNoCl = GC.S_WITH_EXCL_EFF_FAM, GC.S_X_CL
 if noExclEffFam:
     sXclEffFam = GC.S_NO_EXCL_EFF_FAM
+if useNmerNoCl:
+    sXNoCl = GC.S_X_NO_CL
 sSglMltLbl = GC.S_I + I_Lbl + GC.S_P + P_Lbl
+
+ILblSgl = (I_Lbl == GC.S_SGL_LBL)
 
 maxPosNmer = maxLenNmer//2
 rngPosNmer = range(-maxPosNmer, maxPosNmer + 1)
@@ -224,7 +228,7 @@ dIO = {# --- general
        'lSIFEndS': lSIFEndS,
        'lSIFEndT': lSIFEndT,
        'lSIFEndU': lSIFEndU,
-       'lSIFEndV': lSIFEndV,
+       # 'lSIFEndV': lSIFEndV,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
        # === derived values and input processing
@@ -233,7 +237,9 @@ dIO = {# --- general
        'sSglLbl': GC.S_SGL_LBL,
        'sMltLbl': GC.S_MLT_LBL,
        'sXclEffFam': sXclEffFam,
+       'sXNoCl': sXNoCl,
        'sSglMltLbl': sSglMltLbl,
+       'ILblSgl': ILblSgl,
        'maxPosNmer': maxPosNmer,
        'rngPosNmer': rngPosNmer,
        'lSCXClf': lSCXClf,
