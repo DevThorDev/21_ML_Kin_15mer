@@ -18,7 +18,7 @@ class DataLoader(BaseClass):
         self.getDITp(iTp=iTp)
         self.iniAttr()
         self.fillFPs()
-        if self.dITp['useNmerNoCl']:
+        if self.dITp['useNmerNoCl'] is None or self.dITp['useNmerNoCl']:
             self.getDictNmerNoCl()
         self.loadInpDataClf(iC=self.dITp['iCInpDataClf'])
         self.loadInpDataPrC(iC=self.dITp['iCInpDataPrC'])

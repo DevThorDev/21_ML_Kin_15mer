@@ -220,7 +220,7 @@ def getDClMap(dIG, dITp):
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
     for _, cRow in dfrClMap.iterrows():
         [sK, sV] = cRow.to_list()
-        if sV != dITp['sNone']:
+        if sV not in [dITp['sNoFam'], dITp['sNone']]:
             dClMap[sK] = sV
             GF.addToListUnq(dITp['lXCl'], cEl=sV)
     print('Calculated class dictionary.')
@@ -368,7 +368,17 @@ def toSglLbl(dITp, dfrY):      # faster and more elegant - for large objects
     serY.name = dITp['sEffFam']
     return serY
 
-def toSglLbl2(dITp, dfrY):     # slower and inelegant - rather useless
+def toSglLblExt(dITp, dfrY):   # also assigns "NoFam" and "MultiFam" labels
+    if len(dfrY.shape) == 1:   # already single-column (Series) format
+        return dfrY
+    lXCl, sNoFam, sMltFam = dfrY.columns, dITp['sNoFam'], dITp['sMultiFam']
+    serY = dfrY.apply(lambda x: ([sXCl for k, sXCl in enumerate(lXCl) if
+                                  x[k] == 1][0] if sum(x) == 1 else
+                                 (sMltFam if sum(x) > 1 else sNoFam)), axis=1)
+    serY.name = dITp['sEffFam']
+    return serY
+
+def toSglLblOLD(dITp, dfrY):   # slower and inelegant - rather useless
     if len(dfrY.shape) == 1:   # already single-column (Series) format
         return dfrY
     lY = [dITp['sNone']]*dfrY.shape[0]

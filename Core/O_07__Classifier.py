@@ -104,10 +104,10 @@ class XYData(BaseClass):
 # -----------------------------------------------------------------------------
 class ImbSampler(BaseClass):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, X, Y, iSt=None, sMthL=GC.S_MTH_NONE_L,
+    def __init__(self, inpDat, X, Y, lXCl=[], iSt=None, sMthL=GC.S_MTH_NONE_L,
                  sMth=GC.S_MTH_NONE, iTp=7, lITpUpd=[6]):
         super().__init__(inpDat)
-        self.X, self.Y = X, Y
+        self.X, self.Y, self.lSXCl = X, Y, lXCl
         self.iSt, self.sMthL, self.sMth = iSt, sMthL, sMth
         self.descO = 'Sampler for imbalanced learning'
         self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
@@ -140,20 +140,22 @@ class ImbSampler(BaseClass):
 
     # --- Function obtaining a custom (imbalanced) sampling strategy ----------
     def getStrat(self):
+        dITp, Y = self.dITp, self.Y
         # get default strat., or strat. of the current step index (MultiSteps)
-        self.sStrat = self.dITp['sStrat']
-        if self.dITp['doMultiSteps'] and self.iSt in self.dITp['dSStrat']:
-            self.sStrat = self.dITp['dSStrat'][self.iSt]
+        self.sStrat = dITp['sStrat']
+        if dITp['doMultiSteps'] and self.iSt in dITp['dSStrat']:
+            self.sStrat = dITp['dSStrat'][self.iSt]
         self.printStrat()
         # in case of a custom sampling strategy, calculate the dictionary
-        if self.sStrat in self.dITp['lSmplStratCustom']:
-            if self.sStrat == self.dITp['sStratRealMajo']:
+        if self.sStrat in dITp['lSmplStratCustom']:
+            if self.sStrat == dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
-                self.sStrat = GF.smplStratRealMajo(self.Y)
-            elif self.sStrat == self.dITp['sStratShareMino']:
+                self.sStrat = GF.smplStratRealMajo(SF.toSglLblExt(dITp, Y))
+            elif self.sStrat == dITp['sStratShareMino']:
                 # implement the "ShareMino" strategy
-                dIStrat = self.dITp['dIStrat']
-                self.sStrat = GF.smplStratShareMino(self.Y, dI=dIStrat)
+                dIStrat = dITp['dIStrat']
+                self.sStrat = GF.smplStratShareMino(SF.toSglLblExt(dITp, Y),
+                                                    dI=dIStrat)
 
     # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
     def getImbSampler(self):
@@ -185,8 +187,9 @@ class ImbSampler(BaseClass):
 
     # --- Function performing the random sampling ("imblearn") ----------------
     def fitResampleImbalanced(self):
-        X, YResImb = self.imbSmp.fit_resample(self.X, self.Y)
-        self.printResResampleImb(YIni=self.Y, YRes=YResImb)
+        YS = SF.toSglLblExt(self.dITp, dfrY=self.Y)
+        X, YResImb = self.imbSmp.fit_resample(self.X, YS)
+        self.printResResampleImb(YIni=YS, YRes=YResImb)
         if not self.dITp['ILblSgl']:
             YResImb = SF.toMultiLbl(serY=YResImb, lXCl=self.lSXCl)
         return X, YResImb
@@ -209,7 +212,7 @@ class BaseClfPrC(BaseClass):
     def getCLblsTrain(self):
         sLbl, sTrain = self.dITp['sLbl'], self.dITp['sTrain']
         lLblTrain, self.sCLblsTrain = self.dITp['lLblTrain'], ''
-        if not (lLblTrain is None or self.dITp['ILblSgl']):
+        if not (self.dITp['ILblSgl'] or lLblTrain is None):
             self.sCLblsTrain = GF.joinS([str(nLbl) for nLbl in lLblTrain])
             self.sCLblsTrain = GF.joinS([sLbl, self.sCLblsTrain, sTrain])
 
@@ -330,19 +333,25 @@ class GeneralClassifier(BaseClfPrC):
 
     def printResNoResample(self, Y, doPrt=True):
         if doPrt:
-            print(GC.S_DS04, ' Size of Y:', Y.size)
-            YUnq = Y.unique()
-            print('Unique values of Y:', YUnq)
-            print('Sizes of classes:')
-            for cY in YUnq:
-                print(cY, self.dITp['sColon'], self.dITp['sTab'],
-                      Y[Y == cY].size, sep='')
+            print(GC.S_DS04, ' Shape of Y:', Y.shape)
+            if self.dITp['ILblSgl']:
+                YUnq = Y.unique()
+                print('Unique values of Y:', YUnq)
+                print('Sizes of classes:')
+                for cY in YUnq:
+                    print(cY, self.dITp['sColon'], self.dITp['sTab'],
+                          Y[Y == cY].size, sep='')
 
     # --- method for getting the defined kFold-Splitter -----------------------
     def getKFoldSplitter(self):
         self.kF, cTp, nSpl = None, self.dITp['tpKF'], self.dITp['nSplitsKF']
         mdShf, rndSt = self.dITp['shuffleKF'], self.dITp['rndStateKF']
-        if cTp == GC.S_K_FOLD:
+        if not self.dITp['ILblSgl']: # stratified not possible for multi-label
+            if cTp == GC.S_STRAT_K_FOLD:
+                cTp = GC.S_K_FOLD
+            elif GC.S_STRAT_GROUP_K_FOLD:
+                cTp = GC.S_GROUP_K_FOLD
+        if (cTp == GC.S_K_FOLD):
             self.kF = KFold(n_splits=nSpl, shuffle=mdShf, random_state=rndSt)
         elif cTp == GC.S_GROUP_K_FOLD:
             self.kF = GroupKFold(n_splits=nSpl)
@@ -402,7 +411,7 @@ class GeneralClassifier(BaseClfPrC):
                                                    j=self.j))
 
     def doAllKFolds(self, inpDat, lITpUpd):
-        sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
+        sM, sTr, iSt, lC = self.sMth, self.dITp['sTrain'], self.iSt, self.lSXCl
         self.getKFoldSplitter()
         # YSglLbl = self.D.yieldYClf(sLbl=self.dITp['sSglLbl'])
         # XClf = self.D.yieldXClf(sLbl=self.dITp['I_Lbl'])
@@ -410,8 +419,8 @@ class GeneralClassifier(BaseClfPrC):
             self.j, self.lITrain, self.lITest = j, lITr, lITe
             self.encodeSplitData()
             XTr, YTr = self.XY.getXY(sMth=sM, sTp=sTr, iSt=iSt, j=self.j)
-            self.dSmp[self.j] = ImbSampler(inpDat, X=XTr, Y=YTr, iSt=iSt,
-                                           sMthL=self.sMthL, sMth=sM)
+            self.dSmp[self.j] = ImbSampler(inpDat, X=XTr, Y=YTr, lXCl=lC,
+                                           iSt=iSt, sMthL=self.sMthL, sMth=sM)
             if not self.doPartFit:
                 self.doKFoldsFullFit(sM=sM, sTr=sTr, iSt=iSt)
 
@@ -561,7 +570,8 @@ class GeneralClassifier(BaseClfPrC):
         if cClf is not None and XInp is not None and YInp is not None:
             if self.dITp['doImbSampling']:
                 cSmp = self.dSmp[self.j]
-                X, Y = cSmp.imbSmp.fit_resample(XInp, YInp)
+                YS = SF.toSglLblExt(self.dITp, dfrY=self.Y)
+                X, Y = cSmp.imbSmp.fit_resample(XInp, YS)
                 cSmp.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
             else:
                 self.printResNoResample(Y=Y, doPrt=(k==0))
@@ -679,10 +689,11 @@ class GeneralClassifier(BaseClfPrC):
     # --- method for calculating the confusion matrix -------------------------
     def calcCnfMatrix(self, YTest=None):
         if self.dITp['calcCnfMatrix']:
-            sM, sPd, lC = self.sMth, self.dITp['sPred'], self.lSXCl
-            YPred = self.XY.getY(sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
-            YTest = SF.toSglLbl(self.dITp, dfrY=YTest)
-            YPred = SF.toSglLbl(self.dITp, dfrY=YPred)
+            sM, sPred = self.sMth, self.dITp['sPred']
+            YPred = self.XY.getY(sMth=sM, sTp=sPred, iSt=self.iSt, j=self.j)
+            YTest = SF.toSglLblExt(self.dITp, dfrY=YTest)
+            YPred = SF.toSglLblExt(self.dITp, dfrY=YPred)
+            lC = sorted(list(set(YTest.unique()) | set(YPred.unique())))
             cnfMat = confusion_matrix(y_true=YTest, y_pred=YPred, labels=lC)
             self.dConfusMatrix[self.j] = cnfMat
             dfrCM = GF.iniPdDfr(cnfMat, lSNmC=lC, lSNmR=lC)

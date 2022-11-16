@@ -48,7 +48,7 @@ sBGenInfoEff = GC.S_B_GEN_INFO_EFF
 sEff = GC.S_EFF
 sEffF = GC.S_EFF_F
 sNoEff = GC.S_NO_EFF
-sNoFam = GC.S_NO_FAM
+sNoFam, sMultiFam = GC.S_NO_FAM, GC.S_MULTI_FAM
 sNmer = GC.S_N_MER
 sINmer = GC.S_I_N_MER
 sINmerTrain = GC.S_I_N_MER_TRAIN
@@ -61,8 +61,8 @@ sIEffFTrain = GC.S_I_EFF_F_TRAIN
 sIEffFTest = GC.S_I_EFF_F_TEST
 sEffCode = GC.S_EFF_CODE
 sEffCl = GC.S_EFF_CL
-sXCl = GC.S_X_CL
-sXNoCl = GC.S_X_NO_CL
+sXCl, sNoCl = GC.S_X_CL, GC.S_NO_CL
+sXNoCl, sXNoClAs0, sNoClAs0 = GC.S_X_NO_CL, GC.S_X_NO_CL_AS_0, GC.S_NO_CL_AS_0
 sNone = GC.S_NONE
 sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
@@ -214,6 +214,7 @@ dIO = {# --- general
        'sEffF': sEffF,
        'sNoEff': sNoEff,
        'sNoFam': sNoFam,
+       'sMultiFam': sMultiFam,
        'sNmer': sNmer,
        'sINmer': sINmer,
        'sINmerTrain': sINmerTrain,
@@ -227,7 +228,10 @@ dIO = {# --- general
        'sEffCode': sEffCode,
        'sEffCl': sEffCl,
        'sXCl': sXCl,
+       'sNoCl': sNoCl,
        'sXNoCl': sXNoCl,
+       'sXNoClAs0': sXNoClAs0,
+       'sNoClAs0': sNoClAs0,
        'sNone': sNone,
        'sClf': sClf,
        'sPrC': sPrC,

@@ -898,7 +898,7 @@ def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
 
 def iniPdSerFromDict(dData):
     if len(dData) == 0:
-        pd.Series()
+        return pd.Series()
     else:
         return iniPdDfr(data=dData).iloc[:, 0]
 

@@ -57,7 +57,7 @@ dEncCatFtr = {GC.S_MTH_DUMMY: GC.S_ONE_HOT,    # encoder of cat. features
               GC.S_MTH_NSV: GC.S_ONE_HOT}
 
 # lLblTrain is ignored if D.dITp['I_Lbl'] == GC.S_SGL_LBL
-lLblTrain = [1]                     # number of labels used for training data
+lLblTrain = [0, 1]                     # number of labels used for training data
 # lLblTrain = None                  # 0, 1,..., N or None [use all labels]
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP

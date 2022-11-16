@@ -15,26 +15,29 @@ lvlOut = 1      # higher level --> print more information (0: no printing)
 sSet = GC.S_SET_07
 
 # --- flow control (classifier) -----------------------------------------------
-useFullSeqFromClf = GC.S_COMB_INP    # S_COMB_INP
+useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
 
-noExclEffFam = True                  # do not use Nmers with excl. effFam?
-useNmerNoCl = False                   # use "no class" Nmers from full seq.?
+noExclEffFam = True               # do not use Nmers with excl. effFam?
+useNmerNoCl = None                # use "no class" Nmers from full seq.?
+                                  # True: use "no class" Nmers as class
+                                  # False: do not use any "no class" Nmers
+                                  # None: "no class" Nmers used but not a class
 
-I_Lbl = GC.S_SGL_LBL                 # use multi-label or single-label input?
-P_Lbl = GC.S_MLT_LBL_01              # multi-label or single-label predictions?
-                                     # GC.S_SGL_LBL / GC.S_MLT_LBL
-                                     # GC.S_MLT_LBL_01 (only no/single class)
+I_Lbl = GC.S_MLT_LBL              # use multi-label or single-label input?
+P_Lbl = GC.S_MLT_LBL_01           # multi-label or single-label predictions?
+                                  # GC.S_SGL_LBL / GC.S_MLT_LBL
+                                  # GC.S_MLT_LBL_01 (only no/single class)
 
-usedNmerSeqClf = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
+usedNmerSeqClf = GC.S_UNQ_LIST    # S_FULL_LIST / S_UNQ_LIST
 
-usedAAcTypeClf = GC.S_AAC            # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
+usedAAcTypeClf = GC.S_AAC         # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
-usedClTypeClf = GC.S_NEW + GC.S_CL   # GC.S_NEW/GC.S_OLD + GC.S_CL
+usedClTypeClf = GC.S_NEW + GC.S_CL    # GC.S_NEW/GC.S_OLD + GC.S_CL
 
 # --- flow control (proportion calculator) ------------------------------------
-useFullSeqFromPrC = GC.S_COMB_INP    # S_COMB_INP
-useBinDicts = False                  # use binary dicts (in case they exist)?
-usedNmerSeqPrC = GC.S_UNQ_LIST       # S_FULL_LIST / S_UNQ_LIST
+useFullSeqFromPrC = GC.S_COMB_INP # S_COMB_INP
+useBinDicts = False               # use binary dicts (in case they exist)?
+usedNmerSeqPrC = GC.S_UNQ_LIST    # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcTypePrC = usedAAcTypeClf
 
@@ -59,6 +62,8 @@ sFInpClf = None
 if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
     sFInpClf = GF.joinS([sFInpSClf, sFInpBClf])
 sFInpDClMpClf = GF.joinS([sFInpSClf, GC.S_CL_MAPPING, sSet])
+if useNmerNoCl is None:
+    sFInpDClMpClf = GF.joinS([sFInpDClMpClf, GC.S_NO_CL_AS_0])
 sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sFInpStIClf, sSet])
 
 pInpClf = GC.P_DIR_INP_CLF
@@ -109,10 +114,10 @@ lIPosUsed = None                # None or list of positions used for classific.
 # lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]
 
 # list of keys for file name end strings
-lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam', 'sXNoCl']
-lSIFEndT = ['sSet', 'sRestr', 'sXclEffFam', 'sXNoCl']
-lSIFEndU = ['sRestr', 'sXclEffFam', 'sXNoCl']
-# lSIFEndV = ['sRestr', 'sXNoCl']
+lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam', 'sCls']
+lSIFEndT = ['sSet', 'sRestr', 'sXclEffFam', 'sCls']
+lSIFEndU = ['sRestr', 'sXclEffFam', 'sCls']
+# lSIFEndV = ['sRestr', 'sCls']
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -130,11 +135,14 @@ if maxLenNmer not in setNmerLen:
 sFInpSzClf = sFInpBClf.split(GC.S_USC)[1]
 sFInpSzPrC = sFInpSzClf
 
-sXclEffFam, sXNoCl = GC.S_WITH_EXCL_EFF_FAM, GC.S_X_CL
+sXclEffFam, sCls = GC.S_WITH_EXCL_EFF_FAM, GC.S_X_CL
 if noExclEffFam:
     sXclEffFam = GC.S_NO_EXCL_EFF_FAM
-if useNmerNoCl:
-    sXNoCl = GC.S_X_NO_CL
+if useNmerNoCl is None:
+    sCls = GC.S_X_NO_CL_AS_0
+else:
+    if useNmerNoCl:
+        sCls = GC.S_X_NO_CL
 sSglMltLbl = GC.S_I + I_Lbl + GC.S_P + P_Lbl
 
 ILblSgl = (I_Lbl == GC.S_SGL_LBL)
@@ -237,7 +245,7 @@ dIO = {# --- general
        'sSglLbl': GC.S_SGL_LBL,
        'sMltLbl': GC.S_MLT_LBL,
        'sXclEffFam': sXclEffFam,
-       'sXNoCl': sXNoCl,
+       'sCls': sCls,
        'sSglMltLbl': sSglMltLbl,
        'ILblSgl': ILblSgl,
        'maxPosNmer': maxPosNmer,
