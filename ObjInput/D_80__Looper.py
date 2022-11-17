@@ -18,7 +18,7 @@ sNmSpec = 'Input data for the Looper class in O_80__Looper'
 nRp0, nRpDef = GC.N_REP_0, 2
 dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_ADA: nRp0,
-           GC.S_MTH_RF: nRpDef,
+           GC.S_MTH_RF: nRp0,
            GC.S_MTH_X_TR: nRp0,
            GC.S_MTH_GR_B: nRp0,
            GC.S_MTH_H_GR_B: nRp0,
@@ -101,33 +101,7 @@ d2Par_RF = {GC.S_0: {'n_estimators': 100,
                      'ccp_alpha': 0.0,
                      'max_samples': None},
             # GC.S_A: {'criterion': 'log_loss'},
-            GC.S_B: {'criterion': 'entropy'},
-            # 'C': {'criterion': 'entropy',
-            #       'n_estimators': 100},
-            # 'D': {'criterion': 'entropy',
-            #       'n_estimators': 1000},
-            # 'E': {'criterion': 'entropy',
-            #       'n_estimators': 1000,
-            #       'bootstrap': False},
-            # 'F': {'criterion': 'entropy',
-            #       'n_estimators': 1000,
-            #       'class_weight': 'balanced'},
-            # 'G': {'criterion': 'entropy',
-            #       'n_estimators': 1000,
-            #       'class_weight': 'balanced_subsample'},
-            # 'H': {'criterion': 'entropy',
-            #       'n_estimators': 5000,
-            #       'bootstrap': True},
-            # 'I': {'criterion': 'entropy',
-            #       'n_estimators': 5000,
-            #       'bootstrap': False},
-            # 'J': {'criterion': 'entropy',
-            #       'n_estimators': 1000,
-            #       'ccp_alpha': 0.1},
-            # 'K': {'criterion': 'entropy',
-            #       'n_estimators': 1000,
-            #       'ccp_alpha': 1.},
-            }
+            GC.S_B: {'criterion': 'entropy'}}
 
 # === Extra Trees Classifier ==================================================
 # --- list of parameter grids for Extra Trees Classifier grid search ----------
@@ -274,11 +248,6 @@ lParGrid_PaA = [{'max_iter': [10000],
 #                  'tol': [1.0e-2, 1.0e-3, 1.0e-4],
 #                  'loss': ['hinge', 'squared_hinge'],
 #                  'class_weight': [None, 'balanced']}]
-# lParGrid_PaA = [{'C': stats.loguniform(a=0.01, b=10.0),
-#                  'max_iter': [100, 1000, 3000],
-#                  'tol': [1.0e-2, 1.0e-3, 1.0e-4],
-#                  'loss': ['hinge'],
-#                  'class_weight': ['balanced']}]
 
 # --- parameter dictionary for Passive Aggressive Classifier ------------------
 d2Par_PaA = {GC.S_0: {'C': 1.0,
@@ -401,7 +370,6 @@ lParGrid_CpNB = [{'alpha': [0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8,
 # lParGrid_CpNB = [{'alpha': stats.uniform(loc=0., scale=1.),
 #                   'fit_prior': [False, True],
 #                   'norm': [False, True]}]
-# lParGrid_CpNB = [{'alpha': stats.uniform(loc=0.5, scale=0.45)}]
 
 # --- parameter dictionary for Complement NB Classifier -----------------------
 d2Par_CpNB = {GC.S_0: {'alpha': 1.,

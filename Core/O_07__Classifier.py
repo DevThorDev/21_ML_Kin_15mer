@@ -234,7 +234,8 @@ class BaseClfPrC(BaseClass):
             if not hasattr(self, cAttr):
                 setattr(self, cAttr, {j: None for j in range(nSplKF)})
         self.doPartFit = (self.sMth in self.dITp['lSMthPartFit'] and
-                          self.dITp['nItPtFit'] is not None)
+                          self.dITp['nItPtFit'] is not None and
+                          self.dITp['ILblSgl']) # not impl. w. multilabel input
         self.sKPar = sKPar
         self.getCLblsTrain()
         self.lIFE = self.D.lIFES + [self.sCLblsTrain]
@@ -555,6 +556,19 @@ class GeneralClassifier(BaseClfPrC):
 
 
     # --- method for fitting a Classifier -------------------------------------
+    def ClfPartialFit(self, cClf, XInp, YInp, k=0):
+        X, Y = XInp, YInp
+        if cClf is not None and XInp is not None and YInp is not None:
+            if self.dITp['doImbSampling']:
+                cSmp = self.dSmp[self.j]
+                X, Y = cSmp.imbSmp.fit_resample(XInp, YInp)
+                cSmp.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
+            else:
+                self.printResNoResample(Y=Y, doPrt=(k==0))
+            cClf.partial_fit(X, Y, classes=self.lSXCl)
+            self.printClfPartialFit(X)
+        return X, Y
+
     def ClfFit(self, cClf):
         X, Y = self.XY.getXY(sMth=self.sMth, sTp=self.dITp['sTrain'],
                              iSt=self.iSt, j=self.j)
@@ -565,44 +579,37 @@ class GeneralClassifier(BaseClfPrC):
             except:
                 self.printClfFitError()
 
-    def ClfPartialFit(self, cClf, XInp, YInp, k=0):
-        X, Y = XInp, YInp
-        if cClf is not None and XInp is not None and YInp is not None:
-            if self.dITp['doImbSampling']:
-                cSmp = self.dSmp[self.j]
-                YS = SF.toSglLblExt(self.dITp, dfrY=self.Y)
-                X, Y = cSmp.imbSmp.fit_resample(XInp, YS)
-                cSmp.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
-            else:
-                self.printResNoResample(Y=Y, doPrt=(k==0))
-            cClf.partial_fit(X, Y, classes=self.lSXCl)
-            self.printClfPartialFit(X)
-        return X, Y
-
-    # --- method for selecting the appropriate XTest and YTest values ---------
-    def getXYTest(self, cClf, dat2Pred=None, calcScore=False):
+    # --- method for getting the data to predict and the test data labels -----
+    def getXYTest(self, X2Pred=None):
         sM, sTe, iSt = self.sMth, self.dITp['sTest'], self.iSt
         YTest = self.XY.getY(sMth=sM, sTp=sTe, iSt=iSt, j=self.j)
-        if dat2Pred is not None:
+        if X2Pred is not None:
             cEncM = self.dITp['dEncCatFtr'][sM]
-            dat2Pred = self.encodeCatFeatures(tpEnc=cEncM, catData=dat2Pred)
+            X2Pred = self.encodeCatFeatures(tpEnc=cEncM, catData=X2Pred)
         else:
-            dat2Pred = self.XY.getX(sMth=sM, sTp=sTe, iSt=iSt, j=self.j)
-        if calcScore and self.dScoreClf[self.j] is None:
-            if len(YTest.shape) == 1:
-                try:
-                    self.dScoreClf[self.j] = cClf.score(dat2Pred, YTest)
-                except:
-                    print('ERROR: Cannot calculate score of classifier "',
-                          self.sMthL, '"!', sep='')
+            X2Pred = self.XY.getX(sMth=sM, sTp=sTe, iSt=iSt, j=self.j)
+        return X2Pred, YTest
+
+    # --- method for setting the test data labels -----------------------------
+    def setXYTest(self, YTest=None):
+        self.YTS, self.YTM, self.YPS, self.YPM = [None]*4
         if self.dITp['ILblSgl']:
             self.YTS = YTest
             self.YTM = SF.toMultiLbl(serY=YTest, lXCl=self.lSXCl)
         else:
             self.YTS = SF.toSglLbl(self.dITp, dfrY=YTest)
             self.YTM = YTest
-        return dat2Pred, YTest
 
+    # --- method for calculating the score of a Classifier --------------------
+    def calcClfScore(self, cClf, X2Pred=None, YTest=None, calcScore=True):
+        if self.dScoreClf[self.j] is None:
+            try:
+                self.dScoreClf[self.j] = cClf.score(X2Pred, YTest)
+            except:
+                print('ERROR: Cannot calculate score of classifier "',
+                      self.sMthL, '"!', sep='')
+
+    # --- method for preparing the (partial) fitting of a Classifier ----------
     def fitOrPartialFitClf(self):
         sM, sTr, iSt = self.sMth, self.dITp['sTrain'], self.iSt
         for self.j in range(self.dITp['nSplitsKF']):
@@ -618,7 +625,9 @@ class GeneralClassifier(BaseClfPrC):
             self.dClf[self.j] = cClf
             # calculate the mean accuracy on the given test data and labels
             if self.dITp['tpKF'] is not None:
-                self.getXYTest(cClf=self.dClf[self.j], calcScore=True)
+                XTest, YTest = self.getXYTest()
+                self.calcClfScore(cClf, X2Pred=XTest, YTest=YTest,
+                                  calcScore=(len(YTest.shape)==1))
 
     # --- method for calculating the predicted y classes, and their probs -----
     def getYPred(self, cClf, X2Pr, lSC, lSR):
@@ -629,6 +638,7 @@ class GeneralClassifier(BaseClfPrC):
             return self.YPS
         else:
             self.YPM = GF.iniPdDfr(cClf.predict(X2Pr), lSNmC=lSC, lSNmR=lSR)
+            self.YPS = SF.toSglLbl(self.dITp, dfrY=self.YPM)
             return self.YPM
     
     def getYPredProba(self, cClf, X2Pred=None, YTest=None):
@@ -638,28 +648,30 @@ class GeneralClassifier(BaseClfPrC):
         YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR, sMthL=sML)
         if YProba is None:
             YProba = GF.iniWShape(tmplDfr=self.YPM)
-        # assert YProba.shape == self.YPM.shape
         self.XY.setY(Y=YPred, sMth=sM, sTp=sPd, iSt=self.iSt, j=self.j)
         self.XY.setY(Y=YProba, sMth=sM, sTp=sPa, iSt=self.iSt, j=self.j)
 
     # --- method for calculating values of the Classifier results dictionary --
     def calcLSumVals(self, YTest, YPred):
+        YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
+                              iSt=self.iSt, j=self.j)
         lV, lSXCl = [None]*len(self.dITp['lSResClf']), self.lSXCl
         lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
+        # if self.dITp['ILblSgl']:
+        lV[3] = accuracy_score(YTest, YPred)
+        lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
         if self.dITp['ILblSgl']:
-            lV[3] = accuracy_score(self.YTS, self.YPS)
-            lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
-            lV[5] = top_k_accuracy_score(self.YTS, self.YPM, k=2, labels=lSXCl)
-            lV[6] = top_k_accuracy_score(self.YTS, self.YPM, k=3, labels=lSXCl)
-            lV[7:11] = precision_recall_fscore_support(self.YTS, self.YPS,
-                                                       beta=1.0, labels=lSXCl,
-                                                       average='weighted')
-            lV[11] = f1_score(self.YTS, self.YPS, labels=lSXCl,
-                              average='weighted')
-            lV[12] = roc_auc_score(self.YTS, self.YPM, average='weighted',
-                                   multi_class='ovo', labels=lSXCl)
-            lV[13] = matthews_corrcoef(self.YTS, self.YPS)
-            lV[14] = log_loss(self.YTS, self.YPM, eps=1e-15, labels=lSXCl)
+            lV[5] = top_k_accuracy_score(YTest, YProba, k=2, labels=lSXCl)
+            lV[6] = top_k_accuracy_score(YTest, YProba, k=3, labels=lSXCl)
+        lV[7:11] = precision_recall_fscore_support(self.YTS, self.YPS,
+                                                   beta=1.0, labels=lSXCl,
+                                                   average='weighted')
+        lV[11] = f1_score(self.YTS, self.YPS, labels=lSXCl, average='weighted')
+        lV[12] = roc_auc_score(YTest, YPred, average='weighted',
+                               multi_class='ovo', labels=lSXCl)
+        lV[13] = matthews_corrcoef(self.YTS, self.YPS)
+        if self.dITp['ILblSgl']:
+            lV[14] = log_loss(self.YTS, self.YPS, eps=1e-15, labels=lSXCl)
         return lV
 
     def assembleDDfrPredProba(self, YTest=None, YPred=None):
@@ -715,8 +727,8 @@ class GeneralClassifier(BaseClfPrC):
         for self.j in range(self.dITp['nSplitsKF']):
             cClf = self.selClf(j=self.j)
             if cClf is not None:
-                self.YTS, self.YTM, self.YPS, self.YPM = [None]*4
-                XTest, YTest = self.getXYTest(cClf=cClf, dat2Pred=dat2Pred)
+                XTest, YTest = self.getXYTest(X2Pred=dat2Pred)
+                self.setXYTest(YTest=YTest)
                 self.getYPredProba(cClf, X2Pred=XTest, YTest=YTest)
                 self.calcResPredict(YTest=YTest)
                 self.printPredict(X2Pred=XTest, YTest=YTest)

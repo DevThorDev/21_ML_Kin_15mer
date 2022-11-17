@@ -47,7 +47,7 @@ P_DIR_EVAL_RESULTS_L1_CLF = os.path.join(S_DIR_EVALUATION, S_DIR_RESULTS_M,
                                          S_DIR_RESULTS_L1_CLF)
 
 # SET_S_ST_DIR_RES_L1 = {'GA', 'GB', 'GC', 'TA', 'TB'}
-SET_S_ST_DIR_RES_L1 = {'ID', 'IE'}
+SET_S_ST_DIR_RES_L1 = {'ID', 'IE', 'IF'}
 
 SET_S_SUB_DIR_RES = {S_DIR_RESULTS_L2_PARS, S_DIR_RESULTS_L2_SMRS,
                      S_DIR_RESULTS_L2_UNQN, S_DIR_RESULTS_L2_INPD,

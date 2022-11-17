@@ -24,9 +24,8 @@ useNmerNoCl = None                # use "no class" Nmers from full seq.?
                                   # None: "no class" Nmers used but not a class
 
 I_Lbl = GC.S_MLT_LBL              # use multi-label or single-label input?
-P_Lbl = GC.S_MLT_LBL_01           # multi-label or single-label predictions?
+P_Lbl = GC.S_MLT_LBL              # multi-label or single-label predictions?
                                   # GC.S_SGL_LBL / GC.S_MLT_LBL
-                                  # GC.S_MLT_LBL_01 (only no/single class)
 
 usedNmerSeqClf = GC.S_UNQ_LIST    # S_FULL_LIST / S_UNQ_LIST
 
@@ -242,8 +241,6 @@ dIO = {# --- general
        # === derived values and input processing
        'sFInpSzClf': sFInpSzClf,
        'sFInpSzPrC': sFInpSzPrC,
-       'sSglLbl': GC.S_SGL_LBL,
-       'sMltLbl': GC.S_MLT_LBL,
        'sXclEffFam': sXclEffFam,
        'sCls': sCls,
        'sSglMltLbl': sSglMltLbl,

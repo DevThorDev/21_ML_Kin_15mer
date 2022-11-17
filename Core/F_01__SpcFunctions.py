@@ -288,10 +288,6 @@ def genYStS(dITp, dMltSt, YSt, iSt=0):
     return YSt[YSt != dITp['sNone']]
 
 def genYStM(dITp, dInv, YSt):
-    # lC = list(YSt.columns)
-    # assert GF.allTrue([sCl in lC for sCl in dMltSt])
-    # for sCl, lCl in dMltSt.items():
-    #     lC = list(map(lambda s: s.replace(sCl, lCl[iSt - 1]), lC))
     lC = [s for s in dInv if s != dITp['sNone']]
     YM = YSt.apply(lambda x: pd.Series([(1 if x.loc[dInv[s]].sum() >= 1 else 0)
                                         for s in lC], index=lC), axis=1)
@@ -330,14 +326,6 @@ def getIMltSt(dIG, dITp, Y=None, sLbl=GC.S_SGL_LBL):
             lCl = [serR.at[cI] for cI in serR.index if cI != dITp['sXCl']]
             dMltSt[serR.at[dITp['sXCl']]] = lCl
         dYSt = getDYMltSt(dITp, dMltSt=dMltSt, Y=Y, nSt=nSt, sLbl=sLbl)
-        # TEMP - BEGIN
-        # print('Keys of dYSt:', list(dYSt))
-        # for cK, cDfr in dYSt.items():
-        #     print('---', cK, '---')
-        #     print(cDfr.iloc[:50, :])
-        #     # print(cDfr.iloc[-5:, :])
-        #     print('======================')
-        # TEMP - END
         return {'dXCl': dMltSt, 'dYSt': dYSt, 'nSteps': nSt}
 
 # --- Functions (O_07__Classifier) --------------------------------------------
@@ -351,6 +339,12 @@ def toMultiLbl(serY, lXCl):     # faster - for large objects
         for sXCl in lXCl:
             GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
     return GF.iniPdDfr(dY, lSNmR=serY.index)
+
+def toMultiLblExt(serY, lXCl):  # also converts "NoFam" and "MultiFam" labels
+    if len(serY.shape) > 1:     # already multi-column (DataFrame) format
+        return serY
+    assert type(serY) == pd.core.series.Series
+    # TODO - implement correct "MultiFam" behaviour
 
 def toMultiLbl2(serY, lXCl):    # slower but more elegant - for small objects
     if len(serY.shape) > 1:     # already multi-column (DataFrame) format
@@ -376,6 +370,7 @@ def toSglLblExt(dITp, dfrY):   # also assigns "NoFam" and "MultiFam" labels
                                   x[k] == 1][0] if sum(x) == 1 else
                                  (sMltFam if sum(x) > 1 else sNoFam)), axis=1)
     serY.name = dITp['sEffFam']
+    # TODO - implement correct "MultiFam" behaviour
     return serY
 
 def toSglLblOLD(dITp, dfrY):   # slower and inelegant - rather useless

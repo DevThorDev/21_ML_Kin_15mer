@@ -122,7 +122,6 @@ sClfrClPred = GC.S_CLFR_CL_PRED
 sLbl, sStep = GC.S_LBL, GC.S_STEP
 sSglLbl = GC.S_SGL_LBL
 sMltLbl = GC.S_MLT_LBL
-sMltLbl01 = GC.S_MLT_LBL_01
 sClMapping = GC.S_CL_MAPPING
 sClSteps = GC.S_CL_STEPS
 sMaxLenS = GC.S_MAX_LEN_S
@@ -316,7 +315,6 @@ dIO = {# --- general
        'sStep': sStep,
        'sSglLbl': sSglLbl,
        'sMltLbl': sMltLbl,
-       'sMltLbl01': sMltLbl01,
        'sClMapping': sClMapping,
        'sClSteps': sClSteps,
        'sMaxLenS': sMaxLenS,
