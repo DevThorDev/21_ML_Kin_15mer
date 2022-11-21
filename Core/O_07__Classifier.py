@@ -150,12 +150,12 @@ class ImbSampler(BaseClass):
         if self.sStrat in dITp['lSmplStratCustom']:
             if self.sStrat == dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
-                self.sStrat = GF.smplStratRealMajo(SF.toSglLblExt(dITp, Y))
+                self.sStrat = GF.smplStratRealMajo(SF.toSglLblExt(dITp, Y),
+                                                   dI=dITp['dIStrat'])
             elif self.sStrat == dITp['sStratShareMino']:
                 # implement the "ShareMino" strategy
-                dIStrat = dITp['dIStrat']
                 self.sStrat = GF.smplStratShareMino(SF.toSglLblExt(dITp, Y),
-                                                    dI=dIStrat)
+                                                    dI=dITp['dIStrat'])
 
     # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
     def getImbSampler(self):
@@ -191,7 +191,7 @@ class ImbSampler(BaseClass):
         X, YResImb = self.imbSmp.fit_resample(self.X, YS)
         self.printResResampleImb(YIni=YS, YRes=YResImb)
         if not self.dITp['ILblSgl']:
-            YResImb = SF.toMultiLbl(serY=YResImb, lXCl=self.lSXCl)
+            YResImb = SF.toMultiLblExt(serY=YResImb, lXCl=self.lSXCl)
         return X, YResImb
 
 # -----------------------------------------------------------------------------
@@ -595,9 +595,9 @@ class GeneralClassifier(BaseClfPrC):
         self.YTS, self.YTM, self.YPS, self.YPM = [None]*4
         if self.dITp['ILblSgl']:
             self.YTS = YTest
-            self.YTM = SF.toMultiLbl(serY=YTest, lXCl=self.lSXCl)
+            self.YTM = SF.toMultiLblExt(serY=YTest, lXCl=self.lSXCl)
         else:
-            self.YTS = SF.toSglLbl(self.dITp, dfrY=YTest)
+            self.YTS = SF.toSglLblExt(self.dITp, dfrY=YTest)
             self.YTM = YTest
 
     # --- method for calculating the score of a Classifier --------------------
@@ -634,13 +634,13 @@ class GeneralClassifier(BaseClfPrC):
         if self.dITp['ILblSgl']:
             self.YPS = GF.iniPdSer(cClf.predict(X2Pr), lSNmI=lSR,
                                    nameS=self.dITp['sEffFam'])
-            self.YPM = SF.toMultiLbl(serY=self.YPS, lXCl=self.lSXCl)
+            self.YPM = SF.toMultiLblExt(serY=self.YPS, lXCl=self.lSXCl)
             return self.YPS
         else:
             self.YPM = GF.iniPdDfr(cClf.predict(X2Pr), lSNmC=lSC, lSNmR=lSR)
-            self.YPS = SF.toSglLbl(self.dITp, dfrY=self.YPM)
+            self.YPS = SF.toSglLblExt(self.dITp, dfrY=self.YPM)
             return self.YPM
-    
+
     def getYPredProba(self, cClf, X2Pred=None, YTest=None):
         sM, sPd, sPa = self.sMth, self.dITp['sPred'], self.dITp['sProba']
         sML, lSC, lSR = self.sMthL, self.lSXCl, YTest.index
@@ -657,7 +657,6 @@ class GeneralClassifier(BaseClfPrC):
                               iSt=self.iSt, j=self.j)
         lV, lSXCl = [None]*len(self.dITp['lSResClf']), self.lSXCl
         lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
-        # if self.dITp['ILblSgl']:
         lV[3] = accuracy_score(YTest, YPred)
         lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
         if self.dITp['ILblSgl']:
@@ -675,7 +674,7 @@ class GeneralClassifier(BaseClfPrC):
         return lV
 
     def assembleDDfrPredProba(self, YTest=None, YPred=None):
-        YPred = SF.toMultiLbl(serY=YPred, lXCl=self.lSXCl)
+        YPred = SF.toMultiLblExt(serY=YPred, lXCl=self.lSXCl)
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
                               iSt=self.iSt, j=self.j)
         lSCTP = SF.getLSC(self.dITp, YTest=YTest, YPred=YPred, YProba=YProba)

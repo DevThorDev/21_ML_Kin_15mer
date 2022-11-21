@@ -27,6 +27,7 @@ sDash = GC.S_DASH
 sStar = GC.S_STAR
 sUSC = GC.S_USC
 sUS02 = GC.S_US02
+sVBar = GC.S_VBAR
 sTab = GC.S_TAB
 sNewl = GC.S_NEWL
 sNULL = GC.S_NULL
@@ -181,6 +182,7 @@ dIO = {# --- general
        'sUSC': sUSC,
        'sUS02': sUS02,
        'sTab': sTab,
+       'sVBar': sVBar,
        'sNewl': sNewl,
        'sNULL': sNULL,
        's0': s0,

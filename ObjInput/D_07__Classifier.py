@@ -97,7 +97,7 @@ dSStrat = {1: GC.S_STRAT_REAL_MAJO,
            2: GC.S_STRAT_SHARE_MINO}
                         # dictionary for modifying the strategy for specific
                         # step indices (in case of doMultiSteps)
-dIStrat = {GC.S_STRAT_SHARE_MINO: 1.0}
+dIStrat = {GC.S_STRAT_REAL_MAJO: 0.75, GC.S_STRAT_SHARE_MINO: 1.}
                         # additional data as required by the custom strategy
 # sStrat = {'NoCl': 500,
 #           'X_AGC': 100,

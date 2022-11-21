@@ -337,6 +337,16 @@ def tryRoundX(x, RD=None):
             print('Cannot round "', x, '" to ', RD, ' digits.', sep='')
     return x
 
+def getSSglLbl(x, lXCl, sNoFam, sMltFam, sJoin=GC.S_VBAR):
+    assert x.size == len(lXCl)
+    if sum(x) == 1:
+        return lXCl[x.to_list().index(1)]
+    elif sum(x) > 1:
+        lSJ = [sMltFam] + [sX for k, sX in enumerate(lXCl) if x[k] == 1]
+        return sJoin.join(lSJ)
+    else:
+        return sNoFam
+
 # --- Functions handling lists ------------------------------------------------
 def insStartOrEnd(itS, cEl, sPos=GC.S_E):
     if type(itS) in [str, int, float]:    # convert to 1-element list
@@ -564,10 +574,10 @@ def calcMnSEMOfDfrs(itDfrs, idxDfr=None, colDfr=None):
     d2Mn, d2SEM, N = {}, {}, len(itDfrs)
     for i in idxDfr:
         for j in colDfr:
-            for cDfr in itDfrs:
-                assert i in cDfr.index and j in cDfr.columns
-            cLV = [cDfr.at[i, j] for cDfr in itDfrs]
-            addToDictD(d2Mn, cKMain=i, cKSub=j, cVSub=np.mean(cLV))
+            cLV = [cDfr.at[i, j] for cDfr in itDfrs if
+                   (i in cDfr.index and j in cDfr.columns)]
+            cMean = (np.nan if len(cLV) == 0 else np.mean(cLV))
+            addToDictD(d2Mn, cKMain=i, cKSub=j, cVSub=cMean)
             cSEM = (0. if N == 0 else np.std(cLV, ddof=1)/np.sqrt(N))
             addToDictD(d2SEM, cKMain=i, cKSub=j, cVSub=cSEM)
     return iniPdDfr(d2Mn), iniPdDfr(d2SEM)
@@ -589,20 +599,19 @@ def calcMnSEMFromD3Val(cD3, sJoin=GC.S_USC):
     return d2MnSEM
 
 def calcMnSEMFromD2Dfr(d2Dfr, sJoin=GC.S_USC):
-    dMnSEM, dT, lI = {}, {}, None
+    dMnSEM, dT, lI = {}, {}, []
     # rearrange data in temp dict dT
     for dDfr in d2Dfr.values():
         for cKL2, cDfr in dDfr.items():
-            if lI is None:
-                lI = cDfr.index.to_list()
-            assert lI == cDfr.index.to_list() and lI == cDfr.columns.to_list()
+            lI = sorted(list(set(lI) | set(cDfr.index.to_list()) |
+                             set(cDfr.columns.to_list())))
             addToDictL(dT, cK=cKL2, cE=cDfr)
     # fill dMnSEM
-    if lI is not None:
-        for cK, cLDfr in dT.items():
-            dfrMn, dfrSEM = calcMnSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
-            dMnSEM[sJoin.join([toStr(cK), GC.S_MEAN])] = dfrMn
-            dMnSEM[sJoin.join([toStr(cK), GC.S_SEM])] = dfrSEM
+    lI = toListUnqViaSer(cIt=lI)
+    for cK, cLDfr in dT.items():
+        dfrMn, dfrSEM = calcMnSEMOfDfrs(cLDfr, idxDfr=lI, colDfr=lI)
+        dMnSEM[sJoin.join([toStr(cK), GC.S_MEAN])] = dfrMn
+        dMnSEM[sJoin.join([toStr(cK), GC.S_SEM])] = dfrSEM
     return dMnSEM
 
 def convDDNumToDDProp(dDNum, nDigRnd):
@@ -1154,8 +1163,10 @@ def drawFromNorm(cMn=0., cSD=1., tPar=None, arrShape=None):
     return RNG().normal(loc=cMn, scale=cSD, size=arrShape)
 
 # --- Functions implementing custom imbalanced sampling strategies ------------
-def smplStratRealMajo(Y):
-    sStrat = {cCl: (Y[Y == cCl].size) for cCl in Y.unique()}
+def smplStratRealMajo(Y, dI):
+    shCl = (dI[GC.S_STRAT_REAL_MAJO] if GC.S_STRAT_REAL_MAJO in dI else 1)
+    shCl = max(0, min(1, shCl))
+    sStrat = {cCl: round((Y[Y == cCl].size)*shCl) for cCl in Y.unique()}
     lVSrtDsc, n1, n2 = sorted(sStrat.values(), reverse=True), 0, 0
     if len(lVSrtDsc) >= 2:
         n1, n2 = lVSrtDsc[0], lVSrtDsc[1]
@@ -1168,6 +1179,7 @@ def smplStratRealMajo(Y):
 
 def smplStratShareMino(Y, dI):
     shMino = (dI[GC.S_STRAT_SHARE_MINO] if GC.S_STRAT_SHARE_MINO in dI else 1)
+    shMino = max(0, min(1, shMino))
     sStrat = {cCl: (Y[Y == cCl].size) for cCl in Y.unique()}
     lVSrtAsc, n = sorted(sStrat.values()), 0
     if len(lVSrtAsc) >= 1:

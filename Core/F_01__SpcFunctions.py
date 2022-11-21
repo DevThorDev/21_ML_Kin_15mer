@@ -340,11 +340,21 @@ def toMultiLbl(serY, lXCl):     # faster - for large objects
             GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
     return GF.iniPdDfr(dY, lSNmR=serY.index)
 
-def toMultiLblExt(serY, lXCl):  # also converts "NoFam" and "MultiFam" labels
+def toMultiLblExt(serY, lXCl, sJoin=GC.S_VBAR):
+    # also converts "NoFam" and "MultiFam" labels
     if len(serY.shape) > 1:     # already multi-column (DataFrame) format
         return serY
     assert type(serY) == pd.core.series.Series
-    # TODO - implement correct "MultiFam" behaviour
+    dY = {}
+    for sLbl in serY:
+        if sJoin in sLbl:
+            lSLC = sLbl.split(sJoin)[1:]
+            for sXCl in lXCl:
+                GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl in lSLC else 0))
+        else:
+            for sXCl in lXCl:
+                GF.addToDictL(dY, cK=sXCl, cE=(1 if sXCl == sLbl else 0))
+    return GF.iniPdDfr(dY, lSNmR=serY.index)
 
 def toMultiLbl2(serY, lXCl):    # slower but more elegant - for small objects
     if len(serY.shape) > 1:     # already multi-column (DataFrame) format
@@ -362,15 +372,13 @@ def toSglLbl(dITp, dfrY):      # faster and more elegant - for large objects
     serY.name = dITp['sEffFam']
     return serY
 
-def toSglLblExt(dITp, dfrY):   # also assigns "NoFam" and "MultiFam" labels
+def toSglLblExt(dITp, dfrY, sJoin=GC.S_VBAR):
+    # also assigns "NoFam" and "MultiFam" labels
     if len(dfrY.shape) == 1:   # already single-column (Series) format
         return dfrY
-    lXCl, sNoFam, sMltFam = dfrY.columns, dITp['sNoFam'], dITp['sMultiFam']
-    serY = dfrY.apply(lambda x: ([sXCl for k, sXCl in enumerate(lXCl) if
-                                  x[k] == 1][0] if sum(x) == 1 else
-                                 (sMltFam if sum(x) > 1 else sNoFam)), axis=1)
+    serY = dfrY.apply(GF.getSSglLbl, lXCl=dfrY.columns, sNoFam=dITp['sNoFam'],
+                      sMltFam=dITp['sMultiFam'], sJoin=sJoin, axis=1)
     serY.name = dITp['sEffFam']
-    # TODO - implement correct "MultiFam" behaviour
     return serY
 
 def toSglLblOLD(dITp, dfrY):   # slower and inelegant - rather useless
