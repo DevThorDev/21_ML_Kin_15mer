@@ -656,20 +656,23 @@ class GeneralClassifier(BaseClfPrC):
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
                               iSt=self.iSt, j=self.j)
         lV, lSXCl = [None]*len(self.dITp['lSResClf']), self.lSXCl
+        hasNaNProba = YProba.isnull().to_numpy().any()
         lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
         lV[3] = accuracy_score(YTest, YPred)
         lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
-        if self.dITp['ILblSgl']:
+        if self.dITp['ILblSgl'] and not hasNaNProba:
             lV[5] = top_k_accuracy_score(YTest, YProba, k=2, labels=lSXCl)
             lV[6] = top_k_accuracy_score(YTest, YProba, k=3, labels=lSXCl)
         lV[7:11] = precision_recall_fscore_support(self.YTS, self.YPS,
                                                    beta=1.0, labels=lSXCl,
                                                    average='weighted')
         lV[11] = f1_score(self.YTS, self.YPS, labels=lSXCl, average='weighted')
-        lV[12] = roc_auc_score(YTest, YProba, average='weighted',
-                               multi_class='ovo', labels=lSXCl)
+        if not hasNaNProba:
+            lV[12] = roc_auc_score(YTest, YProba, average='weighted',
+                                   multi_class='ovo', labels=lSXCl)
         lV[13] = matthews_corrcoef(self.YTS, self.YPS)
-        lV[14] = log_loss(self.YTS, YProba, eps=1e-15, labels=lSXCl)
+        if not hasNaNProba:
+            lV[14] = log_loss(self.YTS, YProba, eps=1e-15, labels=lSXCl)
         return lV
 
     def assembleDDfrPredProba(self, YTest=None, YPred=None):
