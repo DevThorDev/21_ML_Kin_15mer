@@ -1164,8 +1164,8 @@ def drawFromNorm(cMn=0., cSD=1., tPar=None, arrShape=None):
 
 # --- Functions implementing custom imbalanced sampling strategies ------------
 def smplStratRealMajo(Y, dI):
-    shCl = (dI[GC.S_STRAT_REAL_MAJO] if GC.S_STRAT_REAL_MAJO in dI else 1)
-    shCl = max(0, min(1, shCl))
+    f = (dI[GC.S_STRAT_REAL_MAJO] if GC.S_STRAT_REAL_MAJO in dI else 1)
+    shCl = (1 if f > 1 else max(0, min(1, f)))
     sStrat = {cCl: round((Y[Y == cCl].size)*shCl) for cCl in Y.unique()}
     lVSrtDsc, n1, n2 = sorted(sStrat.values(), reverse=True), 0, 0
     if len(lVSrtDsc) >= 2:
@@ -1174,7 +1174,7 @@ def smplStratRealMajo(Y, dI):
         n1, n2 = lVSrtDsc[0], lVSrtDsc[0]
     for cCl, nEl in sStrat.items():
         if nEl == n1:
-            sStrat[cCl] = n2
+            sStrat[cCl] = round(min(n1, n2*(1 if f < 1 else f)))
     return sStrat
 
 def smplStratShareMino(Y, dI):

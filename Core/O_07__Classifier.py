@@ -666,11 +666,10 @@ class GeneralClassifier(BaseClfPrC):
                                                    beta=1.0, labels=lSXCl,
                                                    average='weighted')
         lV[11] = f1_score(self.YTS, self.YPS, labels=lSXCl, average='weighted')
-        lV[12] = roc_auc_score(YTest, YPred, average='weighted',
+        lV[12] = roc_auc_score(YTest, YProba, average='weighted',
                                multi_class='ovo', labels=lSXCl)
         lV[13] = matthews_corrcoef(self.YTS, self.YPS)
-        if self.dITp['ILblSgl']:
-            lV[14] = log_loss(self.YTS, self.YPS, eps=1e-15, labels=lSXCl)
+        lV[14] = log_loss(self.YTS, YProba, eps=1e-15, labels=lSXCl)
         return lV
 
     def assembleDDfrPredProba(self, YTest=None, YPred=None):
