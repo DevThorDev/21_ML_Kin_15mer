@@ -54,7 +54,7 @@ pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
 
 # --- names and paths of files and dirs (classifier) --------------------------
 sFInpSClf = 'InpClf'
-sFInpBClf = 'Combined_XS_KinasesPho15mer_202202'
+sFInpBClf = 'Combined_XS_KinasesPho15mer_wLoc_202202'
 sFInpStIClf = '2StA'
 
 sFInpClf = None
