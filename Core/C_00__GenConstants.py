@@ -135,7 +135,7 @@ S_F_RAW_INP_KIN = 'KinaseTarget_202202'
 S_F_RAW_INP_N_MER = 'phosphat_m15'
 
 S_F_PROC_INP_KIN = 'KinasesAndTargets_202202'
-S_F_PROC_INP_N_MER = 'Pho15mer_202202'
+S_F_PROC_INP_N_MER = 'Pho15mer_wLoc_202202'
 
 DIR_INP = '13_Sysbio03_Phospho15mer'
 DIR_RES = DIR_INP
@@ -249,6 +249,7 @@ S_SNIPPET = 'Snippet'
 S_LEN_SNIP = 'lenSnip'
 S_EXP_NAME = 'exp_name'
 S_CODE_TRUNC = 'code_trunc'
+S_LOCATION = 'location'
 S_ANY_EFF = S_ANY + S_EFF_CODE
 S_NUM_OCC = 'nOcc'
 S_ALL_SEQ = S_ALL + S_SEQ

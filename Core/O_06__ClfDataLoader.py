@@ -11,11 +11,11 @@ from Core.O_00__BaseClass import BaseClass
 # -----------------------------------------------------------------------------
 class DataLoader(BaseClass):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, iTp=6):
+    def __init__(self, inpDat, iTp=6, lITpUpd=[1]):
         super().__init__(inpDat)
         self.idO = 'O_06'
         self.descO = 'Loader of the classification input data'
-        self.getDITp(iTp=iTp)
+        self.getDITp(iTp=iTp, lITpUpd=lITpUpd)
         self.iniAttr()
         self.fillFPs()
         if self.dITp['useNmerNoCl'] is None or self.dITp['useNmerNoCl']:
@@ -121,12 +121,28 @@ class DataLoader(BaseClass):
             self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
         return dNmerEffF, serNmerSeq, dfrInp, XS, XM, YS, YM, dClMp, lSXCl
 
+    def procLocData(self):
+        if self.dITp['procLocData']:
+            sP, sF = self.dITp['pProcInp'], self.dITp['sFProcInpNmer']
+            dfrNmer = self.loadData(pF=GF.joinToPath(sP, sF), iC=0)
+            lC = [self.dITp['sCCodeSeq'], self.dITp['sLoc']]
+            dfrWLoc = dfrNmer.loc[:, lC].drop_duplicates(ignore_index=True)
+            dWLoc = {dRec[self.dITp['sCCodeSeq']]: dRec[self.dITp['sLoc']] for
+                     dRec in dfrWLoc.to_dict(orient='records')}
+            dSubStr = GF.getSubStrDict(dWLoc, itSubStr=self.serNmerSeqClf)
+            SF.modDictSubStr(self.dITp, dSubStr)
+            i = ['loc_' + str(k) for k in range(1, 6 + 1)]
+            dfrSubStr = GF.iniDfrFromDictIt(dSubStr, doTrans=True, idxDfr=i)
+            GF.checkDupSaveCSV(dfrSubStr, pF='dfrSS.csv', dropDup=False)
+            print('FINISHED.')
+
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
             self.dfrInpClf = self.loadData(self.FPs.dPF['InpDataClf'], iC=iC)
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
         (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XSClf,
          self.XMClf, self.YSClf, self.YMClf, self.dClMapClf, self.lSXClClf) = t
+        self.procLocData()
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and

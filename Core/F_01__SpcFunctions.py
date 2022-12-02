@@ -185,10 +185,10 @@ def toUnqNmerSeq(dITp, dfrInp, serNmerSeq, sMd=GC.S_CLF):
     return GF.concLOAx1(lObj=lSer, ignIdx=True).T, serNmerSeq
 
 def preProcInp(dITp, dfrInp, dNmerNoCl):
-    lInpNoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam']]
-    if dfrInp.columns.to_list() != lInpNoCl:
+    lINoCl = [dITp['sEffCode'], dITp['sCNmer'], dITp['sEffFam'], dITp['sLoc']]
+    if dfrInp.columns.to_list() != lINoCl:
         print('ERROR: Columns of dfrInp:', dfrInp.columns.to_list())
-    assert dfrInp.columns.to_list() == lInpNoCl
+    assert dfrInp.columns.to_list() == lINoCl
     dIC, dNmerEffF, sNoFam = dfrInp.to_dict(orient='list'), {}, dITp['sNoFam']
     for sNmer, sEffFam in zip(dIC[dITp['sCNmer']], dIC[dITp['sEffFam']]):
         GF.addToDictL(dNmerEffF, cK=getCentSNmerDefLen(dITp, sSeq=sNmer),
@@ -281,6 +281,16 @@ def procInp(dIG, dITp, dNmerEffF):
     dfrProc, XS, XM = GF.iniPdDfr(dProc), GF.iniPdDfr(dXS), GF.iniPdDfr(dXM)
     YS, YM = GF.iniPdSerFromDict(dYS), GF.iniPdDfr(dYM)
     return dfrProc, XS, XM, YS, YM, dClMap, sorted(lSXCl)
+
+def modDictSubStr(dITp, dSubStr):
+    for cK, lV in dSubStr.items():
+        lVM = []
+        for s in lV:
+            if dITp['sVBar'] in s:
+                lVM += s.split(dITp['sVBar'])
+            else:
+                lVM += [s]
+        dSubStr[cK] = GF.toListUnqViaSer(cIt=lVM)
 
 def genYStS(dITp, dMltSt, YSt, iSt=0):
     for sCl, lCl in dMltSt.items():

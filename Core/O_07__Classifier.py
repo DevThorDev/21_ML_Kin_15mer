@@ -197,7 +197,7 @@ class ImbSampler(BaseClass):
 # -----------------------------------------------------------------------------
 class BaseClfPrC(BaseClass):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, sKPar=GC.S_0, iTp=7, lITpUpd=[1, 2, 6]):
+    def __init__(self, inpDat, D, sKPar=GC.S_0, iTp=7, lITpUpd=[1, 6]):
         super().__init__(inpDat)
         self.idO = 'O_07'
         self.descO = 'Classifier and AAc proportions per kinase (class) calc.'
@@ -316,7 +316,7 @@ class GeneralClassifier(BaseClfPrC):
     # --- initialisation of the class -----------------------------------------
     def __init__(self, inpDat, D, iSt=None, sKPar=GC.S_0, cRep=0,
                  sMthL=GC.S_MTH_NONE_L, sMth=GC.S_MTH_NONE, iTp=7,
-                 lITpUpd=[1, 2, 6]):
+                 lITpUpd=[1, 6]):
         self.sMthL, self.sMth = sMthL, sMth
         super().__init__(inpDat, D=D, sKPar=sKPar, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'General Classifier for data classification'
@@ -1066,7 +1066,7 @@ class NuSVClf(SpecificClassifier):
 # -----------------------------------------------------------------------------
 class PropCalculator(BaseClfPrC):
     # --- initialisation of the class -----------------------------------------
-    def __init__(self, inpDat, D, iTp=7, lITpUpd=[1, 2, 6]):
+    def __init__(self, inpDat, D, iTp=7, lITpUpd=[1, 6]):
         super().__init__(inpDat, D=D, iTp=iTp, lITpUpd=lITpUpd)
         self.descO = 'Calculator: AAc proportions per kinase (class)'
         self.getInpData(sMd=self.dITp['sPrC'])

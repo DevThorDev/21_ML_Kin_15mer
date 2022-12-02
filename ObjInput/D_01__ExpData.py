@@ -74,6 +74,7 @@ sPepPIP = 'pep_pos_in_prot'
 sLenSnip = GC.S_LEN_SNIP
 sExpName = GC.S_EXP_NAME
 sCodeTrunc = GC.S_CODE_TRUNC
+sLoc = GC.S_LOCATION
 sAnyEff = GC.S_ANY_EFF
 sFullSeq = GC.S_FULL_SEQ
 sNmer = GC.S_N_MER
@@ -206,6 +207,7 @@ dIO = {# --- general
        'sLenSnip': sLenSnip,
        'sExpName': sExpName,
        'sCodeTrunc': sCodeTrunc,
+       'sLoc': sLoc,
        'sAnyEff': sAnyEff,
        'sFullSeq': sFullSeq,
        'sNmer': sNmer,

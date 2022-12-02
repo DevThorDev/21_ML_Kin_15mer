@@ -16,6 +16,7 @@ sSet = GC.S_SET_07
 
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
+procLocData = True
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
 useNmerNoCl = None                # use "no class" Nmers from full seq.?
@@ -43,10 +44,12 @@ usedAAcTypePrC = usedAAcTypeClf
 usedClTypePrC = usedClTypeClf
 
 # --- names and paths of files and dirs (general) -----------------------------
+sFProcInpNmer = GC.S_F_PROC_INP_N_MER
 sFResComb = 'Combined_S_KinasesPho15mer_202202'
 sFDictNmerSnips = 'DictNmerSnipsNoCl'
 sFDictNmerEffF = 'DictNmerEffF'
 
+pProcInp = GC.P_DIR_PROC_INP
 pResComb = GC.P_DIR_RES_COMB
 pBinData = GC.P_DIR_BIN_DATA
 pUnqNmer = GC.P_DIR_RES_UNQ_N_MER
@@ -178,6 +181,7 @@ dIO = {# --- general
        'sSet': sSet,
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
+       'procLocData': procLocData,
        'noExclEffFam': noExclEffFam,
        'useNmerNoCl': useNmerNoCl,
        'I_Lbl': I_Lbl,
@@ -192,9 +196,11 @@ dIO = {# --- general
        'usedAAcTypePrC': usedAAcTypePrC,
        'usedClTypePrC': usedClTypePrC,
        # --- names and paths of files and dirs (general)
+       'sFProcInpNmer': sFProcInpNmer,
        'sFResComb': sFResComb,
        'sFDictNmerSnips': sFDictNmerSnips,
        'sFDictNmerEffF': sFDictNmerEffF,
+       'pProcInp': pProcInp,
        'pResComb': pResComb,
        'pBinData': pBinData,
        'pUnqNmer': pUnqNmer,

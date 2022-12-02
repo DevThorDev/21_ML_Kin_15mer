@@ -68,7 +68,7 @@ class FilePaths:
         if cS is not None and len(str(cS)) > 0:
             sKP =self.dI[kPos]
             cD[sKP] = GF.insStartOrEnd(cD[sKP], cEl=cS, sPos=sPos)
-    
+
     def modFP(self, d2PI, kMn=None, kPos=None, cS=None, sPos=GC.S_E,
               dIMod=None, modPI=False):
         # dI supports an alternative method to modify the file path
@@ -216,6 +216,8 @@ class BaseClass:
         self.pDirResViterbi = self.dITp['pDirResViterbi']
 
     def loadData(self, pF, iC=None, dDTp=None, NAfillV=None, cSep=None):
+        if not pF.endswith(self.dIG['xtCSV']):
+            pF += self.dIG['xtCSV']
         cDfr, sPrt = None, 'Path ' + pF + ' does not exist! Returning "None".'
         if cSep is None:
             cSep = self.dITp['cSep']
@@ -240,6 +242,8 @@ class BaseClass:
             pF is not None):
             if idxLbl is not None:
                 saveIdx = True
+            if not pF.endswith(self.dIG['xtCSV']):
+                pF += self.dIG['xtCSV']
             GF.checkDupSaveCSV(GF.toDfr(cData), pF, cSep=self.dITp['cSep'],
                                saveIdx=saveIdx, iLbl=idxLbl, dropDup=dropDup)
             print(GC.S_ARR_LR, 'Saved Data as *.csv file to path ' + pF)
