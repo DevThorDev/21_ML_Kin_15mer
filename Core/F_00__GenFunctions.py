@@ -570,6 +570,28 @@ def getSubStrDict(dFullStr, itSubStr, retAsList=True, lUnqEl=True, mdD=1000):
             print('Finished', k + 1, 'of', N, 'substrings.')
     return dSubStr
 
+def getDNOccOfDictVals(cD):
+    dNOcc = {}
+    for sK, lV in cD.items():
+        addToDictCt(dNOcc, cK=tuple(lV))
+    return dNOcc
+
+def unifyEquivItKeys(dInp, tpKey=str, x0=''):
+    dUnif, lKUsed = {}, []
+    for sK1 in dInp:
+        if sK1 not in lKUsed:
+            sKN = [s if type(s) == tpKey else x0 for s in sK1]
+            sKN = tuple((sorted([s for s in sKN if len(s) > 0]) +
+                         ['' for s in sKN if len(s) == 0]))
+            addToDictCt(dUnif, cK=sKN, nInc=dInp[sK1])
+            addToListUnq(lKUsed, cEl=sK1)
+            for sK2 in dInp:
+                if sK2 not in lKUsed:
+                    if set(sK1) == set(sK2):
+                        addToDictCt(dUnif, cK=sKN, nInc=dInp[sK2])
+                        addToListUnq(lKUsed, cEl=sK2)
+    return dUnif
+
 def getMeansD2Val(d2):
     dMn = {}
     for d in d2.values():

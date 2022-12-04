@@ -76,6 +76,7 @@ sExpName = GC.S_EXP_NAME
 sCodeTrunc = GC.S_CODE_TRUNC
 sLoc = GC.S_LOCATION
 sAnyEff = GC.S_ANY_EFF
+sNumOcc = GC.S_NUM_OCC
 sFullSeq = GC.S_FULL_SEQ
 sNmer = GC.S_N_MER
 sLenNmer = GC.S_LEN_N_MER
@@ -209,6 +210,7 @@ dIO = {# --- general
        'sCodeTrunc': sCodeTrunc,
        'sLoc': sLoc,
        'sAnyEff': sAnyEff,
+       'sNumOcc': sNumOcc,
        'sFullSeq': sFullSeq,
        'sNmer': sNmer,
        'sLenNmer': sLenNmer,

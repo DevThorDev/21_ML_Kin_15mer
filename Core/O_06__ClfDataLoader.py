@@ -131,9 +131,17 @@ class DataLoader(BaseClass):
                      dRec in dfrWLoc.to_dict(orient='records')}
             dSubStr = GF.getSubStrDict(dWLoc, itSubStr=self.serNmerSeqClf)
             SF.modDictSubStr(self.dITp, dSubStr)
-            i = ['loc_' + str(k) for k in range(1, 6 + 1)]
+            maxNLoc = max([len(l) for l in dSubStr.values()])
+            i = ['loc_' + str(k) for k in range(1, maxNLoc + 1)]
             dfrSubStr = GF.iniDfrFromDictIt(dSubStr, doTrans=True, idxDfr=i)
-            GF.checkDupSaveCSV(dfrSubStr, pF='dfrSS.csv', dropDup=False)
+            GF.checkDupSaveCSV(dfrSubStr, pF='dfrSubStr.csv', dropDup=False)
+            dCt = GF.getDNOccOfDictVals(cD=dSubStr)
+            dM = GF.unifyEquivItKeys(dInp=dCt)
+            dfrTupUnq = SF.getDfrTupUnq(self.dITp, dM=dM, idxDfr=i)
+            dfrTupUnq.sort_values(by=i, axis=0, ascending=True, inplace=True,
+                                  ignore_index=True)
+            GF.checkDupSaveCSV(dfrTupUnq, pF='dfrTupUnq_SrtLoc12345.csv',
+                               dropDup=False)
             print('FINISHED.')
 
     def loadInpDataClf(self, iC=0):
