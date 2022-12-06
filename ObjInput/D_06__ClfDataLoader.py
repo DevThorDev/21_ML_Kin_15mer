@@ -16,7 +16,9 @@ sSet = GC.S_SET_07
 
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
-useLocData = True
+useLocData = GC.S_W_N_MER         # None (no loc. data)
+                                  # S_W_N_MER (extend Nmer-X by location key)
+                                  # S_SEPARATE (as a second, separate step)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
 useNmerNoCl = None                # use "no class" Nmers from full seq.?
@@ -32,7 +34,7 @@ usedNmerSeqClf = GC.S_UNQ_LIST    # S_FULL_LIST / S_UNQ_LIST
 
 usedAAcTypeClf = GC.S_AAC         # {[S_AAC], S_AAC_CHARGE, S_AAC_POLAR}
 
-usedClTypeClf = GC.S_NEW + GC.S_CL    # GC.S_NEW/GC.S_OLD + GC.S_CL
+usedClTypeClf = GC.S_NEW + GC.S_CL # S_NEW/S_OLD + S_CL
 
 # --- flow control (proportion calculator) ------------------------------------
 useFullSeqFromPrC = GC.S_COMB_INP # S_COMB_INP

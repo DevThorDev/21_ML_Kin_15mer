@@ -78,6 +78,8 @@ sFullSeq = GC.S_FULL_SEQ
 sLast = GC.S_LAST
 sUnique = GC.S_UNIQUE
 sKey = GC.S_KEY
+sWNmer = GC.S_W_N_MER
+sSeparate = GC.S_SEPARATE
 sDescNone = GC.S_DESC_NONE
 sDescDummy = GC.S_DESC_DUMMY
 sDescAda = GC.S_DESC_ADA
@@ -255,6 +257,8 @@ dIO = {# --- general
        'sLast': sLast,
        'sUnique': sUnique,
        'sKey': sKey,
+       'sWNmer': sWNmer,
+       'sSeparate': sSeparate,
        'sDescNone': sDescNone,
        'sDescDummy': sDescDummy,
        'sDescAda': sDescAda,

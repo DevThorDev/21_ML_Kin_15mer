@@ -28,7 +28,7 @@ class DataLoader(BaseClass):
     def iniAttr(self):
         lBase = ['serNmerSeq', 'dfrInp', 'XS', 'XM', 'YS', 'YM', 'dClMap',
                  'dMltSt', 'lSXCl']
-        lAttr2None = ['dMltStSClf', 'dMltStMClf']
+        lAttr2None = ['dMltStSClf', 'dMltStMClf', 'dNmerLoc']
         for sTp in [self.dITp['sClf'], self.dITp['sPrC']]:
             lAttr2None += [s + sTp for s in lBase]
         lAttr2None += ['dNmerNoCl', 'lI']
@@ -38,7 +38,6 @@ class DataLoader(BaseClass):
         self.lIFES = [self.dITp[s] for s in self.dITp['lSIFEndS']]
         self.lIFET = [self.dITp[s] for s in self.dITp['lSIFEndT']]
         self.lIFEU = [self.dITp[s] for s in self.dITp['lSIFEndU']]
-        # self.lIFEV = [self.dITp[s] for s in self.dITp['lSIFEndV']]
 
     # --- methods for filling the file paths ----------------------------------
     def fillFPs(self):
@@ -134,6 +133,7 @@ class DataLoader(BaseClass):
         serK = dfrNmer.apply(GF.getKeyFromL, axis=1, sSep=self.dITp['sVBar'])
         dfrNmer[self.dITp['sKey']] = serK
         self.saveData(dfrNmer, pF=self.FPs.dPF['NmerSeqU'])
+        self.dfrNmerSeq = dfrNmer
         return lIdx
 
     def procLocData(self, sMd=GC.S_CLF):
@@ -151,7 +151,9 @@ class DataLoader(BaseClass):
             SF.modDictSubStr(self.dITp, dSubStr)
             idxLoc = self.genDfrNmerSeq(dSubStr)
         else:
-            dfrNmer = self.loadData(self.FPs.dPF['NmerSeqU'], iC=0)
+            self.dfrNmerSeq = self.loadData(self.FPs.dPF['NmerSeqU'], iC=0)
+        dNmer = dfrNmer.loc[:, [self.dITp['sKey']]].to_dict(orient='index')
+        self.dNmerLoc = {cK: list(cD.values())[0] for cK, cD in dNmer.items()}
         return dSubStr, idxLoc
 
     def genDfrNOccTupUnq(self, tInf):
@@ -162,8 +164,12 @@ class DataLoader(BaseClass):
             dfrTupUnq.sort_values(by=i, axis=0, ascending=True, inplace=True,
                                   ignore_index=True)
             self.saveData(dfrTupUnq, pF=self.FPs.dPF['NOccTupU'])
-        else:
-            dfrTupUnq = self.loadData(self.FPs.dPF['NOccTupU'], iC=0)
+        # else:
+        #     dfrTupUnq = self.loadData(self.FPs.dPF['NOccTupU'], iC=0)
+
+    def extendXClfWithLoc(self):
+        if self.dITp['useLocData'] == self.dITp['sWNmer']:
+            self.XSClf
 
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
@@ -171,7 +177,7 @@ class DataLoader(BaseClass):
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
         (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XSClf,
          self.XMClf, self.YSClf, self.YMClf, self.dClMapClf, self.lSXClClf) = t
-        if self.dITp['useLocData']:
+        if self.dITp['useLocData'] is not None:
             self.genDfrNOccTupUnq(self.procLocData())
 
     def loadInpDataPrC(self, iC=0):
