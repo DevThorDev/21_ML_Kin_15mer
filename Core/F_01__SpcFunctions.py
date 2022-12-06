@@ -292,9 +292,11 @@ def modDictSubStr(dITp, dSubStr):
                 lVM += [s]
         dSubStr[cK] = GF.toListUnqViaSer(cIt=lVM)
 
-def getDfrTupUnq(dITp, dM, idxDfr=None):
-    dfrKeys = pd.concat([pd.Series(t, index=idxDfr) for t in dM], axis=1).T
-    dfrVals = pd.DataFrame(list(dM.values()), columns=[dITp['sNumOcc']])
+def getDfrNOccTupUnq(dITp, dUNOcc, idxDfr=None):
+    dfrKeys = pd.concat([pd.Series(t, index=idxDfr) for t in dUNOcc], axis=1).T
+    serK = dfrKeys.apply(GF.getKeyFromL, axis=1, sSep=dITp['sVBar'])
+    dfrKeys[dITp['sKey']] = serK
+    dfrVals = pd.DataFrame(list(dUNOcc.values()), columns=[dITp['sNumOcc']])
     return pd.concat([dfrKeys, dfrVals], axis=1)
 
 def genYStS(dITp, dMltSt, YSt, iSt=0):

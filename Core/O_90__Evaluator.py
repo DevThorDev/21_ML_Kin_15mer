@@ -67,7 +67,8 @@ class Evaluator(BaseClass):
         for tK, pF in self.FPs.dPF.items():
             if tK == self.dITp['sUnqNmer']:
                 self.serSUnqNmer = self.loadData(pF=self.FPs.dPF[tK], iC=iCS)
-                self.serSUnqNmer = self.serSUnqNmer[self.dITp['sCNmer']]
+                self.serSUnqNmer = GF.iniPdSer(self.serSUnqNmer.index,
+                                               nameS=self.dITp['sCNmer'])
             elif tK == self.dITp['sInpData']:
                 self.serXCl = self.loadData(pF=self.FPs.dPF[tK], iC=iCG)
                 self.serXCl = self.serXCl[self.dITp['sEffFam']].sort_index()

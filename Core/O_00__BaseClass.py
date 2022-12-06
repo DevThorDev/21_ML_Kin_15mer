@@ -66,7 +66,7 @@ class FilePaths:
     # --- method for modifying a file path of the paths dictionary ------------
     def insStr(self, cD, kPos, cS=None, sPos=GC.S_E):
         if cS is not None and len(str(cS)) > 0:
-            sKP =self.dI[kPos]
+            sKP = self.dI[kPos]
             cD[sKP] = GF.insStartOrEnd(cD[sKP], cEl=cS, sPos=sPos)
 
     def modFP(self, d2PI, kMn=None, kPos=None, cS=None, sPos=GC.S_E,
@@ -150,7 +150,7 @@ class BaseClass:
         print(GC.S_DS80)
 
     def printKeyAndDfr(self, cKey, cDfr):
-        print(GC.S_DS04, 'Key', cKey, GC.S_DS04)
+        print(GC.S_DS04, self.dITp['sKey'], cKey, GC.S_DS04)
         print(cDfr, GC.S_NEWL, GC.S_DS80, sep='')
 
     # --- methods for retrieving values and modifying the input dictionary ----

@@ -12,7 +12,9 @@ from pandas.api.types import is_numeric_dtype
 import Core.C_00__GenConstants as GC
 
 # === Numpy/Pandas related constants ==========================================
-L_DTYPE_NP_PD = [np.ndarray, pd.core.series.Series, pd.core.frame.DataFrame]
+L_DTYPE_NP_PD_1D = [np.ndarray, pd.core.series.Series,
+                    pd.core.indexes.base.Index]
+L_DTYPE_NP_PD = L_DTYPE_NP_PD_1D + [pd.core.frame.DataFrame]
 L_DTYPE_COMPLEX = [list, tuple, range, str, set, dict] + L_DTYPE_NP_PD
 
 # === General functions =======================================================
@@ -195,6 +197,16 @@ def getSFEnd(sF, nCharEnd):
     if GC.S_DOT in sF:
         sF = joinS(sF.split(GC.S_DOT)[:-1], cJ=GC.S_DOT)[-nCharEnd:]
     return sF[-nCharEnd:]
+
+def reSortStrWSep(s, sSep=GC.S_VBAR):
+    return sSep.join(sorted(s.split(sSep)))
+
+def getKeyFromL(x, sSep=GC.S_VBAR, sortS=True):
+    l = [s for s in x if (s is not None and s not in [np.nan, ''])]
+    if sortS:
+        return sSep.join(sorted(l))
+    else:
+        return sSep.join(l)
 
 def addSCentNmerToDict(dNum, dENmer, iCNmer):
     for k in range(iCNmer + 1):
@@ -923,7 +935,7 @@ def toSerUnique(pdSer, sName=None):
     return pd.Series(pdSer.unique(), name=nameS)
 
 def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
-    assert (((type(data) == np.ndarray and len(data.shape) == 1) or
+    assert (((type(data) in L_DTYPE_NP_PD_1D and len(data.shape) == 1) or
              (type(data) in [list, tuple]) or (data is None))
             and (len(shape) == 1))
     if lSNmI is None or len(lSNmI) == 0:
@@ -1030,15 +1042,15 @@ def addToDfrSpc(d2, pdDfr=None, concAx=1):
         pdDfr = concPdDfrS(lPdDfr=[pdDfr, iniPdDfr(d2)], concAx=concAx)
     return pdDfr
 
-def iniDfrFromDictIt(cD, idxDfr=None):
-    maxLen = 0
-    for cK, cIt in cD.items():
-        if len(cIt) > maxLen:
-            maxLen = len(cIt)
+def iniDfrFromDictIt(cD, idxDfr=None, doTrans=False):
+    maxLen = max([len(cIt) for cIt in cD.values()])
     for cK, cIt in cD.items():
         cD[cK] = list(cIt) + [np.nan]*(maxLen - len(cIt))
     idxDfr = getIdxDfr(maxLen=maxLen, idxDfr=idxDfr)
-    return pd.DataFrame(cD, index=idxDfr)
+    if doTrans:
+        return pd.DataFrame(cD, index=idxDfr).T
+    else:
+        return pd.DataFrame(cD, index=idxDfr)
 
 def iniDfrFromD2(d2, idxDfr=None, colDfr=None):
     nCol, colDfr = getColDfr(nLvl=2, colDfr=colDfr)

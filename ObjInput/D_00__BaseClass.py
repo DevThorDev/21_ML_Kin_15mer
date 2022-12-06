@@ -77,6 +77,7 @@ sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sLast = GC.S_LAST
 sUnique = GC.S_UNIQUE
+sKey = GC.S_KEY
 sDescNone = GC.S_DESC_NONE
 sDescDummy = GC.S_DESC_DUMMY
 sDescAda = GC.S_DESC_ADA
@@ -131,6 +132,7 @@ sIPos = GC.S_I_POS
 sLbl = GC.S_LBL
 sNmerEffFam = GC.S_N_MER_EFF_FAM
 sNmerSeqU = GC.S_N_MER_SEQ_UNQ
+sNOccTupUnq = GC.S_N_OCC_TUP_UNQ
 sInpData = GC.S_INP_DATA
 sMltStep = GC.S_MLT_STEP
 sOneHot, sOrdinal = GC.S_ONE_HOT, GC.S_ORDINAL
@@ -252,6 +254,7 @@ dIO = {# --- general
        'sFullSeq': sFullSeq,
        'sLast': sLast,
        'sUnique': sUnique,
+       'sKey': sKey,
        'sDescNone': sDescNone,
        'sDescDummy': sDescDummy,
        'sDescAda': sDescAda,
@@ -325,6 +328,7 @@ dIO = {# --- general
        'sLbl': sLbl,
        'sNmerEffFam': sNmerEffFam,
        'sNmerSeqU': sNmerSeqU,
+       'sNOccTupUnq': sNOccTupUnq,
        'sInpData': sInpData,
        'sMltStep': sMltStep,
        'sSampler': sSampler,

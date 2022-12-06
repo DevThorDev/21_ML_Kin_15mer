@@ -66,6 +66,13 @@ class DataLoader(BaseClass):
                                   dIG['sLFJSC']: dITp['sUS02'],
                                   dIG['sLFJCE']: dITp['sUS02'],
                                   dIG['sFXt']: dIG['xtCSV']}
+        d2PI['NOccTupU'] = {dIG['sPath']: dITp['pUnqNmer'],
+                            dIG['sLFS']: dITp['sNOccTupUnq'],
+                            dIG['sLFC']: dITp['sFInpClf'],
+                            dIG['sLFE']: self.lIFEU,
+                            dIG['sLFJSC']: dITp['sUS02'],
+                            dIG['sLFJCE']: dITp['sUS02'],
+                            dIG['sFXt']: dIG['xtCSV']}
         for sTp in ['InpData', 'XS', 'XM', 'YS', 'YM']:
             d2PI[sTp] = {dIG['sPath']: dITp['pInpData'],
                          dIG['sLFS']: dITp['s' + sTp],
@@ -115,34 +122,48 @@ class DataLoader(BaseClass):
         t = SF.procInp(self.dIG, self.dITp, dNmerEffF=dNmerEffF)
         dfrInp, XS, XM, YS, YM, dClMp, lSXCl = t
         if saveData is not None:
-            t2Save = (dNmerEffF, serNmerSeq, dfrInp, XS, XM, YS, YM)
-            lSKeyDPF = (GC.S_N_MER_EFF_FAM, 'NmerSeqU', 'InpData', 'XS', 'XM',
-                        'YS', 'YM')
+            t2Save = (dNmerEffF, dfrInp, XS, XM, YS, YM)
+            lSKeyDPF = (GC.S_N_MER_EFF_FAM, 'InpData', 'XS', 'XM', 'YS', 'YM')
             self.saveProcInpData(tData=t2Save, lSKDPF=lSKeyDPF, sMd=saveData)
         return dNmerEffF, serNmerSeq, dfrInp, XS, XM, YS, YM, dClMp, lSXCl
 
-    def procLocData(self):
-        if self.dITp['procLocData']:
-            sP, sF = self.dITp['pProcInp'], self.dITp['sFProcInpNmer']
-            dfrNmer = self.loadData(pF=GF.joinToPath(sP, sF), iC=0)
+    def genDfrNmerSeq(self, dSubStr):
+        maxNLoc = max([len(l) for l in dSubStr.values()])
+        lIdx = ['loc_' + str(k) for k in range(1, maxNLoc + 1)]
+        dfrNmer = GF.iniDfrFromDictIt(dSubStr, doTrans=True, idxDfr=lIdx)
+        serK = dfrNmer.apply(GF.getKeyFromL, axis=1, sSep=self.dITp['sVBar'])
+        dfrNmer[self.dITp['sKey']] = serK
+        self.saveData(dfrNmer, pF=self.FPs.dPF['NmerSeqU'])
+        return lIdx
+
+    def procLocData(self, sMd=GC.S_CLF):
+        dSubStr, idxLoc = {}, []
+        self.FPs.modFP(d2PI=self.d2PInf, kMn='NmerSeqU', kPos='sLFE', cS=sMd)
+        if not (GF.fileXist(self.FPs.dPF['NmerSeqU']) and
+                GF.fileXist(self.FPs.dPF['NOccTupU'])):
+            sPPI, sFPI = self.dITp['pProcInp'], self.dITp['sFProcInpNmer']
+            dfrNmer = self.loadData(pF=GF.joinToPath(sPPI, sFPI), iC=0)
             lC = [self.dITp['sCCodeSeq'], self.dITp['sLoc']]
             dfrWLoc = dfrNmer.loc[:, lC].drop_duplicates(ignore_index=True)
             dWLoc = {dRec[self.dITp['sCCodeSeq']]: dRec[self.dITp['sLoc']] for
                      dRec in dfrWLoc.to_dict(orient='records')}
             dSubStr = GF.getSubStrDict(dWLoc, itSubStr=self.serNmerSeqClf)
             SF.modDictSubStr(self.dITp, dSubStr)
-            maxNLoc = max([len(l) for l in dSubStr.values()])
-            i = ['loc_' + str(k) for k in range(1, maxNLoc + 1)]
-            dfrSubStr = GF.iniDfrFromDictIt(dSubStr, doTrans=True, idxDfr=i)
-            GF.checkDupSaveCSV(dfrSubStr, pF='dfrSubStr.csv', dropDup=False)
-            dCt = GF.getDNOccOfDictVals(cD=dSubStr)
-            dM = GF.unifyEquivItKeys(dInp=dCt)
-            dfrTupUnq = SF.getDfrTupUnq(self.dITp, dM=dM, idxDfr=i)
+            idxLoc = self.genDfrNmerSeq(dSubStr)
+        else:
+            dfrNmer = self.loadData(self.FPs.dPF['NmerSeqU'], iC=0)
+        return dSubStr, idxLoc
+
+    def genDfrNOccTupUnq(self, tInf):
+        dSubStr, i = tInf
+        if not GF.fileXist(self.FPs.dPF['NOccTupU']):
+            dUnNO = GF.unifyEquivItKeys(dInp=GF.getDNOccOfDictVals(cD=dSubStr))
+            dfrTupUnq = SF.getDfrNOccTupUnq(self.dITp, dUNOcc=dUnNO, idxDfr=i)
             dfrTupUnq.sort_values(by=i, axis=0, ascending=True, inplace=True,
                                   ignore_index=True)
-            GF.checkDupSaveCSV(dfrTupUnq, pF='dfrTupUnq_SrtLoc12345.csv',
-                               dropDup=False)
-            print('FINISHED.')
+            self.saveData(dfrTupUnq, pF=self.FPs.dPF['NOccTupU'])
+        else:
+            dfrTupUnq = self.loadData(self.FPs.dPF['NOccTupU'], iC=0)
 
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
@@ -150,7 +171,8 @@ class DataLoader(BaseClass):
         t = self.procInpData(dfrInp=self.dfrInpClf, saveData=self.dITp['sClf'])
         (self.dNmerEffFClf, self.serNmerSeqClf, self.dfrInpClf, self.XSClf,
          self.XMClf, self.YSClf, self.YMClf, self.dClMapClf, self.lSXClClf) = t
-        self.procLocData()
+        if self.dITp['useLocData']:
+            self.genDfrNOccTupUnq(self.procLocData())
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and
