@@ -118,10 +118,11 @@ lIPosUsed = None                # None or list of positions used for classific.
 # lIPosUsed = [-7, -5, -3, -2, -1, 1, 2, 3, 5, 7]
 
 # list of keys for file name end strings
-lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam', 'sCls']
+lSIFEndS = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam', 'sCls', 'sLocData']
 lSIFEndT = ['sSet', 'sRestr', 'sXclEffFam', 'sCls']
 lSIFEndU = ['sRestr', 'sXclEffFam', 'sCls']
-# lSIFEndV = ['sRestr', 'sCls']
+lSIFEndX = ['sRestr', 'sXclEffFam', 'sCls', 'sLocData']
+lSIFEndY = ['sSet', 'sRestr', 'sSglMltLbl', 'sXclEffFam', 'sCls']
 
 # --- dictionaries ------------------------------------------------------------
 # dAAcPosRestr = None     # None or dict. {iPos: lAAc restrict}
@@ -173,6 +174,7 @@ if lIPosUsed == list(range(lIPosUsed[0], lIPosUsed[-1] + 1)):
 else:
     if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
         sRestr = GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
+sLocData = ('' if useLocData is None else (GC.S_LOC + useLocData))
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -243,6 +245,8 @@ dIO = {# --- general
        'lSIFEndS': lSIFEndS,
        'lSIFEndT': lSIFEndT,
        'lSIFEndU': lSIFEndU,
+       'lSIFEndX': lSIFEndX,
+       'lSIFEndY': lSIFEndY,
        # 'lSIFEndV': lSIFEndV,
        # --- dictionaries
        'dAAcPosRestr': dAAcPosRestr,
@@ -257,6 +261,7 @@ dIO = {# --- general
        'rngPosNmer': rngPosNmer,
        'lSCXClf': lSCXClf,
        'lSCXPrC': lSCXPrC,
-       'sRestr': sRestr}
+       'sRestr': sRestr,
+       'sLocData': sLocData}
 
 ###############################################################################

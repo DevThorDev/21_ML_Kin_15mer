@@ -278,6 +278,7 @@ S_AAC = 'AAc'
 S_AAC_CHARGE = S_AAC + 'Charge'
 S_AAC_POLAR = S_AAC + 'Polar'
 S_KEY = 'Key'
+S_LOC_KEY = S_LOC + S_KEY
 S_W_N_MER = S_W + S_N_MER
 S_SEPARATE = 'Separate'
 S_DESC_NONE = 'No Classifier'

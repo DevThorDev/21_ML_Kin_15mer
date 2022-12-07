@@ -569,19 +569,6 @@ def getInvDict(cD, i=None, valAsList=True, lUnq=True):
                 break
     return dInv
 
-def getSubStrDict(dFullStr, itSubStr, retAsList=True, lUnqEl=True, mdD=1000):
-    dSubStr, N = {}, itSubStr.size
-    for k, sSub in enumerate(itSubStr):
-        for sKey, cV in dFullStr.items():
-            if sSub in sKey:
-                if not retAsList:
-                    dSubStr[sSub] = cV
-                else:
-                    addToDictL(dSubStr, cK=sSub, cE=cV, lUnqEl=lUnqEl)
-        if (k + 1)%mdD == 0:
-            print('Finished', k + 1, 'of', N, 'substrings.')
-    return dSubStr
-
 def getDNOccOfDictVals(cD):
     dNOcc = {}
     for sK, lV in cD.items():

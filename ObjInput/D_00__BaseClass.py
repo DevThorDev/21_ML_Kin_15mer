@@ -77,7 +77,7 @@ sNmerSeq = GC.S_N_MER_SEQ
 sFullSeq = GC.S_FULL_SEQ
 sLast = GC.S_LAST
 sUnique = GC.S_UNIQUE
-sKey = GC.S_KEY
+sKey, sLocKey = GC.S_KEY, GC.S_LOC_KEY
 sWNmer = GC.S_W_N_MER
 sSeparate = GC.S_SEPARATE
 sDescNone = GC.S_DESC_NONE
@@ -257,6 +257,7 @@ dIO = {# --- general
        'sLast': sLast,
        'sUnique': sUnique,
        'sKey': sKey,
+       'sLocKey': sLocKey,
        'sWNmer': sWNmer,
        'sSeparate': sSeparate,
        'sDescNone': sDescNone,

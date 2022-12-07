@@ -282,20 +282,28 @@ def procInp(dIG, dITp, dNmerEffF):
     YS, YM = GF.iniPdSerFromDict(dYS), GF.iniPdDfr(dYM)
     return dfrProc, XS, XM, YS, YM, dClMap, sorted(lSXCl)
 
-def modDictSubStr(dITp, dSubStr):
-    for cK, lV in dSubStr.items():
-        lVM = []
-        for s in lV:
-            if dITp['sVBar'] in s:
-                lVM += s.split(dITp['sVBar'])
-            else:
-                lVM += [s]
-        dSubStr[cK] = GF.toListUnqViaSer(cIt=lVM)
+def genDictNmerLoc(dITp, dfrNL=None):
+    dNL, sComma, sCCodeSeq = {}, dITp['sComma'], dITp['sCCodeSeq']
+    for dRec in dfrNL.to_dict(orient='records'):
+        for sLoc in dRec[dITp['sLoc']].split(sComma):
+            GF.addToDictL(dNL, cK=dRec[sCCodeSeq], cE=sLoc, lUnqEl=True)
+    return dNL
+
+def genDictSubStr(dFullStr, itSubStr, lUnqEl=True, mdD=1000):
+    dSubStr, N = {}, itSubStr.size
+    for k, sSub in enumerate(itSubStr):
+        for sKey, lV in dFullStr.items():
+            if sSub in sKey:
+                for cV in lV:
+                    GF.addToDictL(dSubStr, cK=sSub, cE=cV, lUnqEl=lUnqEl)
+        if (k + 1)%mdD == 0:
+            print('Finished', k + 1, 'of', N, 'substrings.')
+    return dSubStr
 
 def getDfrNOccTupUnq(dITp, dUNOcc, idxDfr=None):
     dfrKeys = pd.concat([pd.Series(t, index=idxDfr) for t in dUNOcc], axis=1).T
     serK = dfrKeys.apply(GF.getKeyFromL, axis=1, sSep=dITp['sVBar'])
-    dfrKeys[dITp['sKey']] = serK
+    dfrKeys[dITp['sLocKey']] = serK
     dfrVals = pd.DataFrame(list(dUNOcc.values()), columns=[dITp['sNumOcc']])
     return pd.concat([dfrKeys, dfrVals], axis=1)
 
