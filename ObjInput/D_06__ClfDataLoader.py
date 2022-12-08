@@ -47,7 +47,6 @@ usedClTypePrC = usedClTypeClf
 
 # --- names and paths of files and dirs (general) -----------------------------
 sFResComb = 'Combined_S_KinasesPho15mer_202202'
-# sFDfrSubStrLoc = 'SubStrings'
 sFDictNmerSnips = 'DictNmerSnipsNoCl'
 sFDictNmerEffF = 'DictNmerEffF'
 
@@ -201,7 +200,6 @@ dIO = {# --- general
        'usedClTypePrC': usedClTypePrC,
        # --- names and paths of files and dirs (general)
        'sFResComb': sFResComb,
-       # 'sFDfrSubStrLoc': sFDfrSubStrLoc,
        'sFDictNmerSnips': sFDictNmerSnips,
        'sFDictNmerEffF': sFDictNmerEffF,
        'pProcInp': pProcInp,
