@@ -214,9 +214,9 @@ def loadInpData(dITp, dfrInp, sMd=GC.S_CLF):
     lSCl = sorted(GF.toListUnqViaSer(dfrInp[dITp['sCY' + sMd]]))
     return dfrInp, X, Y, serNmerSeq, lSCl
 
-def getDClMap(dIG, dITp):
+def getDClMap(dITp):
     dClMap, dITp['lXCl'] = {}, []
-    pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClMpClf'] + dIG['xtCSV'])
+    pDCl = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClMpClf'])
     dfrClMap = GF.readCSV(pF=pDCl, iCol=0)
     for _, cRow in dfrClMap.iterrows():
         [sK, sV] = cRow.to_list()
@@ -230,6 +230,22 @@ def getDClMap(dIG, dITp):
         print(len(dITp['lXCl']), 'different X-classes. List of X-classes:')
         print(dITp['lXCl'])
     return dClMap
+
+def getDLocKeyMap(dITp):
+    dLocKeyMap, dITp['lLocKeys'] = {}, []
+    pDLocKey = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDLocMpClf'])
+    dfrLocKeyMap = GF.readCSV(pF=pDLocKey, iCol=0)
+    for _, cRow in dfrLocKeyMap.iterrows():
+        [sK, sV] = cRow.to_list()
+        dLocKeyMap[sK] = sV
+        GF.addToListUnq(dITp['lLocKeys'], cEl=sV)
+    print('Calculated location key dictionary.')
+    if dITp['printDLocKeyMap']:
+        for sK, sV in dLocKeyMap.items():
+            print(sK, dITp['sColon'], dITp['sTab'], sV, sep='')
+        print(len(dITp['lLocKeys']), 'different locations. List of locations:')
+        print(dITp['lLocKeys'])
+    return dLocKeyMap
 
 def iniDicts(dITp):
     dXS = {sI: [] for sI in dITp['lSCXClf']}
@@ -267,9 +283,9 @@ def fillDDat(dITp, dNEF, dProc, dXS, dXM, dYS, dYM, dClMap, cSeq):
     fill_DX(dX=dXM, cSeq=cSeq)
     return lXCl
 
-def procInp(dIG, dITp, dNmerEffF):
+def procInp(dITp, dNmerEffF):
     iCentAdj, lIPosUsed = dITp['maxPosNmer'], dITp['lIPosUsed']
-    dClMap, lSXCl = getDClMap(dIG, dITp), []
+    dClMap, lSXCl = getDClMap(dITp), []
     dProc, dXS, dXM, dYS, dYM = iniDicts(dITp)
     for cSeq in dNmerEffF:
         cSeqRed = ''.join([cSeq[i + iCentAdj] for i in lIPosUsed])
@@ -338,8 +354,8 @@ def getDYMltSt(dITp, dMltSt=None, Y=None, nSt=None, sLbl=GC.S_SGL_LBL):
     else:
         return genYSt(dITp, dMltSt=dMltSt, Y=Y, nSt=nSt, sLbl=sLbl)
 
-def getIMltSt(dIG, dITp, Y=None, sLbl=GC.S_SGL_LBL):
-    pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'] + dIG['xtCSV'])
+def getIMltSt(dITp, Y=None, sLbl=GC.S_SGL_LBL):
+    pDMS = GF.joinToPath(dITp['pInpClf'], dITp['sFInpDClStClf'])
     dfrMltSt, dMltSt, sSt = GF.readCSV(pF=pDMS, iCol=0), {}, dITp['sStep']
     if dfrMltSt is not None:
         # check DataFrame columns

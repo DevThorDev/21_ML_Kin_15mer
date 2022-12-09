@@ -127,6 +127,7 @@ sLbl, sStep = GC.S_LBL, GC.S_STEP
 sSglLbl = GC.S_SGL_LBL
 sMltLbl = GC.S_MLT_LBL
 sClMapping = GC.S_CL_MAPPING
+sLocKeyMapping = GC.S_LOC_KEY_MAPPING
 sClSteps = GC.S_CL_STEPS
 sMaxLenS = GC.S_MAX_LEN_S
 sRestr = GC.S_RESTR
@@ -326,6 +327,7 @@ dIO = {# --- general
        'sSglLbl': sSglLbl,
        'sMltLbl': sMltLbl,
        'sClMapping': sClMapping,
+       'sLocKeyMapping': sLocKeyMapping,
        'sClSteps': sClSteps,
        'sMaxLenS': sMaxLenS,
        'sRestr': sRestr,

@@ -82,11 +82,18 @@ def modPF(pF, iRm=None, sStart='', sEnd='', sSpl=GC.S_USC, sJoin='',
 def fileXist(pF):
     return os.path.isfile(pF)
 
-def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL):
+def readCSV(pF, iCol=None, dDTp=None, cSep=GC.S_SEMICOL, sXt=GC.XT_CSV):
+    if not pF.endswith(sXt):
+        pF += sXt
     if fileXist(pF):
         return pd.read_csv(pF, sep=cSep, index_col=iCol, dtype=dDTp)
+    else:
+        print('File "', pF, '" does not exist!', sep='')
 
-def saveCSV(pdObj, pF, reprNA='', cSep=GC.S_SEMICOL, saveIdx=True, iLbl=None):
+def saveCSV(pdObj, pF, reprNA='', cSep=GC.S_SEMICOL, sXt=GC.XT_CSV,
+            saveIdx=True, iLbl=None):
+    if not pF.endswith(sXt):
+        pF += sXt
     if pdObj is not None:
         pdObj.to_csv(pF, sep=cSep, na_rep=reprNA, index=saveIdx,
                      index_label=iLbl)

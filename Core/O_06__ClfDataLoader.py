@@ -122,7 +122,7 @@ class DataLoader(BaseClass):
     def procInpData(self, dfrInp, saveData=None):
         dNmerEffF, serNmerSeq = SF.preProcInp(self.dITp, dfrInp=dfrInp,
                                               dNmerNoCl=self.dNmerNoCl)
-        t = SF.procInp(self.dIG, self.dITp, dNmerEffF=dNmerEffF)
+        t = SF.procInp(self.dITp, dNmerEffF=dNmerEffF)
         dfrInp, XS, XM, YS, YM, dClMp, lSXCl = t
         if saveData is not None:
             t2Save = (dNmerEffF, dfrInp, YS, YM)
@@ -151,12 +151,13 @@ class DataLoader(BaseClass):
             dfrNmerLoc = dfrNmer.loc[:, lC].drop_duplicates(ignore_index=True)
             dNmerLoc = SF.genDictNmerLoc(self.dITp, dfrNL=dfrNmerLoc)
             dSubStr = SF.genDictSubStr(dNmerLoc, itSubStr=self.serNmerSeqClf)
-            # SF.modDictSubStr(self.dITp, dSubStr)
             lILoc = self.genSaveDfrNmerSeq(dSubStr)
         else:
             self.dfrNmerSeq = self.loadData(self.FPs.dPF['NmerSeqU'], iC=0)
         dNmer = self.dfrNmerSeq.loc[:, [sLocKey]].to_dict(orient='index')
-        self.dNmerLoc = {cK: list(cD.values())[0] for cK, cD in dNmer.items()}
+        dLocMap = SF.getDLocKeyMap(self.dITp)
+        self.dNmerLoc = {cK: dLocMap[list(cD.values())[0]] for cK, cD in
+                         dNmer.items()}
         return dSubStr, lILoc
 
     def genDfrNOccTupUnq(self, tInf):
@@ -167,8 +168,6 @@ class DataLoader(BaseClass):
             dfrTupUnq.sort_values(by=i, axis=0, ascending=True, inplace=True,
                                   ignore_index=True)
             self.saveData(dfrTupUnq, pF=self.FPs.dPF['NOccTupU'])
-        # else:
-        #     dfrTupUnq = self.loadData(self.FPs.dPF['NOccTupU'], iC=0)
 
     def extendXClfWithLoc(self):
         if self.dITp['useLocData'] == self.dITp['sWNmer']:
@@ -182,7 +181,6 @@ class DataLoader(BaseClass):
                 dfrX = GF.concPdDfrS([dfrXT, dfrXR], concAx=1)
                 dfrX.reset_index(drop=True, inplace=True)
                 lX[k] = dfrX
-                # self.saveData(dfrX, pF='dfrX_'+str(k + 1))
             [self.XSClf, self.XMClf] = lX
             self.saveProcInpData(tData=tuple(lX), tSKDPF=('XS', 'XM'))
 
@@ -338,12 +336,12 @@ class DataLoader(BaseClass):
     # --- methods for getting multi-steps data --------------------------------
     def getDMltStS(self, YS=None):
         if self.dMltStSClf is None:
-            self.dMltStSClf = SF.getIMltSt(self.dIG, self.dITp, Y=YS)
+            self.dMltStSClf = SF.getIMltSt(self.dITp, Y=YS)
         return self.dMltStSClf
 
     def getDMltStM(self, YM=None):
         if self.dMltStMClf is None:
-            self.dMltStMClf = SF.getIMltSt(self.dIG, self.dITp, Y=YM,
+            self.dMltStMClf = SF.getIMltSt(self.dITp, Y=YM,
                                            sLbl=self.dITp['sMltLbl'])
         return self.dMltStMClf
 

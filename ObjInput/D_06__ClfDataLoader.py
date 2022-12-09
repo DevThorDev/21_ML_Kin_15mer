@@ -19,6 +19,7 @@ useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
 useLocData = GC.S_W_N_MER         # None (no loc. data)
                                   # S_W_N_MER (extend Nmer-X by location key)
                                   # S_SEPARATE (as a second, separate step)
+sLocMap = GC.S_A                  # location map (S_A, S_B,...)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
 useNmerNoCl = None                # use "no class" Nmers from full seq.?
@@ -67,6 +68,7 @@ if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
 sFInpDClMpClf = GF.joinS([sFInpSClf, GC.S_CL_MAPPING, sSet])
 if useNmerNoCl is None:
     sFInpDClMpClf = GF.joinS([sFInpDClMpClf, GC.S_NO_CL_AS_0])
+sFInpDLocMpClf = GF.joinS([sFInpSClf, GC.S_LOC_KEY_MAPPING, sLocMap])
 sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sFInpStIClf, sSet])
 
 pInpClf = GC.P_DIR_INP_CLF
@@ -80,22 +82,24 @@ sFInpPrC = None
 if useFullSeqFromPrC == GC.S_COMB_INP:    # currently only option implemented
     sFInpPrC = GF.joinS([sFInpSPrC, sFInpBPrC])
 sFInpDClMpPrC = sFInpDClMpClf
+sFInpDLocMpPrC = sFInpDLocMpClf
 sFInpDClStPrC = sFInpDClStClf
 
 pInpPrC = pInpClf
 
 # --- boolean values (general) ------------------------------------------------
 printDClMap = True
+printDLocKeyMap = True
 
 # --- numbers (general) -------------------------------------------------------
 maxLenNmer = None           # odd number between 1 and 15 or None (max. len)
 # maxLenNmer = 9
 
-# --- numbers (classifier) -------------------------------------------------------
+# --- numbers (classifier) ----------------------------------------------------
 iCInpDataClf = 0
 modDispIni = 1000
 
-# --- numbers (proportion calculator) -------------------------------------------------------
+# --- numbers (proportion calculator) -----------------------------------------
 iCInpDataPrC = 0
 
 # --- strings (general) -------------------------------------------------------
@@ -173,7 +177,7 @@ if lIPosUsed == list(range(lIPosUsed[0], lIPosUsed[-1] + 1)):
 else:
     if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
         sRestr = GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
-sLocData = ('' if useLocData is None else (GC.S_LOC + useLocData))
+sLocData = ('' if useLocData is None else (GC.S_LOC + useLocData + sLocMap))
 
 # === create input dictionary =================================================
 dIO = {# --- general
@@ -185,6 +189,7 @@ dIO = {# --- general
        # --- flow control (classifier)
        'useFullSeqFromClf': useFullSeqFromClf,
        'useLocData': useLocData,
+       'sLocMap': sLocMap,
        'noExclEffFam': noExclEffFam,
        'useNmerNoCl': useNmerNoCl,
        'I_Lbl': I_Lbl,
@@ -212,16 +217,19 @@ dIO = {# --- general
        'sFInpStIClf': sFInpStIClf,
        'sFInpClf': sFInpClf,
        'sFInpDClMpClf': sFInpDClMpClf,
+       'sFInpDLocMpClf': sFInpDLocMpClf,
        'sFInpDClStClf': sFInpDClStClf,
        'sFInpBPrC': sFInpBPrC,
        'pInpClf': pInpClf,
        # --- names and paths of files and dirs (proportion calculator)
        'sFInpPrC': sFInpPrC,
        'sFInpDClMpPrC': sFInpDClMpPrC,
+       'sFInpDLocMpPrC': sFInpDLocMpPrC,
        'sFInpDClStPrC': sFInpDClStPrC,
        'pInpPrC': pInpPrC,
        # --- boolean values (general)
        'printDClMap': printDClMap,
+       'printDLocKeyMap': printDLocKeyMap,
        # --- numbers (general)
        'maxLenNmer': maxLenNmer,
        # --- numbers (classifier)
