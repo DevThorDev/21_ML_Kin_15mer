@@ -170,19 +170,18 @@ class DataLoader(BaseClass):
             self.saveData(dfrTupUnq, pF=self.FPs.dPF['NOccTupU'])
 
     def extendXClfWithLoc(self):
-        if self.dITp['useLocData'] == self.dITp['sWNmer']:
-            lX = [self.XSClf, self.XMClf]
-            for k, dfrX in enumerate(lX):
-                serX = dfrX.apply(lambda x: ''.join([s for s in x]), axis=1)
-                dNmerLocX = {sNmer: self.dNmerLoc[sNmer] for sNmer in serX}
-                dfrXR = GF.iniPdDfr(dNmerLocX, lSNmR=[self.dITp['sLocKey']]).T
-                iR, iC = dfrX.apply(lambda x: ''.join(x), axis=1), dfrX.columns
-                dfrXT = GF.iniPdDfr(dfrX.to_numpy(), lSNmR=iR, lSNmC=iC)
-                dfrX = GF.concPdDfrS([dfrXT, dfrXR], concAx=1)
-                dfrX.reset_index(drop=True, inplace=True)
-                lX[k] = dfrX
-            [self.XSClf, self.XMClf] = lX
-            self.saveProcInpData(tData=tuple(lX), tSKDPF=('XS', 'XM'))
+        lX = [self.XSClf, self.XMClf]
+        for k, dfrX in enumerate(lX):
+            serX = dfrX.apply(lambda x: ''.join([s for s in x]), axis=1)
+            dNmerLocX = {sNmer: self.dNmerLoc[sNmer] for sNmer in serX}
+            dfrXR = GF.iniPdDfr(dNmerLocX, lSNmR=[self.dITp['sLocKey']]).T
+            iR, iC = dfrX.apply(lambda x: ''.join(x), axis=1), dfrX.columns
+            dfrXT = GF.iniPdDfr(dfrX.to_numpy(), lSNmR=iR, lSNmC=iC)
+            dfrX = GF.concPdDfrS([dfrXT, dfrXR], concAx=1)
+            dfrX.reset_index(drop=True, inplace=True)
+            lX[k] = dfrX
+        [self.XSClf, self.XMClf] = lX
+        self.saveProcInpData(tData=tuple(lX), tSKDPF=('XS', 'XM'))
 
     def loadInpDataClf(self, iC=0):
         if self.dfrInpClf is None:
@@ -192,7 +191,10 @@ class DataLoader(BaseClass):
          self.XMClf, self.YSClf, self.YMClf, self.dClMapClf, self.lSXClClf) = t
         if self.dITp['useLocData'] is not None:
             self.genDfrNOccTupUnq(self.procLocData())
-            self.extendXClfWithLoc()
+            if self.dITp['useLocData'] == self.dITp['sWNmer']:
+                self.extendXClfWithLoc()
+            elif self.dITp['useLocData'] == self.dITp['sSeparate']:
+                pass
 
     def loadInpDataPrC(self, iC=0):
         if (self.dfrInpPrC is None and self.dfrInpClf is not None and

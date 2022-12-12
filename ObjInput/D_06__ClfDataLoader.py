@@ -22,13 +22,13 @@ useLocData = GC.S_W_N_MER         # None (no loc. data)
 sLocMap = GC.S_A                  # location map (S_A, S_B,...)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
-useNmerNoCl = None                # use "no class" Nmers from full seq.?
+useNmerNoCl = True                # use "no class" Nmers from full seq.?
                                   # True: use "no class" Nmers as class
                                   # False: do not use any "no class" Nmers
                                   # None: "no class" Nmers used but not a class
 
-I_Lbl = GC.S_MLT_LBL              # use multi-label or single-label input?
-P_Lbl = GC.S_MLT_LBL              # multi-label or single-label predictions?
+I_Lbl = GC.S_SGL_LBL              # use multi-label or single-label input?
+P_Lbl = GC.S_SGL_LBL              # multi-label or single-label predictions?
                                   # GC.S_SGL_LBL / GC.S_MLT_LBL
 
 usedNmerSeqClf = GC.S_UNQ_LIST    # S_FULL_LIST / S_UNQ_LIST

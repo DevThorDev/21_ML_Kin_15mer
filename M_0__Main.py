@@ -128,7 +128,7 @@ dMF = {tK1: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
              GC.S_MTH_MLP]}
 
-# cEval.printDDfrCmb(tK=tK1)
+cEval.printDDfrCmb(tK=tK1)
 cEval.calcPredClassRes(dMthFlt=dMF)
 # cEval.printDfrCl()
 cEndTime = GF.showElapsedTime(startTime)

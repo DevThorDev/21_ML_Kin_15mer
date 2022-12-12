@@ -97,7 +97,7 @@ dSStrat = {1: GC.S_STRAT_REAL_MAJO,
            2: GC.S_STRAT_SHARE_MINO}
                         # dictionary for modifying the strategy for specific
                         # step indices (in case of doMultiSteps)
-dIStrat = {GC.S_STRAT_REAL_MAJO: 1., GC.S_STRAT_SHARE_MINO: 1.}
+dIStrat = {GC.S_STRAT_REAL_MAJO: 10., GC.S_STRAT_SHARE_MINO: 1.}
                         # additional data as required by the custom strategy
 # sStrat = {'NoCl': 500,
 #           'X_AGC': 100,
@@ -132,8 +132,8 @@ bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-nItPtFit = None             # number of iterations / partial fit (or None)
-# nItPtFit = 1000             # number of iterations / partial fit (or None)
+# nItPtFit = None             # number of iterations / partial fit (or None)
+nItPtFit = 1000             # number of iterations / partial fit (or None)
 nItPrintPtFit = 100         # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------

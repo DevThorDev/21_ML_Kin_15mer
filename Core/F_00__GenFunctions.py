@@ -79,6 +79,9 @@ def modPF(pF, iRm=None, sStart='', sEnd='', sSpl=GC.S_USC, sJoin='',
                   sJoin=sJoin)
     return joinS(lSSpl[:-1] + [sFMod], cJ=sJoinP)
 
+def pathXist(pD):
+    return os.path.isdir(pD)
+
 def fileXist(pF):
     return os.path.isfile(pF)
 
@@ -208,12 +211,22 @@ def getSFEnd(sF, nCharEnd):
 def reSortStrWSep(s, sSep=GC.S_VBAR):
     return sSep.join(sorted(s.split(sSep)))
 
+# def getKeyFromL(x, sSep=GC.S_VBAR, sortS=True):
+#     l = toListUnq([s for s in x if (s is not None and s not in [np.nan, ''])])
+#     if sortS:
+#         return sSep.join(sorted(l))
+#     else:
+#         return sSep.join(l)
+
 def getKeyFromL(x, sSep=GC.S_VBAR, sortS=True):
-    l = [s for s in x if (s is not None and s not in [np.nan, ''])]
+    l = []
+    for s in x:
+        if s is not None and s not in [np.nan, '']:
+            l += s.split(sSep)
     if sortS:
-        return sSep.join(sorted(l))
+        return sSep.join(sorted(toListUnq(l)))
     else:
-        return sSep.join(l)
+        return sSep.join(toListUnq(l))
 
 def addSCentNmerToDict(dNum, dENmer, iCNmer):
     for k in range(iCNmer + 1):
@@ -418,7 +431,7 @@ def fillListUnique(cL=[], cIt=[]):
         if cEl not in cL:
             cL.append(cEl)
 
-def toListUnique(cIt=[]):
+def toListUnq(cIt=[]):
     cLUnq = []
     if cIt is None:
         return cLUnq

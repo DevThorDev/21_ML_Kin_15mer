@@ -32,13 +32,14 @@ class Evaluator(BaseClass):
         pFInpD, sInpD = self.dITp['pInpData'], self.dITp['sInpData']
         dFI = SF.getIFS(self.dITp, pF=pFInpD, itSCmp={sInpD}, addI=False)
         self.FPs.dPF[sInpD] = GF.joinToPath(pFInpD, dFI[sInpD])
-        # add the files with detailed and probability info for the classes
-        for sKT in [self.dITp['sDetailed'], self.dITp['sProba']]:
-            for cSet in self.dITp['lSetFIDet']:
-                dFI = SF.getIFS(self.dITp, pF=self.dITp['pInpDet'],
-                                itSCmp=({sKT} | cSet))
-                for tK, sF in dFI.items():
-                    self.FPs.dPF[tK] = GF.joinToPath(self.dITp['pInpDet'], sF)
+        pDet = self.dITp['pInpDet']
+        if GF.pathXist(pDet):
+            # add the files with detailed and probability info for the classes
+            for sKT in [self.dITp['sPredProba']]:
+                for cSet in self.dITp['lSetFIDet']:
+                    dFI = SF.getIFS(self.dITp, pF=pDet, itSCmp=({sKT} | cSet))
+                    for tK, sF in dFI.items():
+                        self.FPs.dPF[tK] = GF.joinToPath(pDet, sF)
         # initialise filter and classifier methods string
         self.sFltMth, self.lAllMth = '', []
         # add the paths to the evaluation of class predictions
@@ -149,8 +150,10 @@ class Evaluator(BaseClass):
         return GF.flattenIt(lSHdC)
 
     def calcResSglClf(self, d1, cDfr, sMth):
-        nCl = cDfr.shape[1]//2
-        dfrTrueCl = cDfr.iloc[:, (-2*nCl):(-nCl)]
+        nCl = cDfr.shape[1]//3
+        lColTC = [s for s in cDfr.columns if s.endswith(self.dITp['sTrueCl'])]
+        # dfrTrueCl = cDfr.iloc[:, (-3*nCl):(-2*nCl)]
+        dfrTrueCl = cDfr.loc[:, lColTC]
         dfrTrueCl = dfrTrueCl.sort_index(axis=0).sort_index(axis=1)
         if self.dfrTrueCl is None:
             self.dfrTrueCl = dfrTrueCl
@@ -170,14 +173,14 @@ class Evaluator(BaseClass):
     def loopOverMethods(self, d1, tF, tFXt, lSM=[]):
         for sM in lSM:
             print(GC.S_DS04, 'Checking for results of method', sM, GC.S_DS04)
-            dDP =  {self.dITp['sDetailed']: {}, self.dITp['sProba']: {}}
+            dDP =  {self.dITp['sPredProba']: {}}
             for tK, cDfr in self.dDfrCmb.items():
                 if (len(tK) > 0) and ((set([sM]) | set(tF)) <= set(tK)):
                     if self.dITp['doPredProbaEval']:
                         SF.fillDictDP(self.dITp, dDP=dDP, tK=tK, cDfr=cDfr)
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
                     if tK[0] is not None and self.dITp['doClsPredEval']:
-                        if tK[0] == 1 and tK[1] == self.dITp['sDetailed']:
+                        if tK[0] == 1 and tK[1] == self.dITp['sPredProba']:
                             print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
                             if sM not in self.lAllMth:
                                 self.lAllMth.append(sM)
@@ -214,7 +217,7 @@ class Evaluator(BaseClass):
     def calcCFlt(self, d1, tF, lSM=[]):
         sKEv, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
-        tFXt, self.lAllMth = tuple([self.dITp['sDetailed']] + list(tF)), []
+        tFXt, self.lAllMth = tuple([self.dITp['sPredProba']] + list(tF)), []
         self.loopOverMethods(d1, tF=tF, tFXt=tFXt, lSM=lSM)
         if not GF.allNone(d1.values()):
             self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
