@@ -22,13 +22,13 @@ useLocData = GC.S_W_N_MER         # None (no loc. data)
 sLocMap = GC.S_A                  # location map (S_A, S_B,...)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
-useNmerNoCl = True                # use "no class" Nmers from full seq.?
+useNmerNoCl = None                # use "no class" Nmers from full seq.?
                                   # True: use "no class" Nmers as class
                                   # False: do not use any "no class" Nmers
                                   # None: "no class" Nmers used but not a class
 
-I_Lbl = GC.S_SGL_LBL              # use multi-label or single-label input?
-P_Lbl = GC.S_SGL_LBL              # multi-label or single-label predictions?
+I_Lbl = GC.S_MLT_LBL              # use multi-label or single-label input?
+P_Lbl = GC.S_MLT_LBL              # multi-label or single-label predictions?
                                   # GC.S_SGL_LBL / GC.S_MLT_LBL
 
 usedNmerSeqClf = GC.S_UNQ_LIST    # S_FULL_LIST / S_UNQ_LIST
@@ -68,7 +68,9 @@ if useFullSeqFromClf == GC.S_COMB_INP:    # currently only option implemented
 sFInpDClMpClf = GF.joinS([sFInpSClf, GC.S_CL_MAPPING, sSet])
 if useNmerNoCl is None:
     sFInpDClMpClf = GF.joinS([sFInpDClMpClf, GC.S_NO_CL_AS_0])
-sFInpDLocMpClf = GF.joinS([sFInpSClf, GC.S_LOC_KEY_MAPPING, sLocMap])
+sFInpDLocMpClf = GF.joinS([sFInpSClf, GC.S_LOC_KEY_MAPPING])
+if sLocMap is not None:
+    sFInpDLocMpClf = GF.joinS([sFInpDLocMpClf, sLocMap])
 sFInpDClStClf = GF.joinS([sFInpSClf, GC.S_CL_STEPS, sFInpStIClf, sSet])
 
 pInpClf = GC.P_DIR_INP_CLF

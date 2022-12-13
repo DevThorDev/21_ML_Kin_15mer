@@ -211,13 +211,6 @@ def getSFEnd(sF, nCharEnd):
 def reSortStrWSep(s, sSep=GC.S_VBAR):
     return sSep.join(sorted(s.split(sSep)))
 
-# def getKeyFromL(x, sSep=GC.S_VBAR, sortS=True):
-#     l = toListUnq([s for s in x if (s is not None and s not in [np.nan, ''])])
-#     if sortS:
-#         return sSep.join(sorted(l))
-#     else:
-#         return sSep.join(l)
-
 def getKeyFromL(x, sSep=GC.S_VBAR, sortS=True):
     l = []
     for s in x:
