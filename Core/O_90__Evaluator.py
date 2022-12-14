@@ -169,7 +169,23 @@ class Evaluator(BaseClass):
                 pFMn = GF.modPF(self.FPs.dPF[tKFP], iRm=self.dITp['sLast'])
                 self.saveData(dfrMn, pF=pFMn)
 
-    def loopOverMethods(self, d1, tF, tFXt, lSM=[]):
+    def checkTupleKey(self, d1, cDfr, dRpTK, sM, tK):
+        if tK[0] is not None and self.dITp['doClsPredEval']:
+            if tK[0] == 1 and tK[1] == self.dITp['sPredProba']:
+                print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
+                if sM not in self.lAllMth:
+                    self.lAllMth.append(sM)
+            self.calcResSglClf(d1, cDfr, sMth=sM)
+            if tK[1] == self.dITp['sPredProba']:
+                dRpTK[sM] = (max(dRpTK[sM], tK[0]) if sM in dRpTK else tK[0])
+
+    def finalDivNRep(self, d1, lSM):
+        for sM in lSM:
+            for l in self.d2ClDet[sM].values():
+                if l[0] in d1 and d1[l[0]] is not None:
+                    d1[l[0]] = [x/2 for x in d1[l[0]]]
+
+    def loopOverMethods(self, d1, dRpTK, tF, tFXt, lSM=[]):
         for sM in lSM:
             print(GC.S_DS04, 'Checking for results of method', sM, GC.S_DS04)
             dDP =  {self.dITp['sPredProba']: {}}
@@ -178,16 +194,9 @@ class Evaluator(BaseClass):
                     if self.dITp['doPredProbaEval']:
                         SF.fillDictDP(self.dITp, dDP=dDP, tK=tK, cDfr=cDfr)
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
-                    if tK[0] is not None and self.dITp['doClsPredEval']:
-                        if tK[0] == 1 and tK[1] == self.dITp['sPredProba']:
-                            print(GC.S_DS04, 'Handling method', sM, GC.S_DS04)
-                            if sM not in self.lAllMth:
-                                self.lAllMth.append(sM)
-                        self.calcResSglClf(d1, cDfr, sMth=sM)
+                    self.checkTupleKey(d1, cDfr, dRpTK, sM=sM, tK=tK)
             self.calcSaveMeanPredProba(dDP=dDP)
-
-    def calcSummaryVals(self):
-        pass
+        self.finalDivNRep(d1, lSM=lSM)
 
     def compareTruePred(self, lSM=[]):
         self.dMapClT = GF.getDSClFromCHdr(itCol=self.dfrTrueCl.columns)
@@ -214,10 +223,10 @@ class Evaluator(BaseClass):
               'comparing true/predicted cLasses.', GC.S_DS04)
 
     def calcCFlt(self, d1, tF, lSM=[]):
-        sKEv, sKPos, sJ = 'OutEval', 'sLFC', self.dITp['sUSC']
+        sKEv, sKPos, sJ, dRepTK = 'OutEval', 'sLFC', self.dITp['sUSC'], {}
         print(GC.S_EQ04, 'Handling filter', tF, GC.S_EQ04)
         tFXt, self.lAllMth = tuple([self.dITp['sPredProba']] + list(tF)), []
-        self.loopOverMethods(d1, tF=tF, tFXt=tFXt, lSM=lSM)
+        self.loopOverMethods(d1, dRpTK=dRepTK, tF=tF, tFXt=tFXt, lSM=lSM)
         if not GF.allNone(d1.values()):
             self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
             self.dfrPredCl = self.dfrPredCl.sort_index(axis=1)
