@@ -27,8 +27,11 @@ sMthNSV = GC.S_MTH_NSV
 
 # --- flow control (general) --------------------------------------------------
 doEvaluation = True             # do evaluation?
-doPredProbaEval = False          # calc. means of detailed and proba results?
+doPredProbaEval = False         # calc. means of pred. cl. and proba results?
+                                # [doPredProbaEval currently not needed]
 doClsPredEval = True            # do evaluation of classes prediction?
+doCompTruePred = False          # do comparison of true and predicted values?
+                                # [doCompTruePred currently not usable]
 
 sFF, sPF = GC.S_FULL_FIT_S, GC.S_PART_FIT_S + str(1000)
 lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
@@ -90,6 +93,7 @@ dIO = {# --- general
        'doEvaluation': doEvaluation,
        'doPredProbaEval': doPredProbaEval,
        'doClsPredEval': doClsPredEval,
+       'doCompTruePred': doCompTruePred,
        'lSetFIDet': lSetFIDet,
        # --- names and paths of files and dir
        'sUnqNmer': sUnqNmer,

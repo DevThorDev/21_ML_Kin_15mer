@@ -150,16 +150,15 @@ class Evaluator(BaseClass):
         return GF.flattenIt(lSHdC)
 
     def calcResSglClf(self, d1, cDfr, sMth):
-        nCl = cDfr.shape[1]//3
         lColTC = [s for s in cDfr.columns if s.endswith(self.dITp['sTrueCl'])]
-        # dfrTrueCl = cDfr.iloc[:, (-3*nCl):(-2*nCl)]
+        lColPb = [s for s in cDfr.columns if s.endswith(self.dITp['sProba'])]
         dfrTrueCl = cDfr.loc[:, lColTC]
         dfrTrueCl = dfrTrueCl.sort_index(axis=0).sort_index(axis=1)
         if self.dfrTrueCl is None:
             self.dfrTrueCl = dfrTrueCl
         else:
             assert self.dfrTrueCl.equals(dfrTrueCl)
-        SF.fillDPrimaryRes(d1, self.d2ClDet, cDfr=cDfr, nCl=nCl, sMth=sMth)
+        SF.fillDPrimaryRes(d1, self.d2ClDet, cDfr=cDfr, lCPb=lColPb, sMth=sMth)
 
     def calcSaveMeanPredProba(self, dDP):
         sKM = self.dITp['sPredProba']
@@ -228,13 +227,14 @@ class Evaluator(BaseClass):
             self.sFltMth, self.dfrCl = sFM, self.dfrCl.convert_dtypes()
             self.FPs.modFP(d2PI=self.d2PInf, kMn=sKEv, kPos=sKPos, cS=sFM)
             self.saveData(self.dfrCl, pF=self.FPs.dPF[sKEv])
-            self.compareTruePred(lSM=lSM)
+            if self.dITp['doCompTruePred']:
+                self.compareTruePred(lSM=lSM)
 
     def calcPredClassRes(self, dMthFlt=None):
         lSHdPred = self.iniLSHdCol(dMthFlt=dMthFlt)
-        d1 = {sC: None for sC in lSHdPred}
         if self.dITp['doEvaluation'] and dMthFlt is not None:
             for tFlt, lSMth in dMthFlt.items():
+                d1 = {sC: None for sC in lSHdPred}
                 self.calcCFlt(d1, tF=tFlt, lSM=lSMth)
 
 ###############################################################################

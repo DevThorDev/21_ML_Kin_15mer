@@ -549,8 +549,8 @@ def fillDictDP(dITp, dDP, tK, cDfr):
                     except:
                         pass
 
-def fillDPrimaryRes(dRes, d2CD, cDfr, nCl, sMth):
-    for sCHd in cDfr.columns[-nCl:]:
+def fillDPrimaryRes(dRes, d2CD, cDfr, lCPb, sMth):
+    for sCHd in lCPb:
         [sNewHd] = d2CD[sMth][GF.getSClFromCHdr(sCHdr=sCHd)]
         if (sNewHd in dRes and dRes[sNewHd] is None) or (sNewHd not in dRes):
             dRes[sNewHd] = GF.iniPdSer(lSNmI=cDfr.index, nameS=sCHd, fillV=0)
