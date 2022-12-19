@@ -613,6 +613,33 @@ def assembleDfrPredProba(lSCTP, YPred, YProba, serSeq=None):
         lDfr[k] = lDfr[k].convert_dtypes()
     return lDfr
 
+def calcRPAll(dResClf, YTest, YPred, nPred):
+    nOKA, nFA = 0, 0
+    for s in YTest.columns:
+        nOK = sum([1 for k in range(nPred) if
+                   (YTest.iloc[k, :].at[s] == YPred.iloc[k, :]).at[s]])
+        nF = sum([1 for k in range(nPred) if
+                  (YTest.iloc[k, :].at[s] != YPred.iloc[k, :]).at[s]])
+        dResClf[joinS([s, dITp['sAll']])] = (nOK, nF)
+        nOKA += nOK
+        nFA += nF
+    dResClf[dITp['sAll']] = (nOKA, nFA)
+
+def calcRP01(dResClf, YTest, YPred, nPred):
+    for i, sI in zip([0, 1], [dITp['s0'], dITp['s1']]):
+        nOKI, nFI = 0, 0
+        for s in YTest.columns:
+            nOK = sum([1 for k in range(nPred) if
+                       YTest.iloc[k, :].at[s] == i and
+                       YPred.iloc[k, :].at[s] == i])
+            nF = sum([1 for k in range(nPred) if
+                      YTest.iloc[k, :].at[s] == i and
+                      YPred.iloc[k, :].at[s] == 1 - i])
+            dResClf[joinS([s, sI])] = (nOK, nF)
+            nOKI += nOK
+            nFI += nF
+        dResClf[sI] = (nOKI, nFI)
+
 def calcResPredict(dITp, dResClf, X2Pred=None, YTest=None, YPred=None,
                    YProba=None, serSeq=None):
     if (X2Pred is not None and YTest is not None and YPred is not None and
@@ -625,29 +652,8 @@ def calcResPredict(dITp, dResClf, X2Pred=None, YTest=None, YPred=None,
         for sK, cV in zip(dITp['lSResClf'], lVCalc):
             dResClf[sK] = cV
         assert (YTest.columns == YPred.columns).all()
-        nOKA, nFA = 0, 0
-        for s in YTest.columns:
-            nOK = sum([1 for k in range(nPred) if
-                       (YTest.iloc[k, :].at[s] == YPred.iloc[k, :]).at[s]])
-            nF = sum([1 for k in range(nPred) if
-                      (YTest.iloc[k, :].at[s] != YPred.iloc[k, :]).at[s]])
-            dResClf[joinS([s, dITp['sAll']])] = (nOK, nF)
-            nOKA += nOK
-            nFA += nF
-        dResClf[dITp['sAll']] = (nOKA, nFA)
-        for i, sI in zip([0, 1], [dITp['s0'], dITp['s1']]):
-            nOKI, nFI = 0, 0
-            for s in YTest.columns:
-                nOK = sum([1 for k in range(nPred) if
-                           YTest.iloc[k, :].at[s] == i and
-                           YPred.iloc[k, :].at[s] == i])
-                nF = sum([1 for k in range(nPred) if
-                          YTest.iloc[k, :].at[s] == i and
-                          YPred.iloc[k, :].at[s] == 1 - i])
-                dResClf[joinS([s, sI])] = (nOK, nF)
-                nOKI += nOK
-                nFI += nF
-            dResClf[sI] = (nOKI, nFI)
+        calcRPAll(dResClf, YTest, YPred, nPred)
+        calcRP01(dResClf, YTest, YPred, nPred)
         sTCl, sPCl, sJ = dITp['sTrueCl'], dITp['sPredCl'], dITp['sUSC']
         # create dfrPred/dfrProba, containing YTest and YPred/YProba
         lSCTP = [joinS([s, sTCl], sJoin=sJ) for s in YTest.columns]

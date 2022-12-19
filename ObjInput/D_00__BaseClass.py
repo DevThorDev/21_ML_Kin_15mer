@@ -68,7 +68,7 @@ sNone = GC.S_NONE
 sClf, sPrC = GC.S_CLF, GC.S_PRC
 sEffFam = GC.S_EFF_FAMILY
 sPredS, sPred, sNPred, sProba = GC.S_PRED_S, GC.S_PRED, GC.S_N_PRED, GC.S_PROBA
-sPredProba = GC.S_PRED_PROBA
+sPredProba, sAvProba = GC.S_PRED_PROBA, GC.S_AV_PROBA
 sTrueCl, sPredCl, sMultiCl = GC.S_TRUE_CL, GC.S_PRED_CL, GC.S_MULTI_CL
 sIGen = GC.S_I_GEN
 sCNmer = GC.S_C_N_MER
@@ -247,6 +247,7 @@ dIO = {# --- general
        'sNPred': sNPred,
        'sProba': sProba,
        'sPredProba': sPredProba,
+       'sAvProba': sAvProba,
        'sTrueCl': sTrueCl,
        'sPredCl': sPredCl,
        'sMultiCl': sMultiCl,

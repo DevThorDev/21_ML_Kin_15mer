@@ -520,7 +520,7 @@ def getIFS(dITp, pF='', itSCmp=None, addI=True, sSpl=GC.S_USC):
     return dSFTI
 
 def getDMapCl(dITp, dDfr, sMth=None):
-    dSCl, sUSC, lSPred = {}, dITp['sUSC'], dITp['lSPred']
+    dSCl, sUSC, sAvProba = {}, dITp['sUSC'], dITp['sAvProba']
     for cDfr in dDfr.values():
         for sC in cDfr.columns:
             sCl = GF.getSClFromCHdr(sCHdr=sC, sSep=sUSC)
@@ -528,9 +528,9 @@ def getDMapCl(dITp, dDfr, sMth=None):
                 dSCl[sCl] = None
     for sCl in dSCl:
         if sMth is not None:
-            dSCl[sCl] = [sUSC.join([sCl, sMth, sPred]) for sPred in lSPred]
+            dSCl[sCl] = [sUSC.join([sCl, sMth, sAvProba])]
         else:
-            dSCl[sCl] = [sUSC.join([sCl, sPred]) for sPred in lSPred]
+            dSCl[sCl] = [sUSC.join([sCl, sAvProba])]
     return dSCl
 
 def fillDictDP(dITp, dDP, tK, cDfr):

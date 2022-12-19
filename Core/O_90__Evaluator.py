@@ -179,11 +179,14 @@ class Evaluator(BaseClass):
             if tK[1] == self.dITp['sPredProba']:
                 dRpTK[sM] = (max(dRpTK[sM], tK[0]) if sM in dRpTK else tK[0])
 
-    def finalDivNRep(self, d1, lSM):
+    def finalDivNRep(self, d1, dRpTK, lSM):
         for sM in lSM:
             for l in self.d2ClDet[sM].values():
                 if l[0] in d1 and d1[l[0]] is not None:
-                    d1[l[0]] = [x/2 for x in d1[l[0]]]
+                    if sM in dRpTK and dRpTK[sM] > 0:
+                        d1[l[0]] /= dRpTK[sM]
+                if d1[l[0]] is None or not (sM in dRpTK and dRpTK[sM] > 0):
+                    del d1[l[0]]
 
     def loopOverMethods(self, d1, dRpTK, tF, tFXt, lSM=[]):
         for sM in lSM:
@@ -196,7 +199,7 @@ class Evaluator(BaseClass):
                 if (len(tK) > 0) and ((set([sM]) | set(tFXt)) <= set(tK)):
                     self.checkTupleKey(d1, cDfr, dRpTK, sM=sM, tK=tK)
             self.calcSaveMeanPredProba(dDP=dDP)
-        self.finalDivNRep(d1, lSM=lSM)
+        self.finalDivNRep(d1, dRpTK, lSM=lSM)
 
     def compareTruePred(self, lSM=[]):
         self.dMapClT = GF.getDSClFromCHdr(itCol=self.dfrTrueCl.columns)
@@ -228,7 +231,7 @@ class Evaluator(BaseClass):
         tFXt, self.lAllMth = tuple([self.dITp['sPredProba']] + list(tF)), []
         self.loopOverMethods(d1, dRpTK=dRepTK, tF=tF, tFXt=tFXt, lSM=lSM)
         if not GF.allNone(d1.values()):
-            self.dfrPredCl = GF.iniPdDfr(d1, lSNmR=self.serSUnqNmer)
+            self.dfrPredCl = GF.concLOAx1(d1)
             self.dfrPredCl = self.dfrPredCl.sort_index(axis=1)
             lO = [self.serXCl, self.dfrTrueCl, self.dfrPredCl]
             self.dfrCl = GF.concLOAx1(lObj=lO, verifInt=True)

@@ -19,7 +19,7 @@ useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
 useLocData = GC.S_W_N_MER         # None (no loc. data)
                                   # S_W_N_MER (extend Nmer-X by location key)
                                   # S_SEPARATE (as a second, separate step)
-sLocMap = GC.S_A                  # location map (S_A, S_B,...)
+sLocMap = None                  # location map (None or S_A, S_B,...)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
 useNmerNoCl = None                # use "no class" Nmers from full seq.?
@@ -166,10 +166,7 @@ else:
 lSCXClf = [str(n) for n in lIPosUsed]
 lSCXPrC = lSCXClf
 
-sRestr, sMxLen = '', str(maxLenNmer)
-if maxLenNmer is not None and maxLenNmer != GC.LEN_N_MER_DEF:
-    pass
-    # sMaxLenNmer = GC.S_MAX_LEN_S + str(GC.S_0)*(2 - len(sMxLen)) + sMxLen
+sRestr, sMxLen, sLocData = '', str(maxLenNmer), ''
 if dAAcPosRestr is not None:
     for sK, lV in dAAcPosRestr.items():
         sRestr += GF.joinS([GC.S_RESTR, sK, GF.joinS(lV)])
@@ -179,7 +176,8 @@ if lIPosUsed == list(range(lIPosUsed[0], lIPosUsed[-1] + 1)):
 else:
     if set(lIPosUsed) < set(range(-GC.I_CENT_N_MER, GC.I_CENT_N_MER + 1)):
         sRestr = GF.joinS([sRestr, GC.S_I_POS, GF.joinS(lIPosUsed)])
-sLocData = ('' if useLocData is None else (GC.S_LOC + useLocData + sLocMap))
+if useLocData is not None:
+    sLocData = GC.S_LOC + useLocData + ('' if sLocMap is None else sLocMap)
 
 # === create input dictionary =================================================
 dIO = {# --- general
