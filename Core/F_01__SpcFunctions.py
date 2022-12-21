@@ -535,7 +535,7 @@ def getDMapCl(dITp, dDfr, sMth=None):
 
 def fillDictDP(dITp, dDP, tK, cDfr):
     if len(tK) > 1:
-        for sKM in [dITp['sDetailed'], dITp['sProba']]:
+        for sKM in [dITp['sPredProba']]:
             if sKM in tK:
                 if tK[0] is None:
                     dDP[sKM][tK[1:]] = None

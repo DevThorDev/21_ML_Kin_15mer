@@ -112,7 +112,7 @@ cEval = Evaluator(inpDatG)
 # tK1 = (GC.S_SMPL_RND_U_S,)
 tK1 = (GC.S_FULL_FIT_S, GC.S_SMPL_NO_S)
 tK2 = (GC.S_FULL_FIT_S, GC.S_SMPL_RND_U_S)
-tK3 = (GC.S_PART_FIT_S + str(1000), GC.S_SMPL_RND_U_S)
+tK3 = (GC.S_PART_FIT_S + str(100), GC.S_SMPL_RND_U_S)
 dMF = {tK1: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
              GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,

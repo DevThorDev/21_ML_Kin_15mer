@@ -19,7 +19,7 @@ useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
 useLocData = GC.S_W_N_MER         # None (no loc. data)
                                   # S_W_N_MER (extend Nmer-X by location key)
                                   # S_SEPARATE (as a second, separate step)
-sLocMap = None                  # location map (None or S_A, S_B,...)
+sLocMap = GC.S_A                  # location map (S_A, S_B,...)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
 useNmerNoCl = None                # use "no class" Nmers from full seq.?

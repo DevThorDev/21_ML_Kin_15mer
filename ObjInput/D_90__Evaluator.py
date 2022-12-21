@@ -33,7 +33,7 @@ doClsPredEval = True            # do evaluation of classes prediction?
 doCompTruePred = False          # do comparison of true and predicted values?
                                 # [doCompTruePred currently not usable]
 
-sFF, sPF = GC.S_FULL_FIT_S, GC.S_PART_FIT_S + str(1000)
+sFF, sPF = GC.S_FULL_FIT_S, GC.S_PART_FIT_S + str(100)
 lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
              {sMthDummy, GC.S_SMPL_NO_S, sFF, GC.S_A},
              {sMthAda, GC.S_SMPL_NO_S, sFF, GC.S_A},
