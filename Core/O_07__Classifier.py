@@ -218,8 +218,8 @@ class BaseClfPrC(BaseClass):
 
     # --- methods for initialising class attributes and loading input data ----
     def iniAttr(self, sKPar=GC.S_0):
-        lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'lSXCl', 'Clf',
-                      'optClf', 'sMth', 'sMthL', 'dfrPred', 'dfrProba']
+        lAttr2None = ['serNmerSeq', 'dfrInp', 'dClMap', 'lSXCl', 'lSXClNoCl',
+                      'Clf', 'optClf', 'sMth', 'sMthL', 'dfrPred', 'dfrProba']
         lAttrDict = ['d3ResClf', 'd2DfrCnfMat', 'd2ResClf', 'dDfrCnfMat',
                      'dDfrPredProba', 'dPropAAc']
         lAttrDictF = ['dClf', 'dScoreClf', 'dConfusMatrix']
@@ -267,11 +267,13 @@ class BaseClfPrC(BaseClass):
         self.X = self.X.loc[self.Y.index, :]
         self.dfrInp = self.dfrInp.loc[self.Y.index, :]
         self.dfrInp[self.dITp['sEffFam']] = self.Y
-        self.lSXCl = sorted(list(self.Y.unique()))
+        lS = sorted([s for s in self.Y.unique() if s != self.dITp['sNoCl']])
+        self.lSXCl, self.lSXClNoCl = lS, sorted([self.dITp['sNoCl']] + lS)
 
     def getInpData(self, sMd=None, sLbl=GC.S_SGL_LBL, iSt=None):
         (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
          self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=self.dITp['I_Lbl'])
+        self.lSXClNoCl = sorted([self.dITp['sNoCl']] + self.lSXCl)
         if self.dITp['doMultiSteps'] and iSt is not None:
             self.modInpDataMltSt(iSt=iSt)
 
@@ -563,7 +565,7 @@ class GeneralClassifier(BaseClfPrC):
                 cSmp.printResResampleImb(YIni=YInp, YRes=Y, doPrt=(k==0))
             else:
                 self.printResNoResample(Y=Y, doPrt=(k==0))
-            cClf.partial_fit(X, Y, classes=self.lSXCl)
+            cClf.partial_fit(X, Y, classes=self.lSXClNoCl)
             self.printClfPartialFit(X)
         return X, Y
 
@@ -641,7 +643,8 @@ class GeneralClassifier(BaseClfPrC):
 
     def getYPredProba(self, cClf, X2Pred=None, YTest=None):
         sM, sPd, sPa = self.sMth, self.dITp['sPred'], self.dITp['sProba']
-        sML, lSC, lSR = self.sMthL, self.lSXCl, YTest.index
+        sML, lSR = self.sMthL, YTest.index
+        lSC = (self.lSXClNoCl if self.dITp['ILblSgl'] else self.lSXCl)
         YPred = self.getYPred(cClf=cClf, X2Pr=X2Pred, lSC=lSC, lSR=lSR)
         YProba = GF.getYProba(cClf, dat2Pr=X2Pred, lSC=lSC, lSR=lSR, sMthL=sML)
         if YProba is None:
@@ -653,24 +656,25 @@ class GeneralClassifier(BaseClfPrC):
     def calcLSumVals(self, YTest, YPred):
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
                               iSt=self.iSt, j=self.j)
-        lV, lSXCl = [None]*len(self.dITp['lSResClf']), self.lSXCl
+        lV = [None]*len(self.dITp['lSResClf'])
+        lSCl = (self.lSXClNoCl if self.dITp['ILblSgl'] else self.lSXCl)
         hasNaNProba = YProba.isnull().to_numpy().any()
         lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
         lV[3] = accuracy_score(YTest, YPred)
         lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
         if self.dITp['ILblSgl'] and not hasNaNProba:
-            lV[5] = top_k_accuracy_score(YTest, YProba, k=2, labels=lSXCl)
-            lV[6] = top_k_accuracy_score(YTest, YProba, k=3, labels=lSXCl)
+            lV[5] = top_k_accuracy_score(YTest, YProba, k=2, labels=lSCl)
+            lV[6] = top_k_accuracy_score(YTest, YProba, k=3, labels=lSCl)
         lV[7:11] = precision_recall_fscore_support(self.YTS, self.YPS,
-                                                   beta=1.0, labels=lSXCl,
+                                                   beta=1.0, labels=lSCl,
                                                    average='weighted')
-        lV[11] = f1_score(self.YTS, self.YPS, labels=lSXCl, average='weighted')
+        lV[11] = f1_score(self.YTS, self.YPS, labels=lSCl, average='weighted')
         if not hasNaNProba:
             lV[12] = roc_auc_score(YTest, YProba, average='weighted',
-                                   multi_class='ovo', labels=lSXCl)
+                                   multi_class='ovo', labels=lSCl)
         lV[13] = matthews_corrcoef(self.YTS, self.YPS)
         if not hasNaNProba:
-            lV[14] = log_loss(self.YTS, YProba, eps=1e-15, labels=lSXCl)
+            lV[14] = log_loss(self.YTS, YProba, eps=1e-15, labels=lSCl)
         return lV
 
     def assembleDDfrPredProba(self, YTest=None, YPred=None):
@@ -734,17 +738,17 @@ class GeneralClassifier(BaseClfPrC):
                 self.calcCnfMatrix(YTest=YTest)
         self.calcFoldsMnPredProba()
 
-    # --- method for plotting the confusion matrix ----------------------------
-    def plotCnfMatrix(self, j=None):
-        if self.dITp['plotCnfMatrix'] and self.dConfusMatrix[j] is not None:
-            CM, lCl = self.dConfusMatrix[j], self.lSXCl
-            D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
-            D.plot()
-            supTtl = self.dITp['sSupTtlPlt']
-            if self.sMthL is not None:
-                supTtl += ' (method: "' + self.sMthL + '")'
-            D.figure_.suptitle(supTtl)
-            plt.show()
+    # # --- method for plotting the confusion matrix ----------------------------
+    # def plotCnfMatrix(self, j=None):
+    #     if self.dITp['plotCnfMatrix'] and self.dConfusMatrix[j] is not None:
+    #         CM, lCl = self.dConfusMatrix[j], self.lSXCl
+    #         D = ConfusionMatrixDisplay(confusion_matrix=CM, display_labels=lCl)
+    #         D.plot()
+    #         supTtl = self.dITp['sSupTtlPlt']
+    #         if self.sMthL is not None:
+    #             supTtl += ' (method: "' + self.sMthL + '")'
+    #         D.figure_.suptitle(supTtl)
+    #         plt.show()
 
 # -----------------------------------------------------------------------------
 class SpecificClassifier(GeneralClassifier):

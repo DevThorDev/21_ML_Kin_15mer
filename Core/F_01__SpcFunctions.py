@@ -248,10 +248,11 @@ def getDLocKeyMap(dITp):
     return dLocKeyMap
 
 def iniDicts(dITp):
-    dXS = {sI: [] for sI in dITp['lSCXClf']}
-    dXM = {sI: [] for sI in dITp['lSCXClf']}
-    dYS, dYM = {dITp['sEffFam']: []}, {sXCl: [] for sXCl in dITp['lXCl']}
-    return {}, dXS, dXM, dYS, dYM
+    dXS = {'lI': [], 'dDat': {sI: [] for sI in dITp['lSCXClf']}}
+    dXM = {'lI': [], 'dDat': {sI: [] for sI in dITp['lSCXClf']}}
+    dYS = {'lI': [], 'dDat': {dITp['sEffFam']: []}}
+    dYM = {'lI': [], 'dDat': {sXCl: [] for sXCl in dITp['lXCl']}}
+    return {'lI': [], 'dDat': {}}, dXS, dXM, dYS, dYM
 
 def getLXCl(dITp, dNEF, dClMap, cSeq):
     # translation of effector families to XClasses
@@ -263,34 +264,42 @@ def getLXCl(dITp, dNEF, dClMap, cSeq):
         lXCl = [dClMap[sFam] for sFam in lEFIncl]
     return lXCl
 
-def fill_DX(dX, cSeq):
+def addToDX(dX, cSeq):
     for sKeyX, sAAc in zip(dX, cSeq):
         GF.addToDictL(dX, cK=sKeyX, cE=sAAc)
 
-def fillDDat(dITp, dNEF, dProc, dXS, dXM, dYS, dYM, dClMap, cSeq):
+def fillDDat(dITp, dNEF, dProc, dXS, dXM, dYS, dYM, dClMap, cSeq, lF):
     assert len(cSeq) == len(dXS) and len(cSeq) == len(dXM)
     lXCl = getLXCl(dITp, dNEF=dNEF, dClMap=dClMap, cSeq=cSeq)
-    # filling of data dictionaries
+    # filling of data dictionaries (dProc and single-label)
     GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
-    if len(lXCl) == 1:      # exactly 1 XCl assigned to this Nmer sequence
-        GF.addToDictL(dYS, cK=dITp['sEffFam'], cE=lXCl[0])
-        fill_DX(dX=dXS, cSeq=cSeq)
+    if len(lXCl) == 0:      # no XCl assigned to this Nmer sequence
+        if len(lF) == 1 and lF[0] == dITp['sNoFam']:
+            GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sNoCl'])
+            GF.addToDictL(dYS, cK=dITp['sEffFam'], cE=dITp['sNoCl'])
+            addToDX(dX=dXS, cSeq=cSeq)
+        else:
+            GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sNone'])
+    elif len(lXCl) == 1:      # exactly 1 XCl assigned to this Nmer sequence
         GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=lXCl[0])
+        GF.addToDictL(dYS, cK=dITp['sEffFam'], cE=lXCl[0])
+        addToDX(dX=dXS, cSeq=cSeq)
     else:
-        GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sNone'])
+        GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sMultiCl'])
+    # filling of data dictionaries (multi-label)
     for cXCl in dITp['lXCl']:
         GF.addToDictL(dYM, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
-    fill_DX(dX=dXM, cSeq=cSeq)
+    addToDX(dX=dXM, cSeq=cSeq)
     return lXCl
 
 def procInp(dITp, dNmerEffF):
     iCentAdj, lIPosUsed = dITp['maxPosNmer'], dITp['lIPosUsed']
     dClMap, lSXCl = getDClMap(dITp), []
     dProc, dXS, dXM, dYS, dYM = iniDicts(dITp)
-    for cSeq in dNmerEffF:
+    for cSeq, lFam in sorted(dNmerEffF.items()):
         cSeqRed = ''.join([cSeq[i + iCentAdj] for i in lIPosUsed])
-        lXCl = fillDDat(dITp, dNEF=dNmerEffF, dProc=dProc, dXS=dXS,
-                        dXM=dXM, dYS=dYS, dYM=dYM, dClMap=dClMap, cSeq=cSeqRed)
+        lXCl = fillDDat(dITp, dNEF=dNmerEffF, dProc=dProc, dXS=dXS, dXM=dXM,
+                        dYS=dYS, dYM=dYM, dClMap=dClMap, cSeq=cSeqRed, lF=lFam)
         GF.fillListUnique(cL=lSXCl, cIt=lXCl)
     for cD in [dXM, dYM]:
         GF.complDict(cDFull=dProc, cDAdd=cD)
@@ -407,7 +416,7 @@ def toMultiLbl2(serY, lXCl):    # slower but more elegant - for small objects
 def toSglLbl(dITp, dfrY):      # faster and more elegant - for large objects
     if len(dfrY.shape) == 1:   # already single-column (Series) format
         return dfrY
-    lXCl, s = dfrY.columns, dITp['sNone']
+    lXCl, s = dfrY.columns, dITp['sNoCl']
     serY = dfrY.apply(lambda x: ([sXCl for k, sXCl in enumerate(lXCl) if
                                   x[k] == 1][0] if sum(x) == 1 else s), axis=1)
     serY.name = dITp['sEffFam']
@@ -425,7 +434,7 @@ def toSglLblExt(dITp, dfrY, sJoin=GC.S_VBAR):
 def toSglLblOLD(dITp, dfrY):   # slower and inelegant - rather useless
     if len(dfrY.shape) == 1:   # already single-column (Series) format
         return dfrY
-    lY = [dITp['sNone']]*dfrY.shape[0]
+    lY = [dITp['sNoCl']]*dfrY.shape[0]
     for k, (_, serR) in enumerate(dfrY.iterrows()):
         if sum(serR) == 1:
             lY[k] = serR.index[serR == 1].to_list()[0]
@@ -470,7 +479,7 @@ def getLSE(dITp, sMth, lIFE):
     else:
         l2Add += [dITp['sFullFitS']]
     if dITp['doImbSampling'] and dITp['sSmplS'] is not None:
-        l2Add += [dITp['sSmplS']]
+        l2Add += [dITp['sSmplS'] + dITp['sStratS'].replace(' ', '')]
     else:
         l2Add += [dITp['sSmplNoS']]
     lSESum += l2Add

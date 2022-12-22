@@ -34,6 +34,8 @@ doCompTruePred = False          # do comparison of true and predicted values?
                                 # [doCompTruePred currently not usable]
 
 sFF, sPF = GC.S_FULL_FIT_S, GC.S_PART_FIT_S + str(100)
+sSmplRM1 = GC.S_SMPL_RND_U_S + GC.S_STRAT_REAL_MAJO_S + str(1)
+sSmplRM10 = GC.S_SMPL_RND_U_S + GC.S_STRAT_REAL_MAJO_S + str(10)
 lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
              {sMthDummy, GC.S_SMPL_NO_S, sFF, GC.S_A},
              {sMthAda, GC.S_SMPL_NO_S, sFF, GC.S_A},
@@ -49,31 +51,56 @@ lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
              {sMthGsNB, GC.S_SMPL_NO_S, sFF, GC.S_A},
              {sMthMLP, GC.S_SMPL_NO_S, sFF, GC.S_A},
              {sMthLSV, GC.S_SMPL_NO_S, sFF, GC.S_A},
-             # (GC.S_SMPL_RND_U_S, sFF)
-             {sMthDummy, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthAda, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthRF, GC.S_SMPL_RND_U_S, sFF, GC.S_B},
-             {sMthXTr, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthGrB, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthHGrB, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthGP, GC.S_SMPL_RND_U_S, sFF, GC.S_B},
-             {sMthPaA, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthPct, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthSGD, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthCtNB, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthCpNB, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthGsNB, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthMLP, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthLSV, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             {sMthNSV, GC.S_SMPL_RND_U_S, sFF, GC.S_A},
-             # (GC.S_SMPL_RND_U_S, sPF)
-             {sMthPaA, GC.S_SMPL_RND_U_S, sPF, GC.S_A},
-             {sMthPct, GC.S_SMPL_RND_U_S, sPF, GC.S_A},
-             {sMthSGD, GC.S_SMPL_RND_U_S, sPF, GC.S_A},
-             {sMthCtNB, GC.S_SMPL_RND_U_S, sPF, GC.S_A},
-             {sMthCpNB, GC.S_SMPL_RND_U_S, sPF, GC.S_A},
-             {sMthGsNB, GC.S_SMPL_RND_U_S, sPF, GC.S_A},
-             {sMthMLP, GC.S_SMPL_RND_U_S, sPF, GC.S_A}]
+             # (sSmplRM1, sFF)
+             {sMthDummy, sSmplRM1, sFF, GC.S_A},
+             {sMthAda, sSmplRM1, sFF, GC.S_A},
+             {sMthRF, sSmplRM1, sFF, GC.S_B},
+             {sMthXTr, sSmplRM1, sFF, GC.S_A},
+             {sMthGrB, sSmplRM1, sFF, GC.S_A},
+             {sMthHGrB, sSmplRM1, sFF, GC.S_A},
+             {sMthGP, sSmplRM1, sFF, GC.S_B},
+             {sMthPaA, sSmplRM1, sFF, GC.S_A},
+             {sMthPct, sSmplRM1, sFF, GC.S_A},
+             {sMthSGD, sSmplRM1, sFF, GC.S_A},
+             {sMthCtNB, sSmplRM1, sFF, GC.S_A},
+             {sMthCpNB, sSmplRM1, sFF, GC.S_A},
+             {sMthGsNB, sSmplRM1, sFF, GC.S_A},
+             {sMthMLP, sSmplRM1, sFF, GC.S_A},
+             {sMthLSV, sSmplRM1, sFF, GC.S_A},
+             {sMthNSV, sSmplRM1, sFF, GC.S_A},
+             # (sSmplRM10, sFF)
+             {sMthDummy, sSmplRM10, sFF, GC.S_A},
+             {sMthAda, sSmplRM10, sFF, GC.S_A},
+             {sMthRF, sSmplRM10, sFF, GC.S_B},
+             {sMthXTr, sSmplRM10, sFF, GC.S_A},
+             {sMthGrB, sSmplRM10, sFF, GC.S_A},
+             {sMthHGrB, sSmplRM10, sFF, GC.S_A},
+             {sMthGP, sSmplRM10, sFF, GC.S_B},
+             {sMthPaA, sSmplRM10, sFF, GC.S_A},
+             {sMthPct, sSmplRM10, sFF, GC.S_A},
+             {sMthSGD, sSmplRM10, sFF, GC.S_A},
+             {sMthCtNB, sSmplRM10, sFF, GC.S_A},
+             {sMthCpNB, sSmplRM10, sFF, GC.S_A},
+             {sMthGsNB, sSmplRM10, sFF, GC.S_A},
+             {sMthMLP, sSmplRM10, sFF, GC.S_A},
+             {sMthLSV, sSmplRM10, sFF, GC.S_A},
+             {sMthNSV, sSmplRM10, sFF, GC.S_A},
+             # (sSmplRM1, sPF)
+             {sMthPaA, sSmplRM1, sPF, GC.S_A},
+             {sMthPct, sSmplRM1, sPF, GC.S_A},
+             {sMthSGD, sSmplRM1, sPF, GC.S_A},
+             {sMthCtNB, sSmplRM1, sPF, GC.S_A},
+             {sMthCpNB, sSmplRM1, sPF, GC.S_A},
+             {sMthGsNB, sSmplRM1, sPF, GC.S_A},
+             {sMthMLP, sSmplRM1, sPF, GC.S_A},
+             # (sSmplRM10, sPF)
+             {sMthPaA, sSmplRM10, sPF, GC.S_A},
+             {sMthPct, sSmplRM10, sPF, GC.S_A},
+             {sMthSGD, sSmplRM10, sPF, GC.S_A},
+             {sMthCtNB, sSmplRM10, sPF, GC.S_A},
+             {sMthCpNB, sSmplRM10, sPF, GC.S_A},
+             {sMthGsNB, sSmplRM10, sPF, GC.S_A},
+             {sMthMLP, sSmplRM10, sPF, GC.S_A}]
 
 # --- names and paths of files and dirs ---------------------------------------
 sUnqNmer = GC.S_N_MER_SEQ_UNQ

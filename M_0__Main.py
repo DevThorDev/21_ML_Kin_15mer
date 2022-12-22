@@ -108,11 +108,15 @@ cTiming.updateTimes(tMth=(7, 1000), stTMth=cStTime, endTMth=cEndTime)
 cStTime = GF.showElapsedTime(startTime)
 cEval = Evaluator(inpDatG)
 
+sSmplRM1 = GC.S_SMPL_RND_U_S + GC.S_STRAT_REAL_MAJO_S + str(1)
+sSmplRM10 = GC.S_SMPL_RND_U_S + GC.S_STRAT_REAL_MAJO_S + str(10)
 # tK1 = (GC.S_SMPL_RND_U_S, GC.S_A)
 # tK1 = (GC.S_SMPL_RND_U_S,)
 tK1 = (GC.S_FULL_FIT_S, GC.S_SMPL_NO_S)
-tK2 = (GC.S_FULL_FIT_S, GC.S_SMPL_RND_U_S)
-tK3 = (GC.S_PART_FIT_S + str(100), GC.S_SMPL_RND_U_S)
+tK2 = (GC.S_FULL_FIT_S, sSmplRM1)
+tK3 = (GC.S_FULL_FIT_S, sSmplRM10)
+tK4 = (GC.S_PART_FIT_S + str(100), sSmplRM1)
+tK5 = (GC.S_PART_FIT_S + str(100), sSmplRM10)
 dMF = {tK1: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
              GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
@@ -124,7 +128,16 @@ dMF = {tK1: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
              GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
              GC.S_MTH_MLP, GC.S_MTH_LSV, GC.S_MTH_NSV],
-       tK3: [GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
+       tK3: [GC.S_MTH_ADA, GC.S_MTH_RF, GC.S_MTH_X_TR,
+             GC.S_MTH_GR_B, GC.S_MTH_H_GR_B,
+             GC.S_MTH_GP,
+             GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
+             GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
+             GC.S_MTH_MLP, GC.S_MTH_LSV, GC.S_MTH_NSV],
+       tK4: [GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
+             GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
+             GC.S_MTH_MLP],
+       tK5: [GC.S_MTH_PA_A, GC.S_MTH_PCT, GC.S_MTH_SGD,
              GC.S_MTH_CT_NB, GC.S_MTH_CP_NB, GC.S_MTH_GS_NB,
              GC.S_MTH_MLP]}
 

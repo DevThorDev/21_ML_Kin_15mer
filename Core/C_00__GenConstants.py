@@ -352,8 +352,8 @@ S_SMPL_NBH_CL_R, S_SMPL_NBH_CL_R_S = ('NeighbourhoodCleaningRule',
                                       'NbhClR' + S_SAMPLER_S)
 S_SMPL_RND_U, S_SMPL_RND_U_S = ('RandomUnderSampler', 'RndU' + S_SAMPLER_S)
 S_SMPL_TOM_LKS, S_SMPL_TOM_LKS_S = ('TomekLinks', 'TomLks' + S_SAMPLER_S)
-S_STRAT_REAL_MAJO = 'RealMajo'
-S_STRAT_SHARE_MINO = 'ShareMino'
+S_STRAT_REAL_MAJO, S_STRAT_REAL_MAJO_S = 'RealMajo', S_R + S_M
+S_STRAT_SHARE_MINO, S_STRAT_SHARE_MINO_S = 'ShareMino', S_S + S_M
 S_FULL_FIT, S_FULL_FIT_S = 'FullFit', 'FF'
 S_PART_FIT, S_PART_FIT_S = 'PartFit', 'PF'
 S_0_PRED, S_1_PRED = S_USC.join([S_0, S_PRED_S]), S_USC.join([S_1, S_PRED_S])
@@ -403,5 +403,7 @@ D_S_SMPL = {S_SMPL_NO: S_SMPL_NO_S,
             S_SMPL_NBH_CL_R: S_SMPL_NBH_CL_R_S,
             S_SMPL_RND_U: S_SMPL_RND_U_S,
             S_SMPL_TOM_LKS: S_SMPL_TOM_LKS_S}
+D_S_STRAT_TO_S = {S_STRAT_REAL_MAJO: S_STRAT_REAL_MAJO_S,
+                  S_STRAT_SHARE_MINO: S_STRAT_SHARE_MINO_S}
 
 ###############################################################################

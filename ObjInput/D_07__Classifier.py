@@ -128,12 +128,12 @@ wReplacement = False            # is sample with or without replacement?
 # *** Classifier input ********************************************************
 # === general input for any Classifier (that might use it) ====================
 rndState = None             # None (random) or integer (reproducible)
-bWarmStart = True           # warm start (True: use warm start)
+bWarmStart = False          # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-nItPtFit = None             # number of iterations / partial fit (or None)
-# nItPtFit = 1000             # number of iterations / partial fit (or None)
+# nItPtFit = None             # number of iterations / partial fit (or None)
+nItPtFit = 100             # number of iterations / partial fit (or None)
 nItPrintPtFit = 100         # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------
@@ -238,6 +238,8 @@ assert typeS in ['GridSearchCV', 'RandomizedSearchCV']
 # *** derived values and input processing *************************************
 sSmplS = (GC.D_S_SMPL[sSampler] if (sSampler in GC.D_S_SMPL) else None)
 lSmplStratCustom = [GC.S_STRAT_REAL_MAJO, GC.S_STRAT_SHARE_MINO]
+sStratS = (GC.D_S_STRAT_TO_S[sStrat] + str(int(dIStrat[sStrat])) if
+           (sStrat in GC.D_S_STRAT_TO_S and sStrat in dIStrat) else sStrat)
 
 # *** create input dictionary *************************************************
 dIO = {# *** general **********************************************************
@@ -375,6 +377,7 @@ dIO = {# *** general **********************************************************
        'lSResClf': lSResClf,
        # *** derived values and input processing ******************************
        'sSmplS': sSmplS,
-       'lSmplStratCustom': lSmplStratCustom}
+       'lSmplStratCustom': lSmplStratCustom,
+       'sStratS': sStratS}
 
 ###############################################################################

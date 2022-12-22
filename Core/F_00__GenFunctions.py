@@ -373,6 +373,16 @@ def getSSglLbl(x, lXCl, sNoFam, sMltFam, sJoin=GC.S_VBAR):
         return sNoFam
 
 # --- Functions handling lists ------------------------------------------------
+def printStartOrEndOfSeq(cSeq, n=10, prEnd=False):
+    N = len(cSeq)
+    print('Length of sequence:', N)
+    if prEnd:
+        rgPr = range(max(0, N - n), N)
+    else:
+        rgPr = range(min(n, N))
+    for k in rgPr:
+        print('Entry', k + 1, '-->\t', cSeq[k])
+
 def insStartOrEnd(itS, cEl, sPos=GC.S_E):
     if type(itS) in [str, int, float]:    # convert to 1-element list
         itS = [str(itS)]
@@ -450,6 +460,17 @@ def getListUniqueWD2(d2, srtDir=None):
     return lUnq
 
 # --- Functions handling dictionaries -----------------------------------------
+def printStartOrEndOfDict(cD, n=10, prEnd=False):
+    N = len(cD)
+    print('Length of dictionary:', N)
+    if prEnd:
+        rgPr = range(max(0, N - n), N)
+    else:
+        rgPr = range(min(n, N))
+    for k in rgPr:
+        cK = list(cD)[k]
+        print('Entry', k + 1, '-->\t', cK, ':', cD[cK])
+
 def addIfAbsent(lD, cK, cV=None):
     for cD in lD:
         if cK not in cD:
