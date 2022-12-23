@@ -2,8 +2,6 @@
 ###############################################################################
 # --- O_07__Classifier.py ----------------------------------------------------
 ###############################################################################
-import matplotlib.pyplot as plt
-
 import Core.C_00__GenConstants as GC
 import Core.F_00__GenFunctions as GF
 import Core.F_01__SpcFunctions as SF
@@ -31,7 +29,7 @@ from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
                              top_k_accuracy_score,
                              precision_recall_fscore_support, f1_score,
                              roc_auc_score, matthews_corrcoef, log_loss,
-                             confusion_matrix, ConfusionMatrixDisplay)
+                             confusion_matrix)
 
 from imblearn.under_sampling import (ClusterCentroids, AllKNN,
                                      NeighbourhoodCleaningRule,
@@ -383,8 +381,8 @@ class GeneralClassifier(BaseClfPrC):
 
     # --- method for splitting data into training and test data ---------------
     def splitTrainTest(self, X, Y):
-        XTrain, XTest = X.loc[self.lITrain, :], X.loc[self.lITest, :]
-        YTrain, YTest = Y.loc[self.lITrain], Y.loc[self.lITest]
+        XTrain, XTest = X.iloc[self.lITrain, :], X.iloc[self.lITest, :]
+        YTrain, YTest = Y.iloc[self.lITrain], Y.iloc[self.lITest]
         if not (self.dITp['ILblSgl'] or self.dITp['lLblTrain'] is None):
             lB = [(serR.sum() in self.dITp['lLblTrain']) for _, serR in
                   YTrain.iterrows()]

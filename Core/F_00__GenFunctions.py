@@ -973,11 +973,14 @@ def iniPdSer(data=None, lSNmI=[], shape=(0,), nameS=None, fillV=np.nan):
                     or (type(data) == list and len(data) == len(lSNmI)))
             return pd.Series(data, index=lSNmI, name=nameS)
 
-def iniPdSerFromDict(dData):
+def iniPdSerFromDict(dData, lSNmR=[]):
     if len(dData) == 0:
         return pd.Series()
     else:
-        return iniPdDfr(data=dData).iloc[:, 0]
+        if lSNmR is None or len(lSNmR) == 0:
+            return iniPdDfr(data=dData).iloc[:, 0]
+        else:
+            return iniPdDfr(data=dData, lSNmR=lSNmR).iloc[:, 0]
 
 def iniPdDfr(data=None, lSNmC=[], lSNmR=[], shape=(0, 0), fillV=np.nan):
     assert len(shape) == 2

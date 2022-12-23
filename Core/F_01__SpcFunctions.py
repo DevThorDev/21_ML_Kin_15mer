@@ -264,32 +264,41 @@ def getLXCl(dITp, dNEF, dClMap, cSeq):
         lXCl = [dClMap[sFam] for sFam in lEFIncl]
     return lXCl
 
-def addToDX(dX, cSeq):
-    for sKeyX, sAAc in zip(dX, cSeq):
-        GF.addToDictL(dX, cK=sKeyX, cE=sAAc)
+def addToDProcDY(cD, cK, cE, cSeq, appI=False):
+    GF.addToDictL(cD['dDat'], cK=cK, cE=cE)
+    if appI:
+        cD['lI'].append(cSeq)
+
+def addToDX(cD, cSeq, appI=False):
+    for sKeyX, sAAc in zip(cD['dDat'], cSeq):
+        GF.addToDictL(cD['dDat'], cK=sKeyX, cE=sAAc)
+    if appI:
+        cD['lI'].append(cSeq)
 
 def fillDDat(dITp, dNEF, dProc, dXS, dXM, dYS, dYM, dClMap, cSeq, lF):
-    assert len(cSeq) == len(dXS) and len(cSeq) == len(dXM)
+    assert len(cSeq) == len(dXS['dDat']) and len(cSeq) == len(dXM['dDat'])
     lXCl = getLXCl(dITp, dNEF=dNEF, dClMap=dClMap, cSeq=cSeq)
+    sEffFam, sNoCl, sNone = dITp['sEffFam'], dITp['sNoCl'], dITp['sNone']
     # filling of data dictionaries (dProc and single-label)
-    GF.addToDictL(dProc, cK=dITp['sCNmer'], cE=cSeq)
+    addToDProcDY(cD=dProc, cK=dITp['sCNmer'], cE=cSeq, cSeq=cSeq, appI=True)
     if len(lXCl) == 0:      # no XCl assigned to this Nmer sequence
         if len(lF) == 1 and lF[0] == dITp['sNoFam']:
-            GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sNoCl'])
-            GF.addToDictL(dYS, cK=dITp['sEffFam'], cE=dITp['sNoCl'])
-            addToDX(dX=dXS, cSeq=cSeq)
+            addToDProcDY(cD=dProc, cK=sEffFam, cE=sNoCl, cSeq=cSeq)
+            addToDProcDY(cD=dYS, cK=sEffFam, cE=sNoCl, cSeq=cSeq, appI=True)
+            addToDX(cD=dXS, cSeq=cSeq, appI=True)
         else:
-            GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sNone'])
+            addToDProcDY(cD=dProc, cK=sEffFam, cE=sNone, cSeq=cSeq)
     elif len(lXCl) == 1:      # exactly 1 XCl assigned to this Nmer sequence
-        GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=lXCl[0])
-        GF.addToDictL(dYS, cK=dITp['sEffFam'], cE=lXCl[0])
-        addToDX(dX=dXS, cSeq=cSeq)
+        addToDProcDY(cD=dProc, cK=sEffFam, cE=lXCl[0], cSeq=cSeq)
+        addToDProcDY(cD=dYS, cK=sEffFam, cE=lXCl[0], cSeq=cSeq, appI=True)
+        addToDX(cD=dXS, cSeq=cSeq, appI=True)
     else:
-        GF.addToDictL(dProc, cK=dITp['sEffFam'], cE=dITp['sMultiCl'])
+        addToDProcDY(cD=dProc, cK=sEffFam, cE=dITp['sMultiCl'], cSeq=cSeq)
     # filling of data dictionaries (multi-label)
-    for cXCl in dITp['lXCl']:
-        GF.addToDictL(dYM, cK=cXCl, cE=(1 if cXCl in lXCl else 0))
-    addToDX(dX=dXM, cSeq=cSeq)
+    for k, cXCl in enumerate(dITp['lXCl']):
+        addToDProcDY(cD=dYM, cK=cXCl, cE=(1 if cXCl in lXCl else 0), cSeq=cSeq,
+                     appI=(k == 0))
+    addToDX(cD=dXM, cSeq=cSeq, appI=True)
     return lXCl
 
 def procInp(dITp, dNmerEffF):
@@ -302,9 +311,11 @@ def procInp(dITp, dNmerEffF):
                         dYS=dYS, dYM=dYM, dClMap=dClMap, cSeq=cSeqRed, lF=lFam)
         GF.fillListUnique(cL=lSXCl, cIt=lXCl)
     for cD in [dXM, dYM]:
-        GF.complDict(cDFull=dProc, cDAdd=cD)
-    dfrProc, XS, XM = GF.iniPdDfr(dProc), GF.iniPdDfr(dXS), GF.iniPdDfr(dXM)
-    YS, YM = GF.iniPdSerFromDict(dYS), GF.iniPdDfr(dYM)
+        GF.complDict(cDFull=dProc['dDat'], cDAdd=cD['dDat'])
+    YS = GF.iniPdSerFromDict(dYS['dDat'], lSNmR=dYS['lI'])
+    lD2Dfr = [dProc, dXS, dXM, dYM]
+    lDfr = [GF.iniPdDfr(cD['dDat'], lSNmR=cD['lI']) for cD in lD2Dfr]
+    dfrProc, XS, XM, YM = lDfr
     return dfrProc, XS, XM, YS, YM, dClMap, sorted(lSXCl)
 
 def genDictNmerLoc(dITp, dfrNL=None):
