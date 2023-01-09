@@ -128,7 +128,7 @@ wReplacement = False            # is sample with or without replacement?
 # *** Classifier input ********************************************************
 # === general input for any Classifier (that might use it) ====================
 rndState = None             # None (random) or integer (reproducible)
-bWarmStart = False          # warm start (True: use warm start)
+bWarmStart = True           # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
