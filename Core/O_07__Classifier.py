@@ -271,7 +271,9 @@ class BaseClfPrC(BaseClass):
     def getInpData(self, sMd=None, sLbl=GC.S_SGL_LBL, iSt=None):
         (self.dfrInp, self.X, self.Y, self.serNmerSeq, self.dClMap,
          self.lSXCl) = self.D.yieldData(sMd=sMd, sLbl=self.dITp['I_Lbl'])
-        self.lSXClNoCl = sorted([self.dITp['sNoCl']] + self.lSXCl)
+        self.lSXClNoCl = [s for s in self.lSXCl]
+        if self.dITp['sNoCl'] not in self.lSXClNoCl:
+            self.lSXClNoCl = sorted([self.dITp['sNoCl']] + self.lSXClNoCl)
         if self.dITp['doMultiSteps'] and iSt is not None:
             self.modInpDataMltSt(iSt=iSt)
 
