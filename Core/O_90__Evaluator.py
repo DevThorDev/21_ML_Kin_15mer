@@ -25,9 +25,10 @@ class Evaluator(BaseClass):
     # --- method for filling the file paths -----------------------------------
     def fillFPs(self):
         # add the file with unique Nmer sequences
-        pFNmer, sNmer = self.dITp['pInpUnqNmer'], self.dITp['sUnqNmer']
+        pFNmer, sNmer = self.dITp['pInpUnqNmer'], self.dITp['sNmerSeqU']
         dFI = SF.getIFS(self.dITp, pF=pFNmer, itSCmp={sNmer}, addI=False)
-        self.FPs.dPF[sNmer] = GF.joinToPath(pFNmer, dFI[sNmer])
+        if sNmer in dFI:
+            self.FPs.dPF[sNmer] = GF.joinToPath(pFNmer, dFI[sNmer])
         # add the file with input data (X_Classes)
         pFInpD, sInpD = self.dITp['pInpData'], self.dITp['sInpData']
         dFI = SF.getIFS(self.dITp, pF=pFInpD, itSCmp={sInpD}, addI=False)
@@ -66,7 +67,7 @@ class Evaluator(BaseClass):
     def loadInpData(self, iCS=0, iCG=1):
         self.dDfrCmb, self.serSUnqNmer = {}, None
         for tK, pF in self.FPs.dPF.items():
-            if tK == self.dITp['sUnqNmer']:
+            if tK == self.dITp['sNmerSeqU']:
                 self.serSUnqNmer = self.loadData(pF=self.FPs.dPF[tK], iC=iCS)
                 self.serSUnqNmer = GF.iniPdSer(self.serSUnqNmer.index,
                                                nameS=self.dITp['sCNmer'])

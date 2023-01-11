@@ -103,7 +103,6 @@ lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
              {sMthMLP, sSmplRM10, sPF, GC.S_A}]
 
 # --- names and paths of files and dirs ---------------------------------------
-sUnqNmer = GC.S_N_MER_SEQ_UNQ
 sInpData = GC.S_INP_DATA
 pInpUnqNmer = GC.P_DIR_RES_UNQ_N_MER
 pInpData = GC.P_DIR_RES_INP_DATA_CLF_PRC
@@ -123,7 +122,6 @@ dIO = {# --- general
        'doCompTruePred': doCompTruePred,
        'lSetFIDet': lSetFIDet,
        # --- names and paths of files and dir
-       'sUnqNmer': sUnqNmer,
        'sInpData': sInpData,
        'pInpUnqNmer': pInpUnqNmer,
        'pInpData': pInpData,
