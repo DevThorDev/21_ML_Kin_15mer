@@ -148,12 +148,12 @@ class ImbSampler(BaseClass):
         if self.sStrat in dITp['lSmplStratCustom']:
             if self.sStrat == dITp['sStratRealMajo']:
                 # implement the "RealMajo" strategy
-                self.sStrat = GF.smplStratRealMajo(SF.toSglLblExt(dITp, Y),
-                                                   dI=dITp['dIStrat'])
+                d = self.dITp['dIStrat'][self.dITp['sStratRealMajo']]
+                self.sStrat = GF.smplStratRealMajo(SF.toSglLblExt(dITp, Y), d)
             elif self.sStrat == dITp['sStratShareMino']:
                 # implement the "ShareMino" strategy
-                self.sStrat = GF.smplStratShareMino(SF.toSglLblExt(dITp, Y),
-                                                    dI=dITp['dIStrat'])
+                d = self.dITp['dIStrat'][self.dITp['sStratShareMino']]
+                self.sStrat = GF.smplStratShareMino(SF.toSglLblExt(dITp, Y), d)
 
     # --- Function obtaining the desired imbalanced sampler ("imblearn") ------
     def getImbSampler(self):

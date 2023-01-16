@@ -3,6 +3,7 @@
 # --- F_00__GenFunctions.py ---------------------------------------------------
 ###############################################################################
 import os, pickle, itertools, time
+from operator import itemgetter
 
 import numpy as np
 from numpy.random import default_rng as RNG
@@ -12,10 +13,11 @@ from pandas.api.types import is_numeric_dtype
 import Core.C_00__GenConstants as GC
 
 # === Numpy/Pandas related constants ==========================================
+L_DTYPE_PY_ITER = [list, tuple, range, str, set, dict]
 L_DTYPE_NP_PD_1D = [np.ndarray, pd.core.series.Series,
                     pd.core.indexes.base.Index]
 L_DTYPE_NP_PD = L_DTYPE_NP_PD_1D + [pd.core.frame.DataFrame]
-L_DTYPE_COMPLEX = [list, tuple, range, str, set, dict] + L_DTYPE_NP_PD
+L_DTYPE_COMPLEX = L_DTYPE_PY_ITER + L_DTYPE_NP_PD
 
 # === General functions =======================================================
 # --- File system related functions -------------------------------------------
@@ -1234,22 +1236,23 @@ def drawFromNorm(cMn=0., cSD=1., tPar=None, arrShape=None):
     return RNG().normal(loc=cMn, scale=cSD, size=arrShape)
 
 # --- Functions implementing custom imbalanced sampling strategies ------------
-def smplStratRealMajo(Y, dI):
-    f = (dI[GC.S_STRAT_REAL_MAJO] if GC.S_STRAT_REAL_MAJO in dI else 1)
-    shCl = (1 if f > 1 else max(0, min(1, f)))
-    sStrat = {cCl: round((Y[Y == cCl].size)*shCl) for cCl in Y.unique()}
-    lVSrtDsc, n1, n2 = sorted(sStrat.values(), reverse=True), 0, 0
-    if len(lVSrtDsc) >= 2:
-        n1, n2 = lVSrtDsc[0], lVSrtDsc[1]
-    elif len(lVSrtDsc) == 1:
-        n1, n2 = lVSrtDsc[0], lVSrtDsc[0]
-    for cCl, nEl in sStrat.items():
-        if nEl == n1:
-            sStrat[cCl] = round(min(n1, n2*(1 if f < 1 else f)))
-    return sStrat
+def smplStratRealMajo(Y, dIRM):
+    # create dSStrat: {sCl: nOcc}
+    dSStrat = {cCl: (Y[Y == cCl].size) for cCl in sorted(Y.unique())}
+    # create lT: sorted (descending) list of (sCl, nOcc)-tuples
+    lT = sorted(dSStrat.items(), key=itemgetter(1), reverse=True)
+    # calculate iNRef and nRef, i.e. the reference index and num. occurrences
+    iNRef = (-1 if len(dIRM['fInc']) >= len(dSStrat) else len(dIRM['fInc']))
+    nRef = lT[iNRef][1]
+    # modify dSStrat using dIRM['fInc'] and dIRM['fDec']
+    for i, (sCl, nOcc) in enumerate(lT):
+        if i < iNRef:
+            dSStrat[sCl] = round(min(nRef*dIRM['fInc'][i], nOcc*dIRM['fDec']))
+        else:
+            dSStrat[sCl] = round(nOcc*dIRM['fDec'])
+    return dSStrat
 
-def smplStratShareMino(Y, dI):
-    shMino = (dI[GC.S_STRAT_SHARE_MINO] if GC.S_STRAT_SHARE_MINO in dI else 1)
+def smplStratShareMino(Y, shMino):
     shMino = max(0, min(1, shMino))
     sStrat = {cCl: (Y[Y == cCl].size) for cCl in Y.unique()}
     lVSrtAsc, n = sorted(sStrat.values()), 0
