@@ -12,14 +12,14 @@ sNmSpec = 'Input data for the data loader class in O_06__ClfDataLoader'
 lvlOut = 1      # higher level --> print more information (0: no printing)
 
 # --- flow control (general) --------------------------------------------------
-sSet = GC.S_SET_05
+sSet = GC.S_SET_08
 
 # --- flow control (classifier) -----------------------------------------------
 useFullSeqFromClf = GC.S_COMB_INP # S_COMB_INP
 useLocData = GC.S_W_N_MER         # None (no loc. data)
                                   # S_W_N_MER (extend Nmer-X by location key)
                                   # S_SEPARATE (as a second, separate step)
-sLocMap = GC.S_C                  # location map (S_A, S_B,...)
+sLocMap = GC.S_D                  # location map (S_A, S_B,...)
 
 noExclEffFam = True               # do not use Nmers with excl. effFam?
 useNmerNoCl = True                # use "no class" Nmers from full seq.?

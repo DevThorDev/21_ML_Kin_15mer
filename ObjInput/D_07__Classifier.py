@@ -97,7 +97,7 @@ dSStrat = {1: GC.S_STRAT_REAL_MAJO,
            2: GC.S_STRAT_SHARE_MINO}
                         # dictionary for modifying the strategy for specific
                         # step indices (in case of doMultiSteps)
-dIStrat = {GC.S_STRAT_REAL_MAJO: {'fInc': [2., 1.2], 'fDec': 0.9},
+dIStrat = {GC.S_STRAT_REAL_MAJO: {'fInc': [1, 1], 'fDec': 1},
            GC.S_STRAT_SHARE_MINO: 1.}
                         # additional data as required by the custom strategy
 # sStrat = {'NoCl': 500,
@@ -133,9 +133,9 @@ bWarmStart = False          # warm start (True: use warm start)
 nJobs = None                # number of jobs to run in parallel (None: 1)
 
 # === general input for any Classifier that implements 'partial_fit' ==========
-nItPtFit = None             # number of iterations / partial fit (or None)
-# nItPtFit = 100             # number of iterations / partial fit (or None)
-nItPrintPtFit = 100         # print status after number of iterations
+# nItPtFit = None             # number of iterations / partial fit (or None)
+nItPtFit = 100              # number of iterations / partial fit (or None)
+nItPrintPtFit = 50          # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------
 typeS = 'RandomizedSearchCV'        # 'GridSearchCV' / 'RandomizedSearchCV'
@@ -237,7 +237,7 @@ assert nItPrintPtFit is None or type(nItPrintPtFit) in [int, float]
 assert typeS in ['GridSearchCV', 'RandomizedSearchCV']
 assert type(dIStrat[GC.S_STRAT_REAL_MAJO]['fInc']) in [list, tuple, set]
 for x in dIStrat[GC.S_STRAT_REAL_MAJO]['fInc']:
-    assert x > 1
+    assert x >= 1
 
 # *** derived values and input processing *************************************
 for k in range(len(dIStrat[GC.S_STRAT_REAL_MAJO]['fInc'])):
