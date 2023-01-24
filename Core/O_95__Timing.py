@@ -38,8 +38,8 @@ class Timing:
         self.elT_07_0052_HGrBClf_Pred = 0.
         self.elT_07_0061_GPClf_Ini = 0.
         self.elT_07_0062_GPClf_Pred = 0.
-        self.elT_07_0071_PaPClf_Ini = 0.
-        self.elT_07_0072_PaPClf_Pred = 0.
+        self.elT_07_0071_PaAClf_Ini = 0.
+        self.elT_07_0072_PaAClf_Pred = 0.
         self.elT_07_0081_PctClf_Ini = 0.
         self.elT_07_0082_PctClf_Pred = 0.
         self.elT_07_0091_SGDClf_Ini = 0.
@@ -71,7 +71,7 @@ class Timing:
                       'AdaClf_Pred', 'RFClf_Ini', 'RFClf_Pred', 'XTrClf_Ini',
                       'XTrClf_Pred', 'GrBClf_Ini', 'GrBClf_Pred',
                       'HGrBClf_Ini', 'HGrBClf_Pred', 'GPClf_Ini', 'GPClf_Pred',
-                      'PaPClf_Ini', 'PaPClf_Pred', 'PctClf_Ini', 'PctClf_Pred',
+                      'PaAClf_Ini', 'PaAClf_Pred', 'PctClf_Ini', 'PctClf_Pred',
                       'SGDClf_Ini', 'SGDClf_Pred', 'CtNBClf_Ini',
                       'CtNBClf_Pred', 'CpNBClf_Ini', 'CpNBClf_Pred',
                       'GsNBClf_Ini', 'GsNBClf_Pred', 'MLPClf_Ini',
@@ -110,8 +110,8 @@ class Timing:
                      self.elT_07_0052_HGrBClf_Pred,
                      self.elT_07_0061_GPClf_Ini,
                      self.elT_07_0062_GPClf_Pred,
-                     self.elT_07_0071_PaPClf_Ini,
-                     self.elT_07_0072_PaPClf_Pred,
+                     self.elT_07_0071_PaAClf_Ini,
+                     self.elT_07_0072_PaAClf_Pred,
                      self.elT_07_0081_PctClf_Ini,
                      self.elT_07_0082_PctClf_Pred,
                      self.elT_07_0091_SGDClf_Ini,
@@ -192,9 +192,9 @@ class Timing:
             elif tMth == (7, 62):
                 self.elT_07_0062_GPClf_Pred += elT
             elif tMth == (7, 71):
-                self.elT_07_0071_PaPClf_Ini += elT
+                self.elT_07_0071_PaAClf_Ini += elT
             elif tMth == (7, 72):
-                self.elT_07_0072_PaPClf_Pred += elT
+                self.elT_07_0072_PaAClf_Pred += elT
             elif tMth == (7, 81):
                 self.elT_07_0081_PctClf_Ini += elT
             elif tMth == (7, 82):
@@ -295,10 +295,10 @@ class Timing:
                str(round(self.elT_07_0061_GPClf_Ini, self.rdDig)) +
                GC.S_NEWL + 'Method 07_0062 | "GPClf_Predict":\t' +
                str(round(self.elT_07_0062_GPClf_Pred, self.rdDig)) +
-               GC.S_NEWL + 'Method 07_0071 | "PaPClf_Ini_ImbSmpl":\t' +
-               str(round(self.elT_07_0071_PaPClf_Ini, self.rdDig)) +
-               GC.S_NEWL + 'Method 07_0072 | "PaPClf_Predict":\t' +
-               str(round(self.elT_07_0072_PaPClf_Pred, self.rdDig)) +
+               GC.S_NEWL + 'Method 07_0071 | "PaAClf_Ini_ImbSmpl":\t' +
+               str(round(self.elT_07_0071_PaAClf_Ini, self.rdDig)) +
+               GC.S_NEWL + 'Method 07_0072 | "PaAClf_Predict":\t' +
+               str(round(self.elT_07_0072_PaAClf_Pred, self.rdDig)) +
                GC.S_NEWL + 'Method 07_0081 | "PctClf_Ini_ImbSmpl":\t' +
                str(round(self.elT_07_0081_PctClf_Ini, self.rdDig)) +
                GC.S_NEWL + 'Method 07_0082 | "PctClf_Predict":\t' +
