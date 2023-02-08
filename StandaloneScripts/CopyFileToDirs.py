@@ -49,7 +49,7 @@ P_DIR_EVAL_RESULTS_L1_CLF = os.path.join(S_DIR_EVALUATION, S_DIR_RESULTS_M,
 # SET_S_ST_DIR_RES_L1 = {'QA', 'QB', 'QC', 'QD', 'QE', 'QF', 'QG', 'QH', 'QI',
 #                        'QJ', 'QK', 'QL', 'QM', 'RA', 'RB', 'RC', 'RD', 'RE',
 #                        'RF', 'RG', 'RH', 'RI', 'RJ'}
-SET_S_ST_DIR_RES_L1 = {'SC', 'XX'}
+SET_S_ST_DIR_RES_L1 = {'TA', 'TB', 'TE', 'TF', 'XX'}
 
 SET_S_SUB_DIR_RES = {S_DIR_RESULTS_L2_PARS, S_DIR_RESULTS_L2_SMRS,
                      S_DIR_RESULTS_L2_UNQN, S_DIR_RESULTS_L2_INPD,
@@ -77,7 +77,7 @@ lSTxtPrnt = ['Copied file\n*\t"', '" to\n>\t"', '".\n']
 # --- dictionaries ------------------------------------------------------------
 dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00', 'O_95'}}
 # dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00'},
-#               P_DIR_SCRIPTS_L1_OINP: {'D_06', 'D_07'}}
+#               P_DIR_SCRIPTS_L1_OINP: {'D_80'}}
 # dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
 #               P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_01'},
 #               P_DIR_SCRIPTS_L1_OINP: {'D_07', 'D_90'}}
