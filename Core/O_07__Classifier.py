@@ -659,7 +659,7 @@ class GeneralClassifier(BaseClfPrC):
                               iSt=self.iSt, j=self.j)
         YProbaB, hasNaNProba = YProba, YProba.isnull().to_numpy().any()
         if len(lSCl) <= 2:      # binary case --> Series (1d-array) required
-            YProbaB = YProbaB[lSCl[-1]]
+            YProbaB = (None if hasNaNProba else YProbaB[lSCl[-1]])
         lV = [None]*len(self.dITp['lSResClf'])
         lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
         lV[3] = accuracy_score(YTest, YPred)
