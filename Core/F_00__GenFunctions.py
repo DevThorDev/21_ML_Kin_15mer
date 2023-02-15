@@ -1242,7 +1242,7 @@ def smplStratRealMajo(Y, dIRM):
     # create lT: sorted (descending) list of (sCl, nOcc)-tuples
     lT = sorted(dSStrat.items(), key=itemgetter(1), reverse=True)
     # calculate iNRef and nRef, i.e. the reference index and num. occurrences
-    iNRef = (-1 if len(dIRM['fInc']) >= len(dSStrat) else len(dIRM['fInc']))
+    iNRef = min(len(dIRM['fInc']), len(dSStrat) - 1)
     nRef = lT[iNRef][1]
     # modify dSStrat using dIRM['fInc'] and dIRM['fDec']
     for i, (sCl, nOcc) in enumerate(lT):

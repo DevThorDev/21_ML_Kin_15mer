@@ -654,27 +654,30 @@ class GeneralClassifier(BaseClfPrC):
 
     # --- method for calculating values of the Classifier results dictionary --
     def calcLSumVals(self, YTest, YPred):
+        lSCl = (self.lSXClNoCl if self.dITp['ILblSgl'] else self.lSXCl)
         YProba = self.XY.getY(sMth=self.sMth, sTp=self.dITp['sProba'],
                               iSt=self.iSt, j=self.j)
+        YProbaB, hasNaNProba = YProba, YProba.isnull().to_numpy().any()
+        if len(lSCl) <= 2:      # binary case --> Series (1d-array) required
+            YProbaB = YProbaB[lSCl[-1]]
         lV = [None]*len(self.dITp['lSResClf'])
-        lSCl = (self.lSXClNoCl if self.dITp['ILblSgl'] else self.lSXCl)
-        hasNaNProba = YProba.isnull().to_numpy().any()
         lV[:3] = GF.calcBasicClfRes(YTest=YTest, YPred=YPred)
         lV[3] = accuracy_score(YTest, YPred)
         lV[4] = balanced_accuracy_score(self.YTS, self.YPS)
         if self.dITp['ILblSgl'] and not hasNaNProba:
-            lV[5] = top_k_accuracy_score(YTest, YProba, k=2, labels=lSCl)
-            lV[6] = top_k_accuracy_score(YTest, YProba, k=3, labels=lSCl)
+            if len(lSCl) >= 2:
+                lV[5] = top_k_accuracy_score(YTest, YProbaB, k=2, labels=lSCl)
+                lV[6] = top_k_accuracy_score(YTest, YProbaB, k=3, labels=lSCl)
         lV[7:11] = precision_recall_fscore_support(self.YTS, self.YPS,
                                                    beta=1.0, labels=lSCl,
                                                    average='weighted')
         lV[11] = f1_score(self.YTS, self.YPS, labels=lSCl, average='weighted')
         if not hasNaNProba:
-            lV[12] = roc_auc_score(YTest, YProba, average='weighted',
+            lV[12] = roc_auc_score(YTest, YProbaB, average='weighted',
                                    multi_class='ovo', labels=lSCl)
         lV[13] = matthews_corrcoef(self.YTS, self.YPS)
         if not hasNaNProba:
-            lV[14] = log_loss(self.YTS, YProba, eps=1e-15, labels=lSCl)
+            lV[14] = log_loss(self.YTS, YProbaB, eps=1e-15, labels=lSCl)
         return lV
 
     def assembleDDfrPredProba(self, YTest=None, YPred=None):

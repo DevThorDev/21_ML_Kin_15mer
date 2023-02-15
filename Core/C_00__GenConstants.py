@@ -374,6 +374,16 @@ S_SET_11 = 'Set11_06Cl'
 S_SET_12 = 'Set12_08Cl'
 S_SET_13 = 'Set13_08Cl'
 
+# --- dummy sets for X class mapping (only a single X class each) -------------
+S_SET_91 = 'Set91_XAGC'
+S_SET_92 = 'Set92_XCDK'
+S_SET_93 = 'Set93_XCDP'
+S_SET_94 = 'Set94_XCK2'
+S_SET_95 = 'Set95_XLRR'
+S_SET_96 = 'Set96_XMPK'
+S_SET_97 = 'Set97_XSn2'
+S_SET_98 = 'Set98_Xsol'
+
 # --- predefined numbers ------------------------------------------------------
 LEN_N_MER_DEF = 15
 I_CENT_N_MER = LEN_N_MER_DEF//2

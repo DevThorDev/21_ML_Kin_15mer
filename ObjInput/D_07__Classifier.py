@@ -100,6 +100,10 @@ dSStrat = {1: GC.S_STRAT_REAL_MAJO,
 dIStrat = {GC.S_STRAT_REAL_MAJO: {'fInc': [1, 1], 'fDec': 1},
            GC.S_STRAT_SHARE_MINO: 1.}
                         # additional data as required by the custom strategy
+                        # fInc: incr. factors for sampling (rel. to ref. index)
+                        # fDec: decr. factor for sampling
+                        #       (for the (numCl - len(fInc) smaller classes))
+                        #       (fDec = None: fDec = 1, but not in file name)
 # sStrat = {'NoCl': 500,
 #           'X_AGC': 100,
 #           'X_CDK': 100,
@@ -243,20 +247,25 @@ for x in dIStrat[GC.S_STRAT_REAL_MAJO]['fInc']:
 for k in range(len(dIStrat[GC.S_STRAT_REAL_MAJO]['fInc'])):
     if dIStrat[GC.S_STRAT_REAL_MAJO]['fInc'][k] < 1:
         dIStrat[GC.S_STRAT_REAL_MAJO]['fInc'][k] = 1
-if dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] > 1:
-    dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] = 1
+if dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] is not None:
+    if dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] > 1:
+        dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] = 1
 sSmplS = (GC.D_S_SMPL[sSampler] if (sSampler in GC.D_S_SMPL) else None)
 lSmplStratCustom = [GC.S_STRAT_REAL_MAJO, GC.S_STRAT_SHARE_MINO]
 sStratS = sStrat
 if sStrat in GC.D_S_STRAT_TO_S and sStrat in dIStrat:
     sStratS = GC.D_S_STRAT_TO_S[sStrat]
-    for f in dIStrat[sStrat]['fInc'] + [dIStrat[sStrat]['fDec']]:
+    lFDec = ([] if dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] is None else
+             [dIStrat[sStrat]['fDec']])
+    for f in dIStrat[sStrat]['fInc'] + lFDec:
         rndInt, rndFlt = int(round(f)), round(f, GC.R04)
         if rndFlt == rndInt:
             sStratS += GC.S_USC + str(rndInt)
         else:
             sStratS += GC.S_USC + str(rndFlt)
     sStratS = sStratS.replace(GC.S_DOT, GC.S_P_SMALL)
+if dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] is None:
+    dIStrat[GC.S_STRAT_REAL_MAJO]['fDec'] = 1
 
 # *** create input dictionary *************************************************
 dIO = {# *** general **********************************************************
