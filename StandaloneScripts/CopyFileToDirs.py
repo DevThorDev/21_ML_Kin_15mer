@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 # --- CopyFileToDirs.py -------------------------------------------------------
+# --- <ONLY TO BE USED IN A SPECIAL LOCATION (EVALUATION)> --------------------
 ###############################################################################
 import os, shutil
 
 # === CONSTANTS ===============================================================
 # --- strings -----------------------------------------------------------------
 S_DOT, S_USC, S_DBL_BS = '.', '_', '\\'
+S_DBL_DOT = S_DOT*2
 S_EXT_PY = 'py'
 S_EXT_CSV = 'csv'
 
@@ -20,6 +22,8 @@ XT_PY = S_DOT + S_EXT_PY
 XT_CSV = S_DOT + S_EXT_CSV
 
 # --- directories and paths ---------------------------------------------------
+S_DIR_SIMUS = 'Z_Simus'
+S_DIR_SIMUS_TMPL_EVAL = 'Z_Simus_Template'
 S_DIR_TEMPLATE = '00_Template'
 S_DIR_EVALUATION = '90_Evaluation'
 S_DIR_SCRIPTS_M = 'A_Scripts'
@@ -38,7 +42,9 @@ S_DIR_RESULTS_L2_DTLD = '31_Detailed'
 S_DIR_RESULTS_L2_PROP = '41_Prop'
 S_DIR_RESULTS_L2_EVAL = '90_Eval'
 
-P_DIR_ROOT = os.path.join('..', '..', '..')
+P_DIR_ROOT = os.path.join(S_DBL_DOT, S_DBL_DOT, S_DBL_DOT, S_DBL_DOT)
+P_DIR_ROOT_SIMUS = os.path.join(P_DIR_ROOT, S_DIR_SIMUS)
+P_DIR_ROOT_STE = os.path.join(P_DIR_ROOT, S_DIR_SIMUS_TMPL_EVAL)
 P_DIR_SCRIPTS_L1_CORE = os.path.join(S_DIR_SCRIPTS_M, S_DIR_SCRIPTS_L1_CORE)
 P_DIR_SCRIPTS_L1_OINP = os.path.join(S_DIR_SCRIPTS_M, S_DIR_SCRIPTS_L1_OINP)
 P_DIR_TMPL_RESULTS_L1_CLF = os.path.join(S_DIR_TEMPLATE, S_DIR_RESULTS_M,
@@ -49,7 +55,7 @@ P_DIR_EVAL_RESULTS_L1_CLF = os.path.join(S_DIR_EVALUATION, S_DIR_RESULTS_M,
 # SET_S_ST_DIR_RES_L1 = {'QA', 'QB', 'QC', 'QD', 'QE', 'QF', 'QG', 'QH', 'QI',
 #                        'QJ', 'QK', 'QL', 'QM', 'RA', 'RB', 'RC', 'RD', 'RE',
 #                        'RF', 'RG', 'RH', 'RI', 'RJ'}
-SET_S_ST_DIR_RES_L1 = {'AA', 'XX'}
+SET_S_ST_DIR_RES_L1 = {'YY'}
 
 SET_S_SUB_DIR_RES = {S_DIR_RESULTS_L2_PARS, S_DIR_RESULTS_L2_SMRS,
                      S_DIR_RESULTS_L2_UNQN, S_DIR_RESULTS_L2_INPD,
@@ -75,9 +81,9 @@ setSSubDirRes = SET_S_SUB_DIR_RES
 lSTxtPrnt = ['Copied file\n*\t"', '" to\n>\t"', '".\n']
 
 # --- dictionaries ------------------------------------------------------------
-# dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00', 'O_95'}}
-dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_00', 'O_07'},
-              P_DIR_SCRIPTS_L1_OINP: {'D_07'}}
+dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'F_00'}}
+# dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_00', 'O_07'},
+#               P_DIR_SCRIPTS_L1_OINP: {'D_07'}}
 # dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
 #               P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_01'},
 #               P_DIR_SCRIPTS_L1_OINP: {'D_07', 'D_90'}}
@@ -100,6 +106,8 @@ dInp = {# --- strings (1) -----------------------------------------------------
         'xtPY': XT_PY,
         'xtCSV': XT_CSV,
         # --- directories and paths -------------------------------------------
+        'sDirSimus': S_DIR_SIMUS,
+        'sDirSTmEv': S_DIR_SIMUS_TMPL_EVAL,
         'sDirTmpl': S_DIR_TEMPLATE,
         'sDirEval': S_DIR_EVALUATION,
         'sDirScrM': S_DIR_SCRIPTS_M,
@@ -118,6 +126,8 @@ dInp = {# --- strings (1) -----------------------------------------------------
         'sDirResL2Prop': S_DIR_RESULTS_L2_PROP,
         'sDirResL2Eval': S_DIR_RESULTS_L2_EVAL,
         'pDirRoot': P_DIR_ROOT,
+        'pDirRootSimus': P_DIR_ROOT_SIMUS,
+        'pDirRootSTE': P_DIR_ROOT_STE,
         'pDirScrL1Core': P_DIR_SCRIPTS_L1_CORE,
         'pDirScrL1OInp': P_DIR_SCRIPTS_L1_OINP,
         'pDirResL1Clf': P_DIR_TMPL_RESULTS_L1_CLF,
@@ -168,10 +178,10 @@ def getLP(dI, pM, setSSt={}, sEnd=None):
     return lP
 
 def getDPF2Copy(dI):
-    dPF2Copy, pDRoot, xtF = {}, dI['pDirRoot'], dI['xtF2Copy']
-    for pDDst in getLP(dI, pM=pDRoot, setSSt=dI['setSStDir']):
+    dPF2Copy, xtF = {}, dI['xtF2Copy']
+    for pDDst in getLP(dI, pM=dI['pDirRootSimus'], setSSt=dI['setSStDir']):
         for pD2Copy, setSStF2Copy in dI['dSStF2Copy'].items():
-            pDSrcF = os.path.join(pDRoot, dI['sDirTmpl'], pD2Copy)
+            pDSrcF = os.path.join(dI['pDirRootSTE'], dI['sDirTmpl'], pD2Copy)
             pDDstF = os.path.join(pDDst, pD2Copy)
             for pF in getLP(dI, pM=pDSrcF, setSSt=setSStF2Copy, sEnd=xtF):
                 addToDictL(dPF2Copy, cK=pDDstF, cE=pF, lUnqEl=True)
@@ -186,11 +196,12 @@ def copyFromTemplateToResultDirs(dI, dPF):
                 printAction(lSTxt=dI['lSTxtPrnt'], lSIns=[pFSrc, pFDst])
 
 def copyFromResultToEvaluationDirs(dI):
-    pDDstM = os.path.join(dI['pDirRoot'], dI['sDirEval'], dI['sDirResM'])
-    for sDSrc in os.listdir(dI['pDirRoot']):
+    pDDstM = os.path.join(dI['pDirRootSTE'], dI['sDirEval'], dI['sDirResM'])
+    for sDSrc in os.listdir(dI['pDirRootSimus']):
         for sSt in dI['setSStDirResL1']:
             if sDSrc.startswith(sSt):
-                pDSrcM = os.path.join(dI['pDirRoot'], sDSrc, dI['sDirResM'])
+                pDSrcM = os.path.join(dI['pDirRootSimus'], sDSrc,
+                                      dI['sDirResM'])
                 for sD in dI['setSSubDirRes']:
                     pDSrc = os.path.join(pDSrcM, dI['sDirResL1Clf'], sD)
                     pDDst = os.path.join(pDDstM, dI['sDirResL1Clf'], sD)
