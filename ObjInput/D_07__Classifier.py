@@ -29,6 +29,7 @@ doGsNBClf = True                    # do Gaussian NB classification?
 doMLPClf = True                     # do neural network MLP classification?
 doLinSVClf = True                   # do Linear SV classification?
 doNuSVClf = True                    # do Nu-Support SV classification?
+doCSVClf = True                     # do C-Support SV classification?
 
 doPropCalc = False                   # do calculation of AAc proportions/class?
 
@@ -54,10 +55,11 @@ dEncCatFtr = {GC.S_MTH_DUMMY: GC.S_ONE_HOT,    # encoder of cat. features
               GC.S_MTH_GS_NB: GC.S_ONE_HOT,
               GC.S_MTH_MLP: GC.S_ONE_HOT,
               GC.S_MTH_LSV: GC.S_ONE_HOT,
-              GC.S_MTH_NSV: GC.S_ONE_HOT}
+              GC.S_MTH_NSV: GC.S_ONE_HOT,
+              GC.S_MTH_CSV: GC.S_ONE_HOT}
 
 # lLblTrain is ignored if D.dITp['I_Lbl'] == GC.S_SGL_LBL
-lLblTrain = [0, 1]                     # number of labels used for training data
+lLblTrain = [0, 1]                  # number of labels used for training data
 # lLblTrain = None                  # 0, 1,..., N or None [use all labels]
 
 useFullSeqFrom = GC.S_COMB_INP      # S_COMB_INP
@@ -143,7 +145,7 @@ nItPrintPtFit = 50          # print status after number of iterations
 
 # --- selection of grid search or randomised search; and halving --------------
 typeS = 'RandomizedSearchCV'        # 'GridSearchCV' / 'RandomizedSearchCV'
-halvingS = False                     # should halving search be performed?
+halvingS = False                    # should halving search be performed?
 # --- general grid search / randomised search input ---------------------------
 scoringS = 'balanced_accuracy'      # scoring par. string for grid searches
 verboseS = 2                        # verbosity (higher --> more messages)
@@ -158,7 +160,7 @@ nCandidatesHvRS = 'exhaust'         # number of candidate parameters to sample
 
 # --- cross validation of grid search / randomised search input ---------------
 nSplitsCV = 5                       # number of folds (rep. strat. k-fold CV)
-nRepeatsCV = 5                     # number of repeats (rep. strat. k-fold CV)
+nRepeatsCV = 5                      # number of repeats (rep. strat. k-fold CV)
 
 # --- general input for Dummy Classifier --------------------------------------
 
@@ -203,6 +205,9 @@ vVerbLSV = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # --- general input for Nu-Support SV Classifier ------------------------------
 vVerbNSV = 1                # state of verbosity ([0], 1, 2, 3...)
+
+# --- general input for C-Support SV Classifier -------------------------------
+vVerbCSV = 1                # state of verbosity ([0], 1, 2, 3...)
 
 # *** other input *************************************************************
 # === numbers =================================================================
@@ -290,6 +295,7 @@ dIO = {# *** general **********************************************************
        'doMLPClf': doMLPClf,
        'doLinSVClf': doLinSVClf,
        'doNuSVClf': doNuSVClf,
+       'doCSVClf': doCSVClf,
        'doPropCalc': doPropCalc,
        'doMultiSteps': doMultiSteps,
        'saveDetailedClfRes': saveDetailedClfRes,
@@ -387,6 +393,8 @@ dIO = {# *** general **********************************************************
        'vVerbLSV': vVerbLSV,
        # --- general input for Nu-Support SV Classifier
        'vVerbNSV': vVerbNSV,
+       # --- general input for C-Support SV Classifier
+       'vVerbCSV': vVerbCSV,
        # *** other input ******************************************************
        # === numbers
        'rndDigScore': rndDigScore,

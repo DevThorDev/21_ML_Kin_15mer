@@ -24,7 +24,7 @@ from sklearn.linear_model import (PassiveAggressiveClassifier, Perceptron,
                                   SGDClassifier)
 from sklearn.naive_bayes import CategoricalNB, ComplementNB, GaussianNB
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import LinearSVC, NuSVC
+from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
                              top_k_accuracy_score,
                              precision_recall_fscore_support, f1_score,
@@ -1066,6 +1066,25 @@ class NuSVClf(SpecificClassifier):
         Clf = NuSVC(random_state=self.dITp['rndState'],
                     verbose=self.dITp['vVerbNSV'],
                     **self.d2Par[self.sKPar])
+        return self.setClfOptClfGridSearch(cClf=Clf)
+
+# -----------------------------------------------------------------------------
+class CSVClf(SpecificClassifier):
+    # --- initialisation of the class -----------------------------------------
+    def __init__(self, inpDat, D, lG, d2Par, iSt=None, sKPar=GC.S_0, cRep=0):
+        # Classifier method is needed before "super" is initialised
+        sDCSV, sMCSVL, sMCSV = GC.S_DESC_CSV, GC.S_MTH_CSV_L, GC.S_MTH_CSV
+        super().__init__(inpDat, D=D, lG=lG, d2Par=d2Par, iSt=iSt, sKPar=sKPar,
+                         cRep=cRep, sDesc=sDCSV, sMthL=sMCSVL, sMth=sMCSV)
+        if self.dITp['doCSVClf']:
+            self.fitOrPartialFitClf()
+        print('Initiated "CSVClf" base object.')
+
+    # --- methods for fitting and predicting with a C-Support SV Classifier ---
+    def getClf(self):
+        Clf = SVC(random_state=self.dITp['rndState'],
+                  verbose=self.dITp['vVerbCSV'],
+                  **self.d2Par[self.sKPar])
         return self.setClfOptClfGridSearch(cClf=Clf)
 
 # -----------------------------------------------------------------------------

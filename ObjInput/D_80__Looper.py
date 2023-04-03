@@ -31,7 +31,8 @@ dNumRep = {GC.S_MTH_DUMMY: nRp0,
            GC.S_MTH_GS_NB: nRp0,
            GC.S_MTH_MLP: nRp0,
            GC.S_MTH_LSV: nRp0,
-           GC.S_MTH_NSV: nRp0}
+           GC.S_MTH_NSV: nRp0,
+           GC.S_MTH_CSV: nRp0}
 
 doParGrid = False                   # do parameter grid calculations?
 
