@@ -55,7 +55,7 @@ P_DIR_EVAL_RESULTS_L1_CLF = os.path.join(S_DIR_EVALUATION, S_DIR_RESULTS_M,
 # SET_S_ST_DIR_RES_L1 = {'QA', 'QB', 'QC', 'QD', 'QE', 'QF', 'QG', 'QH', 'QI',
 #                        'QJ', 'QK', 'QL', 'QM', 'RA', 'RB', 'RC', 'RD', 'RE',
 #                        'RF', 'RG', 'RH', 'RI', 'RJ'}
-SET_S_ST_DIR_RES_L1 = {'YY'}
+SET_S_ST_DIR_RES_L1 = {'ZZ'}
 
 SET_S_SUB_DIR_RES = {S_DIR_RESULTS_L2_PARS, S_DIR_RESULTS_L2_SMRS,
                      S_DIR_RESULTS_L2_UNQN, S_DIR_RESULTS_L2_INPD,
