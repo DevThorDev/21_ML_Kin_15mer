@@ -81,12 +81,12 @@ setSSubDirRes = SET_S_SUB_DIR_RES
 lSTxtPrnt = ['Copied file\n*\t"', '" to\n>\t"', '".\n']
 
 # --- dictionaries ------------------------------------------------------------
-dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'F_00'}}
+# dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'F_00'}}
 # dSStF2Copy = {P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_00', 'O_07'},
 #               P_DIR_SCRIPTS_L1_OINP: {'D_07'}}
-# dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
-#               P_DIR_SCRIPTS_L1_CORE: {'C_00', 'F_01'},
-#               P_DIR_SCRIPTS_L1_OINP: {'D_07', 'D_90'}}
+dSStF2Copy = {S_DIR_SCRIPTS_M: {'M_0'},
+              P_DIR_SCRIPTS_L1_CORE: {'C_00', 'O_07', 'O_80', 'O_95'},
+              P_DIR_SCRIPTS_L1_OINP: {'D_00', 'D_07', 'D_80', 'D_90'}}
 
 # === DERIVED VALUES ==========================================================
 setSStDir = setSStDirEval

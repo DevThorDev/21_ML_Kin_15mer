@@ -10,7 +10,7 @@ from Core.O_00__BaseClass import BaseClass
 from Core.O_07__Classifier import (DummyClf, AdaClf, RFClf, XTrClf, GrBClf,
                                    HGrBClf, GPClf, PaAggClf, PctClf, SGDClf,
                                    CtNBClf, CpNBClf, GsNBClf, MLPClf, LinSVClf,
-                                   NuSVClf)
+                                   NuSVClf, CSVClf)
 
 # -----------------------------------------------------------------------------
 class Looper(BaseClass):
@@ -152,6 +152,9 @@ class Looper(BaseClass):
         elif sMth == self.dITp['sMthNSV']:  # Nu-Support SV Classifier
             tM, lG = (7, 151), self.dITp['lParGrid_NSV']
             cClf = NuSVClf(self.inpD, self.D, lG, d2Par, iSt, sKPar, cRep)
+        elif sMth == self.dITp['sMthCSV']:  # C-Support SV Classifier
+            tM, lG = (7, 161), self.dITp['lParGrid_CSV']
+            cClf = CSVClf(self.inpD, self.D, lG, d2Par, iSt, sKPar, cRep)
         self.cTM, self.lParGrid, self.cClf = tM, lG, cClf
 
     def saveMeanPredProba(self, sKPar=GC.S_0):

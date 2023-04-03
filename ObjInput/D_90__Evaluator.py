@@ -24,6 +24,7 @@ sMthGsNB = GC.S_MTH_GS_NB
 sMthMLP = GC.S_MTH_MLP
 sMthLSV = GC.S_MTH_LSV
 sMthNSV = GC.S_MTH_NSV
+sMthCSV = GC.S_MTH_CSV
 
 # --- flow control (general) --------------------------------------------------
 doEvaluation = True             # do evaluation?
@@ -68,6 +69,7 @@ lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
              {sMthMLP, sSmplRM1, sFF, GC.S_A},
              {sMthLSV, sSmplRM1, sFF, GC.S_A},
              {sMthNSV, sSmplRM1, sFF, GC.S_A},
+             {sMthCSV, sSmplRM1, sFF, GC.S_A},
              # (sSmplRM10, sFF)
              {sMthDummy, sSmplRM10, sFF, GC.S_A},
              {sMthAda, sSmplRM10, sFF, GC.S_A},
@@ -85,6 +87,7 @@ lSetFIDet = [# (GC.S_SMPL_NO_S, sFF)
              {sMthMLP, sSmplRM10, sFF, GC.S_A},
              {sMthLSV, sSmplRM10, sFF, GC.S_A},
              {sMthNSV, sSmplRM10, sFF, GC.S_A},
+             {sMthCSV, sSmplRM10, sFF, GC.S_A},
              # (sSmplRM1, sPF)
              {sMthPaA, sSmplRM1, sPF, GC.S_A},
              {sMthPct, sSmplRM1, sPF, GC.S_A},

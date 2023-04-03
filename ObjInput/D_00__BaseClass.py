@@ -97,6 +97,7 @@ sDescGsNB = GC.S_DESC_GS_NB
 sDescMLP = GC.S_DESC_MLP
 sDescLSV = GC.S_DESC_LSV
 sDescNSV = GC.S_DESC_NSV
+sDescCSV = GC.S_DESC_CSV
 sMthNoneL, sMthNone = GC.S_MTH_NONE_L, GC.S_MTH_NONE
 sMthDummyL, sMthDummy = GC.S_MTH_DUMMY_L, GC.S_MTH_DUMMY
 sMthAdaL, sMthAda = GC.S_MTH_ADA_L, GC.S_MTH_ADA
@@ -114,6 +115,7 @@ sMthGsNBL, sMthGsNB = GC.S_MTH_GS_NB_L, GC.S_MTH_GS_NB
 sMthMLPL, sMthMLP = GC.S_MTH_MLP_L, GC.S_MTH_MLP
 sMthLSVL, sMthLSV = GC.S_MTH_LSV_L, GC.S_MTH_LSV
 sMthNSVL, sMthNSV = GC.S_MTH_NSV_L, GC.S_MTH_NSV
+sMthCSVL, sMthCSV = GC.S_MTH_CSV_L, GC.S_MTH_CSV
 sPar, sGSRS = GC.S_PAR, GC.S_GSRS
 sSummary = GC.S_SUMMARY
 sCnfMat = GC.S_CNF_MAT
@@ -155,10 +157,10 @@ s0Pred, s1Pred, sNotPred = GC.S_0_PRED, GC.S_1_PRED, GC.S_NOT_PRED
 # === derived values and input processing =====================================
 lSMth_L = [sMthDummyL, sMthAdaL, sMthRFL, sMthXTrL, sMthGrBL, sMthHGrBL,
            sMthGPL, sMthPaAL, sMthPctL, sMthSGDL, sMthCtNBL, sMthCpNBL,
-           sMthGsNBL, sMthMLPL, sMthLSVL, sMthNSVL]
+           sMthGsNBL, sMthMLPL, sMthLSVL, sMthNSVL, sMthCSVL]
 lSMth = [sMthDummy, sMthAda, sMthRF, sMthXTr, sMthGrB, sMthHGrB, sMthGP,
          sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB, sMthGsNB, sMthMLP,
-         sMthLSV, sMthNSV]
+         sMthLSV, sMthNSV, sMthCSV]
 lSMthPartFit = [sMthPaA, sMthPct, sMthSGD, sMthCtNB, sMthCpNB, sMthGsNB,
                 sMthMLP]
 lSEnc = [sOneHot, sOrdinal]
@@ -279,6 +281,7 @@ dIO = {# --- general
        'sDescMLP': sDescMLP,
        'sDescLSV': sDescLSV,
        'sDescNSV': sDescNSV,
+       'sDescCSV': sDescCSV,
        'sMthNoneL': sMthNoneL,
        'sMthNone': sMthNone,
        'sMthDummyL': sMthDummyL,
@@ -313,6 +316,8 @@ dIO = {# --- general
        'sMthLSV': sMthLSV,
        'sMthNSVL': sMthNSVL,
        'sMthNSV': sMthNSV,
+       'sMthCSVL': sMthCSVL,
+       'sMthCSV': sMthCSV,
        'sPar': sPar,
        'sGSRS': sGSRS,
        'sSummary': sSummary,

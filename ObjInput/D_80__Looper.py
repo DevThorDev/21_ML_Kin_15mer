@@ -508,6 +508,47 @@ d2Par_NSV = {GC.S_0: {'nu': 0.5,
                       'probability': True,    # to use "predict_proba"
                       'tol': 1e-5}}
 
+# === C-Support SV Classifier =================================================
+# --- list of parameter grids for C-Support SV Classifier grid search ---------
+lParGrid_CSV = [{'C': [0.1, 0.5, 1.],
+                 'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
+                 'degree': [2, 3, 4],
+                 'gamma': ['scale', 'auto'],
+                 'coef0': [0., 1.],
+                 'shrinking': [False, True],
+                 'probability': [False, True],
+                 'class_weight': [None, 'balanced'],
+                 'decision_function_shape': ['ovo', 'ovr'],
+                 'break_ties': [False, True]}]
+lParGrid_CSV = [{'C': [1.],
+                 'kernel': ['poly'],
+                 'degree': [3],
+                 'gamma': ['scale'],
+                 'coef0': stats.uniform(loc=-10., scale=20.),
+                 'shrinking': [True],
+                 'probability': [False],
+                 'tol': [1e-5],
+                 'class_weight': [None],
+                 'decision_function_shape': ['ovo', 'ovr'],
+                 'break_ties': [False]}]
+
+# --- parameter dictionary for C-Support SV Classifier ------------------------
+d2Par_CSV = {GC.S_0: {'C': 1.,
+                      'kernel': 'rbf',
+                      'degree': 3,
+                      'gamma': 'scale',
+                      'coef0': 0.0,
+                      'shrinking': True,
+                      'probability': False,
+                      'tol': 1e-3,
+                      'class_weight': None,
+                      'max_iter': -1,
+                      'decision_function_shape': 'ovr',
+                      'break_ties': False},
+             GC.S_A: {'kernel': 'poly',
+                      'probability': True,    # to use "predict_proba"
+                      'tol': 1e-5}}
+
 # *** other input *************************************************************
 # === numbers =================================================================
 
@@ -544,6 +585,7 @@ if not doParGrid:
     lParGrid_MLP = None
     lParGrid_LSV = None
     lParGrid_NSV = None
+    lParGrid_CSV = None
 
 # *** create input dictionary *************************************************
 dIO = {# *** general **********************************************************
@@ -602,6 +644,9 @@ dIO = {# *** general **********************************************************
        # === Nu-Support SV Classifier
        # --- parameter grid for optimising the Nu-Support SV Classifier
        'lParGrid_NSV': lParGrid_NSV,
+       # === C-Support SV Classifier
+       # --- parameter grid for optimising the C-Support SV Classifier
+       'lParGrid_CSV': lParGrid_CSV,
        # --- parameter dictionary for all Classifier methods
        'd3Par': {GC.S_MTH_DUMMY: d2Par_Dy,
                  GC.S_MTH_ADA: d2Par_Ada,
@@ -618,7 +663,8 @@ dIO = {# *** general **********************************************************
                  GC.S_MTH_GS_NB: d2Par_GsNB,
                  GC.S_MTH_MLP: d2Par_MLP,
                  GC.S_MTH_LSV: d2Par_LSV,
-                 GC.S_MTH_NSV: d2Par_NSV},
+                 GC.S_MTH_NSV: d2Par_NSV,
+                 GC.S_MTH_CSV: d2Par_CSV},
        # *** other input ******************************************************
        # === numbers
        # === strings
