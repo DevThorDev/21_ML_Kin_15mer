@@ -434,9 +434,9 @@ def procAxLines(dSub, pdDfr, sglAx, k):
     for l in range(pdDfr.shape[0] - 1):
         serY = pdDfr.loc[l + 1, :][pdDfr.loc[l + 1, :].notna()]
         assert serX.shape[0] == serY.shape[0]
-        sglAx.plot(serX, serY, label=dSub['lLLeg'][k][l],
-                   ls=dSub['lLStyLn'][k][l], lw=dSub['lLWdLn'][k][l],
-                   color=dSub['lLClrLn'][k][l],
+        cLbl = (dSub['lLLeg'][k][l] if k == 0 else None)
+        sglAx.plot(serX, serY, label=cLbl, ls=dSub['lLStyLn'][k][l],
+                   lw=dSub['lLWdLn'][k][l], color=dSub['lLClrLn'][k][l],
                    marker=dSub['lLStyMk'][k][l], ms=dSub['lLSzMk'][k][l],
                    mew=dSub['lLWdMk'][k][l],
                    fillstyle=dSub['lLFillStyMk'][k][l],
@@ -527,7 +527,9 @@ def plotFig5(dInp, dPlt, dDfr, sTtl=None, savePlt=True):
         else:
             n = 0
             m += 1
-    decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=True,
+    cFig.legend(bbox_to_anchor=(0., 0., 1., .05), loc='lower left',
+                ncols=3, mode='expand', borderaxespad=0.)
+    decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=False,
                      saveFig=savePlt)
     plt.close()
 
