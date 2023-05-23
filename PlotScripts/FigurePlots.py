@@ -26,7 +26,7 @@ pPltFig = os.path.join('..', 'PlottedFigures')
 # --- flow control ------------------------------------------------------------
 plotF2 = False
 plotF3 = False
-plotF4 = True
+plotF4 = False
 plotF5 = True
 
 # --- predefined colours ------------------------------------------------------
@@ -40,12 +40,13 @@ sFPltDat_F2 = 'Data_Figure2'
 sPlt_F2 = 'Figure2'
 tFigSz_F2 = (6.4, 7.2)
 layoutTp_F2 = 'constrained'
-wdBar_F2 = 1.6
 lblX_F2, lblY_F2 = None, None
 lnWdAxY_F2 = 1
 lnStyAxY_F2 = '-'
 lnClrAxY_F2 = 'k'
 sSupTtl_F2 = None
+wdBar_F2 = 1.6
+
 # subplot-specific
 nRowSubPl_F2 = 3
 nColSubPl_F2 = 2
@@ -56,6 +57,7 @@ lWdBarInSubPl_F2 = [wdBar_F2]*len(lPosInSubPl_F2)
 lClrInSubPl_F2 = [(0.85, 0.5, 0.0, 0.85), (0.8, 0.0, 0.0, 0.75),
                   (0.0, 0.5, 0.75, 0.85), (0.0, 0.0, 0.8, 0.75)]
 tXLimInSubPl_F2 = (0, 6)
+
 lLPosSubPl_F2 = [lPosInSubPl_F2]*(nRowSubPl_F2*nColSubPl_F2)
 lLLblXSubPl_F2 = [lLblXInSubPl_F2]*(nRowSubPl_F2*nColSubPl_F2)
 lLLblYSubPl_F2 = [lblYInSubPl_F2]*(nRowSubPl_F2*nColSubPl_F2)
@@ -83,12 +85,13 @@ sFPltDat_F3 = 'Data_Figure3'
 sPlt_F3 = 'Figure3'
 tFigSz_F3 = (6.4, 7.2)
 layoutTp_F3 = 'constrained'
-wdBar_F3 = 0.9
 lblX_F3, lblY_F3 = None, None
 lnWdAxY_F3 = 1
 lnStyAxY_F3 = '-'
 lnClrAxY_F3 = 'k'
 sSupTtl_F3 = None
+wdBar_F3 = 0.9
+
 # subplot-specific
 nRowSubPl_F3 = 3
 nColSubPl_F3 = 2
@@ -99,6 +102,7 @@ lWdBarInSubPl_F3 = [wdBar_F3]*len(lPosInSubPl_F3)
 lClrInSubPl_F3 = [(0.4, 0.4, 0.4, 1.), (0.75, 0.55, 0.0, 1.),
                   (0.9, 0.0, 0.0, 1.), (0.0, 0.0, 0.9, 1.)]
 tXLimInSubPl_F3 = (0.45, 4.55)
+
 lLPosSubPl_F3 = [lPosInSubPl_F3]*(nRowSubPl_F3*nColSubPl_F3)
 lLLblXSubPl_F3 = [lLblXInSubPl_F3]*(nRowSubPl_F3*nColSubPl_F3)
 lLLblYSubPl_F3 = [lblYInSubPl_F3]*(nRowSubPl_F3*nColSubPl_F3)
@@ -131,12 +135,13 @@ sFPltDat_F4 = 'Data_Figure4'
 sPlt_F4 = 'Figure4'
 tFigSz_F4 = (6.4, 7.2)
 layoutTp_F4 = 'constrained'
-wdBar_F4 = 0.9
 lblX_F4, lblY_F4 = None, None
 lnWdAxY_F4 = 1
 lnStyAxY_F4 = '-'
 lnClrAxY_F4 = 'k'
 sSupTtl_F4 = None
+wdBar_F4 = 0.9
+
 # subplot-specific
 nRowSubPl_F4 = 3
 nColSubPl_F4 = 2
@@ -151,6 +156,7 @@ lClrInSubPl_F4 = [(0.55, 0.35, 0.0, 1.), (0.65, 0.45, 0.0, 1.),
                   (0.0, 0.0, 0.7, 1.), (0.0, 0.0, 0.85, 1.),
                   (0.0, 0.0, 1., 1.)]
 tXLimInSubPl_F4 = (0.45, 11.55)
+
 lLPosSubPl_F4 = [lPosInSubPl_F4]*(nRowSubPl_F4*nColSubPl_F4)
 lLLblXSubPl_F4 = [lLblXInSubPl_F4]*(nRowSubPl_F4*nColSubPl_F4)
 lLLblYSubPl_F4 = [lblYInSubPl_F4]*(nRowSubPl_F4*nColSubPl_F4)
@@ -191,57 +197,67 @@ dSFPltDat_F5 = {'Kin1': 'Data_Figure5_Kin1_AGC',
                 'Kin7': 'Data_Figure5_Kin7_Sn2',
                 'Kin8': 'Data_Figure5_Kin8_sol'}
 sPlt_F5 = 'Figure5'
-tFigSz_F5 = (6.4, 7.2)
+tFigSz_F5 = (6.4, 9.0)
 layoutTp_F5 = 'constrained'
-wdBar_F5 = 0.9
 lblX_F5, lblY_F5 = None, None
 lnWdAxY_F5 = 1
 lnStyAxY_F5 = '-'
 lnClrAxY_F5 = 'k'
 sSupTtl_F5 = None
+
 # subplot-specific
-nRowSubPl_F5 = 3
+nRowSubPl_F5 = 4
 nColSubPl_F5 = 2
-lPosInSubPl_F5 = None
 lLblXInSubPl_F5 = None
 lblYInSubPl_F5 = None
-lWdBarInSubPl_F5 = [wdBar_F5]*len(lPosInSubPl_F5)
-lClrInSubPl_F5 = [(0.55, 0.35, 0.0, 1.), (0.65, 0.45, 0.0, 1.),
-                  (0.75, 0.55, 0.0, 1.), (0.85, 0.65, 0.0, 1.),
-                  (0.95, 0.75, 0.0, 1.),
-                  (0.0, 0.0, 0.4, 1.), (0.0, 0.0, 0.55, 1.),
-                  (0.0, 0.0, 0.7, 1.), (0.0, 0.0, 0.85, 1.),
-                  (0.0, 0.0, 1., 1.)]
-tXLimInSubPl_F5 = (0.45, 11.55)
-lLPosSubPl_F5 = [lPosInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lStyLnInSubPl_F5 = ['-']*6
+lWdLnInSubPl_F5 = [1.5]*6
+lClrLnInSubPl_F5 = [(0.7, 0.0, 0.8, 1.), (0.9, 0.0, 0.0, 1.),
+                    (0.0, 0.7, 0.8, 1.), (0.0, 0.0, 0.9, 1.),
+                    (0.8, 0.7, 0.0, 1.), (0.4, 0.4, 0.4, 1.)]
+lStyMkInSubPl_F5 = ['o', 'x', 'd']*2
+lSzMkInSubPl_F5 = [6]*6
+lWdMkInSubPl_F5 = [1]*6
+lFillStyMkInSubPl_F5 = ['none']*6
+lClrMkInSubPl_F5 = [(0.6, 0.0, 0.7, 1.), (0.8, 0.0, 0.0, 1.),
+                    (0.0, 0.6, 0.7, 1.), (0.0, 0.0, 0.8, 1.),
+                    (0.7, 0.6, 0.0, 1.), (0.3, 0.3, 0.3, 1.)]
+tXLimInSubPl_F5 = (0.1, 0.5)
+lLegInSubPl_F5 = ['accuracy', 'balanced accuracy', 'minimum accuracy']*2
+
 lLLblXSubPl_F5 = [lLblXInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
 lLLblYSubPl_F5 = [lblYInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
-lWdBarSubPl_F5 = [lWdBarInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
-lLClrSubPl_F5 = [lClrInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLStyLnSubPl_F5 = [lStyLnInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLWdLnSubPl_F5 = [lWdLnInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLClrLnSubPl_F5 = [lClrLnInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLStyMkSubPl_F5 = [lStyMkInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLSzMkSubPl_F5 = [lSzMkInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLWdMkSubPl_F5 = [lWdMkInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLFillStyMkSubPl_F5 = [lFillStyMkInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLClrMkSubPl_F5 = [lClrMkInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
 lTXLimSubPl_F5 = [tXLimInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
+lLLegSubPl_F5 = [lLegInSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
 
-lYTckSubPl12_F5 = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-lYTckSubPl34_F5 = [0.0, 0.2, 0.4, 0.6, 0.8]
-lYTckSubPl56_F5 = [0.7, 0.8, 0.9]
+lXTckSubPl_F5 = [0.1, 0.2, 0.3, 0.4, 0.5]
+lYTckSubPl12_F5 = [0.2, 0.4, 0.6, 0.8, 1.0]
+lYTckSubPl34_F5 = [0.2, 0.4, 0.6, 0.8, 1.0]
+lYTckSubPl56_F5 = [0.2, 0.4, 0.6, 0.8, 1.0]
+lYTckSubPl78_F5 = [0.2, 0.4, 0.6, 0.8, 1.0]
 lTYLimSubPl_F5 = [(lYTckSubPl12_F5[0], lYTckSubPl12_F5[-1]),
                   (lYTckSubPl12_F5[0], lYTckSubPl12_F5[-1]),
                   (lYTckSubPl34_F5[0], lYTckSubPl34_F5[-1]),
                   (lYTckSubPl34_F5[0], lYTckSubPl34_F5[-1]),
                   (lYTckSubPl56_F5[0], lYTckSubPl56_F5[-1]),
-                  (lYTckSubPl56_F5[0], lYTckSubPl56_F5[-1])]
+                  (lYTckSubPl56_F5[0], lYTckSubPl56_F5[-1]),
+                  (lYTckSubPl78_F5[0], lYTckSubPl78_F5[-1]),
+                  (lYTckSubPl78_F5[0], lYTckSubPl78_F5[-1])]
+lLXTckSubPl_F5 = [lXTckSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
 lLYTckSubPl_F5 = [lYTckSubPl12_F5, lYTckSubPl12_F5, lYTckSubPl34_F5,
-                  lYTckSubPl34_F5, lYTckSubPl56_F5, lYTckSubPl56_F5]
-lXLblSubPl_F5 = ['accuracy', 'balanced accuracy', 'minimum accuracy',
-                 'average sensitivity', 'average specificity', 'ROC AUC']
-x = 0.5*(len(lLblXInSubPl_F5)/(2*(len(lLblXInSubPl_F5) + 1)))
-dTxtSubPl_F5 = {'ClfA': {'xPos': x, 'yPos': 0.1, 'sTxt': 'CtNB',
-                         'szFnt': 12, 'hAln': 'center', 'vAln': 'bottom',
-                         'bBox': {'boxstyle': 'round', 'fc': 'w', 'ec': 'k',
-                                  'alpha': 0.85}},
-                'ClfB': {'xPos': 1 - x, 'yPos': 0.1, 'sTxt': 'MLP',
-                         'szFnt': 12, 'hAln': 'center', 'vAln': 'bottom',
-                         'bBox': {'boxstyle': 'round', 'fc': 'w', 'ec': 'k',
-                                  'alpha': 0.85}}}
+                  lYTckSubPl34_F5, lYTckSubPl56_F5, lYTckSubPl56_F5,
+                  lYTckSubPl78_F5, lYTckSubPl78_F5]
+dTxtSubPl_F5 = {}
+assert len(lTYLimSubPl_F5) == nRowSubPl_F5*nColSubPl_F5
+assert len(lLYTckSubPl_F5) == nRowSubPl_F5*nColSubPl_F5
 
 # === Create input and plot dictionaries ======================================
 # --- create input dictionary -------------------------------------------------
@@ -273,13 +289,13 @@ dPlt2 = {'pFDat': os.path.join(pPltDat, sFPltDat_F2 + S_DOT + S_CSV),
          'pFPlt': os.path.join(pPltFig, sPlt_F2 + S_DOT + S_PDF),
          'tFigSz': tFigSz_F2,
          'layoutTp': layoutTp_F2,
-         'wdBar': wdBar_F2,
          'lblX': lblX_F2,
          'lblY': lblY_F2,
          'lnWdAxY': lnWdAxY_F2,
          'lnStyAxY': lnStyAxY_F2,
          'lnClrAxY': lnClrAxY_F2,
          'sSupTtl': sSupTtl_F2,
+         'wdBar': wdBar_F2,
          'nRowSubPl': nRowSubPl_F2,
          'nColSubPl': nColSubPl_F2,
          'dSubPl': {'lLPos': lLPosSubPl_F2,
@@ -299,13 +315,13 @@ dPlt3 = {'pFDat': os.path.join(pPltDat, sFPltDat_F3 + S_DOT + S_CSV),
          'pFPlt': os.path.join(pPltFig, sPlt_F3 + S_DOT + S_PDF),
          'tFigSz': tFigSz_F3,
          'layoutTp': layoutTp_F3,
-         'wdBar': wdBar_F3,
          'lblX': lblX_F3,
          'lblY': lblY_F3,
          'lnWdAxY': lnWdAxY_F3,
          'lnStyAxY': lnStyAxY_F3,
          'lnClrAxY': lnClrAxY_F3,
          'sSupTtl': sSupTtl_F3,
+         'wdBar': wdBar_F3,
          'nRowSubPl': nRowSubPl_F3,
          'nColSubPl': nColSubPl_F3,
          'dSubPl': {'lLPos': lLPosSubPl_F3,
@@ -325,13 +341,13 @@ dPlt4 = {'pFDat': os.path.join(pPltDat, sFPltDat_F4 + S_DOT + S_CSV),
          'pFPlt': os.path.join(pPltFig, sPlt_F4 + S_DOT + S_PDF),
          'tFigSz': tFigSz_F4,
          'layoutTp': layoutTp_F4,
-         'wdBar': wdBar_F4,
          'lblX': lblX_F4,
          'lblY': lblY_F4,
          'lnWdAxY': lnWdAxY_F4,
          'lnStyAxY': lnStyAxY_F4,
          'lnClrAxY': lnClrAxY_F4,
          'sSupTtl': sSupTtl_F4,
+         'wdBar': wdBar_F4,
          'nRowSubPl': nRowSubPl_F4,
          'nColSubPl': nColSubPl_F4,
          'dSubPl': {'lLPos': lLPosSubPl_F4,
@@ -352,7 +368,6 @@ dPlt5 = {'dPFDat': {sK: os.path.join(pPltDat, dSFPltDat_F5[sK] + S_DOT + S_CSV)
          'pFPlt': os.path.join(pPltFig, sPlt_F5 + S_DOT + S_PDF),
          'tFigSz': tFigSz_F5,
          'layoutTp': layoutTp_F5,
-         'wdBar': wdBar_F5,
          'lblX': lblX_F5,
          'lblY': lblY_F5,
          'lnWdAxY': lnWdAxY_F5,
@@ -361,40 +376,77 @@ dPlt5 = {'dPFDat': {sK: os.path.join(pPltDat, dSFPltDat_F5[sK] + S_DOT + S_CSV)
          'sSupTtl': sSupTtl_F5,
          'nRowSubPl': nRowSubPl_F5,
          'nColSubPl': nColSubPl_F5,
-         'dSubPl': {'lLPos': lLPosSubPl_F5,
-                    'lLLblX': lLLblXSubPl_F5,
+         'dSubPl': {'lLLblX': lLLblXSubPl_F5,
                     'lLLblY': lLLblYSubPl_F5,
-                    'lWdBar': lWdBarSubPl_F5,
-                    'lLClr': lLClrSubPl_F5,
+                    'lLStyLn': lLStyLnSubPl_F5,
+                    'lLWdLn': lLWdLnSubPl_F5,
+                    'lLClrLn': lLClrLnSubPl_F5,
+                    'lLStyMk': lLStyMkSubPl_F5,
+                    'lLSzMk': lLSzMkSubPl_F5,
+                    'lLWdMk': lLWdMkSubPl_F5,
+                    'lLFillStyMk': lLFillStyMkSubPl_F5,
+                    'lLClrMk': lLClrMkSubPl_F5,
                     'lTXLim': lTXLimSubPl_F5,
                     'lTYLim': lTYLimSubPl_F5,
+                    'lLXTck': lLXTckSubPl_F5,
                     'lLYTck': lLYTckSubPl_F5,
-                    'lXLbl': lXLblSubPl_F5,
+                    'lLLeg': lLLegSubPl_F5,
                     'dTxt': dTxtSubPl_F5}}
 dPlt5 = dPltG | dPlt5
 
-# === Data manipulation functions =============================================
-# --- Figures 2, 3 and 4 data manipulation ---------------------------------------
-def procDataForPlot(dInp, dPlt):
-    dfrF2 = pd.read_csv(dPlt['pFDat'], sep=dInp['sSemicol'])
-    dfrF2Red = dfrF2[dfrF2[dPlt['sCol0Dfr']] == 1]
-    lDat = [s for s in dfrF2Red.columns if s not in dPlt['lSColDfrNoDat']]
-    return dfrF2Red.loc[:, lDat].reset_index(drop=True)
+# === Dataframe manipulation functions ========================================
+# --- General dataframe manipulation functions --------------------------------
+def reduceDfr(dPlt, pdDfr):
+    pdDfrRed = pdDfr[pdDfr[dPlt['sCol0Dfr']] == 1]
+    lDat = [s for s in pdDfrRed.columns if s not in dPlt['lSColDfrNoDat']]
+    return pdDfrRed.loc[:, lDat].reset_index(drop=True)
+
+# --- Figures 2, 3 and 4 dataframe manipulation -------------------------------
+def procDataForFig234(dInp, dPlt):
+    dfrF = pd.read_csv(dPlt['pFDat'], sep=dInp['sSemicol'])
+    return reduceDfr(dPlt, pdDfr=dfrF)
+
+# --- Figure 5 dataframe manipulation -----------------------------------------
+def procDataForFig5(dInp, dPlt):
+    dDfr = {sK: pd.read_csv(sPF, sep=dInp['sSemicol']) for sK, sPF in
+            dPlt['dPFDat'].items()}
+    for sK, dfrF in dDfr.items():
+        dDfr[sK] = reduceDfr(dPlt, pdDfr=dfrF)
+    return dDfr
 
 # === Plotting functions ======================================================
 # --- Plotting helper functions -----------------------------------------------
-def procAx(dPlt, dSub, pdDfr, sglAx, k):
+def procAxBar(dSub, pdDfr, sglAx, k):
     serHeight = pdDfr.loc[k, :][pdDfr.loc[k, :].notna()]
     assert len(dSub['lLPos'][k]) == serHeight.shape[0]
     sglAx.bar(x=dSub['lLPos'][k], height=serHeight, width=dSub['lWdBar'][k],
               bottom=0, align='center', color=dSub['lLClr'][k])
     sglAx.set_xlim(dSub['lTXLim'][k])
     sglAx.set_ylim(dSub['lTYLim'][k])
-    lS = [str(round(x*100)) + dInp['sPerc'] for x in dSub['lLYTck'][k]]
+    lSYTck = [str(round(x*100)) + dInp['sPerc'] for x in dSub['lLYTck'][k]]
     sglAx.set_xticks(ticks=dSub['lLPos'][k], labels=dSub['lLLblX'][k],
                      rotation='vertical')
-    sglAx.set_yticks(dSub['lLYTck'][k], labels=lS)
+    sglAx.set_yticks(dSub['lLYTck'][k], labels=lSYTck)
     sglAx.set_xlabel(xlabel=dSub['lXLbl'][k], loc='center')
+
+def procAxLines(dSub, pdDfr, sglAx, k):
+    serX = pdDfr.loc[0, :][pdDfr.loc[0, :].notna()]
+    for l in range(pdDfr.shape[0] - 1):
+        serY = pdDfr.loc[l + 1, :][pdDfr.loc[l + 1, :].notna()]
+        assert serX.shape[0] == serY.shape[0]
+        sglAx.plot(serX, serY, label=dSub['lLLeg'][k][l],
+                   ls=dSub['lLStyLn'][k][l], lw=dSub['lLWdLn'][k][l],
+                   color=dSub['lLClrLn'][k][l],
+                   marker=dSub['lLStyMk'][k][l], ms=dSub['lLSzMk'][k][l],
+                   mew=dSub['lLWdMk'][k][l],
+                   fillstyle=dSub['lLFillStyMk'][k][l],
+                   mfc=dSub['lLClrMk'][k][l], mec=dSub['lLClrMk'][k][l])
+    sglAx.set_xlim(dSub['lTXLim'][k])
+    sglAx.set_ylim(dSub['lTYLim'][k])
+    lSXTck = [str(round(x*100)) + dInp['sPerc'] for x in dSub['lLXTck'][k]]
+    sglAx.set_xticks(dSub['lLXTck'][k], labels=lSXTck)
+    lSYTck = [str(round(x*100)) + dInp['sPerc'] for x in dSub['lLYTck'][k]]
+    sglAx.set_yticks(dSub['lLYTck'][k], labels=lSYTck)
 
 def addTxtToAx(dTxt, sglAx):
     for cD in dTxt.values():
@@ -402,6 +454,14 @@ def addTxtToAx(dTxt, sglAx):
                    transform=sglAx.transAxes, fontsize=cD['szFnt'],
                    horizontalalignment=cD['hAln'],
                    verticalalignment=cD['vAln'], bbox=cD['bBox'])
+
+def doBarSubplot(dSub, dTxt, pdDfr, cAx, k, m, n):
+    procAxBar(dSub, pdDfr, sglAx=cAx[m, n], k=k)
+    addTxtToAx(dTxt, sglAx=cAx[m, n])
+
+def doLinesSubplot(dSub, dTxt, pdDfr, cAx, k, m, n):
+    procAxLines(dSub, pdDfr, sglAx=cAx[m, n], k=k)
+    addTxtToAx(dTxt, sglAx=cAx[m, n])
 
 def pltYHalfAxHist(dPlt, cSer=None, yBase=0., yMax=1.):
     if cSer is not None:
@@ -440,7 +500,7 @@ def decorateSavePlot(dPlt, sPF, serDt=None, sTtl=None, xLim=None, yLim=None,
         plt.savefig(dPlt[sPF])
 
 # --- Plotting bar plots (figures 2, 3 and 4) ---------------------------------
-def plotFigures234(dInp, dPlt, pdDfr, sTtl=None, savePlt=True):
+def plotFig234(dInp, dPlt, pdDfr, sTtl=None, savePlt=True):
     assert pdDfr.shape[0] == dPlt['nRowSubPl']*dPlt['nColSubPl']
     cFig, cAx = plt.subplots(nrows=dPlt['nRowSubPl'], ncols=dPlt['nColSubPl'],
                              figsize=dPlt['tFigSz'], layout=dPlt['layoutTp'])
@@ -448,39 +508,41 @@ def plotFigures234(dInp, dPlt, pdDfr, sTtl=None, savePlt=True):
     for m in range(dPlt['nRowSubPl']):
         for n in range(dPlt['nColSubPl']):
             k = m*dPlt['nColSubPl'] + n
-            procAx(dPlt, dSub, pdDfr, sglAx=cAx[m, n], k=k)
-            addTxtToAx(dTxt, sglAx=cAx[m, n])
+            doBarSubplot(dSub, dTxt, pdDfr, cAx=cAx, k=k, m=m, n=n)
     decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=False,
                      saveFig=savePlt)
     plt.close()
 
 ## --- Plotting xy-plots (figure 5) -------------------------------------------
-def plotFigure5(dInp, dPlt, pdDfr, sTtl=None, savePlt=True):
-    assert pdDfr.shape[0] == dPlt['nRowSubPl']*dPlt['nColSubPl']
+def plotFig5(dInp, dPlt, dDfr, sTtl=None, savePlt=True):
+    assert len(dDfr) == dPlt['nRowSubPl']*dPlt['nColSubPl']
     cFig, cAx = plt.subplots(nrows=dPlt['nRowSubPl'], ncols=dPlt['nColSubPl'],
                              figsize=dPlt['tFigSz'], layout=dPlt['layoutTp'])
-    dSub, dTxt = dPlt['dSubPl'], dPlt['dSubPl']['dTxt']
-    for m in range(dPlt['nRowSubPl']):
-        for n in range(dPlt['nColSubPl']):
-            k = m*dPlt['nColSubPl'] + n
-            procAx(dPlt, dSub, pdDfr, sglAx=cAx[m, n], k=k)
-            addTxtToAx(dTxt, sglAx=cAx[m, n])
-    decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=False,
+    dSub, dTxt, k, m, n = dPlt['dSubPl'], dPlt['dSubPl']['dTxt'], 0, 0, 0
+    for pdDfr in dDfr.values():
+        doLinesSubplot(dSub, dTxt, pdDfr, cAx=cAx, k=k, m=m, n=n)
+        k += 1
+        if n < dPlt['nColSubPl'] - 1:
+            n += 1
+        else:
+            n = 0
+            m += 1
+    decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=True,
                      saveFig=savePlt)
     plt.close()
 
 # === Main ====================================================================
 if dInp['plotF2']:
-    plotFigures234(dInp, dPlt=dPlt2, pdDfr=procDataForPlot(dInp, dPlt=dPlt2))
+    plotFig234(dInp, dPlt=dPlt2, pdDfr=procDataForFig234(dInp, dPlt=dPlt2))
     print('Plotted figure 2.')
 if dInp['plotF3']:
-    plotFigures234(dInp, dPlt=dPlt3, pdDfr=procDataForPlot(dInp, dPlt=dPlt3))
+    plotFig234(dInp, dPlt=dPlt3, pdDfr=procDataForFig234(dInp, dPlt=dPlt3))
     print('Plotted figure 3.')
 if dInp['plotF4']:
-    plotFigures234(dInp, dPlt=dPlt4, pdDfr=procDataForPlot(dInp, dPlt=dPlt4))
+    plotFig234(dInp, dPlt=dPlt4, pdDfr=procDataForFig234(dInp, dPlt=dPlt4))
     print('Plotted figure 4.')
 if dInp['plotF5']:
-    plotFigure5(dInp, dPlt=dPlt5, pdDfr=procDataForPlot(dInp, dPlt=dPlt5))
+    plotFig5(dInp, dPlt=dPlt5, dDfr=procDataForFig5(dInp, dPlt=dPlt5))
     print('Plotted figure 5.')
 
 # #############################################################################
