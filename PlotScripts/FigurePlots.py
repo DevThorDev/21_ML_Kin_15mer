@@ -7,7 +7,6 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 
 # === Constants ===============================================================
 S_SPACE = ' '
@@ -27,7 +26,8 @@ pPltFig = os.path.join('..', 'PlottedFigures')
 plotF2 = False
 plotF3 = False
 plotF4 = False
-plotF5 = True
+plotF5 = False
+plotF6 = True
 
 # --- predefined colours ------------------------------------------------------
 
@@ -198,6 +198,7 @@ dSFPltDat_F5 = {'Kin1': 'Data_Figure5_Kin1_AGC',
                 'Kin8': 'Data_Figure5_Kin8_sol'}
 sPlt_F5 = 'Figure5'
 tFigSz_F5 = (6.4, 9.0)
+tFigMarg_F5 = (0.1, 0.1, 0.1, 0.5)      # (left, right, top, bottom) in inches
 layoutTp_F5 = 'constrained'
 lblX_F5, lblY_F5 = None, None
 lnWdAxY_F5 = 1
@@ -255,9 +256,49 @@ lLXTckSubPl_F5 = [lXTckSubPl_F5]*(nRowSubPl_F5*nColSubPl_F5)
 lLYTckSubPl_F5 = [lYTckSubPl12_F5, lYTckSubPl12_F5, lYTckSubPl34_F5,
                   lYTckSubPl34_F5, lYTckSubPl56_F5, lYTckSubPl56_F5,
                   lYTckSubPl78_F5, lYTckSubPl78_F5]
-dTxtSubPl_F5 = {}
+lSTxtSubPl = ['AGC', 'CDK', 'CDPK', 'CK2', 'LRR', 'MAPK', 'SnRK2', 'soluble']
+dTxtSubPl_F5 = {'sKin': {'xPos': 0.1, 'yPos': 0.1, 'lSTxt': lSTxtSubPl,
+                         'szFnt': 12, 'hAln': 'left', 'vAln': 'bottom',
+                         'bBox': {'boxstyle': 'round', 'fc': (0.9, 0.9, 0.9),
+                                  'ec': 'k', 'alpha': 0.85}}}
 assert len(lTYLimSubPl_F5) == nRowSubPl_F5*nColSubPl_F5
 assert len(lLYTckSubPl_F5) == nRowSubPl_F5*nColSubPl_F5
+
+# === Plot-specific input for figure 6 (multi-class double threshold heatmap) =
+sFPltDat_F6 = 'Data_Figure6'
+sPlt_F6 = 'Figure6'
+tFigSz_F6 = (6.4, 3.6)
+layoutTp_F6 = 'constrained'
+lblX_F6, lblY_F6 = None, None
+lnWdAxY_F6 = 1
+lnStyAxY_F6 = '-'
+lnClrAxY_F6 = 'k'
+sSupTtl_F6 = None
+
+# subplot-specific
+nRowSubPl_F6 = 1
+nColSubPl_F6 = 1
+lLblXInSubPl_F5 = None
+lblYInSubPl_F5 = None
+lLblXInSubPl_F6 = ['No/FF', '1.5:1/PF', '1.33:1/PF', '1.1:1/PF', '1:1/PF']*2
+lblYInSubPl_F6 = None
+lClrInSubPl_F6 = [(0.55, 0.35, 0.0, 1.), (0.65, 0.45, 0.0, 1.),
+                  (0.75, 0.55, 0.0, 1.), (0.85, 0.65, 0.0, 1.),
+                  (0.95, 0.75, 0.0, 1.),
+                  (0.0, 0.0, 0.4, 1.), (0.0, 0.0, 0.55, 1.),
+                  (0.0, 0.0, 0.7, 1.), (0.0, 0.0, 0.85, 1.),
+                  (0.0, 0.0, 1., 1.)]
+
+lLLblXSubPl_F6 = [lLblXInSubPl_F6]*(nRowSubPl_F6*nColSubPl_F6)
+lLLblYSubPl_F6 = [lblYInSubPl_F6]*(nRowSubPl_F6*nColSubPl_F6)
+lLClrSubPl_F6 = [lClrInSubPl_F6]*(nRowSubPl_F6*nColSubPl_F6)
+
+lXTckSubPl_F6 = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+lYTckSubPl_F6 = [0.1, 0.2, 0.3, 0.4]
+tXLimSubPl_F6 = (lXTckSubPl_F6[0], lXTckSubPl_F6[-1])
+tYLimSubPl_F6 = (lYTckSubPl_F6[0], lYTckSubPl_F6[-1])
+# x = 0.5*(len(lLblXInSubPl_F6)/(2*(len(lLblXInSubPl_F6) + 1)))
+dTxtSubPl_F6 = {}
 
 # === Create input and plot dictionaries ======================================
 # --- create input dictionary -------------------------------------------------
@@ -277,7 +318,8 @@ dInp = {# === Constants
         'plotF2': plotF2,
         'plotF3': plotF3,
         'plotF4': plotF4,
-        'plotF5': plotF5}
+        'plotF5': plotF5,
+        'plotF6': plotF6}
 
 # --- create plot dictionary of general input data ----------------------------
 dPltG = {'sCol0Dfr': sCol0PlotRow,
@@ -367,6 +409,7 @@ dPlt5 = {'dPFDat': {sK: os.path.join(pPltDat, dSFPltDat_F5[sK] + S_DOT + S_CSV)
                     for sK in dSFPltDat_F5},
          'pFPlt': os.path.join(pPltFig, sPlt_F5 + S_DOT + S_PDF),
          'tFigSz': tFigSz_F5,
+         'tFigMarg': tFigMarg_F5,
          'layoutTp': layoutTp_F5,
          'lblX': lblX_F5,
          'lblY': lblY_F5,
@@ -394,28 +437,76 @@ dPlt5 = {'dPFDat': {sK: os.path.join(pPltDat, dSFPltDat_F5[sK] + S_DOT + S_CSV)
                     'dTxt': dTxtSubPl_F5}}
 dPlt5 = dPltG | dPlt5
 
+# --- create plot dictionary of data for plot 6 -------------------------------
+dPlt6 = {'pFDat': os.path.join(pPltDat, sFPltDat_F6 + S_DOT + S_CSV),
+         'pFPlt': os.path.join(pPltFig, sPlt_F6 + S_DOT + S_PDF),
+         'tFigSz': tFigSz_F6,
+         'layoutTp': layoutTp_F6,
+         'lblX': lblX_F6,
+         'lblY': lblY_F6,
+         'lnWdAxY': lnWdAxY_F6,
+         'lnStyAxY': lnStyAxY_F6,
+         'lnClrAxY': lnClrAxY_F6,
+         'sSupTtl': sSupTtl_F6,
+         'nRowSubPl': nRowSubPl_F6,
+         'nColSubPl': nColSubPl_F6,
+         'dSubPl': {'lLLblX': lLLblXSubPl_F6,
+                    'lLLblY': lLLblYSubPl_F6,
+                    'lLClr': lLClrSubPl_F6,
+                    'lXTck': lXTckSubPl_F6,
+                    'lYTck': lYTckSubPl_F6,
+                    'tXLim': tXLimSubPl_F6,
+                    'tYLim': tYLimSubPl_F6,
+                    'dTxt': dTxtSubPl_F6}}
+dPlt6 = dPltG | dPlt6
+
 # === Dataframe manipulation functions ========================================
 # --- General dataframe manipulation functions --------------------------------
-def reduceDfr(dPlt, pdDfr):
-    pdDfrRed = pdDfr[pdDfr[dPlt['sCol0Dfr']] == 1]
-    lDat = [s for s in pdDfrRed.columns if s not in dPlt['lSColDfrNoDat']]
-    return pdDfrRed.loc[:, lDat].reset_index(drop=True)
+def reduceDfr(pdDfr, sCSel=None, lSNoDat=None):
+    if sCSel is not None:
+        pdDfr = pdDfr[pdDfr[sCSel] == 1]
+    if lSNoDat is None:
+        return pdDfr
+    else:
+        lDat = [s for s in pdDfr.columns if s not in lSNoDat]
+        return pdDfr.loc[:, lDat].reset_index(drop=True)
 
 # --- Figures 2, 3 and 4 dataframe manipulation -------------------------------
 def procDataForFig234(dInp, dPlt):
     dfrF = pd.read_csv(dPlt['pFDat'], sep=dInp['sSemicol'])
-    return reduceDfr(dPlt, pdDfr=dfrF)
+    return reduceDfr(pdDfr=dfrF, sCSel=dPlt['sCol0Dfr'],
+                     lSNoDat=dPlt['lSColDfrNoDat'])
 
 # --- Figure 5 dataframe manipulation -----------------------------------------
 def procDataForFig5(dInp, dPlt):
     dDfr = {sK: pd.read_csv(sPF, sep=dInp['sSemicol']) for sK, sPF in
             dPlt['dPFDat'].items()}
     for sK, dfrF in dDfr.items():
-        dDfr[sK] = reduceDfr(dPlt, pdDfr=dfrF)
+        dDfr[sK] = reduceDfr(pdDfr=dfrF, sCSel=dPlt['sCol0Dfr'],
+                             lSNoDat=dPlt['lSColDfrNoDat'])
     return dDfr
+
+# --- Figure 6 dataframe manipulation -----------------------------------------
+def procDataForFig6(dInp, dPlt):
+    return reduceDfr(pdDfr=pd.read_csv(dPlt['pFDat'], sep=dInp['sSemicol']))
 
 # === Plotting functions ======================================================
 # --- Plotting helper functions -----------------------------------------------
+def setFigMargins(cFig, tMargins):
+    # set figure margins from edges as (left, right, top, bottom) in inches
+    assert len(tMargins) == 4
+    leftSp, rightSp, topSp, bottomSp = tMargins
+    cWd, cHt = cFig.get_size_inches()
+    #convert to figure coordinates:
+    leftSp, rightSp = leftSp/cWd, 1 - rightSp/cWd
+    bottomSp, topSp = bottomSp/cHt, 1 - topSp/cHt
+    #get the layout engine and convert to its desired format
+    cLOEng = cFig.get_layout_engine()
+    #set and recompute the layout
+    cRectSp = (leftSp, bottomSp, rightSp - leftSp, topSp - bottomSp)
+    cLOEng.set(rect=cRectSp)
+    cLOEng.execute(cFig)
+
 def procAxBar(dSub, pdDfr, sglAx, k):
     serHeight = pdDfr.loc[k, :][pdDfr.loc[k, :].notna()]
     assert len(dSub['lLPos'][k]) == serHeight.shape[0]
@@ -429,7 +520,7 @@ def procAxBar(dSub, pdDfr, sglAx, k):
     sglAx.set_yticks(dSub['lLYTck'][k], labels=lSYTck)
     sglAx.set_xlabel(xlabel=dSub['lXLbl'][k], loc='center')
 
-def procAxLines(dSub, pdDfr, sglAx, k):
+def procAxLines(dPlt, dSub, pdDfr, sglAx, k):
     serX = pdDfr.loc[0, :][pdDfr.loc[0, :].notna()]
     for l in range(pdDfr.shape[0] - 1):
         serY = pdDfr.loc[l + 1, :][pdDfr.loc[l + 1, :].notna()]
@@ -447,21 +538,35 @@ def procAxLines(dSub, pdDfr, sglAx, k):
     sglAx.set_xticks(dSub['lLXTck'][k], labels=lSXTck)
     lSYTck = [str(round(x*100)) + dInp['sPerc'] for x in dSub['lLYTck'][k]]
     sglAx.set_yticks(dSub['lLYTck'][k], labels=lSYTck)
+    if k >= dPlt['nColSubPl']*(dPlt['nRowSubPl'] - 1):
+        sglAx.set_xlabel(xlabel='Classification threshold', loc='center')
 
-def addTxtToAx(dTxt, sglAx):
+def procAxHeatmap(dSub, pdDfr, sglAx):
+    serX = pdDfr.iloc[0, 1:][pdDfr.iloc[0, 1:].notna()].convert_dtypes()
+    serY = pd.Series(pdDfr.iloc[1:, 0], name=pdDfr.columns[0], dtype=float)
+    arrDat = pdDfr.iloc[1:, 1:].to_numpy()
+    im = sglAx.imshow(arrDat)
+
+def addTxtToAx(dTxt, sglAx, k=0):
     for cD in dTxt.values():
-        sglAx.text(x=cD['xPos'], y=cD['yPos'], s=cD['sTxt'],
+        assert (('sTxt' in cD) or (('lSTxt' in cD) and k < len(cD['lSTxt'])))
+        sTxt = (cD['sTxt'] if 'sTxt' in cD else cD['lSTxt'][k])
+        sglAx.text(x=cD['xPos'], y=cD['yPos'], s=sTxt,
                    transform=sglAx.transAxes, fontsize=cD['szFnt'],
                    horizontalalignment=cD['hAln'],
                    verticalalignment=cD['vAln'], bbox=cD['bBox'])
 
 def doBarSubplot(dSub, dTxt, pdDfr, cAx, k, m, n):
     procAxBar(dSub, pdDfr, sglAx=cAx[m, n], k=k)
-    addTxtToAx(dTxt, sglAx=cAx[m, n])
+    addTxtToAx(dTxt, sglAx=cAx[m, n], k=k)
 
-def doLinesSubplot(dSub, dTxt, pdDfr, cAx, k, m, n):
-    procAxLines(dSub, pdDfr, sglAx=cAx[m, n], k=k)
-    addTxtToAx(dTxt, sglAx=cAx[m, n])
+def doLinesSubplot(dPlt, dSub, dTxt, pdDfr, cAx, k, m, n):
+    procAxLines(dPlt, dSub, pdDfr, sglAx=cAx[m, n], k=k)
+    addTxtToAx(dTxt, sglAx=cAx[m, n], k=k)
+
+def doHeatmapPlot(dSub, dTxt, pdDfr, cAx):
+    procAxHeatmap(dSub, pdDfr, sglAx=cAx)
+    addTxtToAx(dTxt, sglAx=cAx)
 
 def pltYHalfAxHist(dPlt, cSer=None, yBase=0., yMax=1.):
     if cSer is not None:
@@ -513,22 +618,34 @@ def plotFig234(dInp, dPlt, pdDfr, sTtl=None, savePlt=True):
                      saveFig=savePlt)
     plt.close()
 
-## --- Plotting xy-plots (figure 5) -------------------------------------------
+# --- Plotting xy-plots (figure 5) --------------------------------------------
 def plotFig5(dInp, dPlt, dDfr, sTtl=None, savePlt=True):
     assert len(dDfr) == dPlt['nRowSubPl']*dPlt['nColSubPl']
     cFig, cAx = plt.subplots(nrows=dPlt['nRowSubPl'], ncols=dPlt['nColSubPl'],
                              figsize=dPlt['tFigSz'], layout=dPlt['layoutTp'])
+    setFigMargins(cFig, tMargins=dPlt['tFigMarg'])
     dSub, dTxt, k, m, n = dPlt['dSubPl'], dPlt['dSubPl']['dTxt'], 0, 0, 0
     for pdDfr in dDfr.values():
-        doLinesSubplot(dSub, dTxt, pdDfr, cAx=cAx, k=k, m=m, n=n)
+        doLinesSubplot(dPlt, dSub, dTxt, pdDfr, cAx=cAx, k=k, m=m, n=n)
         k += 1
         if n < dPlt['nColSubPl'] - 1:
             n += 1
         else:
             n = 0
             m += 1
-    cFig.legend(bbox_to_anchor=(0., 0., 1., .05), loc='lower left',
-                ncols=3, mode='expand', borderaxespad=0.)
+    cFig.legend(bbox_to_anchor=(0.085, 0.01, 0.85, .1), loc='lower center',
+                ncols=3, mode='expand', borderaxespad=0.5)
+    decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=False,
+                     saveFig=savePlt)
+    plt.close()
+
+# --- Plotting a heatmap (figure 6) -------------------------------------------
+def plotFig6(dInp, dPlt, pdDfr, sTtl=None, savePlt=True):
+    cFig, cAx = plt.subplots(nrows=dPlt['nRowSubPl'], ncols=dPlt['nColSubPl'],
+                             figsize=dPlt['tFigSz'], layout=dPlt['layoutTp'])
+    dSub, dTxt = dPlt['dSubPl'], dPlt['dSubPl']['dTxt']
+    doHeatmapPlot(dSub, dTxt, pdDfr, cAx)
+    plt.show()
     decorateSavePlot(dPlt, sPF='pFPlt', sTtl=sTtl, addLeg=False,
                      saveFig=savePlt)
     plt.close()
@@ -546,5 +663,8 @@ if dInp['plotF4']:
 if dInp['plotF5']:
     plotFig5(dInp, dPlt=dPlt5, dDfr=procDataForFig5(dInp, dPlt=dPlt5))
     print('Plotted figure 5.')
+if dInp['plotF6']:
+    plotFig6(dInp, dPlt=dPlt6, pdDfr=procDataForFig6(dInp, dPlt=dPlt6))
+    print('Plotted figure 6.')
 
 # #############################################################################
