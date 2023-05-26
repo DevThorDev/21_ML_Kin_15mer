@@ -24,10 +24,10 @@ pPltDat = os.path.join('..', 'PlotInputData')
 pPltFig = os.path.join('..', 'PlottedFigures')
 
 # --- flow control ------------------------------------------------------------
-plotF2 = False
-plotF3 = False
-plotF4 = False
-plotF5 = False
+plotF2 = True
+plotF3 = True
+plotF4 = True
+plotF5 = True
 plotF6 = True
 
 # --- predefined colours ------------------------------------------------------
