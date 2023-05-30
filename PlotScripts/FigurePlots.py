@@ -84,7 +84,16 @@ lXLblPadSubPl_F2 = [5]*(nRowSubPl_F2*nColSubPl_F2)
 lYLblPadSubPl_F2 = None
 lXLblLocSubPl_F2 = ['center']*(nRowSubPl_F2*nColSubPl_F2)
 lYLblLocSubPl_F2 = None
-dTxtSubPl_F2 = {}
+fScl = (max(lPosInSubPl_F2) + min(lPosInSubPl_F2))
+x = (1 + 0.5*(lPosInSubPl_F2[1] - lPosInSubPl_F2[0]))/fScl
+dTxtSubPl_F2 = {'ClfA': {'xPos': x, 'yPos': 0.05, 'sTxt': 'CtNB',
+                         'szFnt': 10, 'hAln': 'center', 'vAln': 'bottom',
+                         'bBox': {'boxstyle': 'round', 'fc': 'w', 'ec': 'k',
+                                  'alpha': 0.85}},
+                'ClfB': {'xPos': 1 - x, 'yPos': 0.05, 'sTxt': 'MLP',
+                         'szFnt': 10, 'hAln': 'center', 'vAln': 'bottom',
+                         'bBox': {'boxstyle': 'round', 'fc': 'w', 'ec': 'k',
+                                  'alpha': 0.85}}}
 
 # === Plot-specific input for figure 3 (classifiers) ==========================
 sFPltDat_F3 = 'Data_Figure3'
